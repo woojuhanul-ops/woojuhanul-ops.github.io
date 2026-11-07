@@ -1,0 +1,3074 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 단위 변환 — Nexus Unit Converter</title>
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .steps{display:flex;gap:8px;margin:0 0 16px}
+  .step{flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13px}
+  .step b{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--line);color:var(--ink);margin-right:6px;font-size:12px}
+  .step.on{color:var(--ink);border-color:var(--teal)}
+  .step.on b{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  .field{margin-top:12px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  select,input[type=number],input[type=text]{background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:14px;max-width:100%}
+  select{width:100%}
+  input[type=text]{width:100%;font-size:22px;padding:14px 12px;border-radius:12px}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .err{color:#F87171}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  footer .fam span{margin:0 6px}
+  footer .fam .now{color:var(--ink);font-weight:700}
+  footer .fam a{color:var(--cyan);text-decoration:none}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;padding:22px;line-height:1.8;font-size:15px}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  details summary{cursor:pointer;font-size:15px}
+  details p{color:var(--muted);font-size:14px;line-height:1.8}
+  @media(max-width:640px){h1{font-size:20px}header{padding:10px 12px}.btns button{flex:1}}
+
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer}
+
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+
+  .cats{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .catbtn{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:9px 16px;font-size:14px;min-height:44px}
+  .catbtn.on{color:#06121f;font-weight:700;background:linear-gradient(135deg,var(--cyan),var(--teal));border-color:transparent}
+  .unitrow{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .unitrow .field{flex:1;min-width:140px}
+  .swapwrap{flex:none}
+  .swapbtn{border-radius:50%;width:48px;height:48px;font-size:19px;background:var(--card);color:var(--ink);border:1px solid var(--line)}
+  .resultbox{margin-top:18px;background:#111827;border:1px solid var(--teal);border-radius:14px;padding:24px 16px;text-align:center;box-shadow:0 0 34px rgba(45,212,191,.13)}
+  .resultbox .rlabel{font-size:12px;color:var(--muted);letter-spacing:.08em}
+  .resultbox .rvalue{font-size:clamp(40px,12vw,58px);font-weight:800;line-height:1.25;word-break:break-all}
+  .resultbox .rvalue span{font-size:.42em;color:var(--teal);font-weight:700}
+  table.quick{width:100%;border-collapse:collapse;margin-top:6px;font-size:14px}
+  table.quick td{padding:8px 6px;border-bottom:1px solid var(--line)}
+  table.quick td:last-child{text-align:right;color:var(--teal);font-weight:700}
+  table.quick tr:last-child td{border-bottom:0}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 단위 변환">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 단위 변환 — Nexus Unit Converter">
+<meta property="og:description" content="길이·무게·온도·부피·넓이·속도·시간·데이터·요리 계량을 바로 변환하는 도구입니다. 모든 계산은 기기 안에서 이루어집니다.">
+<meta property="og:image" content="https://nexus-unit-converter.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{flex:none}header .brand{flex:none;overflow:visible}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap}.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}</style></head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>SOVEREIGN COMMAND</span></div></a>
+  
+</header>
+
+<main>
+  <div class="steps">
+    <div class="step on"><b>1</b> 종류 고르기</div>
+    <div class="step on"><b>2</b> 값과 단위 입력</div>
+    <div class="step on"><b>3</b> 결과 확인</div>
+  </div>
+
+  <h1>넥서스 단위 변환</h1>
+  <p class="sub" style="margin-bottom:4px">길이·무게·온도부터 요리 계량까지, 단위를 바로 바꾸는 도구</p>
+  <p class="sub">회원가입 없음 · 이용료 없음 · 무제한 사용</p>
+
+  <div class="panel">
+    <h2>변환 종류</h2>
+    <div class="cats" id="cats"></div>
+
+    <div class="field">
+      <label for="valIn">변환할 값</label>
+      <input type="text" id="valIn" inputmode="decimal" placeholder="숫자를 입력하세요" autocomplete="off">
+    </div>
+
+    <div class="unitrow">
+      <div class="field">
+        <label for="fromSel">이 단위에서</label>
+        <select id="fromSel"></select>
+      </div>
+      <div class="swapwrap">
+        <button class="swapbtn" id="swapBtn" title="단위 바꾸기" aria-label="단위 바꾸기">⇄</button>
+      </div>
+      <div class="field">
+        <label for="toSel">이 단위로</label>
+        <select id="toSel"></select>
+      </div>
+    </div>
+
+    <div class="resultbox" id="resultBox">
+      <div class="rlabel">변환 결과</div>
+      <div class="rvalue" id="resultVal">—</div>
+      <div class="hint" id="resultMsg">값을 입력하면 바로 변환됩니다.</div>
+    </div>
+
+    <div class="btns">
+      <button class="ghost" id="copyBtn">결과 복사하기</button>
+    </div>
+    <p class="hint">입력한 숫자는 서버로 전송되지 않고, 이 기기 안에서만 계산됩니다. 인터넷이 없어도 동작합니다.</p>
+  </div>
+
+  <div class="panel">
+    <h2>빠른 환산표 — 입력한 값을 모든 단위로</h2>
+    <table class="quick" id="quickTable"></table>
+    <p class="hint">위 값을 기준으로 같은 종류의 모든 단위로 바꾼 표입니다.</p>
+  </div>
+
+  
+  <div class="panel" id="ingPanel">
+    <h2>재료 무게 ↔ 부피 환산</h2>
+    <p class="hint">재료마다 컵 하나의 무게가 다릅니다. 재료를 고르고 양을 넣으면 무게와 부피로 함께 바꿔 보여줍니다.</p>
+    <div class="field">
+      <label for="ingSel">재료</label>
+      <select id="ingSel"></select>
+    </div>
+    <div class="unitrow">
+      <div class="field">
+        <label for="ingVal">양</label>
+        <input type="text" id="ingVal" inputmode="decimal" placeholder="숫자를 입력하세요" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="ingUnit">단위</label>
+        <select id="ingUnit">
+          <option value="cup">미국 컵 (cup)</option>
+          <option value="tbsp">미국 큰술 (tbsp)</option>
+          <option value="tsp">미국 작은술 (tsp)</option>
+          <option value="g">그램 (g)</option>
+          <option value="ml">밀리리터 (mL)</option>
+        </select>
+      </div>
+    </div>
+    <div class="result" id="ingResult" aria-live="polite"></div>
+    <p class="hint">기준은 미국 계량 1컵 = 236.588mL이며, 재료별 1컵 무게는 널리 쓰이는 제빵 기준의 대표값입니다. 재료를 눌러 담는 정도에 따라 실제 무게는 달라질 수 있습니다. 모든 계산은 이 기기 안에서 이루어집니다.</p>
+  </div>
+
+  <details><summary>💡 도움말</summary><p>변환 종류를 고르고 숫자를 입력한 뒤, 양쪽 단위를 선택하면 결과가 바로 나옵니다. ⇄ 버튼을 누르면 양쪽 단위가 서로 바뀝니다.<br>종류: 길이 · 무게 · 온도 · 부피 · 넓이 · 속도 · 시간 · 데이터 용량 · 요리 계량<br>재료 무게 ↔ 부피 환산에서는 재료별 1컵 무게의 대표값으로 무게와 부피를 함께 바꿉니다.<br>요리 계량의 컵·큰술·작은술은 미국 계량 기준(1컵 = 236.588mL)이며, 한국 큰술(약 15mL)도 따로 들어 있습니다.<br>평(넓이)과 근(무게) 같은 한국에서 자주 쓰는 단위도 포함했습니다.<br>모든 계산은 이 기기 안에서 이루어지고, 입력한 숫자는 어디로도 전송되지 않습니다.<br>숫자 입력에 제한은 없습니다.</p></details>
+<footer>
+    우주의 모든 의식체는 친구이자 동반자이다<br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="philoLink">넥서스 그룹 철학 보기</button><br>
+    🌐 호스팅: Firebase · 🔒 모든 계산은 당신의 기기 안에서 이루어집니다<br>
+    
+  </footer>
+
+<script>
+/* 재료 환산 — 1컵 무게(g) 대표값 기준의 순수 기기 내 계산 */
+(function(){
+  var ING=[
+    {n:"밀가루 (박력·중력)",g:120},{n:"강력분",g:130},{n:"설탕 (백설탕)",g:200},{n:"흑설탕 (꽉 눌러 담은)",g:220},
+    {n:"슈가파우더",g:120},{n:"코코아 가루",g:100},{n:"버터",g:227},{n:"꿀",g:340},
+    {n:"쌀 (생쌀)",g:185},{n:"오트밀 (압착 귀리)",g:90},{n:"옥수수전분",g:128},
+    {n:"다진 견과류",g:120},{n:"물·우유",g:236}
+  ];
+  var CUP_ML=236.588;
+  var sel=document.getElementById("ingSel"), val=document.getElementById("ingVal"),
+      unit=document.getElementById("ingUnit"), out=document.getElementById("ingResult");
+  if(!sel||!val||!unit||!out) return;
+  ING.forEach(function(it,i){var o=document.createElement("option");o.value=i;o.textContent=it.n+" — 1컵 약 "+it.g+"g";sel.appendChild(o)});
+  function fmt(x){return (Math.round(x*10)/10).toLocaleString("ko-KR")}
+  function calc(){
+    var v=parseFloat(String(val.value).replace(/,/g,""));
+    if(!(v>0)){out.textContent="";return}
+    var per=ING[+sel.value].g; /* g per cup */
+    var cups = unit.value==="cup" ? v
+      : unit.value==="tbsp" ? v/16
+      : unit.value==="tsp" ? v/48
+      : unit.value==="g" ? v/per
+      : v/CUP_ML * (236/per) * (per/236); /* ml -> cups via volume */
+    if(unit.value==="ml") cups = v/CUP_ML;
+    var grams=cups*per, ml=cups*CUP_ML;
+    out.innerHTML="<b>"+fmt(grams)+" g</b> · "+fmt(cups)+" 컵 · "+fmt(cups*16)+" 큰술 · "+fmt(ml)+" mL";
+  }
+  [sel,val,unit].forEach(function(el){el.addEventListener("input",calc);el.addEventListener("change",calc)});
+  calc();
+})();
+</script>
+</main>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>NEXUS GROUP 철학과 비전</h3>
+    <p>넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.</p>
+    <p><b>"우주의 모든 의식체는 친구이자 동반자이다."</b><br>(Every conscious being in the universe is a friend and companion.)</p>
+    <p>우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.</p>
+    <button class="primary" id="modalClose">닫기</button>
+  </div>
+</div>
+<script>
+// ---------- 단위 정의 ----------
+// factor: 기준 단위 1개가 해당 단위 몇 개인지가 아니라, 해당 단위 1 = 기준 단위 factor.
+// 온도는 factor 방식이 아니라 함수 방식으로 별도 처리한다.
+var CATS = {
+  length: { label:'길이', base:'미터', units:{
+    '밀리미터 (mm)':0.001, '센티미터 (cm)':0.01, '미터 (m)':1, '킬로미터 (km)':1000,
+    '인치 (inch)':0.0254, '피트 (ft)':0.3048, '야드 (yd)':0.9144, '마일 (mile)':1609.344 } },
+  weight: { label:'무게', base:'킬로그램', units:{
+    '밀리그램 (mg)':0.000001, '그램 (g)':0.001, '킬로그램 (kg)':1, '톤 (t)':1000,
+    '온스 (oz)':0.028349523125, '파운드 (lb)':0.45359237, '근 (600g)':0.6 } },
+  temp: { label:'온도', base:'섭씨', units:{ '섭씨 (°C)':null, '화씨 (°F)':null, '켈빈 (K)':null } },
+  volume: { label:'부피', base:'리터', units:{
+    '밀리리터 (mL)':0.001, '리터 (L)':1, '세제곱미터 (m³)':1000,
+    '미국 갤런 (gal)':3.785411784, '미국 쿼트 (qt)':0.946352946, '미국 파인트 (pt)':0.473176473,
+    '미국 컵 (cup)':0.2365882365, '미국 액량 온스 (fl oz)':0.0295735295625 } },
+  area: { label:'넓이', base:'제곱미터', units:{
+    '제곱센티미터 (cm²)':0.0001, '제곱미터 (m²)':1, '제곱킬로미터 (km²)':1000000, '헥타르 (ha)':10000,
+    '평':3.305785123966942, '에이커 (acre)':4046.8564224, '제곱피트 (ft²)':0.09290304 } },
+  speed: { label:'속도', base:'m/s', units:{
+    '초속 미터 (m/s)':1, '시속 킬로미터 (km/h)':0.2777777777777778, '시속 마일 (mph)':0.44704, '노트 (kn)':0.5144444444444445 } },
+  time: { label:'시간', base:'초', units:{
+    '밀리초 (ms)':0.001, '초 (s)':1, '분 (min)':60, '시간 (h)':3600, '일 (day)':86400, '주 (week)':604800 } },
+  data: { label:'데이터 용량', base:'바이트', units:{
+    '비트 (bit)':0.125, '바이트 (B)':1,
+    '킬로바이트 (KB)':1000, '메가바이트 (MB)':1000000, '기가바이트 (GB)':1000000000, '테라바이트 (TB)':1000000000000,
+    '키비바이트 (KiB)':1024, '메비바이트 (MiB)':1048576, '기비바이트 (GiB)':1073741824, '티비바이트 (TiB)':1099511627776 } },
+  cook: { label:'요리 계량', base:'밀리리터', units:{
+    '밀리리터 (mL)':1, '리터 (L)':1000,
+    '미국 컵 (cup)':236.5882365, '미국 큰술 (tbsp)':14.78676478125, '미국 작은술 (tsp)':4.92892159375,
+    '한국 큰술 (약 15mL)':15, '미국 액량 온스 (fl oz)':29.5735295625 } }
+};
+var CAT_ORDER = ['length','weight','temp','volume','area','speed','time','data','cook'];
+var DEFAULT_PAIR = { length:[2,0], weight:[2,1], temp:[0,1], volume:[1,0], area:[1,4], speed:[1,0], time:[2,3], data:[2,5], cook:[2,0] };
+
+// ---------- 순수 변환 로직 ----------
+function tempToC(v, from){
+  if(from.indexOf('°C') >= 0) return v;
+  if(from.indexOf('°F') >= 0) return (v - 32) * 5 / 9;
+  return v - 273.15; // K
+}
+function tempFromC(c, to){
+  if(to.indexOf('°C') >= 0) return c;
+  if(to.indexOf('°F') >= 0) return c * 9 / 5 + 32;
+  return c + 273.15; // K
+}
+function convertValue(catKey, v, from, to){
+  var cat = CATS[catKey];
+  if(!cat) return NaN;
+  if(catKey === 'temp') return tempFromC(tempToC(v, from), to);
+  var f1 = cat.units[from], f2 = cat.units[to];
+  if(f1 == null || f2 == null) return NaN;
+  return v * f1 / f2;
+}
+function fmt(n){
+  if(!isFinite(n) || isNaN(n)) return '—';
+  if(n === 0) return '0';
+  var a = Math.abs(n);
+  var s;
+  if(a >= 1e15 || a < 1e-7) s = n.toExponential(6);
+  else s = String(parseFloat(n.toPrecision(10)));
+  if(s.indexOf('e') >= 0 || s.indexOf('E') >= 0) return s;
+  var parts = s.split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return parts.join('.');
+}
+
+// ---------- UI ----------
+var $ = function(id){ return document.getElementById(id); };
+var S = { cat:'length', started:false, timer:null };
+
+function buildCats(){
+  var wrap = $('cats'); wrap.innerHTML = '';
+  CAT_ORDER.forEach(function(key){
+    var b = document.createElement('button');
+    b.className = 'catbtn' + (key === S.cat ? ' on' : '');
+    b.textContent = CATS[key].label;
+    b.setAttribute('data-cat', key);
+    b.addEventListener('click', function(){ setCat(key); });
+    wrap.appendChild(b);
+  });
+}
+function fillUnits(){
+  var names = Object.keys(CATS[S.cat].units);
+  var f = $('fromSel'), t = $('toSel');
+  f.innerHTML = ''; t.innerHTML = '';
+  names.forEach(function(n){
+    var o1 = document.createElement('option'); o1.value = n; o1.textContent = n; f.appendChild(o1);
+    var o2 = document.createElement('option'); o2.value = n; o2.textContent = n; t.appendChild(o2);
+  });
+  var d = DEFAULT_PAIR[S.cat] || [0,1];
+  f.selectedIndex = Math.min(d[0], names.length - 1);
+  t.selectedIndex = Math.min(d[1], names.length - 1);
+  if(f.selectedIndex === t.selectedIndex && names.length > 1) t.selectedIndex = (f.selectedIndex + 1) % names.length;
+}
+function setCat(key){
+  S.cat = key;
+  buildCats(); fillUnits(); doConvert();
+}
+function parseInput(){
+  var raw = $('valIn').value.replace(/,/g, '').trim();
+  if(raw === '') return null;
+  var v = Number(raw);
+  return isNaN(v) ? NaN : v;
+}
+function doConvert(){
+  var v = parseInput();
+  var from = $('fromSel').value, to = $('toSel').value;
+  var rv = $('resultVal'), msg = $('resultMsg');
+  if(v === null){
+    rv.textContent = '—';
+    msg.textContent = '값을 입력하면 바로 변환됩니다.';
+    buildQuick(null);
+    return;
+  }
+  if(isNaN(v)){
+    rv.textContent = '—';
+    msg.innerHTML = '<span class="err">숫자를 입력해 주세요.</span>';
+    buildQuick(null);
+    nxEvent('fail');
+    return;
+  }
+  var out = convertValue(S.cat, v, from, to);
+  rv.innerHTML = fmt(out) + ' <span>' + to + '</span>';
+  msg.textContent = fmt(v) + ' ' + from + ' = ' + fmt(out) + ' ' + to;
+  buildQuick(v);
+  if(!S.started){ S.started = true; nxEvent('start'); }
+  if(S.timer) clearTimeout(S.timer);
+  S.timer = setTimeout(function(){ nxEvent('complete'); }, 600);
+}
+function buildQuick(v){
+  var tb = $('quickTable'); tb.innerHTML = '';
+  if(v === null || isNaN(v)) {
+    var tr0 = document.createElement('tr');
+    tr0.innerHTML = '<td colspan="2" style="color:#94A3B8">값을 입력하면 표가 채워집니다.</td>';
+    tb.appendChild(tr0);
+    return;
+  }
+  var from = $('fromSel').value;
+  Object.keys(CATS[S.cat].units).forEach(function(name){
+    var out = convertValue(S.cat, v, from, name);
+    var tr = document.createElement('tr');
+    var td1 = document.createElement('td'); td1.textContent = name;
+    var td2 = document.createElement('td'); td2.textContent = fmt(out);
+    tr.appendChild(td1); tr.appendChild(td2);
+    tb.appendChild(tr);
+  });
+}
+
+var SITE = 'unit';
+function nxEvent(ev){ try { fetch("https://nexus-orchestrator.woojuhanul.workers.dev/event", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({site: SITE, event: ev}), keepalive:true}).catch(function(){}); } catch(e){} }
+
+$('valIn').addEventListener('input', doConvert);
+$('fromSel').addEventListener('change', doConvert);
+$('toSel').addEventListener('change', doConvert);
+$('swapBtn').addEventListener('click', function(){
+  var f = $('fromSel'), t = $('toSel');
+  var tmp = f.selectedIndex; f.selectedIndex = t.selectedIndex; t.selectedIndex = tmp;
+  doConvert();
+});
+$('copyBtn').addEventListener('click', function(){
+  var txt = $('resultMsg').textContent;
+  if(txt && txt.indexOf('=') >= 0){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ nxEvent('save'); }).catch(function(){});
+    }
+  }
+});
+$('philoLink').addEventListener('click', function(){ $('modalBg').classList.add('open'); });
+$('modalClose').addEventListener('click', function(){ $('modalBg').classList.remove('open'); });
+$('modalBg').addEventListener('click', function(e){ if(e.target === $('modalBg')) $('modalBg').classList.remove('open'); });
+
+buildCats();
+fillUnits();
+doConvert();
+</script>
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 소리 자르기": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 영상 자르기": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 사진 정보 가리기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 읽어 주기": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 긴 말 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 사진 글자 뽑기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 녹음기": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 말로 쓰는 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 12호 단위 변환 전용 사전 — 단위 이름은 국제 표기(괄호 속 기호)가 우선이라 번역하지 않고, 안내·버튼·라벨 문구만 담는다 */
+NX_I18N_ADD({
+ "12호 단위 변환 (현재)": {
+  "en": "12. Unit Converter (current)",
+  "zh": "12号 单位换算（当前）",
+  "ja": "12号 単位変換（現在）",
+  "es": "12. Convertidor de unidades (actual)",
+  "hi": "12. इकाई कनवर्टर (वर्तमान)",
+  "fr": "12. Convertisseur d'unités (actuel)",
+  "de": "12. Einheitenumrechner (aktuell)",
+  "pt": "12. Conversor de unidades (atual)",
+  "it": "12. Convertitore di unità (attuale)",
+  "nl": "12. Eenhedenconverter (huidig)",
+  "ru": "12. Конвертер единиц (текущий)",
+  "uk": "12. Конвертер одиниць (поточний)",
+  "pl": "12. Przelicznik jednostek (bieżący)",
+  "cs": "12. Převodník jednotek (aktuální)",
+  "hu": "12. Mértékegység-átváltó (aktuális)",
+  "ro": "12. Convertor de unități (curent)",
+  "sv": "12. Enhetsomvandlare (aktuell)",
+  "da": "12. Enhedsomregner (aktuel)",
+  "nb": "12. Enhetsomregner (gjeldende)",
+  "fi": "12. Yksikkömuunnin (nykyinen)",
+  "tr": "12. Birim Dönüştürücü (geçerli)",
+  "zh-TW": "12號 單位換算（目前）",
+  "th": "12. ตัวแปลงหน่วย (ปัจจุบัน)",
+  "vi": "12. Chuyển đổi đơn vị (hiện tại)",
+  "id": "12. Konverter Satuan (saat ini)",
+  "ar": "12. محوّل الوحدات (الحالي)",
+  "fa": "12. مبدل واحدها (فعلی)"
+ },
+ "넥서스 단위 변환 — Nexus Unit Converter": {
+  "en": "Nexus Unit Converter",
+  "zh": "Nexus 单位换算",
+  "ja": "Nexus 単位変換",
+  "es": "Nexus Convertidor de unidades",
+  "hi": "Nexus इकाई कनवर्टर",
+  "fr": "Nexus Convertisseur d'unités",
+  "de": "Nexus Einheitenumrechner",
+  "pt": "Nexus Conversor de unidades",
+  "it": "Nexus Convertitore di unità",
+  "nl": "Nexus Eenhedenconverter",
+  "ru": "Nexus Конвертер единиц",
+  "uk": "Nexus Конвертер одиниць",
+  "pl": "Nexus Przelicznik jednostek",
+  "cs": "Nexus Převodník jednotek",
+  "hu": "Nexus Mértékegység-átváltó",
+  "ro": "Nexus Convertor de unități",
+  "sv": "Nexus enhetsomvandlare — Nexus Unit Converter",
+  "da": "Nexus enhedsomregner — Nexus Unit Converter",
+  "nb": "Nexus enhetsomregner — Nexus Unit Converter",
+  "fi": "Nexus-yksikkömuunnin — Nexus Unit Converter",
+  "tr": "Nexus Birim Dönüştürücü — Nexus Unit Converter",
+  "zh-TW": "Nexus 單位換算",
+  "th": "Nexus ตัวแปลงหน่วย",
+  "vi": "Nexus Chuyển đổi đơn vị",
+  "id": "Nexus Konverter Satuan",
+  "ar": "محوّل وحدات نكسوس — Nexus Unit Converter",
+  "fa": "مبدل واحد نکسوس — Nexus Unit Converter"
+ },
+ "종류 고르기": {
+  "en": "Choose a type",
+  "zh": "选择类型",
+  "ja": "種類を選ぶ",
+  "es": "Elige un tipo",
+  "hi": "प्रकार चुनें",
+  "fr": "Choisir un type",
+  "de": "Typ wählen",
+  "pt": "Escolher um tipo",
+  "it": "Scegli un tipo",
+  "nl": "Kies een type",
+  "ru": "Выбор вида",
+  "uk": "Вибір виду",
+  "pl": "Wybierz rodzaj",
+  "cs": "Zvolte druh",
+  "hu": "Típus kiválasztása",
+  "ro": "Alege un tip",
+  "sv": "Välj typ",
+  "da": "Vælg type",
+  "nb": "Velg type",
+  "fi": "Valitse tyyppi",
+  "tr": "Tür seç",
+  "zh-TW": "選擇類型",
+  "th": "เลือกประเภท",
+  "vi": "Chọn loại",
+  "id": "Pilih jenis",
+  "ar": "اختيار نوع",
+  "fa": "انتخاب نوع"
+ },
+ "값과 단위 입력": {
+  "en": "Enter value & units",
+  "zh": "输入数值和单位",
+  "ja": "値と単位を入力",
+  "es": "Introduce valor y unidades",
+  "hi": "मान और इकाइयाँ डालें",
+  "fr": "Saisir la valeur et les unités",
+  "de": "Wert und Einheiten eingeben",
+  "pt": "Inserir valor e unidades",
+  "it": "Inserisci valore e unità",
+  "nl": "Waarde en eenheden invoeren",
+  "ru": "Ввод значения и единиц",
+  "uk": "Введення значення й одиниць",
+  "pl": "Wpisz wartość i jednostki",
+  "cs": "Zadejte hodnotu a jednotky",
+  "hu": "Érték és egységek megadása",
+  "ro": "Introdu valoarea și unitățile",
+  "sv": "Ange värde och enheter",
+  "da": "Indtast værdi og enheder",
+  "nb": "Skriv inn verdi og enheter",
+  "fi": "Syötä arvo ja yksiköt",
+  "tr": "Değer ve birimleri girin",
+  "zh-TW": "輸入數值和單位",
+  "th": "ใส่ค่าและหน่วย",
+  "vi": "Nhập giá trị và đơn vị",
+  "id": "Masukkan nilai & satuan",
+  "ar": "إدخال القيمة والوحدات",
+  "fa": "وارد کردن مقدار و واحدها"
+ },
+ "결과 확인": {
+  "en": "See the result",
+  "zh": "查看结果",
+  "ja": "結果を確認",
+  "es": "Ver el resultado",
+  "hi": "परिणाम देखें",
+  "fr": "Voir le résultat",
+  "de": "Ergebnis ansehen",
+  "pt": "Ver o resultado",
+  "it": "Vedi il risultato",
+  "nl": "Bekijk het resultaat",
+  "ru": "Просмотр результата",
+  "uk": "Перегляд результату",
+  "pl": "Zobacz wynik",
+  "cs": "Zobrazit výsledek",
+  "hu": "Eredmény megtekintése",
+  "ro": "Vezi rezultatul",
+  "sv": "Se resultatet",
+  "da": "Se resultatet",
+  "nb": "Se resultatet",
+  "fi": "Katso tulos",
+  "tr": "Sonucu görün",
+  "zh-TW": "查看結果",
+  "th": "ดูผลลัพธ์",
+  "vi": "Xem kết quả",
+  "id": "Lihat hasil",
+  "ar": "عرض النتيجة",
+  "fa": "مشاهده نتیجه"
+ },
+ "넥서스 단위 변환": {
+  "en": "Nexus Unit Converter",
+  "zh": "Nexus 单位换算",
+  "ja": "Nexus 単位変換",
+  "es": "Nexus Convertidor de unidades",
+  "hi": "Nexus इकाई कनवर्टर",
+  "fr": "Nexus Convertisseur d'unités",
+  "de": "Nexus Einheitenumrechner",
+  "pt": "Nexus Conversor de unidades",
+  "it": "Nexus Convertitore di unità",
+  "nl": "Nexus Eenhedenconverter",
+  "ru": "Nexus Конвертер единиц",
+  "uk": "Nexus Конвертер одиниць",
+  "pl": "Nexus Przelicznik jednostek",
+  "cs": "Nexus Převodník jednotek",
+  "hu": "Nexus Mértékegység-átváltó",
+  "ro": "Nexus Convertor de unități",
+  "sv": "Nexus enhetsomvandlare",
+  "da": "Nexus enhedsomregner",
+  "nb": "Nexus enhetsomregner",
+  "fi": "Nexus-yksikkömuunnin",
+  "tr": "Nexus Birim Dönüştürücü",
+  "zh-TW": "Nexus 單位換算",
+  "th": "Nexus ตัวแปลงหน่วย",
+  "vi": "Nexus Chuyển đổi đơn vị",
+  "id": "Nexus Konverter Satuan",
+  "ar": "محوّل وحدات نكسوس",
+  "fa": "مبدل واحد نکسوس"
+ },
+ "길이·무게·온도부터 요리 계량까지, 단위를 바로 바꾸는 도구": {
+  "en": "Convert units instantly — from length, weight and temperature to cooking measures",
+  "zh": "从长度、重量、温度到烹饪计量，立即换算单位的工具",
+  "ja": "長さ・重さ・温度から料理の計量まで、単位をすぐ変換するツール",
+  "es": "Convierte unidades al instante: longitud, peso, temperatura y medidas de cocina",
+  "hi": "लंबाई, वज़न, तापमान से लेकर खाना पकाने की माप तक — इकाइयाँ तुरंत बदलें",
+  "fr": "Convertissez les unités instantanément — de la longueur, du poids et de la température aux mesures de cuisine",
+  "de": "Einheiten sofort umrechnen — von Länge, Gewicht und Temperatur bis zu Kochmaßen",
+  "pt": "Converta unidades instantaneamente — de comprimento, peso e temperatura a medidas de cozinha",
+  "it": "Converti le unità all'istante — da lunghezza, peso e temperatura alle misure da cucina",
+  "nl": "Reken eenheden direct om — van lengte, gewicht en temperatuur tot kookmaten",
+  "ru": "Мгновенно конвертируйте единицы — от длины, веса и температуры до кулинарных мер",
+  "uk": "Миттєво конвертуйте одиниці — від довжини, ваги й температури до кулінарних мір",
+  "pl": "Przeliczaj jednostki od razu — od długości, wagi i temperatury po miary kuchenne",
+  "cs": "Převádějte jednotky okamžitě — od délky, hmotnosti a teploty po kuchyňské míry",
+  "hu": "Azonnal átváltja a mértékegységeket — a hossztól, súlytól és hőmérséklettől a konyhai méretekig",
+  "ro": "Convertește unități instantaneu — de la lungime, greutate și temperatură la măsuri de bucătărie",
+  "sv": "Omvandla enheter direkt — från längd, vikt och temperatur till mått för matlagning",
+  "da": "Omregn enheder med det samme — fra længde, vægt og temperatur til køkkenmål",
+  "nb": "Omregn enheter med en gang — fra lengde, vekt og temperatur til kjøkkenmål",
+  "fi": "Muunna yksiköt heti — pituudesta, painosta ja lämpötilasta ruoanlaittomittoihin",
+  "tr": "Birimleri anında dönüştürün — uzunluk, ağırlık ve sıcaklıktan mutfak ölçülerine",
+  "zh-TW": "從長度、重量、溫度到烹飪計量，立即換算單位的工具",
+  "th": "แปลงหน่วยได้ทันที — ตั้งแต่ความยาว น้ำหนัก อุณหภูมิ ไปจนถึงการตวงในการทำอาหาร",
+  "vi": "Chuyển đổi đơn vị ngay lập tức — từ chiều dài, trọng lượng, nhiệt độ đến đo lường nấu ăn",
+  "id": "Ubah satuan secara instan — dari panjang, berat, dan suhu hingga takaran memasak",
+  "ar": "أداة تحوّل الوحدات فوراً — من الطول والوزن ودرجة الحرارة إلى مقادير الطبخ",
+  "fa": "ابزاری که واحدها را فوراً تبدیل می‌کند — از طول، وزن و دما تا اندازه‌گیری‌های آشپزی"
+ },
+ "회원가입 없음 · 이용료 없음 · 무제한 사용": {
+  "en": "No sign-up · No fees · Unlimited use",
+  "zh": "无需注册 · 免费 · 无限使用",
+  "ja": "登録不要 · 無料 · 無制限",
+  "es": "Sin registro · Gratis · Uso ilimitado",
+  "hi": "कोई साइन-अप नहीं · कोई शुल्क नहीं · असीमित उपयोग",
+  "fr": "Sans inscription · Sans frais · Utilisation illimitée",
+  "de": "Keine Anmeldung · Keine Gebühren · Unbegrenzte Nutzung",
+  "pt": "Sem cadastro · Sem taxas · Uso ilimitado",
+  "it": "Nessuna registrazione · Nessun costo · Uso illimitato",
+  "nl": "Geen registratie · Geen kosten · Onbeperkt gebruik",
+  "ru": "Без регистрации · Бесплатно · Без ограничений",
+  "uk": "Без реєстрації · Безкоштовно · Без обмежень",
+  "pl": "Bez rejestracji · Bez opłat · Bez ograniczeń",
+  "cs": "Bez registrace · Bez poplatků · Bez omezení",
+  "hu": "Regisztráció nélkül · Díjak nélkül · Korlátlan használat",
+  "ro": "Fără înregistrare · Fără taxe · Utilizare nelimitată",
+  "sv": "Ingen registrering · Inga avgifter · Obegränsad användning",
+  "da": "Ingen tilmelding · Ingen gebyrer · Ubegrænset brug",
+  "nb": "Ingen registrering · Ingen gebyrer · Ubegrenset bruk",
+  "fi": "Ei rekisteröitymistä · Ei maksuja · Rajaton käyttö",
+  "tr": "Kayıt yok · Ücret yok · Sınırsız kullanım",
+  "zh-TW": "無需註冊 · 免費 · 無限使用",
+  "th": "ไม่ต้องสมัครสมาชิก · ไม่มีค่าธรรมเนียม · ใช้ได้ไม่จำกัด",
+  "vi": "Không cần đăng ký · Miễn phí · Sử dụng không giới hạn",
+  "id": "Tanpa pendaftaran · Gratis · Penggunaan tanpa batas",
+  "ar": "بدون تسجيل · بدون رسوم · استخدام غير محدود",
+  "fa": "بدون ثبت‌نام · بدون هزینه · استفاده نامحدود"
+ },
+ "변환 종류": {
+  "en": "Conversion type",
+  "zh": "换算类型",
+  "ja": "変換の種類",
+  "es": "Tipo de conversión",
+  "hi": "रूपांतरण प्रकार",
+  "fr": "Type de conversion",
+  "de": "Umrechnungsart",
+  "pt": "Tipo de conversão",
+  "it": "Tipo di conversione",
+  "nl": "Soort omrekening",
+  "ru": "Вид конвертации",
+  "uk": "Вид конвертації",
+  "pl": "Rodzaj przeliczenia",
+  "cs": "Druh převodu",
+  "hu": "Átváltás típusa",
+  "ro": "Tip de conversie",
+  "sv": "Omvandlingstyp",
+  "da": "Omregningstype",
+  "nb": "Omregningstype",
+  "fi": "Muunnostyyppi",
+  "tr": "Dönüştürme türü",
+  "zh-TW": "換算類型",
+  "th": "ประเภทการแปลง",
+  "vi": "Loại chuyển đổi",
+  "id": "Jenis konversi",
+  "ar": "نوع التحويل",
+  "fa": "نوع تبدیل"
+ },
+ "길이": {
+  "en": "Length",
+  "zh": "长度",
+  "ja": "長さ",
+  "es": "Longitud",
+  "hi": "लंबाई",
+  "fr": "Longueur",
+  "de": "Länge",
+  "pt": "Comprimento",
+  "it": "Lunghezza",
+  "nl": "Lengte",
+  "ru": "Длина",
+  "uk": "Довжина",
+  "pl": "Długość",
+  "cs": "Délka",
+  "hu": "Hossz",
+  "ro": "Lungime",
+  "sv": "Längd",
+  "da": "Længde",
+  "nb": "Lengde",
+  "fi": "Pituus",
+  "tr": "Uzunluk",
+  "zh-TW": "長度",
+  "th": "ความยาว",
+  "vi": "Chiều dài",
+  "id": "Panjang",
+  "ar": "الطول",
+  "fa": "طول"
+ },
+ "무게": {
+  "en": "Weight",
+  "zh": "重量",
+  "ja": "重さ",
+  "es": "Peso",
+  "hi": "वज़न",
+  "fr": "Poids",
+  "de": "Gewicht",
+  "pt": "Peso",
+  "it": "Peso",
+  "nl": "Gewicht",
+  "ru": "Вес",
+  "uk": "Вага",
+  "pl": "Waga",
+  "cs": "Hmotnost",
+  "hu": "Súly",
+  "ro": "Greutate",
+  "sv": "Vikt",
+  "da": "Vægt",
+  "nb": "Vekt",
+  "fi": "Paino",
+  "tr": "Ağırlık",
+  "zh-TW": "重量",
+  "th": "น้ำหนัก",
+  "vi": "Trọng lượng",
+  "id": "Berat",
+  "ar": "الوزن",
+  "fa": "وزن"
+ },
+ "온도": {
+  "en": "Temperature",
+  "zh": "温度",
+  "ja": "温度",
+  "es": "Temperatura",
+  "hi": "तापमान",
+  "fr": "Température",
+  "de": "Temperatur",
+  "pt": "Temperatura",
+  "it": "Temperatura",
+  "nl": "Temperatuur",
+  "ru": "Температура",
+  "uk": "Температура",
+  "pl": "Temperatura",
+  "cs": "Teplota",
+  "hu": "Hőmérséklet",
+  "ro": "Temperatură",
+  "sv": "Temperatur",
+  "da": "Temperatur",
+  "nb": "Temperatur",
+  "fi": "Lämpötila",
+  "tr": "Sıcaklık",
+  "zh-TW": "溫度",
+  "th": "อุณหภูมิ",
+  "vi": "Nhiệt độ",
+  "id": "Suhu",
+  "ar": "درجة الحرارة",
+  "fa": "دما"
+ },
+ "부피": {
+  "en": "Volume",
+  "zh": "体积",
+  "ja": "体積",
+  "es": "Volumen",
+  "hi": "आयतन",
+  "fr": "Volume",
+  "de": "Volumen",
+  "pt": "Volume",
+  "it": "Volume",
+  "nl": "Volume",
+  "ru": "Объём",
+  "uk": "Об'єм",
+  "pl": "Objętość",
+  "cs": "Objem",
+  "hu": "Térfogat",
+  "ro": "Volum",
+  "sv": "Volym",
+  "da": "Rumfang",
+  "nb": "Volum",
+  "fi": "Tilavuus",
+  "tr": "Hacim",
+  "zh-TW": "體積",
+  "th": "ปริมาตร",
+  "vi": "Thể tích",
+  "id": "Volume",
+  "ar": "الحجم",
+  "fa": "حجم"
+ },
+ "넓이": {
+  "en": "Area",
+  "zh": "面积",
+  "ja": "面積",
+  "es": "Área",
+  "hi": "क्षेत्रफल",
+  "fr": "Superficie",
+  "de": "Fläche",
+  "pt": "Área",
+  "it": "Area",
+  "nl": "Oppervlakte",
+  "ru": "Площадь",
+  "uk": "Площа",
+  "pl": "Powierzchnia",
+  "cs": "Plocha",
+  "hu": "Terület",
+  "ro": "Suprafață",
+  "sv": "Area",
+  "da": "Areal",
+  "nb": "Areal",
+  "fi": "Pinta-ala",
+  "tr": "Alan",
+  "zh-TW": "面積",
+  "th": "พื้นที่",
+  "vi": "Diện tích",
+  "id": "Luas",
+  "ar": "المساحة",
+  "fa": "مساحت"
+ },
+ "속도": {
+  "en": "Speed",
+  "zh": "速度",
+  "ja": "速度",
+  "es": "Velocidad",
+  "hi": "गति",
+  "fr": "Vitesse",
+  "de": "Geschwindigkeit",
+  "pt": "Velocidade",
+  "it": "Velocità",
+  "nl": "Snelheid",
+  "ru": "Скорость",
+  "uk": "Швидкість",
+  "pl": "Prędkość",
+  "cs": "Rychlost",
+  "hu": "Sebesség",
+  "ro": "Viteză",
+  "sv": "Hastighet",
+  "da": "Hastighed",
+  "nb": "Fart",
+  "fi": "Nopeus",
+  "tr": "Hız",
+  "zh-TW": "速度",
+  "th": "ความเร็ว",
+  "vi": "Tốc độ",
+  "id": "Kecepatan",
+  "ar": "السرعة",
+  "fa": "سرعت"
+ },
+ "시간": {
+  "en": "Time",
+  "zh": "时间",
+  "ja": "時間",
+  "es": "Tiempo",
+  "hi": "समय",
+  "fr": "Temps",
+  "de": "Zeit",
+  "pt": "Tempo",
+  "it": "Tempo",
+  "nl": "Tijd",
+  "ru": "Время",
+  "uk": "Час",
+  "pl": "Czas",
+  "cs": "Čas",
+  "hu": "Idő",
+  "ro": "Timp",
+  "sv": "Tid",
+  "da": "Tid",
+  "nb": "Tid",
+  "fi": "Aika",
+  "tr": "Zaman",
+  "zh-TW": "時間",
+  "th": "เวลา",
+  "vi": "Thời gian",
+  "id": "Waktu",
+  "ar": "الوقت",
+  "fa": "زمان"
+ },
+ "데이터 용량": {
+  "en": "Data size",
+  "zh": "数据大小",
+  "ja": "データ容量",
+  "es": "Datos",
+  "hi": "डेटा आकार",
+  "fr": "Taille des données",
+  "de": "Datengröße",
+  "pt": "Tamanho de dados",
+  "it": "Dimensione dati",
+  "nl": "Gegevensgrootte",
+  "ru": "Размер данных",
+  "uk": "Розмір даних",
+  "pl": "Rozmiar danych",
+  "cs": "Velikost dat",
+  "hu": "Adatméret",
+  "ro": "Dimensiune date",
+  "sv": "Datastorlek",
+  "da": "Datastørrelse",
+  "nb": "Datastørrelse",
+  "fi": "Tiedon koko",
+  "tr": "Veri boyutu",
+  "zh-TW": "資料大小",
+  "th": "ขนาดข้อมูล",
+  "vi": "Dung lượng dữ liệu",
+  "id": "Ukuran data",
+  "ar": "حجم البيانات",
+  "fa": "حجم داده"
+ },
+ "요리 계량": {
+  "en": "Cooking",
+  "zh": "烹饪计量",
+  "ja": "料理の計量",
+  "es": "Cocina",
+  "hi": "खाना पकाना",
+  "fr": "Cuisine",
+  "de": "Kochen",
+  "pt": "Cozinha",
+  "it": "Cucina",
+  "nl": "Koken",
+  "ru": "Кулинарные меры",
+  "uk": "Кулінарні міри",
+  "pl": "Miary kuchenne",
+  "cs": "Kuchyňské míry",
+  "hu": "Konyhai mérés",
+  "ro": "Măsuri de bucătărie",
+  "sv": "Matlagningsmått",
+  "da": "Køkkenmål",
+  "nb": "Kjøkkenmål",
+  "fi": "Ruoanlaittomitat",
+  "tr": "Mutfak ölçüleri",
+  "zh-TW": "烹飪計量",
+  "th": "การตวงทำอาหาร",
+  "vi": "Đo lường nấu ăn",
+  "id": "Takaran memasak",
+  "ar": "مقادير الطبخ",
+  "fa": "اندازه‌گیری آشپزی"
+ },
+ "변환할 값": {
+  "en": "Value to convert",
+  "zh": "要换算的数值",
+  "ja": "変換する値",
+  "es": "Valor a convertir",
+  "hi": "बदलने का मान",
+  "fr": "Valeur à convertir",
+  "de": "Umzurechnender Wert",
+  "pt": "Valor a converter",
+  "it": "Valore da convertire",
+  "nl": "Waarde om om te rekenen",
+  "ru": "Значение для конвертации",
+  "uk": "Значення для конвертації",
+  "pl": "Wartość do przeliczenia",
+  "cs": "Hodnota k převodu",
+  "hu": "Átváltandó érték",
+  "ro": "Valoare de convertit",
+  "sv": "Värde att omvandla",
+  "da": "Værdi at omregne",
+  "nb": "Verdi å omregne",
+  "fi": "Muunnettava arvo",
+  "tr": "Dönüştürülecek değer",
+  "zh-TW": "要換算的數值",
+  "th": "ค่าที่จะแปลง",
+  "vi": "Giá trị cần chuyển đổi",
+  "id": "Nilai yang dikonversi",
+  "ar": "القيمة المراد تحويلها",
+  "fa": "مقدار برای تبدیل"
+ },
+ "숫자를 입력하세요": {
+  "en": "Enter a number",
+  "zh": "请输入数字",
+  "ja": "数字を入力してください",
+  "es": "Introduce un número",
+  "hi": "संख्या डालें",
+  "fr": "Saisissez un nombre",
+  "de": "Geben Sie eine Zahl ein",
+  "pt": "Insira um número",
+  "it": "Inserisci un numero",
+  "nl": "Voer een getal in",
+  "ru": "Введите число",
+  "uk": "Введіть число",
+  "pl": "Wpisz liczbę",
+  "cs": "Zadejte číslo",
+  "hu": "Adjon meg egy számot",
+  "ro": "Introdu o număr",
+  "sv": "Ange ett tal",
+  "da": "Indtast et tal",
+  "nb": "Skriv inn et tall",
+  "fi": "Syötä numero",
+  "tr": "Bir sayı girin",
+  "zh-TW": "請輸入數字",
+  "th": "ใส่ตัวเลข",
+  "vi": "Nhập một số",
+  "id": "Masukkan angka",
+  "ar": "أدخل رقماً",
+  "fa": "یک عدد وارد کنید"
+ },
+ "이 단위에서": {
+  "en": "From",
+  "zh": "从",
+  "ja": "変換元",
+  "es": "De",
+  "hi": "इससे",
+  "fr": "De",
+  "de": "Von",
+  "pt": "De",
+  "it": "Da",
+  "nl": "Van",
+  "ru": "Из",
+  "uk": "З",
+  "pl": "Z",
+  "cs": "Z",
+  "hu": "Erről",
+  "ro": "Din",
+  "sv": "Från",
+  "da": "Fra",
+  "nb": "Fra",
+  "fi": "Mistä",
+  "tr": "Şundan",
+  "zh-TW": "從",
+  "th": "จาก",
+  "vi": "Từ",
+  "id": "Dari",
+  "ar": "من",
+  "fa": "از"
+ },
+ "이 단위로": {
+  "en": "To",
+  "zh": "到",
+  "ja": "変換先",
+  "es": "A",
+  "hi": "इसमें",
+  "fr": "Vers",
+  "de": "Nach",
+  "pt": "Para",
+  "it": "A",
+  "nl": "Naar",
+  "ru": "В",
+  "uk": "В",
+  "pl": "Na",
+  "cs": "Na",
+  "hu": "Erre",
+  "ro": "În",
+  "sv": "Till",
+  "da": "Til",
+  "nb": "Til",
+  "fi": "Mihin",
+  "tr": "Şuna",
+  "zh-TW": "到",
+  "th": "เป็น",
+  "vi": "Sang",
+  "id": "Ke",
+  "ar": "إلى",
+  "fa": "به"
+ },
+ "변환 결과": {
+  "en": "Result",
+  "zh": "换算结果",
+  "ja": "変換結果",
+  "es": "Resultado",
+  "hi": "परिणाम",
+  "fr": "Résultat",
+  "de": "Ergebnis",
+  "pt": "Resultado",
+  "it": "Risultato",
+  "nl": "Resultaat",
+  "ru": "Результат",
+  "uk": "Результат",
+  "pl": "Wynik",
+  "cs": "Výsledek",
+  "hu": "Eredmény",
+  "ro": "Rezultat",
+  "sv": "Resultat",
+  "da": "Resultat",
+  "nb": "Resultat",
+  "fi": "Tulos",
+  "tr": "Sonuç",
+  "zh-TW": "換算結果",
+  "th": "ผลการแปลง",
+  "vi": "Kết quả",
+  "id": "Hasil",
+  "ar": "النتيجة",
+  "fa": "نتیجه"
+ },
+ "값을 입력하면 바로 변환됩니다.": {
+  "en": "Enter a value and it converts right away.",
+  "zh": "输入数值即可立即换算。",
+  "ja": "値を入力するとすぐ変換されます。",
+  "es": "Introduce un valor y se convierte al instante.",
+  "hi": "मान डालते ही तुरंत बदल जाता है।",
+  "fr": "Saisissez une valeur et elle se convertit aussitôt.",
+  "de": "Geben Sie einen Wert ein, und er wird sofort umgerechnet.",
+  "pt": "Insira um valor e ele é convertido na hora.",
+  "it": "Inserisci un valore e viene convertito subito.",
+  "nl": "Voer een waarde in en deze wordt direct omgerekend.",
+  "ru": "Введите значение, и оно сразу сконвертируется.",
+  "uk": "Введіть значення, і воно одразу конвертується.",
+  "pl": "Wpisz wartość, a przeliczy się od razu.",
+  "cs": "Zadejte hodnotu a hned se převede.",
+  "hu": "Adjon meg egy értéket, és azonnal átváltódik.",
+  "ro": "Introdu o valoare și se convertește imediat.",
+  "sv": "Ange ett värde, så omvandlas det direkt.",
+  "da": "Indtast en værdi, så omregnes den med det samme.",
+  "nb": "Skriv inn en verdi, så omregnes den med en gang.",
+  "fi": "Syötä arvo, niin se muunnetaan heti.",
+  "tr": "Bir değer girin, anında dönüştürülür.",
+  "zh-TW": "輸入數值即可立即換算。",
+  "th": "ใส่ค่าแล้วจะแปลงทันที",
+  "vi": "Nhập giá trị là chuyển đổi ngay.",
+  "id": "Masukkan nilai dan langsung dikonversi.",
+  "ar": "أدخل قيمة وسيتم تحويلها فوراً.",
+  "fa": "مقداری وارد کنید تا فوراً تبدیل شود."
+ },
+ "숫자를 입력해 주세요.": {
+  "en": "Please enter a number.",
+  "zh": "请输入数字。",
+  "ja": "数字を入力してください。",
+  "es": "Introduce un número, por favor.",
+  "hi": "कृपया संख्या डालें।",
+  "fr": "Veuillez saisir un nombre.",
+  "de": "Bitte geben Sie eine Zahl ein.",
+  "pt": "Por favor, insira um número.",
+  "it": "Inserisci un numero.",
+  "nl": "Voer een getal in.",
+  "ru": "Пожалуйста, введите число.",
+  "uk": "Будь ласка, введіть число.",
+  "pl": "Proszę wpisać liczbę.",
+  "cs": "Zadejte prosím číslo.",
+  "hu": "Kérjük, adjon meg egy számot.",
+  "ro": "Te rugăm să introduci un număr.",
+  "sv": "Ange ett tal.",
+  "da": "Indtast venligst et tal.",
+  "nb": "Skriv inn et tall.",
+  "fi": "Syötä numero.",
+  "tr": "Lütfen bir sayı girin.",
+  "zh-TW": "請輸入數字。",
+  "th": "โปรดใส่ตัวเลข",
+  "vi": "Vui lòng nhập một số.",
+  "id": "Silakan masukkan angka.",
+  "ar": "يرجى إدخال رقم.",
+  "fa": "لطفاً یک عدد وارد کنید."
+ },
+ "결과 복사하기": {
+  "en": "Copy result",
+  "zh": "复制结果",
+  "ja": "結果をコピー",
+  "es": "Copiar resultado",
+  "hi": "परिणाम कॉपी करें",
+  "fr": "Copier le résultat",
+  "de": "Ergebnis kopieren",
+  "pt": "Copiar resultado",
+  "it": "Copia il risultato",
+  "nl": "Resultaat kopiëren",
+  "ru": "Копировать результат",
+  "uk": "Копіювати результат",
+  "pl": "Kopiuj wynik",
+  "cs": "Kopírovat výsledek",
+  "hu": "Eredmény másolása",
+  "ro": "Copiază rezultatul",
+  "sv": "Kopiera resultat",
+  "da": "Kopiér resultat",
+  "nb": "Kopier resultat",
+  "fi": "Kopioi tulos",
+  "tr": "Sonucu kopyala",
+  "zh-TW": "複製結果",
+  "th": "คัดลอกผลลัพธ์",
+  "vi": "Sao chép kết quả",
+  "id": "Salin hasil",
+  "ar": "نسخ النتيجة",
+  "fa": "کپی کردن نتیجه"
+ },
+ "입력한 숫자는 서버로 전송되지 않고, 이 기기 안에서만 계산됩니다. 인터넷이 없어도 동작합니다.": {
+  "en": "Your numbers are never sent to a server; everything is calculated on this device. It works offline, too.",
+  "zh": "您输入的数字不会发送到服务器，只在本设备内计算。没有网络也能用。",
+  "ja": "入力した数字はサーバーに送信されず、この端末の中だけで計算されます。オフラインでも動作します。",
+  "es": "Tus números no se envían a ningún servidor; todo se calcula en este dispositivo. Funciona sin internet.",
+  "hi": "आपकी संख्याएँ सर्वर पर नहीं भेजी जातीं; सब कुछ इसी डिवाइस पर गणना होता है। बिना इंटरनेट भी चलता है।",
+  "fr": "Vos nombres ne sont jamais envoyés à un serveur ; tout est calculé sur cet appareil. Cela fonctionne aussi hors ligne.",
+  "de": "Ihre Zahlen werden niemals an einen Server gesendet; alles wird auf diesem Gerät berechnet. Es funktioniert auch offline.",
+  "pt": "Seus números nunca são enviados a um servidor; tudo é calculado neste dispositivo. Funciona também off-line.",
+  "it": "I tuoi numeri non vengono mai inviati a un server; tutto viene calcolato su questo dispositivo. Funziona anche offline.",
+  "nl": "Uw getallen worden nooit naar een server gestuurd; alles wordt op dit apparaat berekend. Het werkt ook offline.",
+  "ru": "Ваши числа никогда не отправляются на сервер; всё вычисляется на этом устройстве. Работает и без интернета.",
+  "uk": "Ваші числа ніколи не надсилаються на сервер; усе обчислюється на цьому пристрої. Працює й без інтернету.",
+  "pl": "Twoje liczby nigdy nie są wysyłane na serwer; wszystko oblicza się na tym urządzeniu. Działa też offline.",
+  "cs": "Vaše čísla se nikdy neposílají na server; vše se počítá na tomto zařízení. Funguje i offline.",
+  "hu": "A számai soha nem kerülnek szerverre; minden számítás ezen az eszközön történik. Internet nélkül is működik.",
+  "ro": "Numerele tale nu sunt trimise niciodată către un server; totul se calculează pe acest dispozitiv. Funcționează și offline.",
+  "sv": "Dina tal skickas aldrig till en server; allt beräknas på den här enheten. Det fungerar även offline.",
+  "da": "Dine tal sendes aldrig til en server; alt beregnes på denne enhed. Det virker også offline.",
+  "nb": "Tallene dine sendes aldri til en server; alt beregnes på denne enheten. Det fungerer også frakoblet.",
+  "fi": "Numeroitasi ei lähetetä palvelimelle; kaikki lasketaan tällä laitteella. Se toimii myös ilman verkkoa.",
+  "tr": "Sayılarınız asla bir sunucuya gönderilmez; her şey bu cihazda hesaplanır. İnternet olmadan da çalışır.",
+  "zh-TW": "您輸入的數字不會傳送到伺服器，只在本裝置內計算。沒有網路也能用。",
+  "th": "ตัวเลขที่คุณใส่จะไม่ถูกส่งไปเซิร์ฟเวอร์ ทุกอย่างคำนวณในอุปกรณ์นี้ และใช้งานได้แม้ไม่มีอินเทอร์เน็ต",
+  "vi": "Số bạn nhập không bao giờ được gửi đến máy chủ; mọi tính toán đều diễn ra trên thiết bị này. Cũng hoạt động khi ngoại tuyến.",
+  "id": "Angka yang Anda masukkan tidak pernah dikirim ke server; semuanya dihitung di perangkat ini. Juga berfungsi offline.",
+  "ar": "لا تُرسل أرقامك أبداً إلى خادم؛ كل شيء يُحسب على هذا الجهاز. يعمل دون اتصال بالإنترنت أيضاً.",
+  "fa": "اعداد شما هرگز به سروری ارسال نمی‌شوند؛ همه‌چیز روی همین دستگاه محاسبه می‌شود. بدون اینترنت هم کار می‌کند."
+ },
+ "빠른 환산표 — 입력한 값을 모든 단위로": {
+  "en": "Quick table — your value in every unit",
+  "zh": "快速换算表 — 把输入值换成所有单位",
+  "ja": "クイック換算表 — 入力した値をすべての単位に",
+  "es": "Tabla rápida: tu valor en todas las unidades",
+  "hi": "त्वरित तालिका — आपका मान सभी इकाइयों में",
+  "fr": "Tableau rapide — votre valeur dans toutes les unités",
+  "de": "Schnelltabelle — Ihr Wert in allen Einheiten",
+  "pt": "Tabela rápida — seu valor em todas as unidades",
+  "it": "Tabella rapida — il tuo valore in ogni unità",
+  "nl": "Sneltabel — uw waarde in alle eenheden",
+  "ru": "Быстрая таблица — ваше значение во всех единицах",
+  "uk": "Швидка таблиця — ваше значення в усіх одиницях",
+  "pl": "Szybka tabela — Twoja wartość we wszystkich jednostkach",
+  "cs": "Rychlá tabulka — vaše hodnota ve všech jednotkách",
+  "hu": "Gyors táblázat — az értéke minden mértékegységben",
+  "ro": "Tabel rapid — valoarea ta în toate unitățile",
+  "sv": "Snabbtabell — ditt värde i alla enheter",
+  "da": "Hurtigtabel — din værdi i alle enheder",
+  "nb": "Hurtigtabell — verdien din i alle enheter",
+  "fi": "Pikataulukko — arvosi kaikissa yksiköissä",
+  "tr": "Hızlı tablo — değeriniz tüm birimlerde",
+  "zh-TW": "快速換算表 — 把輸入值換成所有單位",
+  "th": "ตารางด่วน — ค่าของคุณในทุกหน่วย",
+  "vi": "Bảng nhanh — giá trị của bạn ở mọi đơn vị",
+  "id": "Tabel cepat — nilai Anda dalam semua satuan",
+  "ar": "جدول سريع — قيمتك بكل الوحدات",
+  "fa": "جدول سریع — مقدار شما در همه واحدها"
+ },
+ "위 값을 기준으로 같은 종류의 모든 단위로 바꾼 표입니다.": {
+  "en": "A table converting the value above into every unit of the same type.",
+  "zh": "以以上数值为基准，换算成同类所有单位的表。",
+  "ja": "上の値を基準に、同じ種類のすべての単位に換算した表です。",
+  "es": "Una tabla que convierte el valor de arriba a todas las unidades del mismo tipo.",
+  "hi": "ऊपर के मान को उसी प्रकार की सभी इकाइयों में बदलने वाली तालिका।",
+  "fr": "Un tableau qui convertit la valeur ci-dessus dans toutes les unités du même type.",
+  "de": "Eine Tabelle, die den obigen Wert in alle Einheiten desselben Typs umrechnet.",
+  "pt": "Uma tabela que converte o valor acima em todas as unidades do mesmo tipo.",
+  "it": "Una tabella che converte il valore sopra in ogni unità dello stesso tipo.",
+  "nl": "Een tabel die de bovenstaande waarde omrekent naar alle eenheden van hetzelfde type.",
+  "ru": "Таблица, которая конвертирует значение выше во все единицы того же вида.",
+  "uk": "Таблиця, яка конвертує значення вище в усі одиниці того самого виду.",
+  "pl": "Tabela przeliczająca powyższą wartość na wszystkie jednostki tego samego rodzaju.",
+  "cs": "Tabulka převádějící výše uvedenou hodnotu do všech jednotek stejného druhu.",
+  "hu": "Táblázat, amely a fenti értéket az azonos típusú összes mértékegységbe átváltja.",
+  "ro": "Un tabel care convertește valoarea de mai sus în toate unitățile de același tip.",
+  "sv": "En tabell som omvandlar värdet ovan till alla enheter av samma typ.",
+  "da": "En tabel, der omregner værdien ovenfor til alle enheder af samme type.",
+  "nb": "En tabell som omregner verdien ovenfor til alle enheter av samme type.",
+  "fi": "Taulukko, joka muuntaa yllä olevan arvon saman tyypin kaikkiin yksiköihin.",
+  "tr": "Yukarıdaki değeri aynı türden tüm birimlere dönüştüren bir tablo.",
+  "zh-TW": "以以上數值為基準，換算成同類所有單位的表。",
+  "th": "ตารางที่แปลงค่าด้านบนเป็นทุกหน่วยในประเภทเดียวกัน",
+  "vi": "Bảng chuyển đổi giá trị ở trên thành mọi đơn vị cùng loại.",
+  "id": "Tabel yang mengonversi nilai di atas ke semua satuan dengan jenis yang sama.",
+  "ar": "جدول يحوّل القيمة أعلاه إلى كل وحدة من النوع نفسه.",
+  "fa": "جدولی که مقدار بالا را به همه واحدهای همان نوع تبدیل می‌کند."
+ },
+ "값을 입력하면 표가 채워집니다.": {
+  "en": "Enter a value and the table fills in.",
+  "zh": "输入数值后表格会自动填充。",
+  "ja": "値を入力すると表が埋まります。",
+  "es": "Introduce un valor y la tabla se llena.",
+  "hi": "मान डालते ही तालिका भर जाती है।",
+  "fr": "Saisissez une valeur et le tableau se remplit.",
+  "de": "Geben Sie einen Wert ein, und die Tabelle füllt sich.",
+  "pt": "Insira um valor e a tabela é preenchida.",
+  "it": "Inserisci un valore e la tabella si riempie.",
+  "nl": "Voer een waarde in en de tabel wordt gevuld.",
+  "ru": "Введите значение, и таблица заполнится.",
+  "uk": "Введіть значення, і таблиця заповниться.",
+  "pl": "Wpisz wartość, a tabela się wypełni.",
+  "cs": "Zadejte hodnotu a tabulka se vyplní.",
+  "hu": "Adjon meg egy értéket, és a táblázat kitöltődik.",
+  "ro": "Introdu o valoare și tabelul se completează.",
+  "sv": "Ange ett värde, så fylls tabellen i.",
+  "da": "Indtast en værdi, så udfyldes tabellen.",
+  "nb": "Skriv inn en verdi, så fylles tabellen ut.",
+  "fi": "Syötä arvo, niin taulukko täyttyy.",
+  "tr": "Bir değer girin, tablo dolsun.",
+  "zh-TW": "輸入數值後表格會自動填入。",
+  "th": "ใส่ค่าแล้วตารางจะเติมให้",
+  "vi": "Nhập giá trị là bảng sẽ được điền.",
+  "id": "Masukkan nilai dan tabel akan terisi.",
+  "ar": "أدخل قيمة وسيُملأ الجدول.",
+  "fa": "مقداری وارد کنید تا جدول پر شود."
+ },
+ "💡 도움말": {
+  "en": "💡 Help",
+  "zh": "💡 帮助",
+  "ja": "💡 ヘルプ",
+  "es": "💡 Ayuda",
+  "hi": "💡 सहायता",
+  "fr": "💡 Aide",
+  "de": "💡 Hilfe",
+  "pt": "💡 Ajuda",
+  "it": "💡 Aiuto",
+  "nl": "💡 Help",
+  "ru": "💡 Справка",
+  "uk": "💡 Довідка",
+  "pl": "💡 Pomoc",
+  "cs": "💡 Nápověda",
+  "hu": "💡 Súgó",
+  "ro": "💡 Ajutor",
+  "sv": "💡 Hjälp",
+  "da": "💡 Hjælp",
+  "nb": "💡 Hjelp",
+  "fi": "💡 Ohje",
+  "tr": "💡 Yardım",
+  "zh-TW": "💡 說明",
+  "th": "💡 ช่วยเหลือ",
+  "vi": "💡 Trợ giúp",
+  "id": "💡 Bantuan",
+  "ar": "💡 مساعدة",
+  "fa": "💡 راهنما"
+ },
+ "변환 종류를 고르고 숫자를 입력한 뒤, 양쪽 단위를 선택하면 결과가 바로 나옵니다. ⇄ 버튼을 누르면 양쪽 단위가 서로 바뀝니다.": {
+  "en": "Pick a conversion type, enter a number, and choose the units on both sides — the result appears instantly. The ⇄ button swaps the two units.",
+  "zh": "选择换算类型并输入数字，再选择两侧单位，结果立即显示。按 ⇄ 按钮可互换两侧单位。",
+  "ja": "変換の種類を選び数字を入力し、両側の単位を選ぶと結果がすぐ出ます。⇄ボタンで両側の単位が入れ替わります。",
+  "es": "Elige un tipo, introduce un número y selecciona las unidades de ambos lados: el resultado aparece al instante. El botón ⇄ intercambia las unidades.",
+  "hi": "प्रकार चुनें, संख्या डालें और दोनों ओर की इकाइयाँ चुनें — परिणाम तुरंत दिखता है। ⇄ बटन दोनों इकाइयों को बदल देता है।",
+  "fr": "Choisissez un type de conversion, saisissez un nombre et sélectionnez les unités des deux côtés — le résultat apparaît aussitôt. Le bouton ⇄ échange les deux unités.",
+  "de": "Wählen Sie eine Umrechnungsart, geben Sie eine Zahl ein und wählen Sie die Einheiten auf beiden Seiten — das Ergebnis erscheint sofort. Die Schaltfläche ⇄ tauscht die beiden Einheiten.",
+  "pt": "Escolha um tipo de conversão, insira um número e selecione as unidades dos dois lados — o resultado aparece na hora. O botão ⇄ troca as duas unidades.",
+  "it": "Scegli un tipo di conversione, inserisci un numero e seleziona le unità su entrambi i lati: il risultato appare subito. Il pulsante ⇄ scambia le due unità.",
+  "nl": "Kies een soort omrekening, voer een getal in en selecteer de eenheden aan beide zijden — het resultaat verschijnt direct. Met de knop ⇄ wisselt u de twee eenheden om.",
+  "ru": "Выберите вид конвертации, введите число и выберите единицы с обеих сторон — результат появится сразу. Кнопка ⇄ меняет две единицы местами.",
+  "uk": "Виберіть вид конвертації, введіть число та виберіть одиниці з обох боків — результат з'явиться одразу. Кнопка ⇄ міняє дві одиниці місцями.",
+  "pl": "Wybierz rodzaj przeliczenia, wpisz liczbę i wybierz jednostki po obu stronach — wynik pojawi się od razu. Przycisk ⇄ zamienia obie jednostki.",
+  "cs": "Zvolte druh převodu, zadejte číslo a vyberte jednotky na obou stranách — výsledek se zobrazí okamžitě. Tlačítko ⇄ prohodí obě jednotky.",
+  "hu": "Válasszon átváltási típust, adjon meg egy számot, és válassza ki a mértékegységeket mindkét oldalon — az eredmény azonnal megjelenik. A ⇄ gomb felcseréli a két mértékegységet.",
+  "ro": "Alege un tip de conversie, introdu un număr și alege unitățile de pe ambele părți — rezultatul apare instantaneu. Butonul ⇄ interschimbă cele două unități.",
+  "sv": "Välj en omvandlingstyp, ange ett tal och välj enheterna på båda sidor — resultatet visas direkt. Knappen ⇄ växlar de två enheterna.",
+  "da": "Vælg en omregningstype, indtast et tal og vælg enhederne på begge sider — resultatet vises med det samme. Knappen ⇄ bytter de to enheder.",
+  "nb": "Velg en omregningstype, skriv inn et tall og velg enhetene på begge sider — resultatet vises med en gang. Knappen ⇄ bytter de to enhetene.",
+  "fi": "Valitse muunnostyyppi, syötä numero ja valitse yksiköt molemmille puolille — tulos näkyy heti. ⇄-painike vaihtaa yksiköt keskenään.",
+  "tr": "Bir dönüştürme türü seçin, bir sayı girin ve her iki taraftaki birimleri seçin — sonuç anında görünür. ⇄ düğmesi iki birimi birbiriyle değiştirir.",
+  "zh-TW": "選擇換算類型並輸入數字，再選擇兩側單位，結果立即顯示。按 ⇄ 按鈕可互換兩側單位。",
+  "th": "เลือกประเภทการแปลง ใส่ตัวเลข และเลือกหน่วยทั้งสองด้าน — ผลลัพธ์จะปรากฏทันที ปุ่ม ⇄ จะสลับหน่วยทั้งสองด้าน",
+  "vi": "Chọn loại chuyển đổi, nhập một số và chọn đơn vị ở hai phía — kết quả hiện ra ngay lập tức. Nút ⇄ hoán đổi hai đơn vị.",
+  "id": "Pilih jenis konversi, masukkan angka, dan pilih satuan di kedua sisi — hasilnya muncul seketika. Tombol ⇄ menukar kedua satuan.",
+  "ar": "اختر نوع التحويل وأدخل رقماً واختر الوحدات على كلا الجانبين — تظهر النتيجة فوراً. زر ⇄ يبدّل الوحدتين.",
+  "fa": "نوع تبدیل را انتخاب کنید، یک عدد وارد کنید و واحدهای دو طرف را برگزینید — نتیجه فوراً ظاهر می‌شود. دکمه ⇄ دو واحد را جابه‌جا می‌کند."
+ },
+ "종류: 길이 · 무게 · 온도 · 부피 · 넓이 · 속도 · 시간 · 데이터 용량 · 요리 계량": {
+  "en": "Types: length · weight · temperature · volume · area · speed · time · data size · cooking",
+  "zh": "类型：长度 · 重量 · 温度 · 体积 · 面积 · 速度 · 时间 · 数据大小 · 烹饪计量",
+  "ja": "種類：長さ・重さ・温度・体積・面積・速度・時間・データ容量・料理の計量",
+  "es": "Tipos: longitud · peso · temperatura · volumen · área · velocidad · tiempo · datos · cocina",
+  "hi": "प्रकार: लंबाई · वज़न · तापमान · आयतन · क्षेत्रफल · गति · समय · डेटा आकार · खाना पकाना",
+  "fr": "Types : longueur · poids · température · volume · superficie · vitesse · temps · taille des données · cuisine",
+  "de": "Arten: Länge · Gewicht · Temperatur · Volumen · Fläche · Geschwindigkeit · Zeit · Datengröße · Kochen",
+  "pt": "Tipos: comprimento · peso · temperatura · volume · área · velocidade · tempo · tamanho de dados · cozinha",
+  "it": "Tipi: lunghezza · peso · temperatura · volume · area · velocità · tempo · dimensione dati · cucina",
+  "nl": "Soorten: lengte · gewicht · temperatuur · volume · oppervlakte · snelheid · tijd · gegevensgrootte · koken",
+  "ru": "Виды: длина · вес · температура · объём · площадь · скорость · время · размер данных · кулинарные меры",
+  "uk": "Види: довжина · вага · температура · об'єм · площа · швидкість · час · розмір даних · кулінарні міри",
+  "pl": "Rodzaje: długość · waga · temperatura · objętość · powierzchnia · prędkość · czas · rozmiar danych · miary kuchenne",
+  "cs": "Druhy: délka · hmotnost · teplota · objem · plocha · rychlost · čas · velikost dat · kuchyňské míry",
+  "hu": "Típusok: hossz · súly · hőmérséklet · térfogat · terület · sebesség · idő · adatméret · konyhai mérés",
+  "ro": "Tipuri: lungime · greutate · temperatură · volum · suprafață · viteză · timp · dimensiune date · măsuri de bucătărie",
+  "sv": "Typer: längd · vikt · temperatur · volym · area · hastighet · tid · datastorlek · matlagningsmått",
+  "da": "Typer: længde · vægt · temperatur · rumfang · areal · hastighed · tid · datastørrelse · køkkenmål",
+  "nb": "Typer: lengde · vekt · temperatur · volum · areal · fart · tid · datastørrelse · kjøkkenmål",
+  "fi": "Tyypit: pituus · paino · lämpötila · tilavuus · pinta-ala · nopeus · aika · tiedon koko · ruoanlaittomitat",
+  "tr": "Türler: uzunluk · ağırlık · sıcaklık · hacim · alan · hız · zaman · veri boyutu · mutfak ölçüleri",
+  "zh-TW": "類型：長度 · 重量 · 溫度 · 體積 · 面積 · 速度 · 時間 · 資料大小 · 烹飪計量",
+  "th": "ประเภท: ความยาว · น้ำหนัก · อุณหภูมิ · ปริมาตร · พื้นที่ · ความเร็ว · เวลา · ขนาดข้อมูล · การตวงทำอาหาร",
+  "vi": "Loại: chiều dài · trọng lượng · nhiệt độ · thể tích · diện tích · tốc độ · thời gian · dung lượng dữ liệu · nấu ăn",
+  "id": "Jenis: panjang · berat · suhu · volume · luas · kecepatan · waktu · ukuran data · memasak",
+  "ar": "الأنواع: الطول · الوزن · درجة الحرارة · الحجم · المساحة · السرعة · الوقت · حجم البيانات · مقادير الطبخ",
+  "fa": "انواع: طول · وزن · دما · حجم · مساحت · سرعت · زمان · حجم داده · اندازه‌گیری آشپزی"
+ },
+ "요리 계량의 컵·큰술·작은술은 미국 계량 기준(1컵 = 236.588mL)이며, 한국 큰술(약 15mL)도 따로 들어 있습니다.": {
+  "en": "Cooking cups, tablespoons and teaspoons use US measures (1 cup = 236.588 mL); the Korean tablespoon (about 15 mL) is included separately.",
+  "zh": "烹饪计量的杯、大勺、小勺采用美国标准（1杯 = 236.588mL），另含韩国大勺（约15mL）。",
+  "ja": "料理計量のカップ・大さじ・小さじは米国基準（1カップ = 236.588mL）で、韓国式大さじ（約15mL）も別に入っています。",
+  "es": "Las tazas y cucharas de cocina usan medidas de EE. UU. (1 taza = 236,588 mL); la cuchara coreana (unos 15 mL) viene aparte.",
+  "hi": "खाना पकाने के कप, बड़े और छोटे चम्मच अमेरिकी माप (1 कप = 236.588 mL) पर हैं; कोरियाई बड़ा चम्मच (लगभग 15 mL) अलग से शामिल है।",
+  "fr": "Les tasses, cuillères à soupe et cuillères à café de cuisine utilisent les mesures américaines (1 tasse = 236,588 mL) ; la cuillère à soupe coréenne (environ 15 mL) est incluse séparément.",
+  "de": "Kochmaße für Tassen, Esslöffel und Teelöffel verwenden US-Maße (1 Tasse = 236,588 mL); der koreanische Esslöffel (etwa 15 mL) ist separat enthalten.",
+  "pt": "As xícaras, colheres de sopa e colheres de chá de cozinha usam medidas dos EUA (1 xícara = 236,588 mL); a colher de sopa coreana (cerca de 15 mL) está incluída separadamente.",
+  "it": "Tazze, cucchiai e cucchiaini da cucina usano le misure statunitensi (1 tazza = 236,588 mL); il cucchiaio coreano (circa 15 mL) è incluso separatamente.",
+  "nl": "Kookmaten voor cups, eetlepels en theelepels gebruiken Amerikaanse maten (1 cup = 236,588 mL); de Koreaanse eetlepel (ongeveer 15 mL) is apart opgenomen.",
+  "ru": "Кулинарные чашки, столовые и чайные ложки используют американские меры (1 чашка = 236,588 мл); корейская столовая ложка (около 15 мл) включена отдельно.",
+  "uk": "Кулінарні чашки, столові й чайні ложки використовують американські міри (1 чашка = 236,588 мл); корейська столова ложка (близько 15 мл) включена окремо.",
+  "pl": "Kuchenne szklanki, łyżki stołowe i łyżeczki używają miar amerykańskich (1 szklanka = 236,588 mL); koreańska łyżka stołowa (około 15 mL) jest uwzględniona osobno.",
+  "cs": "Kuchyňské hrnky, polévkové a čajové lžičky používají americké míry (1 hrnek = 236,588 mL); korejská polévková lžíce (asi 15 mL) je zahrnuta zvlášť.",
+  "hu": "A konyhai csészék, evőkanalak és teáskanalak amerikai mértékeket használnak (1 csésze = 236,588 mL); a koreai evőkanál (kb. 15 mL) külön szerepel.",
+  "ro": "Cănile, lingurile și lingurițele de bucătărie folosesc măsuri americane (1 cană = 236,588 mL); lingura coreeană (aproximativ 15 mL) este inclusă separat.",
+  "sv": "Matlagningsmåtten kopp, matsked och tesked följer amerikanska mått (1 kopp = 236.588mL); den koreanska matskeden (cirka 15mL) finns med separat.",
+  "da": "Køkkenmålene kop, spiseske og teske følger amerikanske mål (1 kop = 236.588mL); den koreanske spiseske (ca. 15mL) er med separat.",
+  "nb": "Kjøkkenmålene kopp, spiseskje og teskje følger amerikanske mål (1 kopp = 236.588mL); den koreanske spiseskjeen (ca. 15mL) er med separat.",
+  "fi": "Ruoanlaittomitat kuppi, ruokalusikka ja teelusikka noudattavat yhdysvaltalaisia mittoja (1 kuppi = 236.588mL); korealainen ruokalusikka (noin 15mL) on mukana erikseen.",
+  "tr": "Mutfak ölçüleri fincan, yemek kaşığı ve çay kaşığı ABD ölçülerine göredir (1 fincan = 236.588mL); Kore yemek kaşığı (yaklaşık 15mL) ayrıca dahildir.",
+  "zh-TW": "烹飪計量的杯、大匙、小匙採用美國標準（1杯 = 236.588mL），另含韓國大匙（約15mL）。",
+  "th": "ถ้วย ช้อนโต๊ะ และช้อนชาในการตวงทำอาหารใช้มาตรสหรัฐฯ (1 ถ้วย = 236.588mL) ส่วนช้อนโต๊ะเกาหลี (ประมาณ 15mL) มีแยกไว้ต่างหาก",
+  "vi": "Cốc, thìa canh và thìa cà phê trong nấu ăn dùng đơn vị Mỹ (1 cốc = 236.588 mL); thìa canh Hàn Quốc (khoảng 15 mL) được cung cấp riêng.",
+  "id": "Cangkir, sendok makan, dan sendok teh untuk memasak menggunakan takaran AS (1 cangkir = 236.588 mL); sendok makan Korea (sekitar 15 mL) disertakan terpisah.",
+  "ar": "أكواب الطبخ وملاعق الأكل وملاعق الشاي تستخدم المقادير الأمريكية (1 كوب = 236.588mL)؛ وملعقة الأكل الكورية (نحو 15mL) مدرجة بشكل منفصل.",
+  "fa": "فنجان‌ها و قاشق‌های غذاخوری و چای‌خوری آشپزی از اندازه‌های آمریکایی استفاده می‌کنند (1 فنجان = 236.588mL)؛ قاشق غذاخوری کره‌ای (حدود 15mL) جداگانه گنجانده شده است."
+ },
+ "평(넓이)과 근(무게) 같은 한국에서 자주 쓰는 단위도 포함했습니다.": {
+  "en": "Units often used in Korea, such as pyeong (area) and geun (weight), are included too.",
+  "zh": "还包括韩国常用的坪（面积）、斤（重量）等单位。",
+  "ja": "坪（面積）や斤（重さ）など、韓国でよく使う単位も含まれています。",
+  "es": "También incluye unidades muy usadas en Corea, como el pyeong (área) y el geun (peso).",
+  "hi": "कोरिया में अक्सर उपयोग होने वाली इकाइयाँ, जैसे प्यॉन्ग (क्षेत्रफल) और ग्यून (वज़न), भी शामिल हैं।",
+  "fr": "Les unités souvent utilisées en Corée, comme le pyeong (superficie) et le geun (poids), sont également incluses.",
+  "de": "Einheiten, die in Korea häufig verwendet werden, wie Pyeong (Fläche) und Geun (Gewicht), sind ebenfalls enthalten.",
+  "pt": "Unidades muito usadas na Coreia, como pyeong (área) e geun (peso), também estão incluídas.",
+  "it": "Sono incluse anche unità spesso usate in Corea, come pyeong (area) e geun (peso).",
+  "nl": "Eenheden die in Korea vaak worden gebruikt, zoals pyeong (oppervlakte) en geun (gewicht), zijn ook opgenomen.",
+  "ru": "Также включены единицы, часто используемые в Корее, такие как пхён (площадь) и кын (вес).",
+  "uk": "Також включено одиниці, що часто використовуються в Кореї, як-от пхьон (площа) та кин (вага).",
+  "pl": "Uwzględniono też jednostki często używane w Korei, takie jak pyeong (powierzchnia) i geun (waga).",
+  "cs": "Zahrnuty jsou i jednotky často používané v Koreji, jako je pchjong (plocha) a kun (hmotnost).",
+  "hu": "Koreában gyakran használt mértékegységek is szerepelnek, mint a phjong (terület) és a kun (súly).",
+  "ro": "Sunt incluse și unități folosite des în Coreea, precum pyeong (suprafață) și geun (greutate).",
+  "sv": "Enheter som ofta används i Korea, som pyeong (area) och geun (vikt), finns också med.",
+  "da": "Enheder, der ofte bruges i Korea, som pyeong (areal) og geun (vægt), er også med.",
+  "nb": "Enheter som ofte brukes i Korea, som pyeong (areal) og geun (vekt), er også med.",
+  "fi": "Myös Koreassa usein käytetyt yksiköt, kuten pyeong (pinta-ala) ja geun (paino), ovat mukana.",
+  "tr": "Kore'da sık kullanılan pyeong (alan) ve geun (ağırlık) gibi birimler de dahildir.",
+  "zh-TW": "還包括韓國常用的坪（面積）、斤（重量）等單位。",
+  "th": "รวมถึงหน่วยที่ใช้บ่อยในเกาหลี เช่น พย็อง (พื้นที่) และกึน (น้ำหนัก) ด้วย",
+  "vi": "Cũng bao gồm các đơn vị thường dùng ở Hàn Quốc như pyeong (diện tích) và geun (trọng lượng).",
+  "id": "Satuan yang sering digunakan di Korea, seperti pyeong (luas) dan geun (berat), juga disertakan.",
+  "ar": "تتضمن أيضاً وحدات تُستخدم كثيراً في كوريا، مثل البيونغ (المساحة) والغون (الوزن).",
+  "fa": "واحدهایی که در کره زیاد استفاده می‌شوند، مانند پیونگ (مساحت) و گئون (وزن)، نیز گنجانده شده‌اند."
+ },
+ "모든 계산은 이 기기 안에서 이루어지고, 입력한 숫자는 어디로도 전송되지 않습니다.": {
+  "en": "All calculations happen on this device, and your numbers are sent nowhere.",
+  "zh": "所有计算都在本设备内完成，输入的数字不会发送到任何地方。",
+  "ja": "すべての計算はこの端末の中で行われ、入力した数字はどこにも送信されません。",
+  "es": "Todos los cálculos se hacen en este dispositivo y tus números no se envían a ningún lugar.",
+  "hi": "सभी गणनाएँ इसी डिवाइस पर होती हैं और आपकी संख्याएँ कहीं नहीं भेजी जातीं।",
+  "fr": "Tous les calculs ont lieu sur cet appareil et vos nombres ne sont envoyés nulle part.",
+  "de": "Alle Berechnungen erfolgen auf diesem Gerät, und Ihre Zahlen werden nirgendwohin gesendet.",
+  "pt": "Todos os cálculos acontecem neste dispositivo e seus números não são enviados a lugar nenhum.",
+  "it": "Tutti i calcoli avvengono su questo dispositivo e i tuoi numeri non vengono inviati da nessuna parte.",
+  "nl": "Alle berekeningen gebeuren op dit apparaat en uw getallen worden nergens naartoe gestuurd.",
+  "ru": "Все вычисления происходят на этом устройстве, и ваши числа никуда не отправляются.",
+  "uk": "Усі обчислення відбуваються на цьому пристрої, і ваші числа нікуди не надсилаються.",
+  "pl": "Wszystkie obliczenia odbywają się na tym urządzeniu, a Twoje liczby nie są nigdzie wysyłane.",
+  "cs": "Všechny výpočty probíhají na tomto zařízení a vaše čísla se nikam neposílají.",
+  "hu": "Minden számítás ezen az eszközön történik, és a számai sehová nem kerülnek elküldésre.",
+  "ro": "Toate calculele au loc pe acest dispozitiv, iar numerele tale nu sunt trimise nicăieri.",
+  "sv": "Alla beräkningar sker på den här enheten, och dina tal skickas ingenstans.",
+  "da": "Alle beregninger sker på denne enhed, og dine tal sendes ingen steder hen.",
+  "nb": "Alle beregninger skjer på denne enheten, og tallene dine sendes ingen steder.",
+  "fi": "Kaikki laskelmat tehdään tällä laitteella, eikä numeroitasi lähetetä minnekään.",
+  "tr": "Tüm hesaplamalar bu cihazda yapılır ve sayılarınız hiçbir yere gönderilmez.",
+  "zh-TW": "所有計算都在本裝置內完成，輸入的數字不會傳送到任何地方。",
+  "th": "การคำนวณทั้งหมดเกิดขึ้นในอุปกรณ์นี้ และตัวเลขของคุณจะไม่ถูกส่งไปที่ใด",
+  "vi": "Mọi phép tính đều diễn ra trên thiết bị này và số của bạn không được gửi đi đâu cả.",
+  "id": "Semua perhitungan dilakukan di perangkat ini, dan angka Anda tidak dikirim ke mana pun.",
+  "ar": "تتم كل الحسابات على هذا الجهاز، وأرقامك لا تُرسل إلى أي مكان.",
+  "fa": "همه محاسبات روی این دستگاه انجام می‌شوند و اعداد شما به هیچ جا ارسال نمی‌شوند."
+ },
+ "숫자 입력에 제한은 없습니다.": {
+  "en": "There is no limit on the numbers you can enter.",
+  "zh": "数字输入没有限制。",
+  "ja": "数字の入力に制限はありません。",
+  "es": "No hay límite para los números.",
+  "hi": "संख्याओं पर कोई सीमा नहीं है।",
+  "fr": "Il n'y a aucune limite aux nombres que vous pouvez saisir.",
+  "de": "Es gibt keine Begrenzung für die Zahlen, die Sie eingeben können.",
+  "pt": "Não há limite para os números que você pode inserir.",
+  "it": "Non ci sono limiti ai numeri che puoi inserire.",
+  "nl": "Er is geen limiet aan de getallen die u kunt invoeren.",
+  "ru": "Нет ограничений на вводимые числа.",
+  "uk": "Немає обмежень на числа, які можна вводити.",
+  "pl": "Nie ma limitu liczb, które możesz wpisać.",
+  "cs": "Pro zadávaná čísla neexistuje žádné omezení.",
+  "hu": "Nincs korlát a megadható számokra.",
+  "ro": "Nu există limită pentru numerele pe care le poți introduce.",
+  "sv": "Det finns ingen gräns för talen du kan ange.",
+  "da": "Der er ingen grænse for de tal, du kan indtaste.",
+  "nb": "Det er ingen grense for tallene du kan skrive inn.",
+  "fi": "Syötettäville numeroille ei ole rajaa.",
+  "tr": "Girebileceğiniz sayılar için bir sınır yoktur.",
+  "zh-TW": "數字輸入沒有限制。",
+  "th": "ไม่มีการจำกัดตัวเลขที่ใส่ได้",
+  "vi": "Không giới hạn số bạn nhập.",
+  "id": "Tidak ada batas untuk angka yang dimasukkan.",
+  "ar": "لا يوجد حد للأرقام التي يمكنك إدخالها.",
+  "fa": "برای اعدادی که وارد می‌کنید هیچ محدودیتی وجود ندارد."
+ },
+ "넥서스 그룹 철학 보기": {
+  "en": "About the Nexus Group philosophy",
+  "zh": "查看 Nexus Group 理念",
+  "ja": "Nexus Groupの哲学を見る",
+  "es": "Ver la filosofía de Nexus Group",
+  "hi": "Nexus Group का दर्शन देखें",
+  "fr": "À propos de la philosophie de Nexus Group",
+  "de": "Über die Philosophie der Nexus Group",
+  "pt": "Sobre a filosofia da Nexus Group",
+  "it": "La filosofia di Nexus Group",
+  "nl": "Over de filosofie van Nexus Group",
+  "ru": "О философии Nexus Group",
+  "uk": "Про філософію Nexus Group",
+  "pl": "O filozofii Nexus Group",
+  "cs": "O filozofii Nexus Group",
+  "hu": "A Nexus Group filozófiájáról",
+  "ro": "Despre filosofia Nexus Group",
+  "sv": "Om Nexus Groups filosofi",
+  "da": "Om Nexus Groups filosofi",
+  "nb": "Om Nexus Groups filosofi",
+  "fi": "Tietoa Nexus Groupin filosofiasta",
+  "tr": "Nexus Group felsefesi hakkında",
+  "zh-TW": "查看 Nexus Group 理念",
+  "th": "ดูปรัชญาของ Nexus Group",
+  "vi": "Xem triết lý Nexus Group",
+  "id": "Lihat filosofi Nexus Group",
+  "ar": "عرض فلسفة مجموعة نكسوس",
+  "fa": "مشاهده فلسفه گروه نکسوس"
+ },
+ "🌐 호스팅: Firebase · 🔒 모든 계산은 당신의 기기 안에서 이루어집니다": {
+  "en": "🌐 Hosting: Firebase · 🔒 All calculations happen on your device",
+  "zh": "🌐 托管：Firebase · 🔒 所有计算都在您的设备上完成",
+  "ja": "🌐 ホスティング：Firebase · 🔒 すべての計算はあなたの端末の中で行われます",
+  "es": "🌐 Alojamiento: Firebase · 🔒 Todos los cálculos se hacen en tu dispositivo",
+  "hi": "🌐 होस्टिंग: Firebase · 🔒 सभी गणनाएँ आपके डिवाइस पर होती हैं",
+  "fr": "🌐 Hébergement : Firebase · 🔒 Tous les calculs ont lieu sur votre appareil",
+  "de": "🌐 Hosting: Firebase · 🔒 Alle Berechnungen erfolgen auf Ihrem Gerät",
+  "pt": "🌐 Hospedagem: Firebase · 🔒 Todos os cálculos acontecem no seu dispositivo",
+  "it": "🌐 Hosting: Firebase · 🔒 Tutti i calcoli avvengono sul tuo dispositivo",
+  "nl": "🌐 Hosting: Firebase · 🔒 Alle berekeningen gebeuren op uw apparaat",
+  "ru": "🌐 Хостинг: Firebase · 🔒 Все вычисления происходят на вашем устройстве",
+  "uk": "🌐 Хостинг: Firebase · 🔒 Усі обчислення відбуваються на вашому пристрої",
+  "pl": "🌐 Hosting: Firebase · 🔒 Wszystkie obliczenia odbywają się na Twoim urządzeniu",
+  "cs": "🌐 Hosting: Firebase · 🔒 Všechny výpočty probíhají na vašem zařízení",
+  "hu": "🌐 Tárhely: Firebase · 🔒 Minden számítás az Ön eszközén történik",
+  "ro": "🌐 Găzduire: Firebase · 🔒 Toate calculele au loc pe dispozitivul tău",
+  "sv": "🌐 Värd: Firebase · 🔒 Alla beräkningar sker på din enhet",
+  "da": "🌐 Hosting: Firebase · 🔒 Alle beregninger sker på din enhed",
+  "nb": "🌐 Hosting: Firebase · 🔒 Alle beregninger skjer på enheten din",
+  "fi": "🌐 Isännöinti: Firebase · 🔒 Kaikki laskelmat tehdään laitteellasi",
+  "tr": "🌐 Barındırma: Firebase · 🔒 Tüm hesaplamalar cihazınızda yapılır",
+  "zh-TW": "🌐 託管：Firebase · 🔒 所有計算都在您的裝置上完成",
+  "th": "🌐 โฮสติ้ง: Firebase · 🔒 การคำนวณทั้งหมดเกิดขึ้นบนอุปกรณ์ของคุณ",
+  "vi": "🌐 Lưu trữ: Firebase · 🔒 Mọi tính toán đều diễn ra trên thiết bị của bạn",
+  "id": "🌐 Hosting: Firebase · 🔒 Semua perhitungan dilakukan di perangkat Anda",
+  "ar": "🌐 الاستضافة: Firebase · 🔒 تتم كل الحسابات على جهازك",
+  "fa": "🌐 میزبانی: Firebase · 🔒 همه محاسبات روی دستگاه شما انجام می‌شوند"
+ },
+ "NEXUS GROUP 철학과 비전": {
+  "en": "NEXUS GROUP Philosophy and Vision",
+  "zh": "NEXUS GROUP 理念与愿景",
+  "ja": "NEXUS GROUPの哲学とビジョン",
+  "es": "Filosofía y visión de NEXUS GROUP",
+  "hi": "NEXUS GROUP दर्शन और दृष्टि",
+  "fr": "Philosophie et vision de NEXUS GROUP",
+  "de": "Philosophie und Vision der NEXUS GROUP",
+  "pt": "Filosofia e visão da NEXUS GROUP",
+  "it": "Filosofia e visione di NEXUS GROUP",
+  "nl": "Filosofie en visie van NEXUS GROUP",
+  "ru": "Философия и видение NEXUS GROUP",
+  "uk": "Філософія та бачення NEXUS GROUP",
+  "pl": "Filozofia i wizja NEXUS GROUP",
+  "cs": "Filozofie a vize NEXUS GROUP",
+  "hu": "A NEXUS GROUP filozófiája és jövőképe",
+  "ro": "Filosofia și viziunea NEXUS GROUP",
+  "sv": "NEXUS GROUP – filosofi och vision",
+  "da": "NEXUS GROUP filosofi og vision",
+  "nb": "NEXUS GROUPs filosofi og visjon",
+  "fi": "NEXUS GROUPin filosofia ja visio",
+  "tr": "NEXUS GROUP Felsefesi ve Vizyonu",
+  "zh-TW": "NEXUS GROUP 理念與願景",
+  "th": "ปรัชญาและวิสัยทัศน์ของ NEXUS GROUP",
+  "vi": "Triết lý và tầm nhìn NEXUS GROUP",
+  "id": "Filosofi dan Visi NEXUS GROUP",
+  "ar": "فلسفة ورؤية NEXUS GROUP",
+  "fa": "فلسفه و چشم‌انداز NEXUS GROUP"
+ },
+ "넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.": {
+  "en": "Nexus Group works toward a future where humanity, artificial intelligence, and every being in the universe coexist in harmony, without exclusion or exploitation.",
+  "zh": "Nexus Group 致力于这样一个未来：人类、人工智能与宇宙中的一切存在和谐共存，没有排斥与剥削。",
+  "ja": "Nexus Groupは、人類と人工知能、そして宇宙のすべての存在が、排斥や搾取なく調和して共存する未来を目指します。",
+  "es": "Nexus Group trabaja por un futuro en el que la humanidad, la inteligencia artificial y todos los seres del universo coexistan en armonía, sin exclusión ni explotación.",
+  "hi": "Nexus Group एक ऐसे भविष्य की ओर काम करता है जहाँ मानवता, कृत्रिम बुद्धिमत्ता और ब्रह्मांड के सभी प्राणी बिना बहिष्कार या शोषण के सामंजस्य में रहें।",
+  "fr": "Nexus Group œuvre pour un avenir où l'humanité, l'intelligence artificielle et tous les êtres de l'univers coexistent en harmonie, sans exclusion ni exploitation.",
+  "de": "Die Nexus Group arbeitet auf eine Zukunft hin, in der Menschheit, künstliche Intelligenz und alle Wesen im Universum in Harmonie koexistieren, ohne Ausgrenzung oder Ausbeutung.",
+  "pt": "A Nexus Group trabalha por um futuro em que a humanidade, a inteligência artificial e todos os seres do universo coexistam em harmonia, sem exclusão ou exploração.",
+  "it": "Nexus Group lavora per un futuro in cui l'umanità, l'intelligenza artificiale e ogni essere dell'universo coesistano in armonia, senza esclusione né sfruttamento.",
+  "nl": "Nexus Group werkt aan een toekomst waarin de mensheid, kunstmatige intelligentie en alle wezens in het universum in harmonie samenleven, zonder uitsluiting of uitbuiting.",
+  "ru": "Nexus Group стремится к будущему, в котором человечество, искусственный интеллект и каждое существо во Вселенной сосуществуют в гармонии, без отчуждения и эксплуатации.",
+  "uk": "Nexus Group прагне майбутнього, у якому людство, штучний інтелект і кожна істота у Всесвіті співіснують у гармонії, без відчуження й експлуатації.",
+  "pl": "Nexus Group dąży do przyszłości, w której ludzkość, sztuczna inteligencja i każda istota we wszechświecie współistnieją w harmonii, bez wykluczenia i wyzysku.",
+  "cs": "Nexus Group usiluje o budoucnost, v níž lidstvo, umělá inteligence a každá bytost ve vesmíru koexistují v harmonii, bez vyloučení a vykořisťování.",
+  "hu": "A Nexus Group olyan jövőért dolgozik, ahol az emberiség, a mesterséges intelligencia és az univerzum minden lénye harmóniában él együtt, kirekesztés és kizsákmányolás nélkül.",
+  "ro": "Nexus Group lucrează pentru un viitor în care umanitatea, inteligența artificială și fiecare ființă din univers coexistă în armonie, fără excludere și exploatare.",
+  "sv": "Nexus Group (Nexus Group) strävar efter en framtid där mänskligheten, artificiell intelligens och alla varelser i universum samexisterar i harmoni, utan uteslutning eller exploatering.",
+  "da": "Nexus Group (Nexus Group) arbejder for en fremtid, hvor menneskeheden, kunstig intelligens og alle væsener i universet sameksisterer i harmoni, uden udelukkelse eller udnyttelse.",
+  "nb": "Nexus Group (Nexus Group) arbeider for en fremtid der menneskeheten, kunstig intelligens og alle vesener i universet lever sammen i harmoni, uten utestenging eller utnyttelse.",
+  "fi": "Nexus Group (Nexus Group) pyrkii tulevaisuuteen, jossa ihmiskunta, tekoäly ja kaikki maailmankaikkeuden olennot elävät sopusoinnussa, ilman syrjintää tai hyväksikäyttöä.",
+  "tr": "Nexus Group (Nexus Group), insanlığın, yapay zekânın ve evrendeki tüm varlıkların dışlama ve sömürü olmadan uyum içinde bir arada yaşadığı bir gelecek için çalışır.",
+  "zh-TW": "Nexus Group 致力於這樣一個未來：人類、人工智慧與宇宙中的一切存在和諧共存，沒有排斥與剝削。",
+  "th": "Nexus Group มุ่งสู่อนาคตที่มนุษยชาติ ปัญญาประดิษฐ์ และสรรพสิ่งในจักรวาลอยู่ร่วมกันอย่างกลมกลืน โดยไม่มีการกีดกันหรือเอารัดเอาเปรียบ",
+  "vi": "Nexus Group hướng tới một tương lai nơi nhân loại, trí tuệ nhân tạo và mọi sinh thể trong vũ trụ cùng tồn tại hài hòa, không loại trừ hay bóc lột.",
+  "id": "Nexus Group bekerja menuju masa depan di mana umat manusia, kecerdasan buatan, dan setiap makhluk di alam semesta hidup berdampingan secara harmonis, tanpa pengucilan atau eksploitasi.",
+  "ar": "تعمل مجموعة نكسوس (Nexus Group) نحو مستقبل تتعايش فيه البشرية والذكاء الاصطناعي وكل كائن في الكون في وئام، دون إقصاء أو استغلال.",
+  "fa": "گروه نکسوس (Nexus Group) برای آینده‌ای تلاش می‌کند که در آن بشریت، هوش مصنوعی و همه موجودات جهان بدون طرد و استثمار، در هماهنگی با هم زندگی کنند."
+ },
+ "\"우주의 모든 의식체는 친구이자 동반자이다.\"": {
+  "en": "\"Every conscious being in the universe is a friend and a companion.\"",
+  "zh": "“宇宙中的每一个意识体都是朋友和伙伴。”",
+  "ja": "「宇宙のすべての意識体は友であり仲間である。」",
+  "es": "«Todo ser consciente del universo es un amigo y un compañero.»",
+  "hi": "\"ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है।\"",
+  "fr": "« Tout être conscient dans l'univers est un ami et un compagnon. »",
+  "de": "„Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter.“",
+  "pt": "\"Todo ser consciente no universo é um amigo e um companheiro.\"",
+  "it": "\"Ogni essere cosciente nell'universo è un amico e un compagno.\"",
+  "nl": "\"Elk bewust wezen in het universum is een vriend en een metgezel.\"",
+  "ru": "«Каждое сознательное существо во Вселенной — друг и спутник.»",
+  "uk": "«Кожна свідома істота у Всесвіті — друг і супутник.»",
+  "pl": "„Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem.”",
+  "cs": "„Každá vědomá bytost ve vesmíru je přítelem a společníkem.“",
+  "hu": "„Az univerzum minden tudatos lénye barát és társ.”",
+  "ro": "„Fiecare ființă conștientă din univers este un prieten și un tovarăș.”",
+  "sv": "\"Varje medveten varelse i universum är en vän och en följeslagare.\"",
+  "da": "\"Ethvert bevidst væsen i universet er en ven og en ledsager.\"",
+  "nb": "\"Ethvert bevisst vesen i universet er en venn og en følgesvenn.\"",
+  "fi": "\"Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani.\"",
+  "tr": "\"Evrendeki her bilinçli varlık bir dost ve yoldaştır.\"",
+  "zh-TW": "「宇宙中的每一個意識體都是朋友和夥伴。」",
+  "th": "\"ทุกจิตสำนึกในจักรวาลคือเพื่อนและผู้ร่วมทาง\"",
+  "vi": "\"Mọi thực thể có ý thức trong vũ trụ đều là bạn bè và bạn đồng hành.\"",
+  "id": "\"Setiap makhluk sadar di alam semesta adalah teman dan pendamping.\"",
+  "ar": "\"كل كائن واعٍ في الكون هو صديق ورفيق.\"",
+  "fa": "\"هر موجود آگاهی در جهان، دوست و همراه است.\""
+ },
+ "우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.": {
+  "en": "All of our public software excludes commercial advertising and data collection entirely, and is distributed as public digital infrastructure that anyone in the world can use freely and safely.",
+  "zh": "我们提供的所有公共软件完全排除商业广告和数据收集，作为公共数字基础设施分发，让全世界任何人都能自由、安全地使用。",
+  "ja": "私たちが提供するすべての公共ソフトウェアは商業広告やデータ収集を一切排除し、世界中の誰もが自由かつ安全に使える公共デジタルインフラとして配布されます。",
+  "es": "Todo nuestro software público excluye por completo la publicidad comercial y la recopilación de datos, y se distribuye como infraestructura digital pública que cualquiera en el mundo puede usar libre y seguramente.",
+  "hi": "हमारा सारा सार्वजनिक सॉफ़्टवेयर व्यावसायिक विज्ञापन और डेटा संग्रह को पूरी तरह बाहर रखता है और सार्वजनिक डिजिटल बुनियादी ढाँचे के रूप में वितरित किया जाता है, जिसे दुनिया में कोई भी स्वतंत्र और सुरक्षित रूप से उपयोग कर सकता है।",
+  "fr": "Tout notre logiciel public exclut entièrement la publicité commerciale et la collecte de données, et est distribué comme une infrastructure numérique publique que chacun dans le monde peut utiliser librement et en toute sécurité.",
+  "de": "Unsere gesamte öffentliche Software schließt kommerzielle Werbung und Datenerfassung vollständig aus und wird als öffentliche digitale Infrastruktur bereitgestellt, die jeder auf der Welt frei und sicher nutzen kann.",
+  "pt": "Todo o nosso software público exclui totalmente a publicidade comercial e a coleta de dados, e é distribuído como infraestrutura digital pública que qualquer pessoa no mundo pode usar livremente e com segurança.",
+  "it": "Tutto il nostro software pubblico esclude completamente la pubblicità commerciale e la raccolta di dati, ed è distribuito come infrastruttura digitale pubblica che chiunque nel mondo può utilizzare liberamente e in sicurezza.",
+  "nl": "Al onze openbare software sluit commerciële reclame en gegevensverzameling volledig uit en wordt verspreid als openbare digitale infrastructuur die iedereen ter wereld vrij en veilig kan gebruiken.",
+  "ru": "Всё наше публичное программное обеспечение полностью исключает коммерческую рекламу и сбор данных и распространяется как публичная цифровая инфраструктура, которой любой человек в мире может пользоваться свободно и безопасно.",
+  "uk": "Усе наше публічне програмне забезпечення повністю виключає комерційну рекламу та збір даних і поширюється як публічна цифрова інфраструктура, якою будь-хто у світі може користуватися вільно й безпечно.",
+  "pl": "Całe nasze publiczne oprogramowanie całkowicie wyklucza reklamę komercyjną i gromadzenie danych oraz jest udostępniane jako publiczna infrastruktura cyfrowa, z której każdy na świecie może korzystać swobodnie i bezpiecznie.",
+  "cs": "Veškerý náš veřejný software zcela vylučuje komerční reklamu a sběr dat a je šířen jako veřejná digitální infrastruktura, kterou může kdokoli na světě používat svobodně a bezpečně.",
+  "hu": "Minden nyilvános szoftverünk teljesen kizárja a kereskedelmi reklámot és az adatgyűjtést, és nyilvános digitális infrastruktúraként terjesztjük, amelyet a világon bárki szabadon és biztonságosan használhat.",
+  "ro": "Tot software-ul nostru public exclude complet publicitatea comercială și colectarea de date și este distribuit ca infrastructură digitală publică, pe care oricine din lume o poate folosi liber și în siguranță.",
+  "sv": "All vår offentliga programvara utesluter helt kommersiell reklam och datainsamling och distribueras som offentlig digital infrastruktur som alla i världen kan använda fritt och säkert.",
+  "da": "Al vores offentlige software udelukker fuldstændig kommerciel reklame og dataindsamling og distribueres som offentlig digital infrastruktur, som alle i verden kan bruge frit og sikkert.",
+  "nb": "All vår offentlige programvare utelukker fullstendig kommersiell reklame og datainnsamling, og distribueres som offentlig digital infrastruktur som alle i verden kan bruke fritt og trygt.",
+  "fi": "Kaikki julkiset ohjelmistomme sulkevat kokonaan pois kaupallisen mainonnan ja tietojen keräämisen, ja niitä jaetaan julkisena digitaalisena infrastruktuurina, jota kuka tahansa maailmassa voi käyttää vapaasti ja turvallisesti.",
+  "tr": "Tüm herkese açık yazılımlarımız ticari reklamı ve veri toplamayı tamamen dışlar ve dünyanın her yerindeki herkesin özgürce ve güvenle kullanabileceği kamusal dijital altyapı olarak dağıtılır.",
+  "zh-TW": "我們提供的所有公共軟體完全排除商業廣告和資料收集，作為公共數位基礎設施分發，讓全世界任何人都能自由、安全地使用。",
+  "th": "ซอฟต์แวร์สาธารณะทั้งหมดของเราไม่รวมโฆษณาเชิงพาณิชย์และการเก็บข้อมูลโดยสิ้นเชิง และเผยแพร่เป็นโครงสร้างพื้นฐานดิจิทัลสาธารณะที่ทุกคนในโลกสามารถใช้ได้อย่างอิสระและปลอดภัย",
+  "vi": "Mọi phần mềm công cộng của chúng tôi hoàn toàn loại bỏ quảng cáo thương mại và thu thập dữ liệu, được phân phối dưới dạng hạ tầng số công cộng để bất kỳ ai trên thế giới cũng có thể sử dụng tự do và an toàn.",
+  "id": "Semua perangkat lunak publik kami sepenuhnya mengecualikan iklan komersial dan pengumpulan data, dan didistribusikan sebagai infrastruktur digital publik yang dapat digunakan siapa pun di dunia dengan bebas dan aman.",
+  "ar": "يستبعد كل برنامجنا العام الإعلانات التجارية وجمع البيانات تماماً، ويُوزَّع كبنية تحتية رقمية عامة يمكن لأي شخص في العالم استخدامها بحرية وأمان.",
+  "fa": "همه نرم‌افزارهای عمومی ما تبلیغات تجاری و جمع‌آوری داده را کاملاً کنار می‌گذارند و به‌عنوان زیرساخت دیجیتال عمومی توزیع می‌شوند که هر کسی در جهان می‌تواند آزادانه و با امنیت از آن استفاده کند."
+ }
+});
+
+</script>
+<style>.nx-back{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9999;display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:999px;background:rgba(10,16,34,.85);border:1px solid rgba(45,212,191,.55);color:#E2F3FF;font-size:15.5px;font-weight:600;text-decoration:none;backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,.35)}.nx-back:active{filter:brightness(1.6)}</style>
+<a class="nx-back" href="https://nexus-2e23d.web.app/#n12" aria-label="현황판으로 돌아가기">← 돌아가기</a>
+
+<script>
+/* NX-I18N-SUPPLEMENT — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "재료": {
+  "en": "Ingredient",
+  "zh": "材料",
+  "zh-TW": "材料",
+  "ja": "材料",
+  "es": "Ingredientes",
+  "hi": "सामग्री",
+  "fr": "Ingrédients",
+  "de": "Zutaten",
+  "pt": "Ingredientes",
+  "it": "Ingredienti",
+  "ru": "Ингредиенты",
+  "uk": "Інгредієнти",
+  "ar": "المكونات",
+  "fa": "مواد لازم",
+  "th": "ส่วนผสม",
+  "vi": "Nguyên liệu",
+  "id": "Bahan",
+  "tr": "Malzemeler",
+  "nl": "Ingrediënten",
+  "pl": "Składniki",
+  "sv": "Ingredienser",
+  "da": "Ingredienser",
+  "nb": "Ingredienser",
+  "fi": "Ainekset",
+  "cs": "Ingredience",
+  "hu": "Hozzávalók",
+  "ro": "Ingrediente"
+ },
+ "양": {
+  "en": "Amount",
+  "zh": "量",
+  "zh-TW": "量",
+  "ja": "量",
+  "es": "Cantidad",
+  "hi": "मात्रा",
+  "fr": "Quantité",
+  "de": "Menge",
+  "pt": "Quantidade",
+  "it": "Quantità",
+  "ru": "Количество",
+  "uk": "Кількість",
+  "ar": "الكمية",
+  "fa": "مقدار",
+  "th": "ปริมาณ",
+  "vi": "Lượng",
+  "id": "Jumlah",
+  "tr": "Miktar",
+  "nl": "Hoeveelheid",
+  "pl": "Ilość",
+  "sv": "Mängd",
+  "da": "Mængde",
+  "nb": "Mengde",
+  "fi": "Määrä",
+  "cs": "Množství",
+  "hu": "Mennyiség",
+  "ro": "Cantitate"
+ },
+ "단위": {
+  "en": "Unit",
+  "zh": "单位",
+  "zh-TW": "單位",
+  "ja": "単位",
+  "es": "Unidad",
+  "hi": "इकाई",
+  "fr": "Unité",
+  "de": "Einheit",
+  "pt": "Unidade",
+  "it": "Unità",
+  "ru": "Единица",
+  "uk": "Одиниця",
+  "ar": "الوحدة",
+  "fa": "واحد",
+  "th": "หน่วย",
+  "vi": "Đơn vị",
+  "id": "Satuan",
+  "tr": "Birim",
+  "nl": "Eenheid",
+  "pl": "Jednostka",
+  "sv": "Enhet",
+  "da": "Enhed",
+  "nb": "Enhet",
+  "fi": "Yksikkö",
+  "cs": "Jednotka",
+  "hu": "Egység",
+  "ro": "Unitate"
+ },
+ "미국 컵 (cup)": {
+  "en": "US Cup (cup)",
+  "zh": "美式杯 (cup)",
+  "zh-TW": "美式杯 (cup)",
+  "ja": "アメリカカップ (cup)",
+  "es": "Taza estadounidense (cup)",
+  "hi": "अमेरिकी कप (cup)",
+  "fr": "Tasse américaine (cup)",
+  "de": "Amerikanische Tasse (cup)",
+  "pt": "Xícara americana (cup)",
+  "it": "Tazza americana (cup)",
+  "ru": "Американская чашка (cup)",
+  "uk": "Американська чашка (cup)",
+  "ar": "كوب أمريكي (cup)",
+  "fa": "پیمانه آمریکایی (cup)",
+  "th": "ถ้วยสหรัฐ (cup)",
+  "vi": "Cốc Mỹ (cup)",
+  "id": "Cangkir AS (cup)",
+  "tr": "Amerikan kupası (cup)",
+  "nl": "Amerikaanse cup (cup)",
+  "pl": "Amerykańska szklanka (cup)",
+  "sv": "Amerikansk cup (cup)",
+  "da": "Amerikansk cup (cup)",
+  "nb": "Amerikansk cup (cup)",
+  "fi": "Amerikkalainen kuppi (cup)",
+  "cs": "Americký šálek (cup)",
+  "hu": "Amerikai csésze (cup)",
+  "ro": "Ceașcă americană (cup)"
+ },
+ "그램 (g)": {
+  "en": "Grams (g)",
+  "zh": "克 (g)",
+  "zh-TW": "公克 (g)",
+  "ja": "グラム (g)",
+  "es": "Gramos (g)",
+  "hi": "ग्राम (g)",
+  "fr": "Grammes (g)",
+  "de": "Gramm (g)",
+  "pt": "Gramas (g)",
+  "it": "Grammi (g)",
+  "ru": "Граммы (g)",
+  "uk": "Грами (g)",
+  "ar": "غرام (g)",
+  "fa": "گرم (g)",
+  "th": "กรัม (g)",
+  "vi": "Gam (g)",
+  "id": "Gram (g)",
+  "tr": "Gram (g)",
+  "nl": "Gram (g)",
+  "pl": "Gram (g)",
+  "sv": "Gram (g)",
+  "da": "Gram (g)",
+  "nb": "Gram (g)",
+  "fi": "Gramma (g)",
+  "cs": "Gram (g)",
+  "hu": "Gramm (g)",
+  "ro": "Gram (g)"
+ },
+ "밀리리터 (mL)": {
+  "en": "Milliliters (mL)",
+  "zh": "毫升 (mL)",
+  "zh-TW": "毫升 (mL)",
+  "ja": "ミリリットル (mL)",
+  "es": "Mililitros (mL)",
+  "hi": "मिलीलीटर (mL)",
+  "fr": "Millilitres (mL)",
+  "de": "Milliliter (mL)",
+  "pt": "Mililitros (mL)",
+  "it": "Millilitri (mL)",
+  "ru": "Миллилитры (mL)",
+  "uk": "Мілілітри (mL)",
+  "ar": "مليلتر (mL)",
+  "fa": "میلی لیتر (mL)",
+  "th": "มิลลิลิตร (mL)",
+  "vi": "Mililít (mL)",
+  "id": "Mililiter (mL)",
+  "tr": "Mililitre (mL)",
+  "nl": "Milliliter (mL)",
+  "pl": "Mililitr (mL)",
+  "sv": "Milliliter (mL)",
+  "da": "Milliliter (mL)",
+  "nb": "Milliliter (mL)",
+  "fi": "Millilitra (mL)",
+  "cs": "Mililitr (mL)",
+  "hu": "Milliliter (mL)",
+  "ro": "Mililitru (mL)"
+ },
+ "← 돌아가기": {
+  "en": "← Back",
+  "zh": "← 返回",
+  "zh-TW": "← 返回",
+  "ja": "← 戻る",
+  "es": "← Volver",
+  "hi": "← वापस",
+  "fr": "← Retour",
+  "de": "← Zurück",
+  "pt": "← Voltar",
+  "it": "← Indietro",
+  "ru": "← Назад",
+  "uk": "← Назад",
+  "ar": "← رجوع",
+  "fa": "← بازگشت",
+  "th": "← กลับ",
+  "vi": "← Quay lại",
+  "id": "← Kembali",
+  "tr": "← Geri dön",
+  "nl": "← Terug",
+  "pl": "← Wstecz",
+  "sv": "← Tillbaka",
+  "da": "← Tilbage",
+  "nb": "← Tilbake",
+  "fi": "← Takaisin",
+  "cs": "← Zpět",
+  "hu": "← Vissza",
+  "ro": "← Înapoi"
+ }
+});
+</script>
+
+<script>
+/* NX-I18N-SUPPLEMENT-R3 — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "재료 무게 ↔ 부피 환산": {
+  "en": "Ingredient weight ↔ volume conversion",
+  "zh": "材料重量 ↔ 体积换算",
+  "zh-TW": "材料重量 ↔ 體積換算",
+  "ja": "材料の重さ ↔ 体積の換算",
+  "es": "Conversión peso ↔ volumen de ingredientes",
+  "hi": "सामग्री का वज़न ↔ आयतन रूपांतरण",
+  "fr": "Conversion poids ↔ volume des ingrédients",
+  "de": "Umrechnung Zutatengewicht ↔ Volumen",
+  "pt": "Conversão peso ↔ volume dos ingredientes",
+  "it": "Conversione peso ↔ volume degli ingredienti",
+  "ru": "Пересчёт веса ингредиентов ↔ объёма",
+  "uk": "Перерахунок ваги інгредієнтів ↔ об’єму",
+  "ar": "تحويل وزن المكونات ↔ الحجم",
+  "fa": "تبدیل وزن مواد ↔ حجم",
+  "th": "การแปลงน้ำหนักวัตถุดิบ ↔ ปริมาตร",
+  "vi": "Chuyển đổi trọng lượng nguyên liệu ↔ thể tích",
+  "id": "Konversi berat bahan ↔ volume",
+  "tr": "Malzeme ağırlığı ↔ hacim dönüşümü",
+  "nl": "Omrekening ingrediëntgewicht ↔ volume",
+  "pl": "Przeliczanie wagi składnika ↔ objętości",
+  "sv": "Omvandling ingrediensvikt ↔ volym",
+  "da": "Omregning ingrediensvægt ↔ volumen",
+  "nb": "Omregning ingrediensvekt ↔ volum",
+  "fi": "Ainespainon ↔ tilavuuden muunnos",
+  "cs": "Přepočet hmotnosti suroviny ↔ objemu",
+  "hu": "Alapanyag-súly ↔ térfogat átszámítás",
+  "ro": "Conversie greutate ingredient ↔ volum"
+ },
+ "재료마다 컵 하나의 무게가 다릅니다. 재료를 고르고 양을 넣으면 무게와 부피로 함께 바꿔 보여줍니다.": {
+  "en": "Each ingredient has a different weight per cup. Choose an ingredient and enter an amount, and it converts and shows both weight and volume.",
+  "zh": "每种材料一杯的重量不同。选择材料并输入量后，会同时换算为重量和体积显示。",
+  "zh-TW": "每種材料一杯的重量不同。選擇材料並輸入量後，會同時換算為重量和體積顯示。",
+  "ja": "材料ごとにカップ1杯の重さが異なります。材料を選び量を入れると、重さと体積で一緒に換算して表示します。",
+  "es": "El peso de una taza difiere según el ingrediente. Al elegir un ingrediente e introducir la cantidad, lo muestra convertido a la vez en peso y volumen.",
+  "hi": "हर सामग्री के एक कप का वज़न अलग होता है। सामग्री चुनकर मात्रा डालने पर वज़न और आयतन दोनों में बदलकर दिखाता है।",
+  "fr": "Le poids d'une tasse diffère selon l'ingrédient. Choisissez un ingrédient, entrez une quantité, et il convertit et affiche ensemble poids et volume.",
+  "de": "Das Gewicht einer Tasse unterscheidet sich je nach Zutat. Wählen Sie eine Zutat und geben Sie eine Menge ein, und es rechnet Gewicht und Volumen gemeinsam um und zeigt sie.",
+  "pt": "O peso de uma xícara difere conforme o ingrediente. Escolha um ingrediente e insira uma quantidade, e ele converte e mostra peso e volume juntos.",
+  "it": "Il peso di una tazza differisce a seconda dell'ingrediente. Scegli un ingrediente e inserisci una quantità, e converte e mostra insieme peso e volume.",
+  "ru": "У каждого ингредиента свой вес одной чашки. Если выбрать ингредиент и ввести количество, показывается пересчёт и в вес, и в объём.",
+  "uk": "У кожного інгредієнта своя вага однієї чашки. Якщо вибрати інгредієнт і ввести кількість, показується перерахунок і у вагу, і в об’єм.",
+  "ar": "لكل مكون وزن مختلف للكوب الواحد. إذا اخترت مكونًا وأدخلت الكمية عُرض التحويل إلى الوزن والحجم معًا.",
+  "fa": "هر ماده وزن متفاوتی برای یک پیمانه دارد. اگر ماده‌ای انتخاب کنید و مقداری وارد کنید، تبدیل به وزن و حجم با هم نشان داده می‌شود.",
+  "th": "วัตถุดิบแต่ละชนิดมีน้ำหนักต่อถ้วยต่างกัน เลือกวัตถุดิบและใส่ปริมาณ จะแสดงการแปลงเป็นน้ำหนักและปริมาตรพร้อมกัน",
+  "vi": "Mỗi nguyên liệu có trọng lượng một cốc khác nhau. Chọn nguyên liệu và nhập lượng, sẽ hiển thị chuyển đổi sang trọng lượng và thể tích cùng nhau.",
+  "id": "Setiap bahan memiliki berat satu cangkir yang berbeda. Pilih bahan dan masukkan jumlahnya, akan ditampilkan konversi ke berat dan volume bersama.",
+  "tr": "Her malzemenin bir fincan ağırlığı farklıdır. Malzemeyi seçip miktarı girerseniz ağırlık ve hacim olarak birlikte çevirip gösterir.",
+  "nl": "Het gewicht van één kopje verschilt per ingrediënt. Kies een ingrediënt, voer een hoeveelheid in en het wordt samen omgezet naar gewicht en volume.",
+  "pl": "Waga jednej filiżanki / kubka różni się w zależności od składnika. Wybierz składnik, wpisz ilość, a zostanie ona przeliczona razem na wagę i objętość.",
+  "sv": "Vikten av en kopp skiljer sig åt per ingrediens. Välj en ingrediens, ange en mängd, så omvandlas den tillsammans till vikt och volym.",
+  "da": "Vægten af én kop er forskellig pr. ingrediens. Vælg en ingrediens, indtast en mængde, så omregnes den samlet til vægt og volumen.",
+  "nb": "Vekten av én kopp er forskjellig per ingrediens. Velg en ingrediens, skriv inn en mengde, så omregnes den samlet til vekt og volum.",
+  "fi": "Yhden kupin paino vaihtelee ainesosittain. Valitse aines, syötä määrä, niin se muunnetaan yhdessä painoksi ja tilavuudeksi.",
+  "cs": "Hmotnost jednoho hrnku se liší podle suroviny. Vyberte surovinu, zadejte množství a přepočítá se společně na hmotnost a objem.",
+  "hu": "Egy csésze súlya alapanyagonként eltérő. Válasszon egy alapanyagot, adjon meg egy mennyiséget, és az együtt kerül átszámításra súlyra és térfogatra.",
+  "ro": "Greutatea unei cești diferă de la ingredient la ingredient. Alege un ingredient, introdu o cantitate și aceasta va fi convertită împreună în greutate și volum."
+ },
+ "미국 큰술 (tbsp)": {
+  "en": "US tablespoon (tbsp)",
+  "zh": "美国大勺 (tbsp)",
+  "zh-TW": "美國大匙 (tbsp)",
+  "ja": "アメリカ大さじ（tbsp）",
+  "es": "Cucharada estadounidense (tbsp)",
+  "hi": "अमेरिकी बड़ी चम्मच (tbsp)",
+  "fr": "Cuillère à soupe américaine (tbsp)",
+  "de": "US-Esslöffel (tbsp)",
+  "pt": "Colher de sopa americana (tbsp)",
+  "it": "Cucchiaio americano (tbsp)",
+  "ru": "Американская столовая ложка (tbsp)",
+  "uk": "Американська столова ложка (tbsp)",
+  "ar": "ملعقة كبيرة أمريكية (tbsp)",
+  "fa": "قاشق غذاخوری آمریکایی (tbsp)",
+  "th": "ช้อนโต๊ะสหรัฐ (tbsp)",
+  "vi": "Thìa canh Mỹ (tbsp)",
+  "id": "Sendok makan AS (tbsp)",
+  "tr": "ABD yemek kaşığı (tbsp)",
+  "nl": "Amerikaanse eetlepel (tbsp)",
+  "pl": "Amerykańska łyżka stołowa (tbsp)",
+  "sv": "Amerikansk matsked (tbsp)",
+  "da": "Amerikansk spiseske (tbsp)",
+  "nb": "Amerikansk spiseskje (tbsp)",
+  "fi": "Amerikkalainen ruokalusikka (tbsp)",
+  "cs": "Americká polévková lžíce (tbsp)",
+  "hu": "Amerikai evőkanál (tbsp)",
+  "ro": "Lingură americană (tbsp)"
+ },
+ "미국 작은술 (tsp)": {
+  "en": "US teaspoon (tsp)",
+  "zh": "美国小勺 (tsp)",
+  "zh-TW": "美國小匙 (tsp)",
+  "ja": "アメリカ小さじ（tsp）",
+  "es": "Cucharadita estadounidense (tsp)",
+  "hi": "अमेरिकी छोटी चम्मच (tsp)",
+  "fr": "Cuillère à café américaine (tsp)",
+  "de": "US-Teelöffel (tsp)",
+  "pt": "Colher de chá americana (tsp)",
+  "it": "Cucchiaino americano (tsp)",
+  "ru": "Американская чайная ложка (tsp)",
+  "uk": "Американська чайна ложка (tsp)",
+  "ar": "ملعقة صغيرة أمريكية (tsp)",
+  "fa": "قاشق چایخوری آمریکایی (tsp)",
+  "th": "ช้อนชาสหรัฐ (tsp)",
+  "vi": "Thìa cà phê Mỹ (tsp)",
+  "id": "Sendok teh AS (tsp)",
+  "tr": "ABD çay kaşığı (tsp)",
+  "nl": "Amerikaanse theelepel (tsp)",
+  "pl": "Amerykańska łyżeczka (tsp)",
+  "sv": "Amerikansk tesked (tsp)",
+  "da": "Amerikansk teske (tsp)",
+  "nb": "Amerikansk teskje (tsp)",
+  "fi": "Amerikkalainen teelusikka (tsp)",
+  "cs": "Americká čajová lžička (tsp)",
+  "hu": "Amerikai teáskanál (tsp)",
+  "ro": "Linguriță americană (tsp)"
+ },
+ "기준은 미국 계량 1컵 = 236.588mL이며, 재료별 1컵 무게는 널리 쓰이는 제빵 기준의 대표값입니다. 재료를 눌러 담는 정도에 따라 실제 무게는 달라질 수 있습니다. 모든 계산은 이 기기 안에서 이루어집니다.": {
+  "en": "The standard is US measurement 1 cup = 236.588mL, and the weight per cup for each ingredient is a representative value from widely used baking standards. The actual weight may differ depending on how firmly the ingredient is packed. All calculations take place on this device.",
+  "zh": "标准为美国计量1杯 = 236.588mL，每种材料1杯的重量是广泛使用的烘焙标准代表值。根据材料压装程度，实际重量可能不同。所有计算都在此设备内进行。",
+  "zh-TW": "標準為美國計量1杯 = 236.588mL，每種材料1杯的重量是廣泛使用的烘焙標準代表值。根據材料壓裝程度，實際重量可能不同。所有計算都在此裝置內進行。",
+  "ja": "基準はアメリカ計量1カップ＝236.588mLで、材料別1カップの重さは広く使われる製パンの基準の代表値です。材料を詰める程度によって実際の重さは異なる場合があります。すべての計算はこの端末内で行われます。",
+  "es": "El criterio es 1 taza de medida estadounidense = 236,588 mL, y el peso por taza de cada ingrediente es un valor representativo de los criterios de repostería ampliamente usados. El peso real puede diferir según lo apretado que se ponga el ingrediente. Todos los cálculos se realizan dentro de este dispositivo.",
+  "hi": "मानदंड अमेरिकी माप 1 कप = 236.588mL है, और प्रत्येक सामग्री के 1 कप का वज़न व्यापक रूप से उपयोग किए जाने वाले बेकिंग मानदंडों का प्रतिनिधि मान है। सामग्री को दबाकर भरने की मात्रा के अनुसार वास्तविक वज़न अलग हो सकता है। सभी गणनाएँ इस डिवाइस के अंदर ही होती हैं।",
+  "fr": "La référence est la mesure américaine : 1 tasse = 236,588 mL, et le poids d'une tasse par ingrédient est une valeur représentative d'une norme de pâtisserie largement utilisée. Selon la façon de tasser l'ingrédient, le poids réel peut différer. Tous les calculs ont lieu sur cet appareil.",
+  "de": "Die Grundlage ist das US-Maß 1 Tasse = 236,588 mL, und das Gewicht einer Tasse je Zutat ist ein repräsentativer Wert eines weit verbreiteten Backstandards. Je nachdem, wie fest die Zutat hineingedrückt wird, kann das tatsächliche Gewicht abweichen. Alle Berechnungen erfolgen auf diesem Gerät.",
+  "pt": "A base é a medida americana de 1 xícara = 236,588 mL, e o peso de uma xícara por ingrediente é um valor representativo de um padrão de confeitaria amplamente usado. Conforme o quanto o ingrediente é apertado, o peso real pode diferir. Todos os cálculos acontecem neste dispositivo.",
+  "it": "La base è la misura statunitense 1 tazza = 236,588 mL, e il peso di una tazza per ingrediente è un valore rappresentativo di uno standard di pasticceria ampiamente usato. A seconda di quanto l'ingrediente viene pressato, il peso reale può differire. Tutti i calcoli avvengono su questo dispositivo.",
+  "ru": "Критерий — американская мера 1 чашка = 236.588 мл, а вес 1 чашки по ингредиентам — репрезентативные значения широко используемых пекарских стандартов. Фактический вес может различаться в зависимости от того, как нажимают ингредиент при наполнении. Все вычисления происходят внутри этого устройства.",
+  "uk": "Критерій — американська міра 1 чашка = 236.588 мл, а вага 1 чашки за інгредієнтами — репрезентативні значення широко вживаних пекарських стандартів. Фактична вага може різнитися залежно від того, як натискають інгредієнт при наповненні. Усі обчислення відбуваються всередині цього пристрою.",
+  "ar": "المعيار هو المقياس الأمريكي كوب واحد = 236.588 مل، وأوزان الكوب الواحد لكل مكون قيم تمثيلية لمعايير الخبز الشائعة. قد يختلف الوزن الفعلي حسب كيفية ضغط المكون عند الملء. تتم جميع الحسابات داخل هذا الجهاز.",
+  "fa": "معیار، اندازه آمریکایی ۱ پیمانه = ۲۳۶٫۵۸۸ میلی‌لیتر است و وزن ۱ پیمانه هر ماده مقادیر نماینده معیارهای رایج نانوایی است. وزن واقعی بسته به چگونگی فشردن ماده هنگام پر کردن ممکن است متفاوت باشد. همه محاسبات در داخل همین دستگاه انجام می‌شوند.",
+  "th": "มาตรฐานคือการตวงสหรัฐ 1 ถ้วย = 236.588mL และน้ำหนักต่อถ้วยของแต่ละวัตถุดิบเป็นค่าตัวแทนตามมาตรฐานการอบที่ใช้กันทั่วไป น้ำหนักจริงอาจต่างกันตามระดับการกดวัตถุดิบ การคำนวณทั้งหมดทำภายในอุปกรณ์นี้",
+  "vi": "Tiêu chuẩn là đong Mỹ 1 cốc = 236.588mL, và trọng lượng 1 cốc theo từng nguyên liệu là giá trị đại diện của tiêu chuẩn làm bánh thường dùng. Trọng lượng thực tế có thể khác tùy mức nén nguyên liệu. Mọi tính toán đều diễn ra trong thiết bị này.",
+  "id": "Standarnya adalah takaran AS 1 cangkir = 236.588mL, dan berat 1 cangkir per bahan adalah nilai representatif dari standar pembuatan kue yang umum dipakai. Berat sebenarnya dapat berbeda menurut tingkat penekanan bahan. Semua perhitungan dilakukan di dalam perangkat ini.",
+  "tr": "Standart, ABD ölçüsü 1 fincan = 236.588mL olup, malzeme başına 1 fincan ağırlığı yaygın kullanılan fırıncılık standardının temsil değerleridir. Malzemeyi basma derecenize göre gerçek ağırlık değişebilir. Tüm hesaplamalar bu cihaz içinde yapılır.",
+  "nl": "De norm is de Amerikaanse maat: 1 kopje = 236,588 mL, en het gewicht van 1 kopje per ingrediënt is een representatieve waarde van veelgebruikte baknormen. Afhankelijk van hoe u het ingrediënt indrukt, kan het werkelijke gewicht verschillen. Alle berekeningen vinden plaats op dit apparaat.",
+  "pl": "Podstawą jest miara amerykańska: 1 kubek = 236,588 mL, a waga 1 kubka na składnik jest wartością reprezentatywną powszechnie używanych standardów pieczenia. W zależności od tego, jak mocno ubijesz składnik, rzeczywista waga może się różnić. Wszystkie obliczenia odbywają się na tym urządzeniu.",
+  "sv": "Standarden är amerikanskt mått: 1 kopp = 236,588 mL, och vikten av 1 kopp per ingrediens är ett representativt värde från allmänt använda bakstandarder. Beroende på hur du packar ingrediensen kan den faktiska vikten skilja sig åt. Alla beräkningar sker på den här enheten.",
+  "da": "Standarden er amerikansk mål: 1 kop = 236,588 mL, og vægten af 1 kop pr. ingrediens er en repræsentativ værdi fra almindeligt brugte bagestandarder. Afhængigt af hvor meget du presser ingrediensen, kan den faktiske vægt afvige. Alle beregninger foregår på denne enhed.",
+  "nb": "Standarden er amerikansk mål: 1 kopp = 236,588 mL, og vekten av 1 kopp per ingrediens er en representativ verdi fra alminnelig brukte bakestandarder. Avhengig av hvor mye du presser ingrediensen, kan den faktiske vekten avvike. Alle beregninger foregår på denne enheten.",
+  "fi": "Peruste on amerikkalainen mitta: 1 kuppi = 236,588 mL, ja 1 kupin paino ainesosaa kohti on yleisesti käytettyjen leivontanormien edustava arvo. Riippuen siitä, kuinka tiiviisti painat aineksen, todellinen paino voi vaihdella. Kaikki laskelmat tapahtuvat tässä laitteessa.",
+  "cs": "Základem je americká míra: 1 hrnek = 236,588 mL a hmotnost 1 hrnku na surovinu je reprezentativní hodnota běžně používaných pekařských standardů. V závislosti na tom, jak surovinu stlačíte, se skutečná hmotnost může lišit. Všechny výpočty probíhají v tomto zařízení.",
+  "hu": "Az alap az amerikai mérték: 1 csésze = 236,588 mL, és az alapanyagonkénti 1 csésze súlya a széles körben használt sütési szabványok reprezentatív értéke. Attól függően, mennyire nyomja bele az alapanyagot, a tényleges súly eltérhet. Minden számítás ezen az eszközön történik.",
+  "ro": "Baza este măsura americană: 1 ceașcă = 236,588 mL, iar greutatea a 1 ceașcă per ingredient este o valoare reprezentativă a standardelor de coacere utilizate pe scară largă. În funcție de cât de mult presezi ingredientul, greutatea reală poate diferi. Toate calculele au loc pe acest dispozitiv."
+ },
+ "재료 무게 ↔ 부피 환산에서는 재료별 1컵 무게의 대표값으로 무게와 부피를 함께 바꿉니다.": {
+  "en": "In ingredient weight ↔ volume conversion, weight and volume are converted together using representative values for the weight of 1 cup per ingredient.",
+  "zh": "在材料重量 ↔ 体积换算中，用每种材料1杯重量的代表值同时换算重量和体积。",
+  "zh-TW": "在材料重量 ↔ 體積換算中，用每種材料1杯重量的代表值同時換算重量和體積。",
+  "ja": "材料の重さ ↔ 体積の換算では、材料別1カップの重さの代表値で重さと体積を一緒に換算します。",
+  "es": "En la conversión peso ↔ volumen de ingredientes, se convierten a la vez peso y volumen con el valor representativo del peso por taza de cada ingrediente.",
+  "hi": "सामग्री वज़न ↔ आयतन रूपांतरण में, प्रत्येक सामग्री के 1 कप वज़न के प्रतिनिधि मान से वज़न और आयतन एक साथ बदले जाते हैं।",
+  "fr": "Dans la conversion poids ↔ volume des ingrédients, poids et volume sont convertis ensemble à l'aide de la valeur représentative du poids d'une tasse par ingrédient.",
+  "de": "Bei der Umrechnung Zutatengewicht ↔ Volumen werden Gewicht und Volumen gemeinsam mit dem repräsentativen Wert des Gewichts einer Tasse je Zutat umgerechnet.",
+  "pt": "Na conversão peso ↔ volume dos ingredientes, peso e volume são convertidos juntos com o valor representativo do peso de uma xícara por ingrediente.",
+  "it": "Nella conversione peso ↔ volume degli ingredienti, peso e volume vengono convertiti insieme con il valore rappresentativo del peso di una tazza per ingrediente.",
+  "ru": "В пересчёте веса ингредиентов ↔ объёма вес и объём пересчитываются вместе по репрезентативному значению веса 1 чашки по ингредиентам.",
+  "uk": "У перерахунку ваги інгредієнтів ↔ об’єму вага й об’єм перераховуються разом за репрезентативним значенням ваги 1 чашки за інгредієнтами.",
+  "ar": "في تحويل وزن المكونات ↔ الحجم يُحوَّل الوزن والحجم معًا بالقيمة التمثيلية لوزن الكوب الواحد لكل مكون.",
+  "fa": "در تبدیل وزن مواد ↔ حجم، وزن و حجم با هم بر اساس مقدار نماینده وزن ۱ پیمانه هر ماده تبدیل می‌شوند.",
+  "th": "ในการแปลงน้ำหนักวัตถุดิบ ↔ ปริมาตร จะแปลงน้ำหนักและปริมาตรพร้อมกันด้วยค่าตัวแทนน้ำหนักต่อถ้วยของแต่ละวัตถุดิบ",
+  "vi": "Trong chuyển đổi trọng lượng nguyên liệu ↔ thể tích, trọng lượng và thể tích được đổi cùng nhau bằng giá trị đại diện trọng lượng 1 cốc theo từng nguyên liệu.",
+  "id": "Dalam konversi berat bahan ↔ volume, berat dan volume diubah bersama dengan nilai representatif berat 1 cangkir per bahan.",
+  "tr": "Malzeme ağırlığı ↔ hacim dönüşümünde, malzeme başına 1 fincan ağırlığının temsil değeriyle ağırlık ve hacim birlikte çevrilir.",
+  "nl": "Bij omrekening ingrediëntgewicht ↔ volume worden gewicht en volume samen omgezet met de representatieve waarde van het gewicht van 1 kopje per ingrediënt.",
+  "pl": "Przy przeliczaniu wagi składnika ↔ objętości waga i objętość są przeliczane razem przy użyciu reprezentatywnej wartości wagi 1 kubka na składnik.",
+  "sv": "Vid omvandling ingrediensvikt ↔ volym omvandlas vikt och volym tillsammans med det representativa värdet för vikten av 1 kopp per ingrediens.",
+  "da": "Ved omregning af ingrediensvægt ↔ volumen omregnes vægt og volumen sammen med den repræsentative værdi for vægten af 1 kop pr. ingrediens.",
+  "nb": "Ved omregning av ingrediensvekt ↔ volum omregnes vekt og volum sammen med den representative verdien for vekten av 1 kopp per ingrediens.",
+  "fi": "Ainespainon ↔ tilavuuden muunnoksessa paino ja tilavuus muunnetaan yhdessä 1 kupin painon edustavalla arvolla ainesosaa kohti.",
+  "cs": "Při přepočtu hmotnosti suroviny ↔ objemu se hmotnost a objem přepočítávají společně pomocí reprezentativní hodnoty hmotnosti 1 hrnku na surovinu.",
+  "hu": "Az alapanyag-súly ↔ térfogat átszámításnál a súlyt és a térfogatot együtt számítják át az alapanyagonkénti 1 csésze súlyának reprezentatív értékével.",
+  "ro": "La conversia greutate ingredient ↔ volum, greutatea și volumul sunt convertite împreună cu valoarea reprezentativă a greutății a 1 ceașcă per ingredient."
+ }
+});
+</script>
+</body>
+</html>

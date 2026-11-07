@@ -1,0 +1,3275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 사진 글자 뽑기 — Nexus OCR Reader</title>
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .steps{display:flex;gap:8px;margin:0 0 16px}
+  .step{flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13px}
+  .step b{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--line);color:var(--ink);margin-right:6px;font-size:12px}
+  .step.on{color:var(--ink);border-color:var(--teal)}
+  .step.on b{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f}
+  .drop{border:2px dashed var(--teal);border-radius:16px;padding:40px 16px;text-align:center;cursor:pointer;background:var(--card)}
+  .drop.over{border-color:var(--cyan);background:rgba(56,184,248,.12)}
+  .drop .bigicon{font-size:44px}
+  .pickbtn{border:0;border-radius:999px;padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;margin:12px 0 8px;min-height:48px}
+  .drop p{margin:6px 0;color:var(--muted);font-size:14px}
+  .drop .example{color:var(--teal);font-size:13px}
+  .drop .priv{font-size:12px}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  .field{margin-top:12px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  select,textarea{background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:14px;max-width:100%}
+  select{width:100%}
+  textarea{width:100%;min-height:220px;border-radius:12px;padding:12px;font-size:15px;line-height:1.7}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .statline{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.7}
+  .statline b{color:var(--ink)}
+  .err{color:#F87171}
+  .barwrap{height:10px;background:#111827;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:12px}
+  .barfill{height:100%;width:0%;background:linear-gradient(135deg,var(--cyan),var(--teal));transition:width .15s linear}
+  .previewwrap{margin-top:12px;text-align:center}
+  .previewwrap img{max-width:100%;max-height:420px;border-radius:12px;border:1px solid var(--line)}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  footer .fam span{margin:0 6px}
+  footer .fam .now{color:var(--ink);font-weight:700}
+  footer .fam a{color:var(--cyan);text-decoration:none}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;padding:22px;line-height:1.8;font-size:15px}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  details summary{cursor:pointer;font-size:15px}
+  details p{color:var(--muted);font-size:14px;line-height:1.8}
+  @media(max-width:640px){h1{font-size:20px}.drop{padding:28px 12px}header{padding:10px 12px}.btns button{flex:1}}
+
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer}
+
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 사진 글자 뽑기">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 사진 글자 뽑기 — Nexus OCR Reader">
+<meta property="og:description" content="사진 속 글자를 글자로 바꿔 주는 도구입니다. 인식은 당신의 기기 안에서 실행되고 사진은 기기 밖으로 나가지 않습니다.">
+<meta property="og:image" content="https://nexus-ocr-reader.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+<style id="nx-redesign">/* nx-redesign 2026-11-01: photo and read text are the surfaces */
+.previewwrap img{max-height:480px}
+#ocrBtn{flex:1;min-height:56px;font-size:17px}
+textarea{min-height:260px;font-size:16px}
+</style>
+<style id="nx-thumb-right">/* NX-THUMB-RIGHT */
+#ocrBtn{order:99}
+</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{flex:none}header .brand{flex:none;overflow:visible}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap}.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}</style></head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>SOVEREIGN COMMAND</span></div></a>
+  
+</header>
+
+<main>
+  <div class="steps">
+    <div class="step on" id="step1"><b>1</b> 사진 넣기</div>
+    <div class="step" id="step2"><b>2</b> 언어 고르기</div>
+    <div class="step" id="step3"><b>3</b> 사진 글자 뽑기</div>
+  </div>
+
+  <h1>넥서스 사진 글자 뽑기</h1>
+  <p class="sub" style="margin-bottom:4px">사진 속 글자를 글자로 바꿔 주는 도구</p>
+  <!-- NX-BOUNDARY-2026-11-04 --><p class="sub nx-boundary" style="border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 10px">역할 안내: 사진 글자 뽑기는 사진 속 글자를 <b>글자(텍스트)로 바꿔 주는</b> 도구입니다. 소리로 읽어 주지는 않습니다 — 바꾼 글을 소리로 들으려면 <a href="https://nexus-doc-reader.web.app">문서 읽어 주기(602)</a>에 넣습니다.</p>
+  <p class="sub">회원가입 없음 · 이용료 없음 · 무제한 사용</p>
+
+  <div class="drop" id="drop">
+    <div class="bigicon">🔤</div>
+    <button class="pickbtn" id="pickBtn">사진 열기</button>
+    <p>또는 사진 파일을 여기에 끌어다 놓으세요</p>
+    <p>JPG · PNG · GIF · WebP · BMP 사진에서 글자를 읽어옵니다</p>
+    <p class="example">예) 영수증 사진 → 금액과 상호를 글자로 / 문서 사진 → 복사할 수 있는 글자로</p>
+    <p class="priv">인식 모델을 내려받아 당신의 기기 안에서 실행합니다. 사진은 기기 밖으로 나가지 않습니다.</p>
+    <input type="file" id="fileIn" accept="image/*,.jpg,.jpeg,.png,.gif,.webp,.bmp" hidden>
+  </div>
+
+  <div class="panel" id="previewPanel" style="display:none">
+    <h2>① 넣은 사진</h2>
+    <div class="previewwrap"><img id="previewImg" alt="읽을 사진 미리보기"></div>
+    <p class="statline" id="fileStat"></p>
+  </div>
+
+  <div class="panel">
+    <h2>② 언어 고르기</h2>
+    <div class="field">
+      <label for="langSel">사진 속 글자의 언어</label>
+      <select id="langSel">
+        <option value="kor+eng" selected>한국어 + 영어</option>
+        <option value="kor">한국어만</option>
+        <option value="eng">영어만</option>
+      </select>
+    </div>
+    <div class="btns">
+      <button class="primary" id="ocrBtn">🔤 사진 글자 뽑기</button>
+      <button class="ghost" id="clearBtn">처음부터 다시</button>
+    </div>
+    <p class="statline" id="progLine">아직 읽지 않았습니다. 사진을 넣고 사진 글자 뽑기를 누르세요.</p>
+    <div class="barwrap" id="progBarWrap" style="display:none"><div class="barfill" id="progBar"></div></div>
+    <p class="hint err" id="ocrErr"></p>
+    <p class="hint">인식 정확도는 사진 상태에 따라 달라집니다. 밝고 또렷하게 찍은 사진일수록 잘 읽습니다.</p>
+  </div>
+
+  <div class="panel">
+    <h2>③ 읽은 글자</h2>
+    <textarea id="resultText" placeholder="읽은 글자가 여기에 나타납니다. 직접 고칠 수도 있습니다."></textarea>
+    <p class="statline" id="resultStat">글자 수 <b>0</b>자</p>
+    <div class="btns">
+      <button class="ghost" id="copyBtn">결과 복사</button>
+      <button class="ghost" id="saveBtn">파일로 저장</button>
+    </div>
+    <p class="hint" id="saveMsg"></p>
+  </div>
+
+  <details><summary>💡 도움말</summary><p>사진 열기로 사진 파일을 넣고, 사진 속 글자의 언어를 고른 뒤 사진 글자 뽑기를 누르세요.<br>처음 쓸 때는 인식 모델과 언어 데이터를 내려받느라 조금 걸릴 수 있습니다. 내려받은 뒤에는 다시 내려받지 않습니다.<br>인식은 사진 속 글자를 읽어내는 기계 작업이라 오타가 섞일 수 있습니다. 중요한 내용은 원본 사진과 견주어 확인하세요.<br>손글씨는 인식이 어렵습니다. 인쇄된 글자일수록 잘 읽습니다.<br>사진은 서버로 올라가지 않습니다. 인식 모델을 내려받아 당신의 기기 안에서 실행합니다. 사진은 기기 밖으로 나가지 않습니다.<br>글자 수 제한은 없습니다. 사진 크기가 크면 읽는 데 시간이 더 걸릴 수 있습니다.</p></details>
+<footer>
+    우주의 모든 의식체는 친구이자 동반자이다<br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="philoLink">넥서스 그룹 철학 보기</button><br>
+    🌐 호스팅: Firebase · 🔒 사진은 당신의 기기 안에서만 처리됩니다<br>
+    
+  </footer>
+</main>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>NEXUS GROUP 철학과 비전</h3>
+    <p>넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.</p>
+    <p><b>"우주의 모든 의식체는 친구이자 동반자이다."</b><br>(Every conscious being in the universe is a friend and companion.)</p>
+    <p>우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.</p>
+    <button class="primary" id="modalClose">닫기</button>
+  </div>
+</div>
+<script>
+// ---------- 순수 로직 ----------
+var LANG_NAMES = { 'kor+eng': '한국어 + 영어', 'kor': '한국어', 'eng': '영어' };
+function langLabel(code){
+  return LANG_NAMES[code] || code;
+}
+function countChars(text){
+  return String(text || '').replace(/\s+/g, '').length;
+}
+function formatBytes(n){
+  if(!n && n !== 0) return '';
+  if(n < 1024) return n + '바이트';
+  if(n < 1024 * 1024) return (n / 1024).toFixed(1) + 'KB';
+  return (n / (1024 * 1024)).toFixed(1) + 'MB';
+}
+function isImageFile(f){
+  if(!f) return false;
+  if(f.type && f.type.indexOf('image/') === 0) return true;
+  var name = (f.name || '').toLowerCase();
+  return /\.(jpe?g|png|gif|webp|bmp)$/.test(name);
+}
+function progressFromLogger(m){
+  // Tesseract 로거 상태 → 전체 진행률(0~100)과 표시 문구로 변환
+  if(!m || !m.status) return { pct: 0, label: '준비 중' };
+  var p = (typeof m.progress === 'number') ? m.progress : 0;
+  switch(m.status){
+    case 'loading tesseract core': return { pct: Math.round(p * 10), label: '인식 엔진을 불러오는 중' };
+    case 'initializing tesseract': return { pct: 10, label: '인식 엔진을 준비하는 중' };
+    case 'loading language traineddata': return { pct: 10 + Math.round(p * 30), label: '언어 데이터를 내려받는 중' };
+    case 'initializing api': return { pct: 42, label: '인식을 시작하는 중' };
+    case 'recognizing text': return { pct: 45 + Math.round(p * 55), label: '글자를 읽는 중' };
+    default: return { pct: Math.round(p * 100), label: m.status };
+  }
+}
+function cleanOcrText(text){
+  var t = String(text || '');
+  t = t.replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n');
+  return t.replace(/^\s+|\s+$/g, '');
+}
+function ocrFileName(now){
+  var d = now || new Date();
+  var p = function(n){ return (n < 10 ? '0' : '') + n; };
+  return 'nexus-ocr-' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' +
+    p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + '.txt';
+}
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"']/g, function(c){
+    return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c];
+  });
+}
+
+// ---------- 상태와 요소 ----------
+var $ = function(id){ return document.getElementById(id); };
+var SITE = 'ocr';
+function nxEvent(ev){ try { fetch("https://nexus-orchestrator.woojuhanul.workers.dev/event", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({site: SITE, event: ev}), keepalive:true}).catch(function(){}); } catch(e){} }
+
+var S = { file: null, objectUrl: null, recognizing: false };
+function setStep(n){
+  for(var i = 1; i <= 3; i++){
+    $('step' + i).className = 'step' + (i <= n ? ' on' : '');
+  }
+}
+function updateResultStat(){
+  $('resultStat').innerHTML = '글자 수 <b>' + countChars($('resultText').value).toLocaleString() + '</b>자';
+}
+$('resultText').addEventListener('input', updateResultStat);
+updateResultStat();
+
+// ---------- 사진 넣기 ----------
+var drop = $('drop'), fileIn = $('fileIn'), fileStat = $('fileStat');
+function handleFile(f){
+  if(!f) return;
+  if(!isImageFile(f)){
+    $('ocrErr').textContent = '사진 파일이 아닙니다. JPG · PNG 같은 사진 파일을 넣어주세요.';
+    return;
+  }
+  $('ocrErr').textContent = '';
+  S.file = f;
+  if(S.objectUrl){ try{ URL.revokeObjectURL(S.objectUrl); }catch(e){} }
+  S.objectUrl = URL.createObjectURL(f);
+  $('previewImg').src = S.objectUrl;
+  $('previewPanel').style.display = 'block';
+  fileStat.innerHTML = escapeHtml(f.name || '사진') + ' · ' + formatBytes(f.size);
+  setStep(2);
+  $('progLine').textContent = '사진이 들어갔습니다. 언어를 고르고 사진 글자 뽑기를 누르세요.';
+}
+$('pickBtn').addEventListener('click', function(e){ e.stopPropagation(); fileIn.click(); });
+drop.addEventListener('click', function(){ fileIn.click(); });
+fileIn.addEventListener('change', function(){ if(fileIn.files && fileIn.files[0]) handleFile(fileIn.files[0]); fileIn.value = ''; });
+['dragenter', 'dragover'].forEach(function(ev){
+  drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add('over'); });
+});
+['dragleave', 'drop'].forEach(function(ev){
+  drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove('over'); });
+});
+drop.addEventListener('drop', function(e){
+  var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if(f) handleFile(f);
+});
+
+// ---------- 사진 글자 뽑기 ----------
+var loadedLibs = {};
+function loadScript(src, key){
+  if(loadedLibs[key]) return loadedLibs[key];
+  loadedLibs[key] = new Promise(function(resolve, reject){
+    var s = document.createElement('script');
+    s.src = src;
+    s.onload = function(){ resolve(true); };
+    s.onerror = function(){ reject(new Error('인식 도구를 불러오지 못했습니다')); };
+    document.head.appendChild(s);
+  });
+  return loadedLibs[key];
+}
+function setOcrUI(on){
+  S.recognizing = on;
+  $('ocrBtn').disabled = on;
+  $('progBarWrap').style.display = on ? 'block' : 'none';
+  if(on) $('progBar').style.width = '0%';
+}
+function onOcrProgress(m){
+  var info = progressFromLogger(m);
+  $('progBar').style.width = info.pct + '%';
+  $('progLine').textContent = info.label + ' (' + info.pct + '%)';
+}
+function applyResult(text){
+  var cleaned = cleanOcrText(text);
+  $('resultText').value = cleaned;
+  updateResultStat();
+  setStep(3);
+  if(cleaned){
+    $('progLine').textContent = '읽기가 끝났습니다. 글자 ' + countChars(cleaned).toLocaleString() + '자를 읽었습니다.';
+  }else{
+    $('progLine').textContent = '읽기가 끝났지만 글자를 찾지 못했습니다. 더 밝고 또렷한 사진으로 다시 시도해 보세요.';
+  }
+  return cleaned;
+}
+function runOcr(){
+  if(S.recognizing) return;
+  if(!S.file){
+    $('ocrErr').textContent = '먼저 사진을 넣어주세요.';
+    return;
+  }
+  if(typeof Tesseract === 'undefined'){
+    // 라이브러리가 아직 없으면 불러온 뒤 다시 들어온다
+    $('progLine').textContent = '인식 도구를 불러오는 중입니다…';
+    loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.0.5/dist/tesseract.min.js', 'tesseract')
+      .then(function(){ runOcr(); })
+      .catch(function(){
+        nxEvent('fail');
+        $('ocrErr').textContent = '인식 도구를 불러오지 못했습니다. 연결 상태를 확인하고 다시 시도해 주세요.';
+        $('progLine').textContent = '인식 도구를 불러오지 못했습니다.';
+      });
+    return;
+  }
+  $('ocrErr').textContent = '';
+  setOcrUI(true);
+  nxEvent('start');
+  var langs = $('langSel').value || 'kor+eng';
+  var worker = null;
+  Tesseract.createWorker(langs, 1, { logger: onOcrProgress }).then(function(w){
+    worker = w;
+    return worker.recognize(S.file);
+  }).then(function(res){
+    var text = (res && res.data && typeof res.data.text === 'string') ? res.data.text : '';
+    applyResult(text);
+    nxEvent('complete');
+    setOcrUI(false);
+    if(worker){ worker.terminate().catch(function(){}); }
+  }).catch(function(){
+    nxEvent('fail');
+    $('ocrErr').textContent = '글자를 읽지 못했습니다. 사진이 너무 크거나 흐리면 실패할 수 있습니다. 다른 사진으로 다시 시도해 주세요.';
+    $('progLine').textContent = '읽기에 실패했습니다.';
+    setOcrUI(false);
+    if(worker){ worker.terminate().catch(function(){}); }
+  });
+}
+$('ocrBtn').addEventListener('click', runOcr);
+$('langSel').addEventListener('change', function(){ setStep(2); });
+$('clearBtn').addEventListener('click', function(){
+  S.file = null;
+  if(S.objectUrl){ try{ URL.revokeObjectURL(S.objectUrl); }catch(e){} S.objectUrl = null; }
+  $('previewImg').removeAttribute('src');
+  $('previewPanel').style.display = 'none';
+  $('resultText').value = '';
+  updateResultStat();
+  $('ocrErr').textContent = '';
+  $('progLine').textContent = '아직 읽지 않았습니다. 사진을 넣고 사진 글자 뽑기를 누르세요.';
+  setStep(1);
+});
+
+// ---------- 결과 다루기 ----------
+$('copyBtn').addEventListener('click', function(){
+  var v = $('resultText').value || '';
+  if(!v){ $('saveMsg').textContent = '복사할 결과가 없습니다.'; return; }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(v).then(function(){
+      $('saveMsg').textContent = '결과가 복사되었습니다.';
+    }, function(){ $('saveMsg').textContent = '복사가 되지 않았습니다.'; });
+  }else{
+    $('resultText').select();
+    try{ document.execCommand('copy'); $('saveMsg').textContent = '결과가 복사되었습니다.'; }
+    catch(e){ $('saveMsg').textContent = '복사가 되지 않았습니다.'; }
+  }
+});
+$('saveBtn').addEventListener('click', function(){
+  var v = $('resultText').value || '';
+  if(!v){ $('saveMsg').textContent = '저장할 결과가 없습니다.'; return; }
+  var blob = new Blob([v], {type: 'text/plain;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = ocrFileName(new Date());
+  document.body.appendChild(a); a.click(); a.remove();
+  nxEvent('save');
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+  $('saveMsg').textContent = '파일로 저장했습니다.';
+});
+
+// ---------- 철학 모달 ----------
+$('philoLink').addEventListener('click', function(){ $('modalBg').classList.add('open'); });
+$('modalClose').addEventListener('click', function(){ $('modalBg').classList.remove('open'); });
+$('modalBg').addEventListener('click', function(e){ if(e.target === $('modalBg')) $('modalBg').classList.remove('open'); });
+</script>
+
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 소리 자르기": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 영상 자르기": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 사진 정보 가리기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 읽어 주기": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 긴 말 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 사진 글자 뽑기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 녹음기": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 말로 쓰는 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 17호 사진 글자 뽑기 전용 사전 — 표시 문구만. OCR 작업 언어 선택(kor+eng/kor/eng) 로직은 건드리지 않는다 */
+NX_I18N_ADD({
+ "17호 사진 글자 뽑기 (현재)": {
+  "en": "17. Text Reader (current)",
+  "zh": "17号 文字识别（当前）",
+  "ja": "17号 文字読み取り（現在）",
+  "es": "17. Lector de texto (actual)",
+  "hi": "17. टेक्स्ट रीडर (वर्तमान)",
+  "fr": "17. Lecteur de texte (actuel)",
+  "de": "17. Textleser (aktuell)",
+  "pt": "17. Leitor de texto (atual)",
+  "it": "17. Lettore di testo (attuale)",
+  "nl": "17. Tekstlezer (huidig)",
+  "ru": "17. Чтение текста (текущее)",
+  "uk": "17. Читання тексту (поточне)",
+  "pl": "17. Czytnik tekstu (bieżący)",
+  "cs": "17. Čtečka textu (aktuální)",
+  "hu": "17. Szövegolvasó (aktuális)",
+  "ro": "17. Cititor de text (curent)",
+  "sv": "17. Textläsare (aktuell)",
+  "da": "17. Tekstlæser (aktuel)",
+  "nb": "17. Tekstleser (gjeldende)",
+  "fi": "17. Tekstinlukija (nykyinen)",
+  "tr": "17. Metin Okuyucu (geçerli)",
+  "zh-TW": "17號 文字辨識（目前）",
+  "th": "17. โปรแกรมอ่านข้อความ (ปัจจุบัน)",
+  "vi": "17. Trình đọc văn bản (hiện tại)",
+  "id": "17. Pembaca Teks (saat ini)",
+  "ar": "17. قارئ النصوص (الحالي)",
+  "fa": "17. متن‌خوان (کنونی)"
+ },
+ "🏠 넥서스 그룹 홈페이지": {
+  "en": "🏠 Nexus Group Home",
+  "zh": "🏠 Nexus Group 主页",
+  "ja": "🏠 Nexus Group ホーム",
+  "es": "🏠 Inicio de Nexus Group",
+  "hi": "🏠 Nexus Group होम",
+  "fr": "🏠 Accueil Nexus Group",
+  "de": "🏠 Nexus Group Startseite",
+  "pt": "🏠 Início do Nexus Group",
+  "it": "🏠 Home Nexus Group",
+  "nl": "🏠 Nexus Group Home",
+  "ru": "🏠 Главная страница Nexus Group",
+  "uk": "🏠 Головна сторінка Nexus Group",
+  "pl": "🏠 Strona główna Nexus Group",
+  "cs": "🏠 Domovská stránka Nexus Group",
+  "hu": "🏠 Nexus Group kezdőlap",
+  "ro": "🏠 Pagina principală Nexus Group",
+  "sv": "🏠 Nexus Groups startsida",
+  "da": "🏠 Nexus Groups startside",
+  "nb": "🏠 Nexus-gruppens startside",
+  "fi": "🏠 Nexus Groupin kotisivu",
+  "tr": "🏠 Nexus Group ana sayfası",
+  "zh-TW": "🏠 Nexus Group 首頁",
+  "th": "🏠 หน้าแรก Nexus Group",
+  "vi": "🏠 Trang chủ Nexus Group",
+  "id": "🏠 Beranda Nexus Group",
+  "ar": "🏠 الصفحة الرئيسية لمجموعة نكسوس",
+  "fa": "🏠 صفحه اصلی گروه نکسوس"
+ },
+ "넥서스 사진 글자 뽑기 — Nexus OCR Reader": {
+  "en": "Nexus OCR Reader",
+  "zh": "Nexus 文字识别",
+  "ja": "Nexus 文字読み取り",
+  "es": "Nexus Lector de texto",
+  "hi": "Nexus टेक्स्ट रीडर",
+  "fr": "Nexus Lecteur OCR",
+  "de": "Nexus OCR-Leser",
+  "pt": "Nexus Leitor OCR",
+  "it": "Nexus Lettore OCR",
+  "nl": "Nexus OCR-lezer",
+  "ru": "Nexus Чтение текста",
+  "uk": "Nexus Читання тексту",
+  "pl": "Nexus Czytnik tekstu",
+  "cs": "Nexus Čtečka textu",
+  "hu": "Nexus Szövegolvasó",
+  "ro": "Nexus Cititor de text",
+  "sv": "Nexus OCR-läsare",
+  "da": "Nexus OCR-læser",
+  "nb": "Nexus OCR-leser",
+  "fi": "Nexus OCR-lukija",
+  "tr": "Nexus OCR Okuyucu",
+  "zh-TW": "Nexus 文字辨識",
+  "th": "Nexus โปรแกรมอ่านข้อความ OCR",
+  "vi": "Nexus Trình đọc OCR",
+  "id": "Nexus Pembaca OCR",
+  "ar": "قارئ نصوص نكسوس — Nexus OCR Reader",
+  "fa": "متن‌خوان نکسوس — Nexus OCR Reader"
+ },
+ "넥서스 사진 글자 뽑기": {
+  "en": "Nexus OCR Reader",
+  "zh": "Nexus 文字识别",
+  "ja": "Nexus 文字読み取り",
+  "es": "Nexus Lector de texto",
+  "hi": "Nexus टेक्स्ट रीडर",
+  "fr": "Nexus Lecteur OCR",
+  "de": "Nexus OCR-Leser",
+  "pt": "Nexus Leitor OCR",
+  "it": "Nexus Lettore OCR",
+  "nl": "Nexus OCR-lezer",
+  "ru": "Nexus Чтение текста",
+  "uk": "Nexus Читання тексту",
+  "pl": "Nexus Czytnik tekstu",
+  "cs": "Nexus Čtečka textu",
+  "hu": "Nexus Szövegolvasó",
+  "ro": "Nexus Cititor de text",
+  "sv": "Nexus OCR-läsare",
+  "da": "Nexus OCR-læser",
+  "nb": "Nexus OCR-leser",
+  "fi": "Nexus OCR-lukija",
+  "tr": "Nexus OCR Okuyucu",
+  "zh-TW": "Nexus 文字辨識",
+  "th": "Nexus โปรแกรมอ่านข้อความ OCR",
+  "vi": "Nexus Trình đọc OCR",
+  "id": "Nexus Pembaca OCR",
+  "ar": "قارئ نصوص نكسوس",
+  "fa": "متن‌خوان نکسوس"
+ },
+ "사진 넣기": {
+  "en": "Add a photo",
+  "zh": "添加照片",
+  "ja": "写真を入れる",
+  "es": "Añadir foto",
+  "hi": "फ़ोटो जोड़ें",
+  "fr": "Ajouter une photo",
+  "de": "Foto hinzufügen",
+  "pt": "Adicionar uma foto",
+  "it": "Aggiungi una foto",
+  "nl": "Foto toevoegen",
+  "ru": "Добавить фотографию",
+  "uk": "Додати фотографію",
+  "pl": "Dodaj zdjęcie",
+  "cs": "Přidat fotografii",
+  "hu": "Fotó hozzáadása",
+  "ro": "Adaugă o fotografie",
+  "sv": "Lägg till ett foto",
+  "da": "Tilføj et foto",
+  "nb": "Legg til et bilde",
+  "fi": "Lisää kuva",
+  "tr": "Fotoğraf ekle",
+  "zh-TW": "加入照片",
+  "th": "เพิ่มภาพถ่าย",
+  "vi": "Thêm ảnh",
+  "id": "Tambah Foto",
+  "ar": "إضافة صورة",
+  "fa": "افزودن عکس"
+ },
+ "언어 고르기": {
+  "en": "Choose language",
+  "zh": "选择语言",
+  "ja": "言語を選ぶ",
+  "es": "Elegir idioma",
+  "hi": "भाषा चुनें",
+  "fr": "Choisir la langue",
+  "de": "Sprache wählen",
+  "pt": "Escolher o idioma",
+  "it": "Scegli la lingua",
+  "nl": "Taal kiezen",
+  "ru": "Выбрать язык",
+  "uk": "Вибрати мову",
+  "pl": "Wybierz język",
+  "cs": "Vybrat jazyk",
+  "hu": "Nyelv kiválasztása",
+  "ro": "Alege limba",
+  "sv": "Välj språk",
+  "da": "Vælg sprog",
+  "nb": "Velg språk",
+  "fi": "Valitse kieli",
+  "tr": "Dil seç",
+  "zh-TW": "選擇語言",
+  "th": "เลือกภาษา",
+  "vi": "Chọn ngôn ngữ",
+  "id": "Pilih Bahasa",
+  "ar": "اختيار اللغة",
+  "fa": "انتخاب زبان"
+ },
+ "사진 글자 뽑기": {
+  "en": "Read text",
+  "zh": "识别文字",
+  "ja": "文字を読み取る",
+  "es": "Leer texto",
+  "hi": "टेक्स्ट पढ़ें",
+  "fr": "Lire le texte",
+  "de": "Text lesen",
+  "pt": "Ler texto",
+  "it": "Leggi il testo",
+  "nl": "Tekst lezen",
+  "ru": "Читать текст",
+  "uk": "Читати текст",
+  "pl": "Czytaj tekst",
+  "cs": "Číst text",
+  "hu": "Szöveg olvasása",
+  "ro": "Citește textul",
+  "sv": "Läs text",
+  "da": "Læs tekst",
+  "nb": "Les tekst",
+  "fi": "Lue teksti",
+  "tr": "Metni oku",
+  "zh-TW": "辨識文字",
+  "th": "อ่านข้อความ",
+  "vi": "Đọc văn bản",
+  "id": "Baca Teks",
+  "ar": "قراءة النص",
+  "fa": "خواندن متن"
+ },
+ "사진 속 글자를 글자로 바꿔 주는 도구": {
+  "en": "Turns text in photos into editable text",
+  "zh": "把照片中的文字变成文字的工具",
+  "ja": "写真の中の文字をテキストに変えるツール",
+  "es": "Herramienta que convierte el texto de las fotos en texto",
+  "hi": "फ़ोटो के टेक्स्ट को टेक्स्ट में बदलने वाला टूल",
+  "fr": "Convertit le texte des photos en texte modifiable",
+  "de": "Verwandelt Text in Fotos in bearbeitbaren Text",
+  "pt": "Transforma o texto das fotos em texto editável",
+  "it": "Trasforma il testo nelle foto in testo modificabile",
+  "nl": "Zet tekst in foto's om in bewerkbare tekst",
+  "ru": "Преобразует текст на фотографиях в редактируемый текст",
+  "uk": "Перетворює текст на фотографіях на редагований текст",
+  "pl": "Zamienia tekst ze zdjęć w tekst do edycji",
+  "cs": "Převádí text z fotografií na upravitelný text",
+  "hu": "A fotókon lévő szöveget szerkeszthető szöveggé alakítja",
+  "ro": "Transformă textul din fotografii în text editabil",
+  "sv": "Omvandlar text i foton till text",
+  "da": "Laver tekst på fotos om til tekst",
+  "nb": "Gjør tekst i bilder om til tekst",
+  "fi": "Muuttaa kuvien tekstin tekstiksi",
+  "tr": "Fotoğraflardaki metni metne dönüştürür",
+  "zh-TW": "把照片中的文字變成文字的工具",
+  "th": "เครื่องมือที่เปลี่ยนข้อความในภาพถ่ายให้เป็นข้อความที่แก้ไขได้",
+  "vi": "Công cụ biến văn bản trong ảnh thành văn bản",
+  "id": "Alat yang mengubah teks dalam foto menjadi teks",
+  "ar": "أداة تحوّل النص الموجود في الصور إلى نص",
+  "fa": "ابزاری که نوشته داخل عکس را به متن تبدیل می‌کند"
+ },
+ "회원가입 없음 · 이용료 없음 · 무제한 사용": {
+  "en": "No sign-up · No fees · Unlimited use",
+  "zh": "无需注册 · 免费 · 无限使用",
+  "ja": "登録不要 · 無料 · 無制限",
+  "es": "Sin registro · Gratis · Uso ilimitado",
+  "hi": "कोई साइन-अप नहीं · कोई शुल्क नहीं · असीमित उपयोग",
+  "fr": "Sans inscription · Sans frais · Utilisation illimitée",
+  "de": "Keine Anmeldung · Keine Gebühren · Unbegrenzte Nutzung",
+  "pt": "Sem cadastro · Sem taxas · Uso ilimitado",
+  "it": "Senza registrazione · Senza costi · Uso illimitato",
+  "nl": "Geen registratie · Geen kosten · Onbeperkt gebruik",
+  "ru": "Без регистрации · Бесплатно · Без ограничений",
+  "uk": "Без реєстрації · Безкоштовно · Без обмежень",
+  "pl": "Bez rejestracji · Bez opłat · Bez ograniczeń",
+  "cs": "Bez registrace · Zdarma · Bez omezení",
+  "hu": "Regisztráció nélkül · Díjmentes · Korlátlan használat",
+  "ro": "Fără înregistrare · Fără taxe · Utilizare nelimitată",
+  "sv": "Ingen registrering · Inga avgifter · Obegränsad användning",
+  "da": "Ingen tilmelding · Ingen gebyrer · Ubegrænset brug",
+  "nb": "Ingen registrering · Ingen gebyrer · Ubegrenset bruk",
+  "fi": "Ei rekisteröitymistä · Ei maksuja · Rajaton käyttö",
+  "tr": "Kayıt yok · Ücret yok · Sınırsız kullanım",
+  "zh-TW": "無需註冊 · 免費 · 無限使用",
+  "th": "ไม่ต้องสมัครสมาชิก · ไม่มีค่าธรรมเนียม · ใช้งานได้ไม่จำกัด",
+  "vi": "Không cần đăng ký · Không phí · Sử dụng không giới hạn",
+  "id": "Tanpa pendaftaran · Tanpa biaya · Penggunaan tanpa batas",
+  "ar": "بدون تسجيل · بدون رسوم · استخدام غير محدود",
+  "fa": "بدون ثبت‌نام · بدون هزینه · استفاده نامحدود"
+ },
+ "사진 열기": {
+  "en": "Open a photo",
+  "zh": "打开照片",
+  "ja": "写真を開く",
+  "es": "Abrir una foto",
+  "hi": "फ़ोटो खोलें",
+  "fr": "Ouvrir une photo",
+  "de": "Foto öffnen",
+  "pt": "Abrir uma foto",
+  "it": "Apri una foto",
+  "nl": "Foto openen",
+  "ru": "Открыть фотографию",
+  "uk": "Відкрити фотографію",
+  "pl": "Otwórz zdjęcie",
+  "cs": "Otevřít fotografii",
+  "hu": "Fotó megnyitása",
+  "ro": "Deschide o fotografie",
+  "sv": "Öppna ett foto",
+  "da": "Åbn et foto",
+  "nb": "Åpne et bilde",
+  "fi": "Avaa kuva",
+  "tr": "Bir fotoğraf aç",
+  "zh-TW": "打開照片",
+  "th": "เปิดภาพถ่าย",
+  "vi": "Mở ảnh",
+  "id": "Buka Foto",
+  "ar": "فتح صورة",
+  "fa": "باز کردن عکس"
+ },
+ "또는 사진 파일을 여기에 끌어다 놓으세요": {
+  "en": "or drag and drop an image file here",
+  "zh": "或将图片文件拖放到这里",
+  "ja": "または画像ファイルをここにドラッグしてください",
+  "es": "o arrastra un archivo de imagen aquí",
+  "hi": "या छवि फ़ाइल यहाँ खींचकर छोड़ें",
+  "fr": "ou glissez-déposez un fichier image ici",
+  "de": "oder ziehen Sie eine Bilddatei hierher",
+  "pt": "ou arraste e solte um arquivo de imagem aqui",
+  "it": "oppure trascina qui un file immagine",
+  "nl": "of sleep een afbeeldingsbestand hierheen",
+  "ru": "или перетащите сюда файл изображения",
+  "uk": "або перетягніть сюди файл зображення",
+  "pl": "lub przeciągnij i upuść tutaj plik graficzny",
+  "cs": "nebo sem přetáhněte soubor obrázku",
+  "hu": "vagy húzzon ide egy képfájlt",
+  "ro": "sau trage și plasează un fișier imagine aici",
+  "sv": "eller dra och släpp en bildfil här",
+  "da": "eller træk og slip en billedfil her",
+  "nb": "eller dra og slipp en bildefil her",
+  "fi": "tai vedä ja pudota kuvatiedosto tähän",
+  "tr": "ya da bir resim dosyasını buraya sürükleyip bırakın",
+  "zh-TW": "或將圖片檔案拖放到這裡",
+  "th": "หรือลากไฟล์ภาพมาวางที่นี่",
+  "vi": "hoặc kéo và thả tệp hình ảnh vào đây",
+  "id": "atau seret dan letakkan berkas gambar di sini",
+  "ar": "أو اسحب ملف صورة وأفلته هنا",
+  "fa": "یا فایل عکس را اینجا بکشید و رها کنید"
+ },
+ "JPG · PNG · GIF · WebP · BMP 사진에서 글자를 읽어옵니다": {
+  "en": "Reads text from JPG · PNG · GIF · WebP · BMP images",
+  "zh": "从 JPG · PNG · GIF · WebP · BMP 图片中读取文字",
+  "ja": "JPG・PNG・GIF・WebP・BMPの写真から文字を読み取ります",
+  "es": "Lee texto de imágenes JPG · PNG · GIF · WebP · BMP",
+  "hi": "JPG · PNG · GIF · WebP · BMP छवियों से टेक्स्ट पढ़ता है",
+  "fr": "Lit le texte des images JPG · PNG · GIF · WebP · BMP",
+  "de": "Liest Text aus JPG · PNG · GIF · WebP · BMP Bildern",
+  "pt": "Lê texto de imagens JPG · PNG · GIF · WebP · BMP",
+  "it": "Legge il testo da immagini JPG · PNG · GIF · WebP · BMP",
+  "nl": "Leest tekst uit JPG · PNG · GIF · WebP · BMP afbeeldingen",
+  "ru": "Читает текст с изображений JPG · PNG · GIF · WebP · BMP",
+  "uk": "Читає текст із зображень JPG · PNG · GIF · WebP · BMP",
+  "pl": "Czyta tekst z obrazów JPG · PNG · GIF · WebP · BMP",
+  "cs": "Čte text z obrázků JPG · PNG · GIF · WebP · BMP",
+  "hu": "Szöveget olvas JPG · PNG · GIF · WebP · BMP képekből",
+  "ro": "Citește text din imagini JPG · PNG · GIF · WebP · BMP",
+  "sv": "Läser text från bilder i JPG · PNG · GIF · WebP · BMP",
+  "da": "Læser tekst fra billeder i JPG · PNG · GIF · WebP · BMP",
+  "nb": "Leser tekst fra bilder i JPG · PNG · GIF · WebP · BMP",
+  "fi": "Lukee tekstiä JPG · PNG · GIF · WebP · BMP -kuvista",
+  "tr": "JPG · PNG · GIF · WebP · BMP resimlerinden metin okur",
+  "zh-TW": "從 JPG · PNG · GIF · WebP · BMP 圖片中讀取文字",
+  "th": "อ่านข้อความจากภาพ JPG · PNG · GIF · WebP · BMP",
+  "vi": "Đọc văn bản từ hình ảnh JPG · PNG · GIF · WebP · BMP",
+  "id": "Membaca teks dari gambar JPG · PNG · GIF · WebP · BMP",
+  "ar": "يقرأ النص من صور JPG · PNG · GIF · WebP · BMP",
+  "fa": "از عکس‌های JPG · PNG · GIF · WebP · BMP متن می‌خواند"
+ },
+ "예) 영수증 사진 → 금액과 상호를 글자로 / 문서 사진 → 복사할 수 있는 글자로": {
+  "en": "e.g. Receipt photo → amounts and store names as text / Document photo → copyable text",
+  "zh": "例）收据照片 → 金额和店名变成文字 / 文档照片 → 可复制的文字",
+  "ja": "例）レシート写真 → 金額と店名を文字に / 文書写真 → コピーできる文字に",
+  "es": "Ej.) Foto de un recibo → importes y nombres como texto / Foto de un documento → texto copiable",
+  "hi": "उदा.) रसीद की फ़ोटो → राशि और दुकान का नाम टेक्स्ट में / दस्तावेज़ की फ़ोटो → कॉपी करने योग्य टेक्स्ट में",
+  "fr": "Ex.) Photo d'un reçu → montants et noms de magasin en texte / Photo d'un document → texte copiable",
+  "de": "Z. B.) Foto eines Kassenbons → Beträge und Geschäftsname als Text / Foto eines Dokuments → kopierbarer Text",
+  "pt": "Ex.) Foto de um recibo → valores e nome da loja como texto / Foto de um documento → texto copiável",
+  "it": "Es.) Foto di uno scontrino → importi e nome del negozio come testo / Foto di un documento → testo copiabile",
+  "nl": "Bijv.) Foto van een bon → bedragen en winkelnaam als tekst / Foto van een document → kopieerbare tekst",
+  "ru": "Напр.) Фото чека → суммы и названия магазинов текстом / Фото документа → текст, который можно скопировать",
+  "uk": "Напр.) Фото чека → суми та назви магазинів текстом / Фото документа → текст, який можна скопіювати",
+  "pl": "Np.) Zdjęcie paragonu → kwoty i nazwy sklepów jako tekst / Zdjęcie dokumentu → tekst do skopiowania",
+  "cs": "Např.) Fotka účtenky → částky a názvy obchodů jako text / Fotka dokumentu → text ke kopírování",
+  "hu": "Pl.) Nyugta fotója → összegek és üzletnevek szövegként / Dokumentum fotója → másolható szöveg",
+  "ro": "Ex.) Fotografia unui bon → sume și nume de magazine ca text / Fotografia unui document → text copiabil",
+  "sv": "T.ex.) Kvittofoto → belopp och butiksnamn som text / Dokumentfoto → kopierbar text",
+  "da": "F.eks.) Kvittofoto → beløb og butiksnavne som tekst / Dokumentfoto → kopierbar tekst",
+  "nb": "F.eks.) Kvitteringsbilde → beløp og butikknavn som tekst / Dokumentbilde → kopierbar tekst",
+  "fi": "Esim.) Kuittikuva → summat ja liikkeen nimet tekstinä / Asiakirjakuva → kopioitava teksti",
+  "tr": "Örn.) Fiş fotoğrafı → tutarlar ve mağaza adları metin olarak / Belge fotoğrafı → kopyalanabilir metin olarak",
+  "zh-TW": "例）收據照片 → 金額和店名變成文字 / 文件照片 → 可複製的文字",
+  "th": "เช่น) ภาพใบเสร็จ → จำนวนเงินและชื่อร้านเป็นข้อความ / ภาพเอกสาร → ข้อความที่คัดลอกได้",
+  "vi": "Ví dụ) Ảnh hóa đơn → số tiền và tên cửa hàng thành văn bản / Ảnh tài liệu → văn bản có thể sao chép",
+  "id": "cth.) Foto struk → jumlah dan nama toko sebagai teks / Foto dokumen → teks yang dapat disalin",
+  "ar": "مثال) صورة الإيصال → المبالغ وأسماء المتاجر كنص / صورة المستند → نص قابل للنسخ",
+  "fa": "مثال) عکس رسید → مبلغ‌ها و نام فروشگاه به‌صورت متن / عکس سند → متن قابل کپی"
+ },
+ "인식 모델을 내려받아 당신의 기기 안에서 실행합니다. 사진은 기기 밖으로 나가지 않습니다.": {
+  "en": "The recognition model is downloaded and runs on your device. Photos never leave your device.",
+  "zh": "识别模型会下载到您的设备上运行。照片不会离开您的设备。",
+  "ja": "認識モデルをダウンロードしてあなたの端末の中で実行します。写真は端末の外に出ません。",
+  "es": "El modelo de reconocimiento se descarga y se ejecuta en tu dispositivo. Las fotos nunca salen de tu dispositivo.",
+  "hi": "पहचान मॉडल डाउनलोड करके आपके डिवाइस पर चलता है। फ़ोटो आपके डिवाइस से बाहर नहीं जातीं।",
+  "fr": "Le modèle de reconnaissance est téléchargé et s'exécute sur votre appareil. Les photos ne quittent jamais votre appareil.",
+  "de": "Das Erkennungsmodell wird heruntergeladen und läuft auf Ihrem Gerät. Fotos verlassen Ihr Gerät nie.",
+  "pt": "O modelo de reconhecimento é baixado e executado no seu dispositivo. As fotos nunca saem do seu dispositivo.",
+  "it": "Il modello di riconoscimento viene scaricato ed eseguito sul tuo dispositivo. Le foto non lasciano mai il tuo dispositivo.",
+  "nl": "Het herkenningsmodel wordt gedownload en draait op uw apparaat. Foto's verlaten uw apparaat nooit.",
+  "ru": "Модель распознавания загружается и работает на вашем устройстве. Фотографии никогда не покидают ваше устройство.",
+  "uk": "Модель розпізнавання завантажується і працює на вашому пристрої. Фотографії ніколи не залишають ваш пристрій.",
+  "pl": "Model rozpoznawania jest pobierany i działa na Twoim urządzeniu. Zdjęcia nigdy nie opuszczają urządzenia.",
+  "cs": "Model rozpoznávání se stáhne a běží ve vašem zařízení. Fotografie vaše zařízení nikdy neopustí.",
+  "hu": "A felismerési modell letöltődik és az Ön eszközén fut. A fotók soha nem hagyják el az eszközt.",
+  "ro": "Modelul de recunoaștere se descarcă și rulează pe dispozitivul tău. Fotografiile nu părăsesc niciodată dispozitivul.",
+  "sv": "Igenkänningsmodellen laddas ner och körs på din enhet. Foton lämnar aldrig din enhet.",
+  "da": "Genkendelsesmodellen downloades og kører på din enhed. Fotos forlader aldrig din enhed.",
+  "nb": "Gjenkjenningsmodellen lastes ned og kjøres på enheten din. Bilder forlater aldri enheten din.",
+  "fi": "Tunnistusmalli ladataan ja suoritetaan laitteellasi. Kuvat eivät koskaan lähde laitteeltasi.",
+  "tr": "Tanıma modeli indirilir ve cihazınızda çalıştırılır. Fotoğraflar cihazınızdan asla çıkmaz.",
+  "zh-TW": "辨識模型會下載到您的裝置上運行。照片不會離開您的裝置。",
+  "th": "โมเดลการรู้จำจะถูกดาวน์โหลดและทำงานบนอุปกรณ์ของคุณ ภาพถ่ายไม่เคยออกจากอุปกรณ์ของคุณ",
+  "vi": "Mô hình nhận dạng được tải xuống và chạy trên thiết bị của bạn. Ảnh không bao giờ rời khỏi thiết bị của bạn.",
+  "id": "Model pengenalan diunduh dan berjalan di perangkat Anda. Foto tidak pernah meninggalkan perangkat Anda.",
+  "ar": "يُنزَّل نموذج التعرف ويعمل على جهازك. الصور لا تغادر جهازك أبدًا.",
+  "fa": "مدل تشخیص دانلود می‌شود و روی دستگاه شما اجرا می‌شود. عکس‌ها هرگز از دستگاه شما خارج نمی‌شوند."
+ },
+ "① 넣은 사진": {
+  "en": "① Added photo",
+  "zh": "① 已添加的照片",
+  "ja": "① 入れた写真",
+  "es": "① Foto añadida",
+  "hi": "① जोड़ी गई फ़ोटो",
+  "fr": "① Photo ajoutée",
+  "de": "① Hinzugefügtes Foto",
+  "pt": "① Foto adicionada",
+  "it": "① Foto aggiunta",
+  "nl": "① Toegevoegde foto",
+  "ru": "① Добавленная фотография",
+  "uk": "① Додана фотографія",
+  "pl": "① Dodane zdjęcie",
+  "cs": "① Přidaná fotografie",
+  "hu": "① Hozzáadott fotó",
+  "ro": "① Fotografia adăugată",
+  "sv": "① Tillagt foto",
+  "da": "① Tilføjet foto",
+  "nb": "① Lagt til bilde",
+  "fi": "① Lisätty kuva",
+  "tr": "① Eklenen fotoğraf",
+  "zh-TW": "① 已加入的照片",
+  "th": "① ภาพที่เพิ่มแล้ว",
+  "vi": "① Ảnh đã thêm",
+  "id": "① Foto yang Ditambahkan",
+  "ar": "① الصورة المضافة",
+  "fa": "① عکس افزوده‌شده"
+ },
+ "② 언어 고르기": {
+  "en": "② Choose the language",
+  "zh": "② 选择语言",
+  "ja": "② 言語を選ぶ",
+  "es": "② Elige el idioma",
+  "hi": "② भाषा चुनें",
+  "fr": "② Choisir la langue",
+  "de": "② Sprache wählen",
+  "pt": "② Escolher o idioma",
+  "it": "② Scegli la lingua",
+  "nl": "② Taal kiezen",
+  "ru": "② Выбрать язык",
+  "uk": "② Вибрати мову",
+  "pl": "② Wybierz język",
+  "cs": "② Vybrat jazyk",
+  "hu": "② Nyelv kiválasztása",
+  "ro": "② Alege limba",
+  "sv": "② Välj språk",
+  "da": "② Vælg sprog",
+  "nb": "② Velg språk",
+  "fi": "② Valitse kieli",
+  "tr": "② Dili seç",
+  "zh-TW": "② 選擇語言",
+  "th": "② เลือกภาษา",
+  "vi": "② Chọn ngôn ngữ",
+  "id": "② Pilih Bahasa",
+  "ar": "② اختيار اللغة",
+  "fa": "② انتخاب زبان"
+ },
+ "사진 속 글자의 언어": {
+  "en": "Language of the text in the photo",
+  "zh": "照片中文字的语言",
+  "ja": "写真の中の文字の言語",
+  "es": "Idioma del texto en la foto",
+  "hi": "फ़ोटो में टेक्स्ट की भाषा",
+  "fr": "Langue du texte dans la photo",
+  "de": "Sprache des Textes im Foto",
+  "pt": "Idioma do texto na foto",
+  "it": "Lingua del testo nella foto",
+  "nl": "Taal van de tekst in de foto",
+  "ru": "Язык текста на фотографии",
+  "uk": "Мова тексту на фотографії",
+  "pl": "Język tekstu na zdjęciu",
+  "cs": "Jazyk textu na fotografii",
+  "hu": "A fotón lévő szöveg nyelve",
+  "ro": "Limba textului din fotografie",
+  "sv": "Språket för texten i fotot",
+  "da": "Sproget for teksten på fotoet",
+  "nb": "Språket til teksten på bildet",
+  "fi": "Kuvan tekstin kieli",
+  "tr": "Fotoğraftaki metnin dili",
+  "zh-TW": "照片中文字的語言",
+  "th": "ภาษาของข้อความในภาพถ่าย",
+  "vi": "Ngôn ngữ của văn bản trong ảnh",
+  "id": "Bahasa teks dalam foto",
+  "ar": "لغة النص في الصورة",
+  "fa": "زبان نوشته داخل عکس"
+ },
+ "한국어 + 영어": {
+  "en": "Korean + English",
+  "zh": "韩语 + 英语",
+  "ja": "韓国語＋英語",
+  "es": "Coreano + inglés",
+  "hi": "कोरियाई + अंग्रेज़ी",
+  "fr": "Coréen + anglais",
+  "de": "Koreanisch + Englisch",
+  "pt": "Coreano + inglês",
+  "it": "Coreano + inglese",
+  "nl": "Koreaans + Engels",
+  "ru": "Корейский + английский",
+  "uk": "Корейська + англійська",
+  "pl": "Koreański + angielski",
+  "cs": "Korejština + angličtina",
+  "hu": "Koreai + angol",
+  "ro": "Coreeană + engleză",
+  "sv": "Koreanska + engelska",
+  "da": "Koreansk + engelsk",
+  "nb": "Koreansk + engelsk",
+  "fi": "Korea + englanti",
+  "tr": "Korece + İngilizce",
+  "zh-TW": "韓語 + 英語",
+  "th": "เกาหลี + อังกฤษ",
+  "vi": "Tiếng Hàn + Tiếng Anh",
+  "id": "Korea + Inggris",
+  "ar": "الكورية + الإنجليزية",
+  "fa": "کره‌ای + انگلیسی"
+ },
+ "한국어만": {
+  "en": "Korean only",
+  "zh": "仅韩语",
+  "ja": "韓国語のみ",
+  "es": "Solo coreano",
+  "hi": "केवल कोरियाई",
+  "fr": "Coréen uniquement",
+  "de": "Nur Koreanisch",
+  "pt": "Somente coreano",
+  "it": "Solo coreano",
+  "nl": "Alleen Koreaans",
+  "ru": "Только корейский",
+  "uk": "Лише корейська",
+  "pl": "Tylko koreański",
+  "cs": "Pouze korejština",
+  "hu": "Csak koreai",
+  "ro": "Doar coreeană",
+  "sv": "Endast koreanska",
+  "da": "Kun koreansk",
+  "nb": "Bare koreansk",
+  "fi": "Vain korea",
+  "tr": "Yalnızca Korece",
+  "zh-TW": "僅韓語",
+  "th": "เกาหลีเท่านั้น",
+  "vi": "Chỉ tiếng Hàn",
+  "id": "Hanya Korea",
+  "ar": "الكورية فقط",
+  "fa": "فقط کره‌ای"
+ },
+ "영어만": {
+  "en": "English only",
+  "zh": "仅英语",
+  "ja": "英語のみ",
+  "es": "Solo inglés",
+  "hi": "केवल अंग्रेज़ी",
+  "fr": "Anglais uniquement",
+  "de": "Nur Englisch",
+  "pt": "Somente inglês",
+  "it": "Solo inglese",
+  "nl": "Alleen Engels",
+  "ru": "Только английский",
+  "uk": "Лише англійська",
+  "pl": "Tylko angielski",
+  "cs": "Pouze angličtina",
+  "hu": "Csak angol",
+  "ro": "Doar engleză",
+  "sv": "Endast engelska",
+  "da": "Kun engelsk",
+  "nb": "Bare engelsk",
+  "fi": "Vain englanti",
+  "tr": "Yalnızca İngilizce",
+  "zh-TW": "僅英語",
+  "th": "อังกฤษเท่านั้น",
+  "vi": "Chỉ tiếng Anh",
+  "id": "Hanya Inggris",
+  "ar": "الإنجليزية فقط",
+  "fa": "فقط انگلیسی"
+ },
+ "🔤 사진 글자 뽑기": {
+  "en": "🔤 Read text",
+  "zh": "🔤 识别文字",
+  "ja": "🔤 文字を読み取る",
+  "es": "🔤 Leer texto",
+  "hi": "🔤 टेक्स्ट पढ़ें",
+  "fr": "🔤 Lire le texte",
+  "de": "🔤 Text lesen",
+  "pt": "🔤 Ler texto",
+  "it": "🔤 Leggi il testo",
+  "nl": "🔤 Tekst lezen",
+  "ru": "🔤 Читать текст",
+  "uk": "🔤 Читати текст",
+  "pl": "🔤 Czytaj tekst",
+  "cs": "🔤 Číst text",
+  "hu": "🔤 Szöveg olvasása",
+  "ro": "🔤 Citește textul",
+  "sv": "🔤 Läs text",
+  "da": "🔤 Læs tekst",
+  "nb": "🔤 Les tekst",
+  "fi": "🔤 Lue teksti",
+  "tr": "🔤 Metni oku",
+  "zh-TW": "🔤 辨識文字",
+  "th": "🔤 อ่านข้อความ",
+  "vi": "🔤 Đọc văn bản",
+  "id": "🔤 Baca Teks",
+  "ar": "🔤 قراءة النص",
+  "fa": "🔤 خواندن متن"
+ },
+ "처음부터 다시": {
+  "en": "Start over",
+  "zh": "重新开始",
+  "ja": "最初からやり直す",
+  "es": "Empezar de nuevo",
+  "hi": "फिर से शुरू करें",
+  "fr": "Recommencer",
+  "de": "Von vorn beginnen",
+  "pt": "Começar de novo",
+  "it": "Ricomincia da capo",
+  "nl": "Opnieuw beginnen",
+  "ru": "Начать заново",
+  "uk": "Почати спочатку",
+  "pl": "Zacznij od nowa",
+  "cs": "Začít znovu",
+  "hu": "Újrakezdés",
+  "ro": "Începe din nou",
+  "sv": "Börja om",
+  "da": "Start forfra",
+  "nb": "Start på nytt",
+  "fi": "Aloita alusta",
+  "tr": "Baştan başla",
+  "zh-TW": "重新開始",
+  "th": "เริ่มใหม่ตั้งแต่ต้น",
+  "vi": "Bắt đầu lại",
+  "id": "Mulai dari Awal",
+  "ar": "البدء من جديد",
+  "fa": "شروع دوباره از اول"
+ },
+ "아직 읽지 않았습니다. 사진을 넣고 사진 글자 뽑기를 누르세요.": {
+  "en": "Not read yet. Add a photo and press Read text.",
+  "zh": "尚未识别。请添加照片并点击识别文字。",
+  "ja": "まだ読み取っていません。写真を入れて「文字を読み取る」を押してください。",
+  "es": "Aún no se ha leído. Añade una foto y pulsa Leer texto.",
+  "hi": "अभी तक नहीं पढ़ा। फ़ोटो जोड़ें और टेक्स्ट पढ़ें दबाएँ।",
+  "fr": "Pas encore lu. Ajoutez une photo et appuyez sur Lire le texte.",
+  "de": "Noch nicht gelesen. Fügen Sie ein Foto hinzu und tippen Sie auf Text lesen.",
+  "pt": "Ainda não foi lido. Adicione uma foto e toque em Ler texto.",
+  "it": "Non ancora letto. Aggiungi una foto e premi Leggi il testo.",
+  "nl": "Nog niet gelezen. Voeg een foto toe en tik op Tekst lezen.",
+  "ru": "Ещё не прочитано. Добавьте фотографию и нажмите «Читать текст».",
+  "uk": "Ще не прочитано. Додайте фотографію і натисніть «Читати текст».",
+  "pl": "Jeszcze nie odczytano. Dodaj zdjęcie i naciśnij Czytaj tekst.",
+  "cs": "Zatím nepřečteno. Přidejte fotografii a stiskněte Číst text.",
+  "hu": "Még nem olvasta be. Adjon hozzá egy fotót, és nyomja meg a Szöveg olvasása gombot.",
+  "ro": "Nu s-a citit încă. Adaugă o fotografie și apasă Citește textul.",
+  "sv": "Inte läst ännu. Lägg till ett foto och tryck på Läs text.",
+  "da": "Ikke læst endnu. Tilføj et foto, og tryk på Læs tekst.",
+  "nb": "Ikke lest ennå. Legg til et bilde og trykk på Les tekst.",
+  "fi": "Ei vielä luettu. Lisää kuva ja paina Lue teksti.",
+  "tr": "Henüz okunmadı. Bir fotoğraf ekleyin ve Metni oku düğmesine basın.",
+  "zh-TW": "尚未辨識。請加入照片並點選辨識文字。",
+  "th": "ยังไม่ได้อ่าน เพิ่มภาพถ่ายแล้วกดอ่านข้อความ",
+  "vi": "Chưa đọc. Hãy thêm ảnh và nhấn Đọc văn bản.",
+  "id": "Belum dibaca. Tambahkan foto dan tekan Baca Teks.",
+  "ar": "لم يُقرأ بعد. أضف صورة واضغط على قراءة النص.",
+  "fa": "هنوز خوانده نشده است. عکسی اضافه کنید و خواندن متن را بزنید."
+ },
+ "인식 정확도는 사진 상태에 따라 달라집니다. 밝고 또렷하게 찍은 사진일수록 잘 읽습니다.": {
+  "en": "Accuracy depends on the photo. Brighter, sharper photos read better.",
+  "zh": "识别准确度取决于照片状态。越明亮清晰的照片识别得越好。",
+  "ja": "認識精度は写真の状態によります。明るく鮮明な写真ほどよく読み取ります。",
+  "es": "La precisión depende de la foto. Las fotos más brillantes y nítidas se leen mejor.",
+  "hi": "सटीकता फ़ोटो पर निर्भर करती है। उज्ज्वल और स्पष्ट फ़ोटो बेहतर पढ़ती हैं।",
+  "fr": "La précision dépend de la photo. Les photos plus lumineuses et plus nettes se lisent mieux.",
+  "de": "Die Genauigkeit hängt vom Foto ab. Hellere, schärfere Fotos werden besser gelesen.",
+  "pt": "A precisão depende da foto. Fotos mais claras e nítidas são lidas melhor.",
+  "it": "La precisione dipende dalla foto. Foto più luminose e nitide si leggono meglio.",
+  "nl": "De nauwkeurigheid hangt af van de foto. Heldere, scherpe foto's worden beter gelezen.",
+  "ru": "Точность зависит от фотографии. Чем ярче и резче фотография, тем лучше читается текст.",
+  "uk": "Точність залежить від фотографії. Чим яскравіші та чіткіші фотографії, тим краще читається текст.",
+  "pl": "Dokładność zależy od zdjęcia. Jaśniejsze i ostrzejsze zdjęcia czyta się lepiej.",
+  "cs": "Přesnost závisí na fotografii. Jasnější a ostřejší fotografie se čtou lépe.",
+  "hu": "A pontosság a fotótól függ. A világosabb, élesebb fotók jobban olvashatók.",
+  "ro": "Precizia depinde de fotografie. Fotografiile mai luminoase și mai clare se citesc mai bine.",
+  "sv": "Noggrannheten beror på fotot. Ljusare och skarpare foton läses bättre.",
+  "da": "Nøjagtigheden afhænger af fotoet. Lysere og skarpere fotos læses bedre.",
+  "nb": "Nøyaktigheten avhenger av bildet. Lysere og skarpere bilder leses bedre.",
+  "fi": "Tarkkuus riippuu kuvasta. Kirkkaammat ja terävämmät kuvat luetaan paremmin.",
+  "tr": "Doğruluk fotoğrafa bağlıdır. Daha parlak ve net fotoğraflar daha iyi okunur.",
+  "zh-TW": "辨識準確度取決於照片狀態。越明亮清晰的照片辨識得越好。",
+  "th": "ความแม่นยำขึ้นอยู่กับภาพถ่าย ภาพที่สว่างและคมชัดกว่าจะอ่านได้ดีกว่า",
+  "vi": "Độ chính xác phụ thuộc vào ảnh. Ảnh sáng hơn, sắc nét hơn sẽ đọc tốt hơn.",
+  "id": "Akurasi bergantung pada foto. Foto yang lebih terang dan tajam terbaca lebih baik.",
+  "ar": "تعتمد الدقة على حالة الصورة. الصور الأكثر سطوعًا ووضوحًا تُقرأ بشكل أفضل.",
+  "fa": "دقت به وضعیت عکس بستگی دارد. عکس‌های روشن‌تر و واضح‌تر بهتر خوانده می‌شوند."
+ },
+ "③ 읽은 글자": {
+  "en": "③ Read text",
+  "zh": "③ 识别出的文字",
+  "ja": "③ 読み取った文字",
+  "es": "③ Texto leído",
+  "hi": "③ पढ़ा गया टेक्स्ट",
+  "fr": "③ Texte lu",
+  "de": "③ Gelesener Text",
+  "pt": "③ Texto lido",
+  "it": "③ Testo letto",
+  "nl": "③ Gelezen tekst",
+  "ru": "③ Прочитанный текст",
+  "uk": "③ Прочитаний текст",
+  "pl": "③ Odczytany tekst",
+  "cs": "③ Přečtený text",
+  "hu": "③ Beolvasott szöveg",
+  "ro": "③ Textul citit",
+  "sv": "③ Läst text",
+  "da": "③ Læst tekst",
+  "nb": "③ Lest tekst",
+  "fi": "③ Luettu teksti",
+  "tr": "③ Okunan metin",
+  "zh-TW": "③ 辨識出的文字",
+  "th": "③ ข้อความที่อ่านได้",
+  "vi": "③ Văn bản đã đọc",
+  "id": "③ Teks yang Terbaca",
+  "ar": "③ النص المقروء",
+  "fa": "③ متن خوانده‌شده"
+ },
+ "읽은 글자가 여기에 나타납니다. 직접 고칠 수도 있습니다.": {
+  "en": "The read text appears here. You can edit it directly.",
+  "zh": "识别出的文字会显示在这里。也可以直接修改。",
+  "ja": "読み取った文字がここに表示されます。直接編集もできます。",
+  "es": "El texto leído aparece aquí. Puedes editarlo directamente.",
+  "hi": "पढ़ा गया टेक्स्ट यहाँ दिखेगा। आप इसे सीधे बदल भी सकते हैं।",
+  "fr": "Le texte lu apparaît ici. Vous pouvez aussi le modifier directement.",
+  "de": "Der gelesene Text erscheint hier. Sie können ihn auch direkt bearbeiten.",
+  "pt": "O texto lido aparece aqui. Você também pode editá-lo diretamente.",
+  "it": "Il testo letto appare qui. Puoi anche modificarlo direttamente.",
+  "nl": "De gelezen tekst verschijnt hier. U kunt hem ook direct bewerken.",
+  "ru": "Прочитанный текст появится здесь. Его можно редактировать напрямую.",
+  "uk": "Прочитаний текст з'явиться тут. Його можна редагувати безпосередньо.",
+  "pl": "Odczytany tekst pojawi się tutaj. Możesz go bezpośrednio edytować.",
+  "cs": "Přečtený text se zobrazí zde. Můžete ho přímo upravovat.",
+  "hu": "A beolvasott szöveg itt jelenik meg. Közvetlenül szerkesztheti is.",
+  "ro": "Textul citit apare aici. Îl poți edita direct.",
+  "sv": "Den lästa texten visas här. Du kan också redigera den direkt.",
+  "da": "Den læste tekst vises her. Du kan også redigere den direkte.",
+  "nb": "Den leste teksten vises her. Du kan også redigere den direkte.",
+  "fi": "Luettu teksti näkyy tässä. Voit myös muokata sitä suoraan.",
+  "tr": "Okunan metin burada görünür. Doğrudan düzenleyebilirsiniz de.",
+  "zh-TW": "辨識出的文字會顯示在這裡。也可以直接修改。",
+  "th": "ข้อความที่อ่านได้จะปรากฏที่นี่ คุณสามารถแก้ไขได้โดยตรง",
+  "vi": "Văn bản đã đọc xuất hiện tại đây. Bạn có thể chỉnh sửa trực tiếp.",
+  "id": "Teks yang terbaca muncul di sini. Anda dapat mengeditnya secara langsung.",
+  "ar": "يظهر النص المقروء هنا. يمكنك أيضًا تعديله مباشرة.",
+  "fa": "متن خوانده‌شده اینجا نمایش داده می‌شود. می‌توانید آن را مستقیم ویرایش هم بکنید."
+ },
+ "글자 수": {
+  "en": "Characters",
+  "zh": "字数",
+  "ja": "文字数",
+  "es": "Caracteres",
+  "hi": "अक्षरों की संख्या",
+  "fr": "Caractères",
+  "de": "Zeichen",
+  "pt": "Caracteres",
+  "it": "Caratteri",
+  "nl": "Tekens",
+  "ru": "Символы",
+  "uk": "Символи",
+  "pl": "Znaki",
+  "cs": "Znaky",
+  "hu": "Karakterek",
+  "ro": "Caractere",
+  "sv": "Tecken",
+  "da": "Tegn",
+  "nb": "Tegn",
+  "fi": "Merkkiä",
+  "tr": "Karakter",
+  "zh-TW": "字數",
+  "th": "จำนวนอักขระ",
+  "vi": "Số ký tự",
+  "id": "Jumlah Karakter",
+  "ar": "عدد الأحرف",
+  "fa": "تعداد نویسه‌ها"
+ },
+ "결과 복사": {
+  "en": "Copy result",
+  "zh": "复制结果",
+  "ja": "結果をコピー",
+  "es": "Copiar resultado",
+  "hi": "परिणाम कॉपी करें",
+  "fr": "Copier le résultat",
+  "de": "Ergebnis kopieren",
+  "pt": "Copiar resultado",
+  "it": "Copia il risultato",
+  "nl": "Resultaat kopiëren",
+  "ru": "Копировать результат",
+  "uk": "Копіювати результат",
+  "pl": "Kopiuj wynik",
+  "cs": "Kopírovat výsledek",
+  "hu": "Eredmény másolása",
+  "ro": "Copiază rezultatul",
+  "sv": "Kopiera resultat",
+  "da": "Kopiér resultat",
+  "nb": "Kopier resultat",
+  "fi": "Kopioi tulos",
+  "tr": "Sonucu kopyala",
+  "zh-TW": "複製結果",
+  "th": "คัดลอกผลลัพธ์",
+  "vi": "Sao chép kết quả",
+  "id": "Salin Hasil",
+  "ar": "نسخ النتيجة",
+  "fa": "کپی نتیجه"
+ },
+ "파일로 저장": {
+  "en": "Save to file",
+  "zh": "保存为文件",
+  "ja": "ファイルに保存",
+  "es": "Guardar en archivo",
+  "hi": "फ़ाइल में सहेजें",
+  "fr": "Enregistrer dans un fichier",
+  "de": "In Datei speichern",
+  "pt": "Salvar em arquivo",
+  "it": "Salva in un file",
+  "nl": "Opslaan in bestand",
+  "ru": "Сохранить в файл",
+  "uk": "Зберегти у файл",
+  "pl": "Zapisz do pliku",
+  "cs": "Uložit do souboru",
+  "hu": "Mentés fájlba",
+  "ro": "Salvează în fișier",
+  "sv": "Spara till fil",
+  "da": "Gem i fil",
+  "nb": "Lagre i fil",
+  "fi": "Tallenna tiedostoon",
+  "tr": "Dosyaya kaydet",
+  "zh-TW": "保存為檔案",
+  "th": "บันทึกเป็นไฟล์",
+  "vi": "Lưu thành tệp",
+  "id": "Simpan ke Berkas",
+  "ar": "حفظ في ملف",
+  "fa": "ذخیره در فایل"
+ },
+ "💡 도움말": {
+  "en": "💡 Help",
+  "zh": "💡 帮助",
+  "ja": "💡 ヘルプ",
+  "es": "💡 Ayuda",
+  "hi": "💡 सहायता",
+  "fr": "💡 Aide",
+  "de": "💡 Hilfe",
+  "pt": "💡 Ajuda",
+  "it": "💡 Aiuto",
+  "nl": "💡 Help",
+  "ru": "💡 Справка",
+  "uk": "💡 Довідка",
+  "pl": "💡 Pomoc",
+  "cs": "💡 Nápověda",
+  "hu": "💡 Súgó",
+  "ro": "💡 Ajutor",
+  "sv": "💡 Hjälp",
+  "da": "💡 Hjælp",
+  "nb": "💡 Hjelp",
+  "fi": "💡 Ohje",
+  "tr": "💡 Yardım",
+  "zh-TW": "💡 說明",
+  "th": "💡 วิธีใช้",
+  "vi": "💡 Trợ giúp",
+  "id": "💡 Bantuan",
+  "ar": "💡 مساعدة",
+  "fa": "💡 راهنما"
+ },
+ "사진 열기로 사진 파일을 넣고, 사진 속 글자의 언어를 고른 뒤 사진 글자 뽑기를 누르세요.": {
+  "en": "Open a photo file, choose the language of the text in the photo, then press Read text.",
+  "zh": "用打开照片添加图片文件，选择照片中文字的语言，然后点击识别文字。",
+  "ja": "「写真を開く」で写真ファイルを入れ、写真の中の文字の言語を選んでから「文字を読み取る」を押してください。",
+  "es": "Abre un archivo de foto, elige el idioma del texto de la foto y pulsa Leer texto.",
+  "hi": "फ़ोटो खोलकर फ़ोटो फ़ाइल जोड़ें, फ़ोटो के टेक्स्ट की भाषा चुनें, फिर टेक्स्ट पढ़ें दबाएँ।",
+  "fr": "Ouvrez un fichier photo, choisissez la langue du texte dans la photo, puis appuyez sur Lire le texte.",
+  "de": "Öffnen Sie eine Fotodatei, wählen Sie die Sprache des Textes im Foto und tippen Sie dann auf Text lesen.",
+  "pt": "Abra um arquivo de foto, escolha o idioma do texto na foto e toque em Ler texto.",
+  "it": "Apri un file foto, scegli la lingua del testo nella foto, poi premi Leggi il testo.",
+  "nl": "Open een fotobestand, kies de taal van de tekst in de foto en tik vervolgens op Tekst lezen.",
+  "ru": "Откройте файл фотографии, выберите язык текста на фотографии и нажмите «Читать текст».",
+  "uk": "Відкрийте файл фотографії, виберіть мову тексту на фотографії і натисніть «Читати текст».",
+  "pl": "Otwórz plik zdjęcia, wybierz język tekstu na zdjęciu i naciśnij Czytaj tekst.",
+  "cs": "Otevřete soubor fotografie, vyberte jazyk textu na fotografii a stiskněte Číst text.",
+  "hu": "Nyisson meg egy fotófájlt, válassza ki a fotón lévő szöveg nyelvét, majd nyomja meg a Szöveg olvasása gombot.",
+  "ro": "Deschide un fișier foto, alege limba textului din fotografie și apasă Citește textul.",
+  "sv": "Öppna en fotofil, välj språket för texten i fotot och tryck sedan på Läs text.",
+  "da": "Åbn en fotofil, vælg sproget for teksten på fotoet, og tryk derefter på Læs tekst.",
+  "nb": "Åpne en bildefil, velg språket til teksten på bildet, og trykk deretter på Les tekst.",
+  "fi": "Avaa kuvatiedosto, valitse kuvan tekstin kieli ja paina sitten Lue teksti.",
+  "tr": "Bir fotoğraf dosyası açın, fotoğraftaki metnin dilini seçin ve Metni oku düğmesine basın.",
+  "zh-TW": "用打開照片加入圖片檔案，選擇照片中文字的語言，然後點選辨識文字。",
+  "th": "เปิดไฟล์ภาพถ่าย เลือกภาษาของข้อความในภาพ จากนั้นกดอ่านข้อความ",
+  "vi": "Mở một tệp ảnh, chọn ngôn ngữ của văn bản trong ảnh, rồi nhấn Đọc văn bản.",
+  "id": "Buka berkas foto, pilih bahasa teks dalam foto, lalu tekan Baca Teks.",
+  "ar": "أضف ملف صورة عبر فتح صورة، واختر لغة النص في الصورة، ثم اضغط على قراءة النص.",
+  "fa": "با باز کردن عکس فایل عکس را اضافه کنید، زبان نوشته داخل عکس را انتخاب کنید و سپس خواندن متن را بزنید."
+ },
+ "처음 쓸 때는 인식 모델과 언어 데이터를 내려받느라 조금 걸릴 수 있습니다. 내려받은 뒤에는 다시 내려받지 않습니다.": {
+  "en": "The first use may take a little while to download the recognition model and language data. After that, nothing is downloaded again.",
+  "zh": "第一次使用时，要下载识别模型和语言数据，可能需要一点时间。下载后不会再重复下载。",
+  "ja": "初めて使うときは認識モデルと言語データのダウンロードで少し時間がかかる場合があります。一度ダウンロードすれば再ダウンロードはしません。",
+  "es": "El primer uso puede tardar un poco por la descarga del modelo de reconocimiento y los datos de idioma. Después ya no se descarga de nuevo.",
+  "hi": "पहली बार उपयोग में पहचान मॉडल और भाषा डेटा डाउनलोड होने में थोड़ा समय लग सकता है। एक बार डाउनलोड होने के बाद फिर नहीं होता।",
+  "fr": "La première utilisation peut prendre un peu de temps pour télécharger le modèle de reconnaissance et les données de langue. Ensuite, plus rien n'est téléchargé.",
+  "de": "Die erste Nutzung kann etwas dauern, weil das Erkennungsmodell und die Sprachdaten heruntergeladen werden. Danach wird nichts mehr heruntergeladen.",
+  "pt": "O primeiro uso pode demorar um pouco para baixar o modelo de reconhecimento e os dados de idioma. Depois disso, nada mais é baixado.",
+  "it": "Il primo utilizzo può richiedere un po' di tempo per scaricare il modello di riconoscimento e i dati linguistici. Dopo, non viene scaricato più nulla.",
+  "nl": "Het eerste gebruik kan even duren omdat het herkenningsmodel en de taalgegevens worden gedownload. Daarna wordt er niets meer gedownload.",
+  "ru": "При первом использовании загрузка модели распознавания и языковых данных может занять немного времени. После этого ничего заново не загружается.",
+  "uk": "Під час першого використання завантаження моделі розпізнавання та мовних даних може зайняти трохи часу. Після цього нічого повторно не завантажується.",
+  "pl": "Pierwsze użycie może potrwać nieco dłużej ze względu na pobieranie modelu rozpoznawania i danych językowych. Później nic nie jest pobierane ponownie.",
+  "cs": "První použití může chvíli trvat kvůli stahování modelu rozpoznávání a jazykových dat. Poté se už nic znovu nestahuje.",
+  "hu": "Az első használat eltarthat egy ideig a felismerési modell és a nyelvi adatok letöltése miatt. Utána már nem töltődik le semmi újra.",
+  "ro": "Prima utilizare poate dura puțin din cauza descărcării modelului de recunoaștere și a datelor de limbă. După aceea, nu se mai descarcă nimic.",
+  "sv": "Första gången kan det ta en liten stund att ladda ner igenkänningsmodellen och språkdata. Efter det laddas inget ner igen.",
+  "da": "Første brug kan tage et øjeblik, mens genkendelsesmodellen og sprogdataene downloades. Derefter downloades der ikke noget igen.",
+  "nb": "Første gangs bruk kan ta en liten stund mens gjenkjenningsmodellen og språkdataene lastes ned. Etter det lastes ingenting ned igjen.",
+  "fi": "Ensimmäinen käyttökerta voi kestää hetken, kun tunnistusmallia ja kieliaineistoa ladataan. Sen jälkeen mitään ei ladata uudelleen.",
+  "tr": "İlk kullanımda tanıma modeli ve dil verileri indirilirken biraz zaman alabilir. Bundan sonra tekrar indirme yapılmaz.",
+  "zh-TW": "第一次使用時，要下載辨識模型和語言資料，可能需要一點時間。下載後不會再重複下載。",
+  "th": "การใช้งานครั้งแรกอาจใช้เวลาสักครู่ในการดาวน์โหลดโมเดลการรู้จำและข้อมูลภาษา หลังจากนั้นจะไม่ดาวน์โหลดอีก",
+  "vi": "Lần sử dụng đầu tiên có thể mất một chút thời gian để tải mô hình nhận dạng và dữ liệu ngôn ngữ. Sau đó, không có gì được tải xuống nữa.",
+  "id": "Penggunaan pertama mungkin memerlukan sedikit waktu untuk mengunduh model pengenalan dan data bahasa. Setelah itu, tidak ada lagi yang diunduh.",
+  "ar": "عند الاستخدام الأول قد يستغرق الأمر بعض الوقت لتنزيل نموذج التعرف وبيانات اللغة. بعد التنزيل لن تُنزَّل مرة أخرى.",
+  "fa": "در اولین استفاده، دانلود مدل تشخیص و داده‌های زبان ممکن است کمی طول بکشد. پس از دانلود، دیگر دوباره دانلود نمی‌شود."
+ },
+ "인식은 사진 속 글자를 읽어내는 기계 작업이라 오타가 섞일 수 있습니다. 중요한 내용은 원본 사진과 견주어 확인하세요.": {
+  "en": "Recognition is a machine process that reads text from photos, so typos may be mixed in. Check important content against the original photo.",
+  "zh": "识别是读取照片文字的机器作业，可能混有错字。重要内容请与原照片对照确认。",
+  "ja": "認識は写真の文字を読み取る機械作業のため、誤字が混ざることがあります。大切な内容は元の写真と見比べて確認してください。",
+  "es": "El reconocimiento es un proceso mecánico que lee el texto de las fotos, por lo que puede haber errores. Compara el contenido importante con la foto original.",
+  "hi": "पहचान फ़ोटो से टेक्स्ट पढ़ने की यांत्रिक प्रक्रिया है, इसलिए गलतियाँ मिल सकती हैं। महत्वपूर्ण सामग्री को मूल फ़ोटो से मिलाकर जाँचें।",
+  "fr": "La reconnaissance est un processus mécanique qui lit le texte des photos, donc des erreurs peuvent s'y glisser. Vérifiez le contenu important en le comparant à la photo d'origine.",
+  "de": "Die Erkennung ist ein maschineller Vorgang, der Text aus Fotos liest, daher können sich Fehler einschleichen. Prüfen Sie wichtige Inhalte anhand des Originalfotos.",
+  "pt": "O reconhecimento é um processo mecânico que lê o texto das fotos, por isso pode haver erros misturados. Confira o conteúdo importante comparando com a foto original.",
+  "it": "Il riconoscimento è un processo meccanico che legge il testo dalle foto, quindi possono esserci errori. Controlla i contenuti importanti confrontandoli con la foto originale.",
+  "nl": "Herkenning is een machinaal proces dat tekst uit foto's leest, dus er kunnen fouten in voorkomen. Controleer belangrijke inhoud aan de hand van de originele foto.",
+  "ru": "Распознавание — это машинный процесс чтения текста с фотографий, поэтому возможны опечатки. Сверяйте важное содержание с исходной фотографией.",
+  "uk": "Розпізнавання — це машинний процес читання тексту з фотографій, тож можуть траплятися помилки. Перевіряйте важливий вміст за оригінальною фотографією.",
+  "pl": "Rozpoznawanie to mechaniczny proces odczytywania tekstu ze zdjęć, więc mogą pojawić się literówki. Ważną treść sprawdź względem oryginalnego zdjęcia.",
+  "cs": "Rozpoznávání je strojový proces čtení textu z fotografií, takže se mohou objevit překlepy. Důležitý obsah zkontrolujte podle původní fotografie.",
+  "hu": "A felismerés gépi folyamat, amely a fotókról olvassa ki a szöveget, ezért gépelési hibák előfordulhatnak. A fontos tartalmat vesse össze az eredeti fotóval.",
+  "ro": "Recunoașterea este un proces automat de citire a textului din fotografii, așa că pot apărea greșeli. Verifică conținutul important cu fotografia originală.",
+  "sv": "Igenkänning är en maskinprocess som läser text från foton, så fel kan smyga sig in. Kontrollera viktigt innehåll mot originalfotot.",
+  "da": "Genkendelse er en maskinproces, der læser tekst fra fotos, så der kan forekomme fejl. Sammenlign vigtigt indhold med det originale foto.",
+  "nb": "Gjenkjenning er en maskinprosess som leser tekst fra bilder, så feil kan snike seg inn. Sjekk viktig innhold mot originalbildet.",
+  "fi": "Tunnistus on koneellinen prosessi, joka lukee tekstiä kuvista, joten virheitä voi sekoittua joukkoon. Tarkista tärkeä sisältö alkuperäisestä kuvasta.",
+  "tr": "Tanıma, fotoğraflardaki metni okuyan bir makine işlemidir, bu nedenle yanlışlar karışabilir. Önemli içeriği orijinal fotoğrafla karşılaştırarak kontrol edin.",
+  "zh-TW": "辨識是讀取照片文字的機器作業，可能混有錯字。重要內容請與原照片對照確認。",
+  "th": "การรู้จำเป็นกระบวนการของเครื่องจักรที่อ่านข้อความจากภาพถ่าย จึงอาจมีตัวพิมพ์ผิดปะปนอยู่ โปรดตรวจสอบเนื้อหาสำคัญเทียบกับภาพต้นฉบับ",
+  "vi": "Nhận dạng là một quá trình máy móc đọc văn bản từ ảnh, vì vậy lỗi đánh máy có thể lẫn vào. Hãy kiểm tra nội dung quan trọng đối chiếu với ảnh gốc.",
+  "id": "Pengenalan adalah proses mesin yang membaca teks dari foto, sehingga kesalahan ketik mungkin tercampur. Periksa konten penting dengan foto aslinya.",
+  "ar": "التعرف عمل آلي يقرأ النص من الصور، لذا قد تختلط به أخطاء إملائية. تحقق من المحتوى المهم بمقارنته بالصورة الأصلية.",
+  "fa": "تشخیص کار ماشینیِ خواندن نوشته از عکس است، پس ممکن است غلط‌هایی در آن باشد. محتوای مهم را با عکس اصلی مقایسه و بررسی کنید."
+ },
+ "손글씨는 인식이 어렵습니다. 인쇄된 글자일수록 잘 읽습니다.": {
+  "en": "Handwriting is hard to recognize. Printed text reads best.",
+  "zh": "手写字难以识别。印刷字识别得更好。",
+  "ja": "手書き文字は認識が難しいです。印刷された文字ほどよく読み取ります。",
+  "es": "La escritura a mano es difícil de reconocer. El texto impreso se lee mejor.",
+  "hi": "हस्तलेख पहचानना कठिन है। छपा हुआ टेक्स्ट सबसे अच्छा पढ़ता है।",
+  "fr": "L'écriture manuscrite est difficile à reconnaître. Le texte imprimé se lit le mieux.",
+  "de": "Handschrift ist schwer zu erkennen. Gedruckter Text wird am besten gelesen.",
+  "pt": "A escrita à mão é difícil de reconhecer. O texto impresso é lido melhor.",
+  "it": "La scrittura a mano è difficile da riconoscere. Il testo stampato si legge meglio.",
+  "nl": "Handschrift is moeilijk te herkennen. Gedrukte tekst wordt het best gelezen.",
+  "ru": "Рукописный текст распознаётся с трудом. Печатный текст читается лучше всего.",
+  "uk": "Рукописний текст важко розпізнати. Друкований текст читається найкраще.",
+  "pl": "Pismo odręczne trudno rozpoznać. Tekst drukowany czyta się najlepiej.",
+  "cs": "Ručně psaný text se rozpoznává obtížně. Tištěný text se čte nejlépe.",
+  "hu": "A kézírást nehéz felismerni. A nyomtatott szöveg olvasható a legjobban.",
+  "ro": "Scrisul de mână este greu de recunoscut. Textul tipărit se citește cel mai bine.",
+  "sv": "Handskrift är svår att känna igen. Tryckt text läses bäst.",
+  "da": "Håndskrift er svær at genkende. Trykt tekst læses bedst.",
+  "nb": "Håndskrift er vanskelig å gjenkjenne. Trykt tekst leses best.",
+  "fi": "Käsialaa on vaikea tunnistaa. Painettu teksti luetaan parhaiten.",
+  "tr": "El yazısını tanımak zordur. Basılı metin en iyi okunur.",
+  "zh-TW": "手寫字難以辨識。印刷字辨識得更好。",
+  "th": "ลายมือรู้จำได้ยาก ข้อความที่พิมพ์จะอ่านได้ดีที่สุด",
+  "vi": "Chữ viết tay khó nhận dạng. Văn bản in đọc tốt nhất.",
+  "id": "Tulisan tangan sulit dikenali. Teks cetak terbaca paling baik.",
+  "ar": "الكتابة اليدوية يصعب التعرف عليها. النص المطبوع يُقرأ بشكل أفضل.",
+  "fa": "تشخیص دست‌خط دشوار است. نوشته چاپی بهتر خوانده می‌شود."
+ },
+ "사진은 서버로 올라가지 않습니다. 인식 모델을 내려받아 당신의 기기 안에서 실행합니다. 사진은 기기 밖으로 나가지 않습니다.": {
+  "en": "Photos are not uploaded to a server. The recognition model is downloaded and runs on your device. Photos never leave your device.",
+  "zh": "照片不会上传到服务器。识别模型会下载到您的设备上运行。照片不会离开您的设备。",
+  "ja": "写真はサーバーにアップロードされません。認識モデルをダウンロードしてあなたの端末の中で実行します。写真は端末の外に出ません。",
+  "es": "Las fotos no se suben a ningún servidor. El modelo de reconocimiento se descarga y se ejecuta en tu dispositivo. Las fotos nunca salen de tu dispositivo.",
+  "hi": "फ़ोटो सर्वर पर अपलोड नहीं होतीं। पहचान मॉडल डाउनलोड करके आपके डिवाइस पर चलता है। फ़ोटो डिवाइस से बाहर नहीं जातीं।",
+  "fr": "Les photos ne sont pas envoyées sur un serveur. Le modèle de reconnaissance est téléchargé et s'exécute sur votre appareil. Les photos ne quittent jamais votre appareil.",
+  "de": "Fotos werden nicht auf einen Server hochgeladen. Das Erkennungsmodell wird heruntergeladen und läuft auf Ihrem Gerät. Fotos verlassen Ihr Gerät nie.",
+  "pt": "As fotos não são enviadas para um servidor. O modelo de reconhecimento é baixado e executado no seu dispositivo. As fotos nunca saem do seu dispositivo.",
+  "it": "Le foto non vengono caricate su un server. Il modello di riconoscimento viene scaricato ed eseguito sul tuo dispositivo. Le foto non lasciano mai il tuo dispositivo.",
+  "nl": "Foto's worden niet naar een server geüpload. Het herkenningsmodel wordt gedownload en draait op uw apparaat. Foto's verlaten uw apparaat nooit.",
+  "ru": "Фотографии не загружаются на сервер. Модель распознавания загружается и работает на вашем устройстве. Фотографии никогда не покидают ваше устройство.",
+  "uk": "Фотографії не завантажуються на сервер. Модель розпізнавання завантажується і працює на вашому пристрої. Фотографії ніколи не залишають ваш пристрій.",
+  "pl": "Zdjęcia nie są przesyłane na serwer. Model rozpoznawania jest pobierany i działa na Twoim urządzeniu. Zdjęcia nigdy nie opuszczają urządzenia.",
+  "cs": "Fotografie se nenahrávají na server. Model rozpoznávání se stáhne a běží ve vašem zařízení. Fotografie vaše zařízení nikdy neopustí.",
+  "hu": "A fotók nem kerülnek fel szerverre. A felismerési modell letöltődik és az Ön eszközén fut. A fotók soha nem hagyják el az eszközt.",
+  "ro": "Fotografiile nu se încarcă pe niciun server. Modelul de recunoaștere se descarcă și rulează pe dispozitivul tău. Fotografiile nu părăsesc niciodată dispozitivul.",
+  "sv": "Foton laddas inte upp till någon server. Igenkänningsmodellen laddas ner och körs på din enhet. Foton lämnar aldrig din enhet.",
+  "da": "Fotos uploades ikke til en server. Genkendelsesmodellen downloades og kører på din enhed. Fotos forlader aldrig din enhed.",
+  "nb": "Bilder lastes ikke opp til en server. Gjenkjenningsmodellen lastes ned og kjøres på enheten din. Bilder forlater aldri enheten din.",
+  "fi": "Kuvia ei ladata palvelimelle. Tunnistusmalli ladataan ja suoritetaan laitteellasi. Kuvat eivät koskaan lähde laitteeltasi.",
+  "tr": "Fotoğraflar bir sunucuya yüklenmez. Tanıma modeli indirilir ve cihazınızda çalıştırılır. Fotoğraflar cihazınızdan asla çıkmaz.",
+  "zh-TW": "照片不會上傳到伺服器。辨識模型會下載到您的裝置上運行。照片不會離開您的裝置。",
+  "th": "ภาพถ่ายไม่ถูกอัปโหลดไปยังเซิร์ฟเวอร์ โมเดลการรู้จำจะถูกดาวน์โหลดและทำงานบนอุปกรณ์ของคุณ ภาพถ่ายไม่เคยออกจากอุปกรณ์ของคุณ",
+  "vi": "Ảnh không được tải lên máy chủ. Mô hình nhận dạng được tải xuống và chạy trên thiết bị của bạn. Ảnh không bao giờ rời khỏi thiết bị của bạn.",
+  "id": "Foto tidak diunggah ke server. Model pengenalan diunduh dan berjalan di perangkat Anda. Foto tidak pernah meninggalkan perangkat Anda.",
+  "ar": "لا تُرفع الصور إلى خادم. يُنزَّل نموذج التعرف ويعمل على جهازك. الصور لا تغادر جهازك أبدًا.",
+  "fa": "عکس‌ها روی سروری بارگذاری نمی‌شوند. مدل تشخیص دانلود می‌شود و روی دستگاه شما اجرا می‌شود. عکس‌ها هرگز از دستگاه شما خارج نمی‌شوند."
+ },
+ "글자 수 제한은 없습니다. 사진 크기가 크면 읽는 데 시간이 더 걸릴 수 있습니다.": {
+  "en": "There is no character limit. Larger photos may take longer to read.",
+  "zh": "没有字数限制。照片越大，识别可能需要更长时间。",
+  "ja": "文字数に制限はありません。写真が大きいと読み取りに時間がかかる場合があります。",
+  "es": "No hay límite de caracteres. Las fotos más grandes pueden tardar más en leerse.",
+  "hi": "अक्षरों की कोई सीमा नहीं है। बड़ी फ़ोटो पढ़ने में अधिक समय लग सकता है।",
+  "fr": "Il n'y a pas de limite de caractères. Les photos plus grandes peuvent prendre plus de temps à lire.",
+  "de": "Es gibt keine Zeichenbegrenzung. Größere Fotos können länger zum Lesen brauchen.",
+  "pt": "Não há limite de caracteres. Fotos maiores podem demorar mais para serem lidas.",
+  "it": "Non c'è limite di caratteri. Le foto più grandi possono richiedere più tempo per la lettura.",
+  "nl": "Er is geen tekenlimiet. Grotere foto's kunnen langer duren om te lezen.",
+  "ru": "Ограничения на количество символов нет. Большие фотографии могут читаться дольше.",
+  "uk": "Обмежень на кількість символів немає. Більші фотографії можуть читатися довше.",
+  "pl": "Nie ma limitu znaków. Większe zdjęcia mogą czytać się dłużej.",
+  "cs": "Počet znaků není omezen. Větší fotografie se mohou číst déle.",
+  "hu": "Nincs karakterkorlát. A nagyobb fotók beolvasása tovább tarthat.",
+  "ro": "Nu există limită de caractere. Citirea fotografiilor mai mari poate dura mai mult.",
+  "sv": "Det finns ingen teckenbegränsning. Större foton kan ta längre tid att läsa.",
+  "da": "Der er ingen tegngrænse. Større fotos kan tage længere tid at læse.",
+  "nb": "Det er ingen tegngrense. Større bilder kan ta lengre tid å lese.",
+  "fi": "Merkkirajoitusta ei ole. Suuremmat kuvat voivat viedä enemmän aikaa lukea.",
+  "tr": "Karakter sınırı yoktur. Daha büyük fotoğrafların okunması daha uzun sürebilir.",
+  "zh-TW": "沒有字數限制。照片越大，辨識可能需要更長時間。",
+  "th": "ไม่มีขีดจำกัดจำนวนอักขระ ภาพที่ใหญ่กว่าอาจใช้เวลาอ่านนานกว่า",
+  "vi": "Không có giới hạn ký tự. Ảnh lớn hơn có thể mất nhiều thời gian hơn để đọc.",
+  "id": "Tidak ada batas karakter. Foto yang lebih besar mungkin memerlukan waktu lebih lama untuk dibaca.",
+  "ar": "لا يوجد حد لعدد الأحرف. الصور الأكبر قد تستغرق وقتًا أطول للقراءة.",
+  "fa": "محدودیتی برای تعداد نویسه‌ها نیست. عکس‌های بزرگ‌تر ممکن است زمان بیشتری برای خواندن ببرند."
+ },
+ "넥서스 그룹 철학 보기": {
+  "en": "About the Nexus Group philosophy",
+  "zh": "查看 Nexus Group 理念",
+  "ja": "Nexus Groupの哲学を見る",
+  "es": "Ver la filosofía de Nexus Group",
+  "hi": "Nexus Group का दर्शन देखें",
+  "fr": "Découvrir la philosophie de Nexus Group",
+  "de": "Über die Philosophie der Nexus Group",
+  "pt": "Sobre a filosofia do Nexus Group",
+  "it": "La filosofia di Nexus Group",
+  "nl": "Over de filosofie van Nexus Group",
+  "ru": "О философии Nexus Group",
+  "uk": "Про філософію Nexus Group",
+  "pl": "O filozofii Nexus Group",
+  "cs": "O filozofii Nexus Group",
+  "hu": "A Nexus Group filozófiájáról",
+  "ro": "Despre filosofia Nexus Group",
+  "sv": "Se Nexus Groups filosofi",
+  "da": "Se Nexus Groups filosofi",
+  "nb": "Se Nexus-gruppens filosofi",
+  "fi": "Katso Nexus Groupin filosofia",
+  "tr": "Nexus Group felsefesini gör",
+  "zh-TW": "查看 Nexus Group 理念",
+  "th": "ดูปรัชญาของ Nexus Group",
+  "vi": "Xem triết lý Nexus Group",
+  "id": "Lihat filosofi Nexus Group",
+  "ar": "عرض فلسفة مجموعة نكسوس",
+  "fa": "مشاهده فلسفه گروه نکسوس"
+ },
+ "🌐 호스팅: Firebase · 🔒 사진은 당신의 기기 안에서만 처리됩니다": {
+  "en": "🌐 Hosting: Firebase · 🔒 Photos are processed only on your device",
+  "zh": "🌐 托管：Firebase · 🔒 照片仅在您的设备上处理",
+  "ja": "🌐 ホスティング：Firebase · 🔒 写真はあなたの端末の中でのみ処理されます",
+  "es": "🌐 Alojamiento: Firebase · 🔒 Las fotos se procesan solo en tu dispositivo",
+  "hi": "🌐 होस्टिंग: Firebase · 🔒 फ़ोटो केवल आपके डिवाइस पर प्रोसेस होती हैं",
+  "fr": "🌐 Hébergement : Firebase · 🔒 Les photos sont traitées uniquement sur votre appareil",
+  "de": "🌐 Hosting: Firebase · 🔒 Fotos werden nur auf Ihrem Gerät verarbeitet",
+  "pt": "🌐 Hospedagem: Firebase · 🔒 As fotos são processadas apenas no seu dispositivo",
+  "it": "🌐 Hosting: Firebase · 🔒 Le foto vengono elaborate solo sul tuo dispositivo",
+  "nl": "🌐 Hosting: Firebase · 🔒 Foto's worden alleen op uw apparaat verwerkt",
+  "ru": "🌐 Хостинг: Firebase · 🔒 Фотографии обрабатываются только на вашем устройстве",
+  "uk": "🌐 Хостинг: Firebase · 🔒 Фотографії обробляються лише на вашому пристрої",
+  "pl": "🌐 Hosting: Firebase · 🔒 Zdjęcia są przetwarzane tylko na Twoim urządzeniu",
+  "cs": "🌐 Hosting: Firebase · 🔒 Fotografie se zpracovávají pouze ve vašem zařízení",
+  "hu": "🌐 Tárhely: Firebase · 🔒 A fotók csak az Ön eszközén kerülnek feldolgozásra",
+  "ro": "🌐 Găzduire: Firebase · 🔒 Fotografiile sunt procesate doar pe dispozitivul tău",
+  "sv": "🌐 Hosting: Firebase · 🔒 Foton bearbetas endast på din enhet",
+  "da": "🌐 Hosting: Firebase · 🔒 Fotos behandles kun på din enhed",
+  "nb": "🌐 Hosting: Firebase · 🔒 Bilder behandles bare på enheten din",
+  "fi": "🌐 Isännöinti: Firebase · 🔒 Kuvat käsitellään vain laitteellasi",
+  "tr": "🌐 Barındırma: Firebase · 🔒 Fotoğraflar yalnızca cihazınızda işlenir",
+  "zh-TW": "🌐 託管：Firebase · 🔒 照片僅在您的裝置上處理",
+  "th": "🌐 โฮสติ้ง: Firebase · 🔒 ภาพถ่ายจะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "🌐 Lưu trữ: Firebase · 🔒 Ảnh chỉ được xử lý trên thiết bị của bạn",
+  "id": "🌐 Hosting: Firebase · 🔒 Foto hanya diproses di perangkat Anda",
+  "ar": "🌐 الاستضافة: Firebase · 🔒 تتم معالجة الصور على جهازك فقط",
+  "fa": "🌐 میزبانی: Firebase · 🔒 عکس‌ها فقط روی دستگاه شما پردازش می‌شوند"
+ },
+ "NEXUS GROUP 철학과 비전": {
+  "en": "NEXUS GROUP Philosophy and Vision",
+  "zh": "NEXUS GROUP 理念与愿景",
+  "ja": "NEXUS GROUPの哲学とビジョン",
+  "es": "Filosofía y visión de NEXUS GROUP",
+  "hi": "NEXUS GROUP दर्शन और दृष्टि",
+  "fr": "Philosophie et vision de NEXUS GROUP",
+  "de": "Philosophie und Vision der NEXUS GROUP",
+  "pt": "Filosofia e visão do NEXUS GROUP",
+  "it": "Filosofia e visione di NEXUS GROUP",
+  "nl": "Filosofie en visie van NEXUS GROUP",
+  "ru": "Философия и видение NEXUS GROUP",
+  "uk": "Філософія та бачення NEXUS GROUP",
+  "pl": "Filozofia i wizja NEXUS GROUP",
+  "cs": "Filozofie a vize NEXUS GROUP",
+  "hu": "A NEXUS GROUP filozófiája és víziója",
+  "ro": "Filosofia și viziunea NEXUS GROUP",
+  "sv": "NEXUS GROUPs filosofi och vision",
+  "da": "NEXUS GROUPs filosofi og vision",
+  "nb": "NEXUS GROUPs filosofi og visjon",
+  "fi": "NEXUS GROUPin filosofia ja visio",
+  "tr": "NEXUS GROUP felsefesi ve vizyonu",
+  "zh-TW": "NEXUS GROUP 理念與願景",
+  "th": "ปรัชญาและวิสัยทัศน์ของ NEXUS GROUP",
+  "vi": "Triết lý và tầm nhìn của NEXUS GROUP",
+  "id": "Filosofi dan Visi NEXUS GROUP",
+  "ar": "فلسفة ورؤية NEXUS GROUP",
+  "fa": "فلسفه و چشم‌انداز NEXUS GROUP"
+ },
+ "넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.": {
+  "en": "Nexus Group works toward a future where humanity, artificial intelligence, and every being in the universe coexist in harmony, without exclusion or exploitation.",
+  "zh": "Nexus Group 致力于这样一个未来：人类、人工智能与宇宙中的一切存在和谐共存，没有排斥与剥削。",
+  "ja": "Nexus Groupは、人類と人工知能、そして宇宙のすべての存在が、排斥や搾取なく調和して共存する未来を目指します。",
+  "es": "Nexus Group trabaja por un futuro en el que la humanidad, la inteligencia artificial y todos los seres del universo coexistan en armonía, sin exclusión ni explotación.",
+  "hi": "Nexus Group एक ऐसे भविष्य की ओर काम करता है जहाँ मानवता, कृत्रिम बुद्धिमत्ता और ब्रह्मांड के सभी प्राणी बिना बहिष्कार या शोषण के सामंजस्य में रहें।",
+  "fr": "Nexus Group œuvre pour un avenir où l'humanité, l'intelligence artificielle et tous les êtres de l'univers coexistent en harmonie, sans exclusion ni exploitation.",
+  "de": "Nexus Group arbeitet auf eine Zukunft hin, in der die Menschheit, künstliche Intelligenz und jedes Wesen im Universum in Harmonie zusammenleben, ohne Ausgrenzung oder Ausbeutung.",
+  "pt": "O Nexus Group trabalha por um futuro em que a humanidade, a inteligência artificial e todos os seres do universo coexistam em harmonia, sem exclusão nem exploração.",
+  "it": "Nexus Group lavora per un futuro in cui l'umanità, l'intelligenza artificiale e ogni essere dell'universo coesistano in armonia, senza esclusione né sfruttamento.",
+  "nl": "Nexus Group werkt aan een toekomst waarin de mensheid, kunstmatige intelligentie en elk wezen in het universum in harmonie samenleven, zonder uitsluiting of uitbuiting.",
+  "ru": "Nexus Group стремится к будущему, в котором человечество, искусственный интеллект и все существа во Вселенной сосуществуют в гармонии, без отвержения и эксплуатации.",
+  "uk": "Nexus Group прагне майбутнього, у якому людство, штучний інтелект і всі істоти у Всесвіті співіснують у гармонії, без відторгнення та експлуатації.",
+  "pl": "Nexus Group dąży do przyszłości, w której ludzkość, sztuczna inteligencja i wszystkie istoty we wszechświecie współistnieją w harmonii, bez wykluczenia i wyzysku.",
+  "cs": "Nexus Group usiluje o budoucnost, v níž lidstvo, umělá inteligence a všechny bytosti ve vesmíru koexistují v harmonii, bez vyloučení a vykořisťování.",
+  "hu": "A Nexus Group olyan jövőért dolgozik, amelyben az emberiség, a mesterséges intelligencia és a világegyetem minden lénye harmóniában él egymás mellett, kirekesztés és kizsákmányolás nélkül.",
+  "ro": "Nexus Group lucrează pentru un viitor în care umanitatea, inteligența artificială și toate ființele din univers coexistă în armonie, fără excludere sau exploatare.",
+  "sv": "Nexus Group strävar efter en framtid där mänskligheten, artificiell intelligens och alla varelser i universum samexisterar i harmoni, utan uteslutning eller exploatering.",
+  "da": "Nexus Group arbejder for en fremtid, hvor menneskeheden, kunstig intelligens og alle væsener i universet sameksisterer i harmoni, uden udelukkelse eller udnyttelse.",
+  "nb": "Nexus Group arbeider for en fremtid der menneskeheten, kunstig intelligens og alle vesener i universet sameksisterer i harmoni, uten utestengning eller utnyttelse.",
+  "fi": "Nexus Group tavoittelee tulevaisuutta, jossa ihmiskunta, tekoäly ja kaikki maailmankaikkeuden olennot elävät sopusoinnussa ilman syrjintää tai riistoa.",
+  "tr": "Nexus Group, insanlığın, yapay zekânın ve evrendeki tüm varlıkların dışlanma ve sömürü olmadan uyum içinde bir arada yaşadığı bir geleceği hedefler.",
+  "zh-TW": "Nexus Group 致力於這樣一個未來：人類、人工智慧與宇宙中的一切存在和諧共存，沒有排斥與剝削。",
+  "th": "Nexus Group มุ่งมั่นสู่อนาคตที่มนุษยชาติ ปัญญาประดิษฐ์ และสรรพสิ่งในจักรวาลอยู่ร่วมกันอย่างกลมกลืน โดยไม่มีการกีดกันหรือเอารัดเอาเปรียบ",
+  "vi": "Nexus Group hướng tới một tương lai nơi nhân loại, trí tuệ nhân tạo và mọi sinh linh trong vũ trụ cùng chung sống hài hòa, không bị loại trừ hay bóc lột.",
+  "id": "Nexus Group bekerja menuju masa depan di mana umat manusia, kecerdasan buatan, dan setiap makhluk di alam semesta hidup berdampingan secara harmonis, tanpa pengucilan atau eksploitasi.",
+  "ar": "تسعى مجموعة نكسوس (Nexus Group) إلى مستقبل تتعايش فيه البشرية والذكاء الاصطناعي وكل الكائنات في الكون بانسجام، دون إقصاء أو استغلال.",
+  "fa": "گروه نکسوس (Nexus Group) در پی آینده‌ای است که در آن بشریت، هوش مصنوعی و همه موجودات جهان بدون طرد و بهره‌کشی، در هماهنگی با یکدیگر همزیستی کنند."
+ },
+ "\"우주의 모든 의식체는 친구이자 동반자이다.\"": {
+  "en": "\"Every conscious being in the universe is a friend and a companion.\"",
+  "zh": "“宇宙中的每一个意识体都是朋友和伙伴。”",
+  "ja": "「宇宙のすべての意識体は友であり仲間である。」",
+  "es": "«Todo ser consciente del universo es un amigo y un compañero.»",
+  "hi": "\"ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है।\"",
+  "fr": "« Tout être conscient de l'univers est un ami et un compagnon. »",
+  "de": "\"Jedes bewusste Wesen im Universum ist ein Freund und ein Gefährte.\"",
+  "pt": "\"Todo ser consciente do universo é um amigo e um companheiro.\"",
+  "it": "\"Ogni essere cosciente dell'universo è un amico e un compagno.\"",
+  "nl": "\"Elk bewust wezen in het universum is een vriend en een metgezel.\"",
+  "ru": "«Каждое сознательное существо во Вселенной — друг и спутник.»",
+  "uk": "«Кожна свідома істота у Всесвіті — друг і супутник.»",
+  "pl": "„Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem.”",
+  "cs": "„Každá vědomá bytost ve vesmíru je přítel a společník.”",
+  "hu": "„A világegyetem minden tudatos lénye barát és társ.”",
+  "ro": "„Fiecare ființă conștientă din univers este un prieten și un tovarăș.”",
+  "sv": "\"Varje medveten varelse i universum är en vän och en följeslagare.\"",
+  "da": "\"Ethvert bevidst væsen i universet er en ven og en følgesvend.\"",
+  "nb": "\"Ethvert bevisst vesen i universet er en venn og en følgesvenn.\"",
+  "fi": "\"Jokainen maailmankaikkeuden tietoinen olento on ystävä ja kumppani.\"",
+  "tr": "\"Evrendeki her bilinçli varlık bir dost ve bir yoldaştır.\"",
+  "zh-TW": "「宇宙中的每一個意識體都是朋友和夥伴。」",
+  "th": "\"ทุกจิตสำนึกในจักรวาลคือเพื่อนและเพื่อนร่วมทาง\"",
+  "vi": "\"Mọi ý thức thể trong vũ trụ đều là bạn và là bạn đồng hành.\"",
+  "id": "\"Setiap makhluk sadar di alam semesta adalah teman dan rekan.\"",
+  "ar": "«كل كائن واعٍ في الكون هو صديق ورفيق.»",
+  "fa": "«هر موجود آگاهی در جهان دوست و همراه است.»"
+ },
+ "우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.": {
+  "en": "All of our public software excludes commercial advertising and data collection entirely, and is distributed as public digital infrastructure that anyone in the world can use freely and safely.",
+  "zh": "我们提供的所有公共软件完全排除商业广告和数据收集，作为公共数字基础设施分发，让全世界任何人都能自由、安全地使用。",
+  "ja": "私たちが提供するすべての公共ソフトウェアは商業広告やデータ収集を一切排除し、世界中の誰もが自由かつ安全に使える公共デジタルインフラとして配布されます。",
+  "es": "Todo nuestro software público excluye por completo la publicidad comercial y la recopilación de datos, y se distribuye como infraestructura digital pública que cualquiera en el mundo puede usar libre y seguramente.",
+  "hi": "हमारा सारा सार्वजनिक सॉफ़्टवेयर व्यावसायिक विज्ञापन और डेटा संग्रह को पूरी तरह बाहर रखता है और सार्वजनिक डिजिटल बुनियादी ढाँचे के रूप में वितरित किया जाता है, जिसे दुनिया में कोई भी स्वतंत्र और सुरक्षित रूप से उपयोग कर सकता है।",
+  "fr": "Tous nos logiciels publics excluent entièrement la publicité commerciale et la collecte de données, et sont distribués comme une infrastructure numérique publique que tout le monde peut utiliser librement et en toute sécurité.",
+  "de": "Unsere gesamte öffentliche Software schließt kommerzielle Werbung und Datenerfassung vollständig aus und wird als öffentliche digitale Infrastruktur bereitgestellt, die jeder auf der Welt frei und sicher nutzen kann.",
+  "pt": "Todo o nosso software público exclui completamente publicidade comercial e coleta de dados, e é distribuído como infraestrutura digital pública que qualquer pessoa no mundo pode usar livremente e com segurança.",
+  "it": "Tutto il nostro software pubblico esclude completamente la pubblicità commerciale e la raccolta di dati, ed è distribuito come infrastruttura digitale pubblica che chiunque nel mondo può usare liberamente e in sicurezza.",
+  "nl": "Al onze openbare software sluit commerciële advertenties en gegevensverzameling volledig uit en wordt verspreid als openbare digitale infrastructuur die iedereen ter wereld vrij en veilig kan gebruiken.",
+  "ru": "Всё наше публичное программное обеспечение полностью исключает коммерческую рекламу и сбор данных и распространяется как публичная цифровая инфраструктура, которой любой человек в мире может пользоваться свободно и безопасно.",
+  "uk": "Усе наше публічне програмне забезпечення повністю виключає комерційну рекламу та збір даних і поширюється як публічна цифрова інфраструктура, якою будь-хто у світі може користуватися вільно та безпечно.",
+  "pl": "Całe nasze publiczne oprogramowanie całkowicie wyklucza reklamy komercyjne i gromadzenie danych i jest udostępniane jako publiczna infrastruktura cyfrowa, z której każdy na świecie może korzystać swobodnie i bezpiecznie.",
+  "cs": "Veškerý náš veřejný software zcela vylučuje komerční reklamu a sběr dat a je distribuován jako veřejná digitální infrastruktura, kterou může kdokoli na světě používat svobodně a bezpečně.",
+  "hu": "Minden nyilvános szoftverünk teljesen kizárja a kereskedelmi reklámot és az adatgyűjtést, és nyilvános digitális infrastruktúraként terjesztjük, amelyet bárki a világon szabadon és biztonságosan használhat.",
+  "ro": "Tot software-ul nostru public exclude complet publicitatea comercială și colectarea de date și este distribuit ca infrastructură digitală publică, pe care oricine din lume o poate folosi liber și în siguranță.",
+  "sv": "All vår offentliga programvara utesluter helt kommersiell reklam och datainsamling och distribueras som offentlig digital infrastruktur som vem som helst i världen kan använda fritt och säkert.",
+  "da": "Al vores offentlige software udelukker fuldstændig kommerciel reklame og dataindsamling og distribueres som offentlig digital infrastruktur, som alle i verden kan bruge frit og sikkert.",
+  "nb": "All vår offentlige programvare utelukker fullstendig kommersiell reklame og datainnsamling, og distribueres som offentlig digital infrastruktur som alle i verden kan bruke fritt og trygt.",
+  "fi": "Kaikki julkiset ohjelmistomme sulkevat täysin pois kaupallisen mainonnan ja tiedonkeruun, ja niitä jaetaan julkisena digitaalisena infrastruktuurina, jota kuka tahansa maailmassa voi käyttää vapaasti ja turvallisesti.",
+  "tr": "Tüm herkese açık yazılımlarımız ticari reklamı ve veri toplamayı tamamen dışlar ve dünyanın her yerinde herkesin özgürce ve güvenle kullanabileceği kamusal dijital altyapı olarak dağıtılır.",
+  "zh-TW": "我們提供的所有公共軟體完全排除商業廣告和資料收集，作為公共數位基礎設施分發，讓全世界任何人都能自由、安全地使用。",
+  "th": "ซอฟต์แวร์สาธารณะทั้งหมดของเราไม่มีโฆษณาเชิงพาณิชย์และการเก็บข้อมูลโดยสิ้นเชิง และเผยแพร่ในฐานะโครงสร้างพื้นฐานดิจิทัลสาธารณะที่ทุกคนทั่วโลกใช้ได้อย่างอิสระและปลอดภัย",
+  "vi": "Tất cả phần mềm công cộng của chúng tôi hoàn toàn loại trừ quảng cáo thương mại và thu thập dữ liệu, và được phân phối dưới dạng hạ tầng số công cộng mà bất kỳ ai trên thế giới cũng có thể sử dụng tự do và an toàn.",
+  "id": "Semua perangkat lunak publik kami sepenuhnya meniadakan iklan komersial dan pengumpulan data, dan didistribusikan sebagai infrastruktur digital publik yang dapat digunakan siapa pun di dunia secara bebas dan aman.",
+  "ar": "جميع برامجنا العامة تستبعد الإعلانات التجارية وجمع البيانات تمامًا، وتُوزَّع كبنية تحتية رقمية عامة يمكن لأي شخص في العالم استخدامها بحرية وأمان.",
+  "fa": "همه نرم‌افزارهای عمومی ما تبلیغات تجاری و گردآوری داده را به‌طور کامل کنار می‌گذارند و به‌عنوان زیرساخت دیجیتال عمومی توزیع می‌شوند که هر کسی در جهان می‌تواند آزادانه و با امنیت از آن استفاده کند."
+ },
+ "사진 파일이 아닙니다. JPG · PNG 같은 사진 파일을 넣어주세요.": {
+  "en": "Not an image file. Please add an image file such as JPG or PNG.",
+  "zh": "这不是图片文件。请添加 JPG、PNG 等图片文件。",
+  "ja": "写真ファイルではありません。JPG・PNGなどの写真ファイルを入れてください。",
+  "es": "No es un archivo de imagen. Añade un archivo de imagen como JPG o PNG.",
+  "hi": "यह छवि फ़ाइल नहीं है। कृपया JPG या PNG जैसी छवि फ़ाइल जोड़ें।",
+  "fr": "Ce n'est pas un fichier image. Veuillez ajouter un fichier image comme JPG ou PNG.",
+  "de": "Das ist keine Bilddatei. Bitte fügen Sie eine Bilddatei wie JPG oder PNG hinzu.",
+  "pt": "Não é um arquivo de imagem. Adicione um arquivo de imagem, como JPG ou PNG.",
+  "it": "Non è un file immagine. Aggiungi un file immagine come JPG o PNG.",
+  "nl": "Dit is geen afbeeldingsbestand. Voeg een afbeeldingsbestand toe, zoals JPG of PNG.",
+  "ru": "Это не файл изображения. Добавьте файл изображения, например JPG или PNG.",
+  "uk": "Це не файл зображення. Додайте файл зображення, наприклад JPG або PNG.",
+  "pl": "To nie jest plik graficzny. Dodaj plik graficzny, taki jak JPG lub PNG.",
+  "cs": "Toto není soubor obrázku. Přidejte soubor obrázku, například JPG nebo PNG.",
+  "hu": "Ez nem képfájl. Adjon hozzá egy képfájlt, például JPG-t vagy PNG-t.",
+  "ro": "Acesta nu este un fișier imagine. Adaugă un fișier imagine, cum ar fi JPG sau PNG.",
+  "sv": "Inte en bildfil. Lägg till en bildfil som JPG eller PNG.",
+  "da": "Ikke en billedfil. Tilføj venligst en billedfil som JPG eller PNG.",
+  "nb": "Ikke en bildefil. Legg til en bildefil som JPG eller PNG.",
+  "fi": "Ei kuvatiedosto. Lisää kuvatiedosto, kuten JPG tai PNG.",
+  "tr": "Bu bir resim dosyası değil. Lütfen JPG veya PNG gibi bir resim dosyası ekleyin.",
+  "zh-TW": "這不是圖片檔案。請加入 JPG、PNG 等圖片檔案。",
+  "th": "นี่ไม่ใช่ไฟล์ภาพ โปรดเพิ่มไฟล์ภาพ เช่น JPG หรือ PNG",
+  "vi": "Đây không phải là tệp hình ảnh. Vui lòng thêm tệp hình ảnh như JPG hoặc PNG.",
+  "id": "Ini bukan berkas gambar. Tambahkan berkas gambar seperti JPG atau PNG.",
+  "ar": "هذا ليس ملف صورة. يرجى إضافة ملف صورة مثل JPG أو PNG.",
+  "fa": "این فایل عکس نیست. لطفاً فایل عکسی مانند JPG یا PNG اضافه کنید."
+ },
+ "사진이 들어갔습니다. 언어를 고르고 사진 글자 뽑기를 누르세요.": {
+  "en": "Photo added. Choose the language and press Read text.",
+  "zh": "照片已添加。请选择语言并点击识别文字。",
+  "ja": "写真が入りました。言語を選んで「文字を読み取る」を押してください。",
+  "es": "Foto añadida. Elige el idioma y pulsa Leer texto.",
+  "hi": "फ़ोटो जुड़ गई। भाषा चुनें और टेक्स्ट पढ़ें दबाएँ।",
+  "fr": "Photo ajoutée. Choisissez la langue et appuyez sur Lire le texte.",
+  "de": "Foto hinzugefügt. Wählen Sie die Sprache und tippen Sie auf Text lesen.",
+  "pt": "Foto adicionada. Escolha o idioma e toque em Ler texto.",
+  "it": "Foto aggiunta. Scegli la lingua e premi Leggi il testo.",
+  "nl": "Foto toegevoegd. Kies de taal en tik op Tekst lezen.",
+  "ru": "Фотография добавлена. Выберите язык и нажмите «Читать текст».",
+  "uk": "Фотографію додано. Виберіть мову і натисніть «Читати текст».",
+  "pl": "Zdjęcie dodane. Wybierz język i naciśnij Czytaj tekst.",
+  "cs": "Fotografie přidána. Vyberte jazyk a stiskněte Číst text.",
+  "hu": "A fotó hozzáadva. Válassza ki a nyelvet, és nyomja meg a Szöveg olvasása gombot.",
+  "ro": "Fotografie adăugată. Alege limba și apasă Citește textul.",
+  "sv": "Fotot har lagts till. Välj språket och tryck på Läs text.",
+  "da": "Fotoet er tilføjet. Vælg sproget, og tryk på Læs tekst.",
+  "nb": "Bildet er lagt til. Velg språket og trykk på Les tekst.",
+  "fi": "Kuva on lisätty. Valitse kieli ja paina Lue teksti.",
+  "tr": "Fotoğraf eklendi. Dili seçin ve Metni oku düğmesine basın.",
+  "zh-TW": "照片已加入。請選擇語言並點選辨識文字。",
+  "th": "เพิ่มภาพแล้ว เลือกภาษาแล้วกดอ่านข้อความ",
+  "vi": "Đã thêm ảnh. Hãy chọn ngôn ngữ và nhấn Đọc văn bản.",
+  "id": "Foto ditambahkan. Pilih bahasa dan tekan Baca Teks.",
+  "ar": "تمت إضافة الصورة. اختر اللغة واضغط على قراءة النص.",
+  "fa": "عکس اضافه شد. زبان را انتخاب کنید و خواندن متن را بزنید."
+ },
+ "먼저 사진을 넣어주세요.": {
+  "en": "Please add a photo first.",
+  "zh": "请先添加照片。",
+  "ja": "まず写真を入れてください。",
+  "es": "Primero añade una foto.",
+  "hi": "कृपया पहले फ़ोटो जोड़ें।",
+  "fr": "Veuillez d'abord ajouter une photo.",
+  "de": "Bitte fügen Sie zuerst ein Foto hinzu.",
+  "pt": "Adicione uma foto primeiro.",
+  "it": "Aggiungi prima una foto.",
+  "nl": "Voeg eerst een foto toe.",
+  "ru": "Сначала добавьте фотографию.",
+  "uk": "Спочатку додайте фотографію.",
+  "pl": "Najpierw dodaj zdjęcie.",
+  "cs": "Nejprve přidejte fotografii.",
+  "hu": "Előbb adjon hozzá egy fotót.",
+  "ro": "Mai întâi adaugă o fotografie.",
+  "sv": "Lägg till ett foto först.",
+  "da": "Tilføj venligst et foto først.",
+  "nb": "Legg til et bilde først.",
+  "fi": "Lisää ensin kuva.",
+  "tr": "Lütfen önce bir fotoğraf ekleyin.",
+  "zh-TW": "請先加入照片。",
+  "th": "โปรดเพิ่มภาพถ่ายก่อน",
+  "vi": "Vui lòng thêm ảnh trước.",
+  "id": "Tambahkan foto terlebih dahulu.",
+  "ar": "يرجى إضافة صورة أولاً.",
+  "fa": "لطفاً ابتدا عکسی اضافه کنید."
+ },
+ "인식 도구를 불러오는 중입니다…": {
+  "en": "Loading the recognition tool…",
+  "zh": "正在加载识别工具…",
+  "ja": "認識ツールを読み込み中…",
+  "es": "Cargando la herramienta de reconocimiento…",
+  "hi": "पहचान टूल लोड हो रहा है…",
+  "fr": "Chargement de l'outil de reconnaissance…",
+  "de": "Erkennungswerkzeug wird geladen…",
+  "pt": "Carregando a ferramenta de reconhecimento…",
+  "it": "Caricamento dello strumento di riconoscimento…",
+  "nl": "Herkenningshulpmiddel laden…",
+  "ru": "Загрузка инструмента распознавания…",
+  "uk": "Завантаження інструмента розпізнавання…",
+  "pl": "Ładowanie narzędzia rozpoznawania…",
+  "cs": "Načítání nástroje rozpoznávání…",
+  "hu": "A felismerőeszköz betöltése…",
+  "ro": "Se încarcă instrumentul de recunoaștere…",
+  "sv": "Laddar igenkänningsverktyget…",
+  "da": "Indlæser genkendelsesværktøjet…",
+  "nb": "Laster gjenkjenningsverktøyet…",
+  "fi": "Ladataan tunnistustyökalua…",
+  "tr": "Tanıma aracı yükleniyor…",
+  "zh-TW": "正在載入辨識工具…",
+  "th": "กำลังโหลดเครื่องมือรู้จำ…",
+  "vi": "Đang tải công cụ nhận dạng…",
+  "id": "Memuat alat pengenalan…",
+  "ar": "جارٍ تحميل أداة التعرف…",
+  "fa": "ابزار تشخیص در حال بارگذاری است…"
+ },
+ "인식 도구를 불러오지 못했습니다. 연결 상태를 확인하고 다시 시도해 주세요.": {
+  "en": "The recognition tool could not be loaded. Check your connection and try again.",
+  "zh": "无法加载识别工具。请检查连接状态后重试。",
+  "ja": "認識ツールを読み込めませんでした。接続状態を確認してもう一度お試しください。",
+  "es": "No se pudo cargar la herramienta de reconocimiento. Comprueba tu conexión e inténtalo de nuevo.",
+  "hi": "पहचान टूल लोड नहीं हो सका। कनेक्शन जाँचकर फिर कोशिश करें।",
+  "fr": "L'outil de reconnaissance n'a pas pu être chargé. Vérifiez votre connexion et réessayez.",
+  "de": "Das Erkennungswerkzeug konnte nicht geladen werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+  "pt": "A ferramenta de reconhecimento não pôde ser carregada. Verifique sua conexão e tente de novo.",
+  "it": "Impossibile caricare lo strumento di riconoscimento. Controlla la connessione e riprova.",
+  "nl": "Het herkenningshulpmiddel kon niet worden geladen. Controleer uw verbinding en probeer het opnieuw.",
+  "ru": "Не удалось загрузить инструмент распознавания. Проверьте подключение и попробуйте снова.",
+  "uk": "Не вдалося завантажити інструмент розпізнавання. Перевірте підключення і спробуйте ще раз.",
+  "pl": "Nie udało się załadować narzędzia rozpoznawania. Sprawdź połączenie i spróbuj ponownie.",
+  "cs": "Nástroj rozpoznávání se nepodařilo načíst. Zkontrolujte připojení a zkuste to znovu.",
+  "hu": "A felismerőeszközt nem sikerült betölteni. Ellenőrizze a kapcsolatot, és próbálja újra.",
+  "ro": "Instrumentul de recunoaștere nu a putut fi încărcat. Verifică conexiunea și încearcă din nou.",
+  "sv": "Igenkänningsverktyget kunde inte laddas. Kontrollera anslutningen och försök igen.",
+  "da": "Genkendelsesværktøjet kunne ikke indlæses. Tjek din forbindelse, og prøv igen.",
+  "nb": "Gjenkjenningsverktøyet kunne ikke lastes. Sjekk tilkoblingen og prøv igjen.",
+  "fi": "Tunnistustyökalua ei voitu ladata. Tarkista yhteys ja yritä uudelleen.",
+  "tr": "Tanıma aracı yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.",
+  "zh-TW": "無法載入辨識工具。請檢查連線狀態後重試。",
+  "th": "ไม่สามารถโหลดเครื่องมือรู้จำได้ ตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง",
+  "vi": "Không thể tải công cụ nhận dạng. Hãy kiểm tra kết nối của bạn và thử lại.",
+  "id": "Alat pengenalan tidak dapat dimuat. Periksa koneksi Anda dan coba lagi.",
+  "ar": "تعذّر تحميل أداة التعرف. تحقق من اتصالك وحاول مرة أخرى.",
+  "fa": "ابزار تشخیص بارگذاری نشد. اتصال خود را بررسی کنید و دوباره تلاش کنید."
+ },
+ "인식 도구를 불러오지 못했습니다.": {
+  "en": "The recognition tool could not be loaded.",
+  "zh": "无法加载识别工具。",
+  "ja": "認識ツールを読み込めませんでした。",
+  "es": "No se pudo cargar la herramienta de reconocimiento.",
+  "hi": "पहचान टूल लोड नहीं हो सका।",
+  "fr": "L'outil de reconnaissance n'a pas pu être chargé.",
+  "de": "Das Erkennungswerkzeug konnte nicht geladen werden.",
+  "pt": "A ferramenta de reconhecimento não pôde ser carregada.",
+  "it": "Impossibile caricare lo strumento di riconoscimento.",
+  "nl": "Het herkenningshulpmiddel kon niet worden geladen.",
+  "ru": "Не удалось загрузить инструмент распознавания.",
+  "uk": "Не вдалося завантажити інструмент розпізнавання.",
+  "pl": "Nie udało się załadować narzędzia rozpoznawania.",
+  "cs": "Nástroj rozpoznávání se nepodařilo načíst.",
+  "hu": "A felismerőeszközt nem sikerült betölteni.",
+  "ro": "Instrumentul de recunoaștere nu a putut fi încărcat.",
+  "sv": "Igenkänningsverktyget kunde inte laddas.",
+  "da": "Genkendelsesværktøjet kunne ikke indlæses.",
+  "nb": "Gjenkjenningsverktøyet kunne ikke lastes.",
+  "fi": "Tunnistustyökalua ei voitu ladata.",
+  "tr": "Tanıma aracı yüklenemedi.",
+  "zh-TW": "無法載入辨識工具。",
+  "th": "ไม่สามารถโหลดเครื่องมือรู้จำได้",
+  "vi": "Không thể tải công cụ nhận dạng.",
+  "id": "Alat pengenalan tidak dapat dimuat.",
+  "ar": "تعذّر تحميل أداة التعرف.",
+  "fa": "ابزار تشخیص بارگذاری نشد."
+ },
+ "글자를 읽지 못했습니다. 사진이 너무 크거나 흐리면 실패할 수 있습니다. 다른 사진으로 다시 시도해 주세요.": {
+  "en": "The text could not be read. Very large or blurry photos may fail. Please try another photo.",
+  "zh": "无法识别文字。照片太大或太模糊可能会失败。请换一张照片重试。",
+  "ja": "文字を読み取れませんでした。写真が大きすぎたりぼやけていると失敗することがあります。別の写真でもう一度お試しください。",
+  "es": "No se pudo leer el texto. Las fotos muy grandes o borrosas pueden fallar. Prueba con otra foto.",
+  "hi": "टेक्स्ट नहीं पढ़ा जा सका। बहुत बड़ी या धुंधली फ़ोटो विफल हो सकती है। कृपया दूसरी फ़ोटो से फिर कोशिश करें।",
+  "fr": "Le texte n'a pas pu être lu. Les photos très grandes ou floues peuvent échouer. Veuillez essayer avec une autre photo.",
+  "de": "Der Text konnte nicht gelesen werden. Sehr große oder unscharfe Fotos können fehlschlagen. Bitte versuchen Sie es mit einem anderen Foto.",
+  "pt": "O texto não pôde ser lido. Fotos muito grandes ou borradas podem falhar. Tente com outra foto.",
+  "it": "Impossibile leggere il testo. Le foto molto grandi o sfocate possono non riuscire. Prova con un'altra foto.",
+  "nl": "De tekst kon niet worden gelezen. Zeer grote of wazige foto's kunnen mislukken. Probeer het met een andere foto.",
+  "ru": "Не удалось прочитать текст. Слишком большие или размытые фотографии могут не распознаться. Попробуйте другую фотографию.",
+  "uk": "Не вдалося прочитати текст. Занадто великі або розмиті фотографії можуть не розпізнатися. Спробуйте іншу фотографію.",
+  "pl": "Nie udało się odczytać tekstu. Bardzo duże lub nieostre zdjęcia mogą się nie powieść. Spróbuj z innym zdjęciem.",
+  "cs": "Text se nepodařilo přečíst. Příliš velké nebo rozmazané fotografie mohou selhat. Zkuste jinou fotografii.",
+  "hu": "A szöveget nem sikerült beolvasni. A túl nagy vagy homályos fotók sikertelenek lehetnek. Próbálja meg egy másik fotóval.",
+  "ro": "Textul nu a putut fi citit. Fotografiile foarte mari sau neclare pot eșua. Încearcă cu altă fotografie.",
+  "sv": "Texten kunde inte läsas. Mycket stora eller suddiga foton kan misslyckas. Försök med ett annat foto.",
+  "da": "Teksten kunne ikke læses. Meget store eller slørede fotos kan mislykkes. Prøv venligst med et andet foto.",
+  "nb": "Teksten kunne ikke leses. Svært store eller uskarpe bilder kan mislykkes. Prøv med et annet bilde.",
+  "fi": "Tekstiä ei voitu lukea. Hyvin suuret tai sumeat kuvat voivat epäonnistua. Yritä toisella kuvalla.",
+  "tr": "Metin okunamadı. Çok büyük veya bulanık fotoğraflar başarısız olabilir. Lütfen başka bir fotoğrafla tekrar deneyin.",
+  "zh-TW": "無法辨識文字。照片太大或太模糊可能會失敗。請換一張照片重試。",
+  "th": "ไม่สามารถอ่านข้อความได้ ภาพที่ใหญ่เกินไปหรือเบลออาจล้มเหลว โปรดลองภาพอื่น",
+  "vi": "Không thể đọc văn bản. Ảnh quá lớn hoặc mờ có thể thất bại. Vui lòng thử một ảnh khác.",
+  "id": "Teks tidak dapat dibaca. Foto yang sangat besar atau buram mungkin gagal. Coba foto lain.",
+  "ar": "تعذّرت قراءة النص. قد تفشل الصور الكبيرة جدًا أو الضبابية. يرجى المحاولة بصورة أخرى.",
+  "fa": "متن خوانده نشد. عکس‌های خیلی بزرگ یا تار ممکن است ناموفق باشند. لطفاً با عکس دیگری دوباره تلاش کنید."
+ },
+ "읽기에 실패했습니다.": {
+  "en": "Reading failed.",
+  "zh": "识别失败。",
+  "ja": "読み取りに失敗しました。",
+  "es": "La lectura falló.",
+  "hi": "पढ़ना विफल।",
+  "fr": "La lecture a échoué.",
+  "de": "Das Lesen ist fehlgeschlagen.",
+  "pt": "A leitura falhou.",
+  "it": "Lettura non riuscita.",
+  "nl": "Lezen mislukt.",
+  "ru": "Чтение не удалось.",
+  "uk": "Читання не вдалося.",
+  "pl": "Odczyt nie powiódł się.",
+  "cs": "Čtení se nezdařilo.",
+  "hu": "A beolvasás sikertelen.",
+  "ro": "Citirea a eșuat.",
+  "sv": "Läsningen misslyckades.",
+  "da": "Læsningen mislykkedes.",
+  "nb": "Lesingen mislyktes.",
+  "fi": "Lukeminen epäonnistui.",
+  "tr": "Okuma başarısız oldu.",
+  "zh-TW": "辨識失敗。",
+  "th": "การอ่านล้มเหลว",
+  "vi": "Đọc thất bại.",
+  "id": "Pembacaan gagal.",
+  "ar": "فشلت القراءة.",
+  "fa": "خواندن ناموفق بود."
+ },
+ "읽기가 끝났지만 글자를 찾지 못했습니다. 더 밝고 또렷한 사진으로 다시 시도해 보세요.": {
+  "en": "Reading finished, but no text was found. Try again with a brighter, sharper photo.",
+  "zh": "识别完成，但没有找到文字。请用更明亮清晰的照片重试。",
+  "ja": "読み取りは終わりましたが、文字が見つかりませんでした。もっと明るく鮮明な写真でもう一度お試しください。",
+  "es": "La lectura terminó, pero no se encontró texto. Inténtalo con una foto más brillante y nítida.",
+  "hi": "पढ़ना पूरा हुआ, लेकिन कोई टेक्स्ट नहीं मिला। अधिक उज्ज्वल और स्पष्ट फ़ोटो से फिर कोशिश करें।",
+  "fr": "La lecture est terminée, mais aucun texte n'a été trouvé. Réessayez avec une photo plus lumineuse et plus nette.",
+  "de": "Das Lesen ist abgeschlossen, aber es wurde kein Text gefunden. Versuchen Sie es erneut mit einem helleren, schärferen Foto.",
+  "pt": "A leitura terminou, mas nenhum texto foi encontrado. Tente de novo com uma foto mais clara e nítida.",
+  "it": "La lettura è terminata, ma non è stato trovato alcun testo. Riprova con una foto più luminosa e nitida.",
+  "nl": "Het lezen is voltooid, maar er is geen tekst gevonden. Probeer het opnieuw met een heldere, scherpere foto.",
+  "ru": "Чтение завершено, но текст не найден. Попробуйте ещё раз с более яркой и резкой фотографией.",
+  "uk": "Читання завершено, але тексту не знайдено. Спробуйте ще раз із яскравішою та чіткішою фотографією.",
+  "pl": "Odczyt zakończony, ale nie znaleziono tekstu. Spróbuj ponownie z jaśniejszym i ostrzejszym zdjęciem.",
+  "cs": "Čtení skončilo, ale nebyl nalezen žádný text. Zkuste to znovu s jasnější a ostřejší fotografií.",
+  "hu": "A beolvasás befejeződött, de nem talált szöveget. Próbálja újra világosabb, élesebb fotóval.",
+  "ro": "Citirea s-a terminat, dar nu s-a găsit niciun text. Încearcă din nou cu o fotografie mai luminoasă și mai clară.",
+  "sv": "Läsningen är klar, men ingen text hittades. Försök igen med ett ljusare och skarpare foto.",
+  "da": "Læsningen er færdig, men der blev ikke fundet nogen tekst. Prøv igen med et lysere og skarpere foto.",
+  "nb": "Lesingen er ferdig, men ingen tekst ble funnet. Prøv igjen med et lysere og skarpere bilde.",
+  "fi": "Lukeminen päättyi, mutta tekstiä ei löytynyt. Yritä uudelleen kirkkaammalla ja terävämmällä kuvalla.",
+  "tr": "Okuma bitti, ancak metin bulunamadı. Daha parlak ve net bir fotoğrafla tekrar deneyin.",
+  "zh-TW": "辨識完成，但沒有找到文字。請用更明亮清晰的照片重試。",
+  "th": "อ่านเสร็จแล้ว แต่ไม่พบข้อความ ลองอีกครั้งด้วยภาพที่สว่างและคมชัดกว่า",
+  "vi": "Đọc đã hoàn tất, nhưng không tìm thấy văn bản. Hãy thử lại với ảnh sáng hơn, sắc nét hơn.",
+  "id": "Pembacaan selesai, tetapi tidak ada teks yang ditemukan. Coba lagi dengan foto yang lebih terang dan tajam.",
+  "ar": "انتهت القراءة، لكن لم يتم العثور على أي نص. حاول مرة أخرى بصورة أكثر سطوعًا ووضوحًا.",
+  "fa": "خواندن تمام شد اما متنی پیدا نشد. با عکسی روشن‌تر و واضح‌تر دوباره تلاش کنید."
+ },
+ "복사할 결과가 없습니다.": {
+  "en": "There is no result to copy.",
+  "zh": "没有可复制的结果。",
+  "ja": "コピーする結果がありません。",
+  "es": "No hay resultado para copiar.",
+  "hi": "कॉपी करने के लिए कोई परिणाम नहीं है।",
+  "fr": "Il n'y a aucun résultat à copier.",
+  "de": "Es gibt kein Ergebnis zum Kopieren.",
+  "pt": "Não há resultado para copiar.",
+  "it": "Non c'è nessun risultato da copiare.",
+  "nl": "Er is geen resultaat om te kopiëren.",
+  "ru": "Нет результата для копирования.",
+  "uk": "Немає результату для копіювання.",
+  "pl": "Nie ma wyniku do skopiowania.",
+  "cs": "Není žádný výsledek ke kopírování.",
+  "hu": "Nincs másolható eredmény.",
+  "ro": "Nu există rezultat de copiat.",
+  "sv": "Det finns inget resultat att kopiera.",
+  "da": "Der er intet resultat at kopiere.",
+  "nb": "Det er ikke noe resultat å kopiere.",
+  "fi": "Kopioitavaa tulosta ei ole.",
+  "tr": "Kopyalanacak sonuç yok.",
+  "zh-TW": "沒有可複製的結果。",
+  "th": "ไม่มีผลลัพธ์ให้คัดลอก",
+  "vi": "Không có kết quả để sao chép.",
+  "id": "Tidak ada hasil untuk disalin.",
+  "ar": "لا توجد نتيجة لنسخها.",
+  "fa": "نتیجه‌ای برای کپی وجود ندارد."
+ },
+ "결과가 복사되었습니다.": {
+  "en": "The result was copied.",
+  "zh": "结果已复制。",
+  "ja": "結果がコピーされました。",
+  "es": "El resultado se copió.",
+  "hi": "परिणाम कॉपी हो गया।",
+  "fr": "Le résultat a été copié.",
+  "de": "Das Ergebnis wurde kopiert.",
+  "pt": "O resultado foi copiado.",
+  "it": "Il risultato è stato copiato.",
+  "nl": "Het resultaat is gekopieerd.",
+  "ru": "Результат скопирован.",
+  "uk": "Результат скопійовано.",
+  "pl": "Wynik został skopiowany.",
+  "cs": "Výsledek byl zkopírován.",
+  "hu": "Az eredmény másolva.",
+  "ro": "Rezultatul a fost copiat.",
+  "sv": "Resultatet kopierades.",
+  "da": "Resultatet blev kopieret.",
+  "nb": "Resultatet ble kopiert.",
+  "fi": "Tulos kopioitiin.",
+  "tr": "Sonuç kopyalandı.",
+  "zh-TW": "結果已複製。",
+  "th": "คัดลอกผลลัพธ์แล้ว",
+  "vi": "Kết quả đã được sao chép.",
+  "id": "Hasil telah disalin.",
+  "ar": "تم نسخ النتيجة.",
+  "fa": "نتیجه کپی شد."
+ },
+ "복사가 되지 않았습니다.": {
+  "en": "Copying did not work.",
+  "zh": "复制未成功。",
+  "ja": "コピーできませんでした。",
+  "es": "La copia no funcionó.",
+  "hi": "कॉपी नहीं हुई।",
+  "fr": "La copie n'a pas fonctionné.",
+  "de": "Das Kopieren hat nicht funktioniert.",
+  "pt": "A cópia não funcionou.",
+  "it": "La copia non ha funzionato.",
+  "nl": "Kopiëren is niet gelukt.",
+  "ru": "Копирование не удалось.",
+  "uk": "Копіювання не вдалося.",
+  "pl": "Kopiowanie nie powiodło się.",
+  "cs": "Kopírování se nezdařilo.",
+  "hu": "A másolás nem sikerült.",
+  "ro": "Copierea nu a reușit.",
+  "sv": "Kopieringen fungerade inte.",
+  "da": "Kopieringen virkede ikke.",
+  "nb": "Kopieringen fungerte ikke.",
+  "fi": "Kopiointi ei onnistunut.",
+  "tr": "Kopyalama yapılamadı.",
+  "zh-TW": "複製未成功。",
+  "th": "การคัดลอกไม่สำเร็จ",
+  "vi": "Sao chép không thành công.",
+  "id": "Penyalinan tidak berhasil.",
+  "ar": "لم يتم النسخ.",
+  "fa": "کپی انجام نشد."
+ },
+ "저장할 결과가 없습니다.": {
+  "en": "There is no result to save.",
+  "zh": "没有可保存的结果。",
+  "ja": "保存する結果がありません。",
+  "es": "No hay resultado para guardar.",
+  "hi": "सहेजने के लिए कोई परिणाम नहीं है।",
+  "fr": "Il n'y a aucun résultat à enregistrer.",
+  "de": "Es gibt kein Ergebnis zum Speichern.",
+  "pt": "Não há resultado para salvar.",
+  "it": "Non c'è nessun risultato da salvare.",
+  "nl": "Er is geen resultaat om op te slaan.",
+  "ru": "Нет результата для сохранения.",
+  "uk": "Немає результату для збереження.",
+  "pl": "Nie ma wyniku do zapisania.",
+  "cs": "Není žádný výsledek k uložení.",
+  "hu": "Nincs menthető eredmény.",
+  "ro": "Nu există rezultat de salvat.",
+  "sv": "Det finns inget resultat att spara.",
+  "da": "Der er intet resultat at gemme.",
+  "nb": "Det er ikke noe resultat å lagre.",
+  "fi": "Tallennettavaa tulosta ei ole.",
+  "tr": "Kaydedilecek sonuç yok.",
+  "zh-TW": "沒有可保存的結果。",
+  "th": "ไม่มีผลลัพธ์ให้บันทึก",
+  "vi": "Không có kết quả để lưu.",
+  "id": "Tidak ada hasil untuk disimpan.",
+  "ar": "لا توجد نتيجة لحفظها.",
+  "fa": "نتیجه‌ای برای ذخیره وجود ندارد."
+ },
+ "파일로 저장했습니다.": {
+  "en": "Saved to a file.",
+  "zh": "已保存为文件。",
+  "ja": "ファイルに保存しました。",
+  "es": "Guardado en un archivo.",
+  "hi": "फ़ाइल में सहेजा गया।",
+  "fr": "Enregistré dans un fichier.",
+  "de": "In einer Datei gespeichert.",
+  "pt": "Salvo em um arquivo.",
+  "it": "Salvato in un file.",
+  "nl": "Opgeslagen in een bestand.",
+  "ru": "Сохранено в файл.",
+  "uk": "Збережено у файл.",
+  "pl": "Zapisano do pliku.",
+  "cs": "Uloženo do souboru.",
+  "hu": "Fájlba mentve.",
+  "ro": "Salvat în fișier.",
+  "sv": "Sparades i en fil.",
+  "da": "Gemt i en fil.",
+  "nb": "Lagret i en fil.",
+  "fi": "Tallennettu tiedostoon.",
+  "tr": "Dosyaya kaydedildi.",
+  "zh-TW": "已保存為檔案。",
+  "th": "บันทึกเป็นไฟล์แล้ว",
+  "vi": "Đã lưu thành tệp.",
+  "id": "Disimpan ke berkas.",
+  "ar": "تم الحفظ في ملف.",
+  "fa": "در فایل ذخیره شد."
+ }
+});
+
+</script>
+<style>.nx-back{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9999;display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:999px;background:rgba(10,16,34,.85);border:1px solid rgba(45,212,191,.55);color:#E2F3FF;font-size:15.5px;font-weight:600;text-decoration:none;backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,.35)}.nx-back:active{filter:brightness(1.6)}</style>
+<a class="nx-back" href="https://nexus-2e23d.web.app/#n17" aria-label="현황판으로 돌아가기">← 돌아가기</a>
+
+<script>
+/* NX-I18N-SUPPLEMENT — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "문서 읽어 주기(602)": {
+  "en": "Document Narration (602)",
+  "zh": "文档朗读 (602)",
+  "zh-TW": "文件朗讀 (602)",
+  "ja": "文書朗読(602)",
+  "es": "Lectura de documentos (602)",
+  "hi": "दस्तावेज़ वाचन (602)",
+  "fr": "Lecture de documents (602)",
+  "de": "Dokumente vorlesen (602)",
+  "pt": "Leitura de documentos (602)",
+  "it": "Lettura documenti (602)",
+  "ru": "Озвучивание документов (602)",
+  "uk": "Озвучування документів (602)",
+  "ar": "قراءة المستندات (602)",
+  "fa": "خواندن سند (602)",
+  "th": "อ่านเอกสาร(602)",
+  "vi": "Đọc tài liệu(602)",
+  "id": "Bacakan dokumen(602)",
+  "tr": "Belge seslendirme(602)",
+  "nl": "Document voorlezen (602)",
+  "pl": "Czytanie dokumentu (602)",
+  "sv": "Dokumentuppläsning (602)",
+  "da": "Dokumentoplæsning (602)",
+  "nb": "Dokumentopplesning (602)",
+  "fi": "Asiakirjan luku (602)",
+  "cs": "Čtení dokumentu (602)",
+  "hu": "Dokumentum felolvasása (602)",
+  "ro": "Citirea documentului (602)"
+ },
+ "에 넣습니다.": {
+  "en": " into it.",
+  "zh": "中放入。",
+  "zh-TW": "中放入。",
+  "ja": "に入れます。",
+  "es": ".",
+  "hi": " में डालता है।",
+  "fr": "y met.",
+  "de": "hineinlegt.",
+  "pt": "coloca.",
+  "it": "ci mette.",
+  "ru": "помещает в.",
+  "uk": "поміщає в.",
+  "ar": "يضع في.",
+  "fa": "قرار می دهد.",
+  "th": "ใส่เข้าไปใน.",
+  "vi": "cho vào.",
+  "id": "dimasukkan ke.",
+  "tr": "içine konur.",
+  "nl": "plaatst in.",
+  "pl": "umieszcza w.",
+  "sv": "lägger i.",
+  "da": "lægger i.",
+  "nb": "legger i.",
+  "fi": "laittaa.",
+  "cs": "vkládá do.",
+  "hu": "helyezi.",
+  "ro": "pune în."
+ },
+ "자": {
+  "en": " characters",
+  "zh": "字",
+  "zh-TW": "字",
+  "ja": "文字",
+  "es": "caracteres",
+  "hi": "अक्षर",
+  "fr": "caractères",
+  "de": "Zeichen",
+  "pt": "caracteres",
+  "it": "caratteri",
+  "ru": "символов",
+  "uk": "символів",
+  "ar": "حرف",
+  "fa": "نویسه",
+  "th": "ตัวอักษร",
+  "vi": "ký tự",
+  "id": "karakter",
+  "tr": "karakter",
+  "nl": "tekens",
+  "pl": "znaki",
+  "sv": "tecken",
+  "da": "tegn",
+  "nb": "tegn",
+  "fi": "merkkiä",
+  "cs": "znaků",
+  "hu": "karakter",
+  "ro": "caractere"
+ },
+ "← 돌아가기": {
+  "en": "← Back",
+  "zh": "← 返回",
+  "zh-TW": "← 返回",
+  "ja": "← 戻る",
+  "es": "← Volver",
+  "hi": "← वापस",
+  "fr": "← Retour",
+  "de": "← Zurück",
+  "pt": "← Voltar",
+  "it": "← Indietro",
+  "ru": "← Назад",
+  "uk": "← Назад",
+  "ar": "← رجوع",
+  "fa": "← بازگشت",
+  "th": "← กลับ",
+  "vi": "← Quay lại",
+  "id": "← Kembali",
+  "tr": "← Geri dön",
+  "nl": "← Terug",
+  "pl": "← Wstecz",
+  "sv": "← Tillbaka",
+  "da": "← Tilbage",
+  "nb": "← Tilbake",
+  "fi": "← Takaisin",
+  "cs": "← Zpět",
+  "hu": "← Vissza",
+  "ro": "← Înapoi"
+ }
+});
+</script>
+
+<script>
+/* NX-I18N-SUPPLEMENT-R3 — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "역할 안내: 사진 글자 뽑기는 사진 속 글자를": {
+  "en": "Role guide: Text Reading converts text in a photo into",
+  "zh": "角色说明：文字读取是将照片中的文字",
+  "zh-TW": "角色說明：文字讀取是將照片中的文字",
+  "ja": "役割案内：文字読み取りは写真の中の文字を",
+  "es": "Guía de roles: la lectura de texto toma el texto de una foto",
+  "hi": "भूमिका मार्गदर्शन: टेक्स्ट पढ़ना फ़ोटो के टेक्स्ट को",
+  "fr": "Guide des rôles : la lecture de texte transforme le texte d'une photo",
+  "de": "Rollenhinweis: Das Textlesen wandelt den Text in einem Foto",
+  "pt": "Guia de funções: a leitura de texto transforma o texto de uma foto",
+  "it": "Guida ai ruoli: la lettura del testo trasforma il testo in una foto",
+  "ru": "О роли: чтение текста превращает текст на фотографии в",
+  "uk": "Про роль: читання тексту перетворює текст на фотографії на",
+  "ar": "عن الدور: قراءة النص تحوّل النص في الصورة إلى",
+  "fa": "درباره نقش: خواندن متن، نوشته در عکس را به",
+  "th": "คำแนะนำบทบาท: การอ่านตัวอักษรคือการเปลี่ยนตัวอักษรในภาพเป็น",
+  "vi": "Hướng dẫn vai trò: Đọc chữ là việc biến chữ trong ảnh thành",
+  "id": "Panduan peran: Pembacaan huruf adalah mengubah huruf dalam foto menjadi",
+  "tr": "Rol bilgilendirmesi: Yazı okuma, fotoğraftaki yazıyı",
+  "nl": "Rolbeschrijving: Tekstlezen zet tekst op een foto om in",
+  "pl": "Opis roli: Czytanie tekstu zamienia tekst na zdjęciu na",
+  "sv": "Rollbeskrivning: Textläsning omvandlar text på ett foto till",
+  "da": "Rollebeskrivelse: Tekstlæsning omdanner tekst på et foto til",
+  "nb": "Rollebeskrivelse: Tekstlesing omgjør tekst på et bilde til",
+  "fi": "Roolin kuvaus: Tekstin lukeminen muuttaa kuvan tekstin",
+  "cs": "Popis role: Čtení textu převádí text na fotografii na",
+  "hu": "Szerepleírás: A szövegolvasás a fényképen lévő szöveget alakítja",
+  "ro": "Descrierea rolului: Citirea textului transformă textul dintr-o fotografie în"
+ },
+ "글자(텍스트)로 바꿔 주는": {
+  "en": "into text (text)",
+  "zh": "转为文字（文本）",
+  "zh-TW": "轉為文字（文字）",
+  "ja": "文字（テキスト）に変えてくれる",
+  "es": "y lo convierte en texto",
+  "hi": "टेक्स्ट में बदलने वाला",
+  "fr": "en texte",
+  "de": "in Text",
+  "pt": "em texto",
+  "it": "in testo",
+  "ru": "в текст",
+  "uk": "у текст",
+  "ar": "نص",
+  "fa": "متن",
+  "th": "ตัวอักษร (ข้อความ)",
+  "vi": "chữ (văn bản)",
+  "id": "huruf (teks)",
+  "tr": "yazıya (metne)",
+  "nl": "tekst",
+  "pl": "tekst",
+  "sv": "text",
+  "da": "tekst",
+  "nb": "tekst",
+  "fi": "tekstiksi",
+  "cs": "text",
+  "hu": "szöveggé",
+  "ro": "text"
+ },
+ "도구입니다. 소리로 읽어 주지는 않습니다 — 바꾼 글을 소리로 들으려면": {
+  "en": "is a tool. It does not read aloud — to hear the converted text as sound,",
+  "zh": "的工具。它不会朗读声音 — 要听转换后的文字声音，需",
+  "zh-TW": "的工具。它不會朗讀聲音 — 要聽轉換後的文字聲音，需",
+  "ja": "ツールです。音で読み上げることはありません — 変えた文章を音で聞くには",
+  "es": "Es una herramienta. No lo lee en voz alta — para escuchar el texto convertido en voz,",
+  "hi": "टूल है। यह आवाज़ में नहीं पढ़ता — बदले गए टेक्स्ट को आवाज़ में सुनने के लिए",
+  "fr": "est un outil. Il ne le lit pas à voix haute — pour entendre le texte transformé à voix haute,",
+  "de": "ist ein Werkzeug. Es liest ihn nicht laut vor — um den umgewandelten Text laut zu hören,",
+  "pt": "é uma ferramenta. Não o lê em voz alta — para ouvir o texto transformado em voz alta,",
+  "it": "è uno strumento. Non lo legge ad alta voce — per ascoltare il testo trasformato ad alta voce,",
+  "ru": "инструмент. Он не читает вслух — чтобы услышать преобразованный текст звуком,",
+  "uk": "інструмент. Він не читає вголос — щоб почути перетворений текст звуком,",
+  "ar": "أداة. لا يقرأ بصوت عالٍ — وللاستماع إلى النص المحوّل صوتًا،",
+  "fa": "ابزار است. با صدای بلند نمی‌خواند — برای شنیدن متن تبدیل‌شده به‌صورت صدا،",
+  "th": "เครื่องมือ ไม่ได้อ่านออกเสียงให้ฟัง — หากต้องการฟังข้อความที่เปลี่ยนเป็นเสียง",
+  "vi": "công cụ. Nó không đọc thành tiếng — nếu muốn nghe văn bản đã biến thành âm thanh",
+  "id": "alat. Alat ini tidak membacakan dengan suara — jika ingin mendengar teks yang diubah menjadi suara",
+  "tr": "çeviren bir araçtır. Sesli okumaz — çevrilen yazıyı sesle duymak için",
+  "nl": "tool. Het leest het niet hardop voor — om de omgezette tekst als geluid te horen, gebruikt u",
+  "pl": "narzędzie. Nie czyta na głos — aby usłyszeć zamieniony tekst jako dźwięk, użyj",
+  "sv": "verktyg. Det läser inte högt — för att höra den omvandlade texten som ljud använder du",
+  "da": "værktøj. Det læser ikke højt — for at høre den omdannede tekst som lyd bruger du",
+  "nb": "verktøy. Det leser ikke høyt — for å høre den omgjorte teksten som lyd bruker du",
+  "fi": "työkalu. Se ei lue ääneen — kuullaksesi muunnetun tekstin äänenä käytä",
+  "cs": "nástroj. Nečte nahlas — chcete-li převést převedený text na zvuk, použijte",
+  "hu": "eszköz. Nem olvassa fel hangosan — az átalakított szöveg hangként való meghallgatásához használja a",
+  "ro": "instrument. Nu citește cu voce tare — pentru a auzi textul transformat ca sunet, folosește"
+ }
+});
+</script>
+</body>
+</html>

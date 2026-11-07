@@ -1,0 +1,3583 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 증명사진 — Nexus ID Photo</title>
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .steps{display:flex;gap:8px;margin:0 0 16px}
+  .step{flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13px}
+  .step b{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--line);color:var(--ink);margin-right:6px;font-size:12px}
+  .step.on{color:var(--ink);border-color:var(--teal)}
+  .step.on b{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f}
+  .drop{border:2px dashed var(--teal);border-radius:16px;padding:40px 16px;text-align:center;cursor:pointer;background:var(--card)}
+  .drop.over{border-color:var(--cyan);background:rgba(56,184,248,.12)}
+  .drop .bigicon{font-size:44px}
+  .pickbtn{border:0;border-radius:999px;padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;margin:12px 0 8px;min-height:48px}
+  .drop p{margin:6px 0;color:var(--muted);font-size:14px}
+  .drop .example{color:var(--teal);font-size:13px}
+  .drop .priv{font-size:12px}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .statline{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.7}
+  .statline b{color:var(--ink)}
+  .err{color:#F87171}
+  .presets{display:flex;gap:8px;flex-wrap:wrap}
+  .preset{flex:1;min-width:128px;background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px 10px;font-size:14px;line-height:1.5;min-height:48px}
+  .preset small{display:block;color:var(--muted);font-size:12px}
+  .preset.on{border-color:var(--teal);background:rgba(45,212,191,.12)}
+  .stagewrap{max-width:430px;margin:0 auto}
+  .stage{position:relative;width:100%;overflow:hidden;border-radius:12px;border:1px solid var(--line);background:#05080f;touch-action:none;cursor:grab}
+  .stage:active{cursor:grabbing}
+  .stage img{position:absolute;left:0;top:0;transform-origin:0 0;user-select:none;-webkit-user-drag:none}
+  .stage svg.guide{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .stage .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;text-align:center;padding:16px;line-height:1.7;pointer-events:none}
+  .zoomrow{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  .zoomrow input[type=range]{flex:1;min-width:140px;accent-color:var(--teal);height:32px}
+  .zoomrow .zbtn{flex:none;width:52px;font-size:19px;padding:11px 0}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  footer .fam span{margin:0 6px}
+  footer .fam .now{color:var(--ink);font-weight:700}
+  footer .fam a{color:var(--cyan);text-decoration:none}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;padding:22px;line-height:1.8;font-size:15px}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  details summary{cursor:pointer;font-size:15px}
+  details p{color:var(--muted);font-size:14px;line-height:1.8}
+  #printArea{display:none}
+  @media(max-width:640px){h1{font-size:20px}.drop{padding:28px 12px}header{padding:10px 12px}.btns button{flex:1}}
+  @media print{
+    header,main,#homeCard,.modal-bg{display:none!important}
+    body{background:#fff}
+    #printArea{display:block}
+    #printArea img{width:4in;height:6in;display:block}
+    @page{size:4in 6in;margin:0}
+  }
+
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer}
+
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 증명사진">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 증명사진 — Nexus ID Photo">
+<meta property="og:description" content="사진을 여권·반명함·비자 규격으로 맞춰 300dpi로 저장하는 도구입니다. 파일은 당신의 기기 안에서만 처리됩니다.">
+<meta property="og:image" content="https://nexus-id-photo.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+<style id="nx-redesign">
+/* 재설계 (디자인 팀 창조 책상, 2026-11-01): 무대를 키우고 안내선을 또렷하게, 저장이 마지막 주인공 */
+.drop{min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.drop .bigicon{font-size:58px}
+.drop .pickbtn{padding:16px 34px;font-size:17px}
+.stagewrap{max-width:480px}
+.stage{box-shadow:0 0 0 1px var(--line),0 12px 44px rgba(0,0,0,.5)}
+.stage svg.guide ellipse{stroke-width:1.3}
+.stage svg.guide line:first-of-type{stroke-width:1.2}
+.preset{padding:14px 10px}
+.preset.on{box-shadow:0 0 0 1px var(--teal),0 0 18px rgba(45,212,191,.20)}
+#saveOne{flex:1 1 100%;font-size:17px;padding:16px 18px}
+.zoomrow .zbtn{min-height:48px}
+</style>
+<style>/* NX-THUMB-RIGHT */ #saveOne{order:99}</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{flex:none}header .brand{flex:none;overflow:visible}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap}.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}</style></head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>SOVEREIGN COMMAND</span></div></a>
+  
+</header>
+
+<main>
+  <div class="steps">
+    <div class="step on" id="step1"><b>1</b> 사진 넣기</div>
+    <div class="step" id="step2"><b>2</b> 규격 고르기</div>
+    <div class="step" id="step3"><b>3</b> 맞추고 저장</div>
+  </div>
+
+  <h1>넥서스 증명사진</h1>
+  <p class="sub" style="margin-bottom:4px">사진을 여권 · 반명함 · 비자 규격으로 맞추는 도구</p>
+  <p class="sub">회원가입 없음 · 이용료 없음 · 무제한 사용</p>
+
+  <div class="drop" id="drop">
+    <div class="bigicon">🪪</div>
+    <button class="pickbtn" id="pickBtn">사진 열기</button>
+    <p>또는 사진을 여기에 끌어다 놓으세요</p>
+    <p>JPG · PNG 사진 파일을 읽어옵니다</p>
+    <p class="example">예) 전화기로 찍은 얼굴 사진 → 여권 규격으로 잘라 저장</p>
+    <p class="priv">파일은 당신의 기기 안에서만 처리됩니다.</p>
+    <input type="file" id="fileIn" accept="image/jpeg,image/png,image/webp,image/*" hidden>
+  </div>
+  <p class="hint err" id="fileMsg"></p>
+
+  <div class="panel">
+    <h2>① 규격 고르기</h2>
+    <div class="presets" id="presets"></div>
+    <p class="statline" id="sizeLine"></p>
+    <p class="hint">제출 기관마다 요구 규격이 다를 수 있습니다. 내기 전에 해당 기관의 규격을 한 번 더 확인하세요.</p>
+  </div>
+
+  <div class="panel">
+    <h2>② 얼굴 맞추기</h2>
+    <div class="stagewrap">
+      <div class="stage" id="stage">
+        <img id="photo" alt="" draggable="false" style="display:none">
+        <div class="empty" id="stageEmpty">아직 사진이 없습니다.<br>위에서 사진을 열어 주세요.</div>
+        <svg class="guide" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <ellipse cx="50" cy="47" rx="27" ry="35" fill="none" stroke="#38BDF8" stroke-width="0.7" stroke-dasharray="2.4 1.8" vector-effect="non-scaling-stroke"/>
+          <line x1="6" y1="42" x2="94" y2="42" stroke="#FBBF24" stroke-width="0.7" stroke-dasharray="2.4 1.8" vector-effect="non-scaling-stroke"/>
+          <line x1="50" y1="4" x2="50" y2="96" stroke="rgba(255,255,255,.35)" stroke-width="0.5" stroke-dasharray="1.6 2" vector-effect="non-scaling-stroke"/>
+        </svg>
+      </div>
+    </div>
+    <div class="zoomrow">
+      <button class="ghost zbtn" id="zoomOut" type="button" aria-label="축소">−</button>
+      <input type="range" id="zoomRange" min="100" max="600" value="100" step="1" aria-label="확대 비율">
+      <button class="ghost zbtn" id="zoomIn" type="button" aria-label="확대">＋</button>
+      <button class="ghost" id="resetView" type="button">처음으로</button>
+    </div>
+    <p class="hint">사진을 끌어(드래그) 얼굴을 타원 안으로 옮기고, 눈을 노란 선에 맞추세요. 손가락 두 개로 벌리거나 마우스 휠로도 확대 · 축소됩니다. 얼굴(정수리부터 턱까지)이 사진 높이의 70~80%쯤 되면 적당합니다.</p>
+    <p class="statline" id="warnLine"></p>
+  </div>
+
+  <div class="panel">
+    <h2>③ 저장하기</h2>
+    <div class="btns" style="margin-top:0">
+      <button class="primary" id="saveOne" disabled>사진 한 장 저장</button>
+      <button class="ghost" id="saveSheet" disabled>4×6 인화 시트 저장</button>
+      <button class="ghost" id="printSheet" disabled>인화 시트 인쇄</button>
+    </div>
+    <p class="statline" id="saveMsg">사진을 열면 저장할 수 있습니다.</p>
+    <p class="hint">인화 시트는 4×6인치(101.6×152.4mm) 종이에 규격 사진 여러 장을 채운 그림 파일입니다. 인쇄소에서 이 파일로 뽑거나, 집에서 4×6 사진 용지에 테두리 없이 인쇄하면 됩니다. 시트의 각 사진 둘레에는 자르기 안내선이 옅게 들어갑니다.</p>
+  </div>
+
+  <div style="margin:14px 0;padding:14px;border:1px solid #26314a;border-radius:14px;background:rgba(255,255,255,.03)">
+   <p style="margin:0 0 10px;font-weight:700">🗣️ 글로 시키기 <span style="font-weight:400;font-size:13px;color:#94a3b8">(안내 도우미 — 이 페이지 기능만 도와줍니다)</span></p>
+   <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <input type="text" id="guideIn" placeholder="예: 확대해" style="flex:1;min-width:200px;padding:10px 12px;border-radius:10px;border:1px solid #26314a;background:#0b0f19;color:#f8fafc">
+    <button type="button" id="guideBtn" class="ghost">시키기</button>
+   </div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+    <button type="button" class="ghost" data-guide="확대해">확대해</button>
+    <button type="button" class="ghost" data-guide="축소해">축소해</button>
+    <button type="button" class="ghost" data-guide="저장해">저장해</button>
+    <button type="button" class="ghost" data-guide="시트 저장">시트 저장</button>
+   </div>
+   <p id="guideStatus" style="margin:10px 0 0;font-size:13px;line-height:1.6;color:#94a3b8;min-height:20px"></p>
+  </div>
+
+  <details><summary>💡 도움말</summary><p>사진 열기로 얼굴 사진을 넣고, 규격을 고른 뒤, 사진을 끌어 얼굴을 타원에 맞추고 저장하세요.<br>내보내기는 300dpi 기준으로 계산합니다. 여권 35×45mm는 413×531px, 반명함 30×40mm는 354×472px, 미국 비자 51×51mm는 602×602px입니다.<br>파일은 당신의 기기 안에서만 처리됩니다. 사진이 서버로 전송되지 않습니다.<br>이 도구는 규격에 맞게 자르고 크기를 바꾸는 도구입니다. 배경을 바꾸는 기능은 넣지 않았습니다 — 배경 교체는 사진 배경을 다루는 별도 도구가 맡을 자리입니다.<br>여권 사진은 제출 기관의 최신 규격(얼굴 크기, 배경색, 안경 · 모자 등)을 반드시 확인하세요. 이 도구의 가이드는 일반적인 맞추기를 돕는 선이며, 규격 합격을 보증하지 않습니다.<br>원본 사진이 너무 작으면 출력 사진이 흐릴 수 있습니다. 가능하면 원본 그대로의 큰 사진을 쓰세요.<br>크기 제한은 없습니다.</p></details>
+<footer>
+    우주의 모든 의식체는 친구이자 동반자이다<br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="philoLink">넥서스 그룹 철학 보기</button><br>
+    🌐 호스팅: Firebase · 🔒 파일은 당신의 기기 안에서만 처리됩니다<br>
+    
+  </footer>
+</main>
+
+<div id="printArea"><img id="printImg" alt=""></div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>NEXUS GROUP 철학과 비전</h3>
+    <p>넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.</p>
+    <p><b>"우주의 모든 의식체는 친구이자 동반자이다."</b><br>(Every conscious being in the universe is a friend and companion.)</p>
+    <p>우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.</p>
+    <button class="primary" id="modalClose">닫기</button>
+  </div>
+</div>
+<script>
+// ---------- 순수 로직 ----------
+var PRINT_DPI = 300;
+var SHEET_MM = { w: 101.6, h: 152.4 };
+var SHEET_GAP_PX = 12;
+var PRESETS = [
+  { id: 'passport', name: '여권 사진', wMm: 35, hMm: 45, small: '35 × 45 mm' },
+  { id: 'half', name: '반명함 사진', wMm: 30, hMm: 40, small: '30 × 40 mm' },
+  { id: 'license', name: '운전면허 사진', wMm: 35, hMm: 45, small: '35 × 45 mm' },
+  { id: 'usvisa', name: '미국 비자 사진', wMm: 51, hMm: 51, small: '51 × 51 mm · 2×2 in' }
+];
+function mmToPx(mm, dpi){
+  return Math.round(mm / 25.4 * (dpi || PRINT_DPI));
+}
+function presetById(id){
+  for(var i = 0; i < PRESETS.length; i++){ if(PRESETS[i].id === id) return PRESETS[i]; }
+  return PRESETS[0];
+}
+function coverFit(vw, vh, natW, natH){
+  if(!natW || !natH) return 1;
+  return Math.max(vw / natW, vh / natH);
+}
+function clampOffset(vw, vh, natW, natH, fit, zoom, ox, oy){
+  var s = fit * zoom;
+  var minX = Math.min(0, vw - natW * s);
+  var minY = Math.min(0, vh - natH * s);
+  return {
+    x: Math.max(minX, Math.min(0, ox)),
+    y: Math.max(minY, Math.min(0, oy))
+  };
+}
+function sourceRect(vw, vh, natW, natH, fit, zoom, ox, oy){
+  var s = fit * zoom;
+  var sx = -ox / s, sy = -oy / s, sw = vw / s, sh = vh / s;
+  sx = Math.max(0, Math.min(natW - sw, sx));
+  sy = Math.max(0, Math.min(natH - sh, sy));
+  return { sx: sx, sy: sy, sw: sw, sh: sh };
+}
+function sheetLayout(sheetW, sheetH, pw, ph, gap){
+  gap = gap || 0;
+  if(pw <= 0 || ph <= 0 || pw > sheetW || ph > sheetH) return null;
+  var cols = Math.floor((sheetW + gap) / (pw + gap));
+  var rows = Math.floor((sheetH + gap) / (ph + gap));
+  if(cols < 1 || rows < 1) return null;
+  var totalW = cols * pw + (cols - 1) * gap;
+  var totalH = rows * ph + (rows - 1) * gap;
+  var startX = Math.floor((sheetW - totalW) / 2);
+  var startY = Math.floor((sheetH - totalH) / 2);
+  var cells = [];
+  for(var r = 0; r < rows; r++){
+    for(var c = 0; c < cols; c++){
+      cells.push({ x: startX + c * (pw + gap), y: startY + r * (ph + gap), w: pw, h: ph });
+    }
+  }
+  return { cols: cols, rows: rows, count: cols * rows, cells: cells };
+}
+function fileStamp(now){
+  var d = now || new Date();
+  var p = function(n){ return (n < 10 ? '0' : '') + n; };
+  return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds());
+}
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"']/g, function(c){
+    return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c];
+  });
+}
+
+// ---------- 텔레메트리 ----------
+var SITE = 'idphoto';
+function nxEvent(ev){ try { fetch("https://nexus-orchestrator.woojuhanul.workers.dev/event", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({site: SITE, event: ev}), keepalive:true}).catch(function(){}); } catch(e){} }
+
+// ---------- 상태와 요소 ----------
+var $ = function(id){ return document.getElementById(id); };
+var S = { preset: PRESETS[0], img: null, natW: 0, natH: 0, fit: 1, zoom: 1, ox: 0, oy: 0 };
+var stage = $('stage'), photo = $('photo');
+
+// 규격 버튼 만들기
+var presetsEl = $('presets');
+PRESETS.forEach(function(p){
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'preset' + (p.id === S.preset.id ? ' on' : '');
+  b.setAttribute('data-preset', p.id);
+  b.innerHTML = escapeHtml(p.name) + '<small>' + escapeHtml(p.small) + '</small>';
+  b.addEventListener('click', function(){ selectPreset(p.id); });
+  presetsEl.appendChild(b);
+});
+function setStep(n){
+  for(var i = 1; i <= 3; i++){ $('step' + i).className = 'step' + (i <= n ? ' on' : ''); }
+}
+function updateSizeLine(){
+  var p = S.preset;
+  $('sizeLine').innerHTML = '출력 크기: <b>' + mmToPx(p.wMm) + ' × ' + mmToPx(p.hMm) + ' px</b> (' +
+    p.wMm + ' × ' + p.hMm + ' mm · 300dpi)';
+}
+function selectPreset(id){
+  S.preset = presetById(id);
+  var btns = presetsEl.querySelectorAll('.preset');
+  for(var i = 0; i < btns.length; i++){
+    btns[i].className = 'preset' + (btns[i].getAttribute('data-preset') === id ? ' on' : '');
+  }
+  stage.style.aspectRatio = S.preset.wMm + ' / ' + S.preset.hMm;
+  updateSizeLine();
+  if(S.img) resetView();
+}
+function viewSize(){
+  return { w: stage.clientWidth || 300, h: stage.clientHeight || 300 };
+}
+function applyTransform(){
+  var s = S.fit * S.zoom;
+  photo.style.transform = 'translate(' + S.ox + 'px,' + S.oy + 'px) scale(' + s + ')';
+  $('zoomRange').value = Math.round(S.zoom * 100);
+  updateWarn();
+}
+function resetView(){
+  var v = viewSize();
+  S.fit = coverFit(v.w, v.h, S.natW, S.natH);
+  S.zoom = 1;
+  S.ox = (v.w - S.natW * S.fit) / 2;
+  S.oy = (v.h - S.natH * S.fit) / 2;
+  applyTransform();
+}
+function setZoom(z){
+  var v = viewSize();
+  var old = S.zoom;
+  S.zoom = Math.max(1, Math.min(6, z));
+  // 화면 가운데를 기준으로 확대 · 축소
+  S.ox = v.w / 2 - (v.w / 2 - S.ox) * (S.zoom / old);
+  S.oy = v.h / 2 - (v.h / 2 - S.oy) * (S.zoom / old);
+  var c = clampOffset(v.w, v.h, S.natW, S.natH, S.fit, S.zoom, S.ox, S.oy);
+  S.ox = c.x; S.oy = c.y;
+  applyTransform();
+}
+function updateWarn(){
+  if(!S.img){ $('warnLine').textContent = ''; return; }
+  var v = viewSize();
+  var r = sourceRect(v.w, v.h, S.natW, S.natH, S.fit, S.zoom, S.ox, S.oy);
+  var need = mmToPx(S.preset.wMm);
+  if(r.sw < need){
+    $('warnLine').innerHTML = '<span class="err">원본 사진이 작아 출력이 흐릴 수 있습니다.</span> 지금 잘라내는 영역의 가로 길이는 약 ' +
+      Math.round(r.sw) + 'px인데, 300dpi 출력에는 ' + need + 'px이 필요합니다.';
+  } else {
+    $('warnLine').textContent = '';
+  }
+}
+$('zoomIn').addEventListener('click', function(){ if(S.img) setZoom(S.zoom * 1.25); });
+$('zoomOut').addEventListener('click', function(){ if(S.img) setZoom(S.zoom / 1.25); });
+$('zoomRange').addEventListener('input', function(){ if(S.img) setZoom(Number($('zoomRange').value) / 100); });
+$('resetView').addEventListener('click', function(){ if(S.img) resetView(); });
+
+// ---------- 사진 열기 ----------
+var fileIn = $('fileIn'), drop = $('drop'), fileMsg = $('fileMsg'), objUrl = null;
+function handleFile(f){
+  if(!f) return;
+  if(!/^image\//.test(f.type || '') && !/\.(jpe?g|png|webp)$/i.test(f.name || '')){
+    fileMsg.textContent = '사진 파일(JPG · PNG 등)을 넣어 주세요.';
+    return;
+  }
+  fileMsg.textContent = '';
+  if(objUrl){ try{ URL.revokeObjectURL(objUrl); }catch(e){} }
+  objUrl = URL.createObjectURL(f);
+  var im = new Image();
+  im.onload = function(){
+    S.img = im; S.natW = im.naturalWidth; S.natH = im.naturalHeight;
+    photo.src = objUrl;
+    photo.style.display = 'block';
+    $('stageEmpty').style.display = 'none';
+    $('saveOne').disabled = false;
+    $('saveSheet').disabled = false;
+    $('printSheet').disabled = false;
+    $('saveMsg').textContent = '사진이 열렸습니다. 얼굴을 맞춘 뒤 저장하세요.';
+    setStep(2);
+    resetView();
+    nxEvent('start');
+  };
+  im.onerror = function(){
+    fileMsg.textContent = '사진을 읽지 못했습니다. 다른 사진으로 시도해 주세요.';
+    nxEvent('fail');
+  };
+  im.src = objUrl;
+}
+$('pickBtn').addEventListener('click', function(e){ e.stopPropagation(); fileIn.click(); });
+drop.addEventListener('click', function(){ fileIn.click(); });
+fileIn.addEventListener('change', function(){ if(fileIn.files && fileIn.files[0]) handleFile(fileIn.files[0]); fileIn.value = ''; });
+['dragenter', 'dragover'].forEach(function(ev){
+  drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add('over'); });
+});
+['dragleave', 'drop'].forEach(function(ev){
+  drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove('over'); });
+});
+drop.addEventListener('drop', function(e){
+  var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if(f) handleFile(f);
+});
+
+// ---------- 끌기와 핀치 ----------
+var pointers = {};
+var dragLast = null, pinchDist = 0;
+stage.addEventListener('pointerdown', function(e){
+  if(!S.img) return;
+  pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+  try{ stage.setPointerCapture(e.pointerId); }catch(err){}
+  var keys = Object.keys(pointers);
+  if(keys.length === 1){ dragLast = { x: e.clientX, y: e.clientY }; }
+  if(keys.length === 2){
+    var a = pointers[keys[0]], b = pointers[keys[1]];
+    pinchDist = Math.hypot(a.x - b.x, a.y - b.y);
+  }
+});
+stage.addEventListener('pointermove', function(e){
+  if(!S.img || !pointers[e.pointerId]) return;
+  pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+  var keys = Object.keys(pointers);
+  if(keys.length === 1 && dragLast){
+    S.ox += e.clientX - dragLast.x;
+    S.oy += e.clientY - dragLast.y;
+    dragLast = { x: e.clientX, y: e.clientY };
+    var v = viewSize();
+    var c = clampOffset(v.w, v.h, S.natW, S.natH, S.fit, S.zoom, S.ox, S.oy);
+    S.ox = c.x; S.oy = c.y;
+    applyTransform();
+  } else if(keys.length === 2){
+    var a = pointers[keys[0]], b = pointers[keys[1]];
+    var d = Math.hypot(a.x - b.x, a.y - b.y);
+    if(pinchDist > 0 && d > 0){ setZoom(S.zoom * d / pinchDist); }
+    pinchDist = d;
+  }
+});
+function endPointer(e){
+  delete pointers[e.pointerId];
+  if(!Object.keys(pointers).length) dragLast = null;
+  pinchDist = 0;
+}
+stage.addEventListener('pointerup', endPointer);
+stage.addEventListener('pointercancel', endPointer);
+stage.addEventListener('wheel', function(e){
+  if(!S.img) return;
+  e.preventDefault();
+  setZoom(S.zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1));
+}, { passive: false });
+window.addEventListener('resize', function(){ if(S.img) resetView(); });
+
+// ---------- 내보내기 ----------
+function renderPhoto(){
+  var p = S.preset;
+  var W = mmToPx(p.wMm), H = mmToPx(p.hMm);
+  var canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+  var v = viewSize();
+  var r = sourceRect(v.w, v.h, S.natW, S.natH, S.fit, S.zoom, S.ox, S.oy);
+  ctx.drawImage(S.img, r.sx, r.sy, r.sw, r.sh, 0, 0, W, H);
+  return canvas;
+}
+function renderSheet(){
+  var photoCanvas = renderPhoto();
+  var W = mmToPx(SHEET_MM.w), H = mmToPx(SHEET_MM.h);
+  var layout = sheetLayout(W, H, photoCanvas.width, photoCanvas.height, SHEET_GAP_PX);
+  var canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  var ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+  if(layout){
+    layout.cells.forEach(function(cell){
+      ctx.drawImage(photoCanvas, cell.x, cell.y, cell.w, cell.h);
+      ctx.strokeStyle = 'rgba(0,0,0,.28)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(cell.x + 0.5, cell.y + 0.5, cell.w - 1, cell.h - 1);
+    });
+  }
+  return { canvas: canvas, layout: layout };
+}
+function downloadCanvas(canvas, name, msg){
+  if(canvas.toBlob){
+    canvas.toBlob(function(blob){
+      if(!blob){ $('saveMsg').innerHTML = '<span class="err">저장에 실패했습니다.</span>'; nxEvent('fail'); return; }
+      saveBlob(blob, name, msg);
+    }, 'image/jpeg', 0.92);
+  } else if(canvas.toDataURL){
+    var a = document.createElement('a');
+    a.href = canvas.toDataURL('image/jpeg', 0.92);
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    $('saveMsg').textContent = msg;
+    nxEvent('save');
+  }
+}
+function saveBlob(blob, name, msg){
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+  $('saveMsg').textContent = msg;
+  nxEvent('save');
+}
+$('saveOne').addEventListener('click', function(){
+  if(!S.img) return;
+  var canvas = renderPhoto();
+  downloadCanvas(canvas, 'nexus-id-photo-' + S.preset.id + '-' + fileStamp(new Date()) + '.jpg',
+    '사진 한 장을 저장했습니다. (' + canvas.width + ' × ' + canvas.height + ' px)');
+  nxEvent('complete');
+  setStep(3);
+});
+$('saveSheet').addEventListener('click', function(){
+  if(!S.img) return;
+  var out = renderSheet();
+  var n = out.layout ? out.layout.count : 0;
+  downloadCanvas(out.canvas, 'nexus-id-photo-sheet-' + fileStamp(new Date()) + '.jpg',
+    '4×6 인화 시트를 저장했습니다. (사진 ' + n + '장 · ' + out.canvas.width + ' × ' + out.canvas.height + ' px)');
+  nxEvent('complete');
+  setStep(3);
+});
+$('printSheet').addEventListener('click', function(){
+  if(!S.img) return;
+  var out = renderSheet();
+  $('printImg').src = out.canvas.toDataURL('image/jpeg', 0.92);
+  setTimeout(function(){ window.print(); }, 60);
+});
+
+// ---------- 안내 도우미 ----------
+function guideSay(m){ $('guideStatus').textContent = m; }
+function runGuide(text){
+  var t = String(text || '').trim();
+  if(/시트/.test(t)){ if(S.img){ $('saveSheet').click(); guideSay('인화 시트를 저장했습니다.'); } else guideSay('먼저 사진을 여세요.'); return; }
+  if(/확대/.test(t)){ if(S.img){ setZoom(S.zoom * 1.25); guideSay('사진을 확대했습니다.'); } else guideSay('먼저 사진을 여세요.'); return; }
+  if(/축소/.test(t)){ if(S.img){ setZoom(S.zoom / 1.25); guideSay('사진을 축소했습니다.'); } else guideSay('먼저 사진을 여세요.'); return; }
+  if(/저장/.test(t)){ if(S.img){ $('saveOne').click(); guideSay('사진 한 장을 저장했습니다.'); } else guideSay('먼저 사진을 여세요.'); return; }
+  if(/여권/.test(t)){ selectPreset('passport'); guideSay('여권 사진 규격을 골랐습니다.'); return; }
+  if(/반명함/.test(t)){ selectPreset('half'); guideSay('반명함 사진 규격을 골랐습니다.'); return; }
+  if(/비자/.test(t)){ selectPreset('usvisa'); guideSay('미국 비자 사진 규격을 골랐습니다.'); return; }
+  guideSay('이해할 수 있는 말이 정해져 있습니다. 예: 확대해, 축소해, 저장해, 시트 저장, 여권, 반명함, 비자.');
+}
+$('guideBtn').addEventListener('click', function(){ runGuide($('guideIn').value); });
+$('guideIn').addEventListener('keydown', function(e){ if(e.key === 'Enter') runGuide($('guideIn').value); });
+document.querySelectorAll('[data-guide]').forEach(function(b){
+  b.addEventListener('click', function(){ runGuide(b.getAttribute('data-guide')); });
+});
+
+// ---------- 철학 모달 ----------
+$('philoLink').addEventListener('click', function(){ $('modalBg').classList.add('open'); });
+$('modalClose').addEventListener('click', function(){ $('modalBg').classList.remove('open'); });
+$('modalBg').addEventListener('click', function(e){ if(e.target === $('modalBg')) $('modalBg').classList.remove('open'); });
+
+// ---------- 초기화 ----------
+stage.style.aspectRatio = S.preset.wMm + ' / ' + S.preset.hMm;
+updateSizeLine();
+</script>
+
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 소리 자르기": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 영상 자르기": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 사진 정보 가리기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 읽어 주기": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 긴 말 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 사진 글자 뽑기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 녹음기": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 말로 쓰는 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 21호 증명사진 전용 사전 */
+NX_I18N_ADD({
+ "21호 증명사진 (현재)": {
+  "en": "21. ID Photo (current)",
+  "zh": "21号 证件照（当前）",
+  "ja": "21号 証明写真（現在）",
+  "es": "21. Foto de identificación (actual)",
+  "hi": "21. आईडी फ़ोटो (वर्तमान)",
+  "fr": "21. Photo d'identité (actuel)",
+  "de": "21. Ausweisfoto (aktuell)",
+  "pt": "21. Foto de identificação (atual)",
+  "it": "21. Fototessera (attuale)",
+  "nl": "21. Pasfoto (huidig)",
+  "ru": "21. Фото на документы (текущий)",
+  "uk": "21. Фото на документи (поточний)",
+  "pl": "21. Zdjęcie do dokumentów (bieżące)",
+  "cs": "21. Průkazová fotografie (aktuální)",
+  "hu": "21. Igazolványkép (aktuális)",
+  "ro": "21. Fotografie pentru acte (curent)",
+  "da": "21. ID-foto (aktuel)",
+  "fi": "21. Henkilökuva (nykyinen)",
+  "nb": "21. ID-foto (gjeldende)",
+  "sv": "21. ID-foto (aktuell)",
+  "tr": "21. Kimlik Fotoğrafı (geçerli)",
+  "zh-TW": "21號 證件照（目前）",
+  "th": "21. รูปติดบัตร (ปัจจุบัน)",
+  "vi": "21. Ảnh thẻ (hiện tại)",
+  "id": "21. Foto ID (saat ini)",
+  "ar": "21. صورة الهوية (الحالية)",
+  "fa": "21. عکس شناسایی (فعلی)"
+ },
+ "넥서스 증명사진 — Nexus ID Photo": {
+  "en": "Nexus ID Photo",
+  "zh": "Nexus 证件照",
+  "ja": "Nexus 証明写真",
+  "es": "Nexus Foto de identificación",
+  "hi": "Nexus आईडी फ़ोटो",
+  "fr": "Nexus Photo d'identité",
+  "de": "Nexus Ausweisfoto",
+  "pt": "Nexus Foto de identificação",
+  "it": "Nexus Fototessera",
+  "nl": "Nexus Pasfoto",
+  "ru": "Nexus Фото на документы — Nexus ID Photo",
+  "uk": "Nexus Фото на документи — Nexus ID Photo",
+  "pl": "Nexus Zdjęcie do dokumentów — Nexus ID Photo",
+  "cs": "Nexus Průkazová fotografie — Nexus ID Photo",
+  "hu": "Nexus Igazolványkép — Nexus ID Photo",
+  "ro": "Nexus Fotografie pentru acte — Nexus ID Photo",
+  "da": "Nexus ID-foto",
+  "fi": "Nexus Henkilökuva",
+  "nb": "Nexus ID-foto",
+  "sv": "Nexus ID-foto",
+  "tr": "Nexus Kimlik Fotoğrafı",
+  "zh-TW": "Nexus 證件照",
+  "th": "Nexus รูปติดบัตร",
+  "vi": "Nexus Ảnh thẻ",
+  "id": "Nexus Foto ID",
+  "ar": "صورة الهوية Nexus — Nexus ID Photo",
+  "fa": "عکس شناسایی Nexus — Nexus ID Photo"
+ },
+ "넥서스 증명사진": {
+  "en": "Nexus ID Photo",
+  "zh": "Nexus 证件照",
+  "ja": "Nexus 証明写真",
+  "es": "Nexus Foto de identificación",
+  "hi": "Nexus आईडी फ़ोटो",
+  "fr": "Nexus Photo d'identité",
+  "de": "Nexus Ausweisfoto",
+  "pt": "Nexus Foto de identificação",
+  "it": "Nexus Fototessera",
+  "nl": "Nexus Pasfoto",
+  "ru": "Nexus Фото на документы",
+  "uk": "Nexus Фото на документи",
+  "pl": "Nexus Zdjęcie do dokumentów",
+  "cs": "Nexus Průkazová fotografie",
+  "hu": "Nexus Igazolványkép",
+  "ro": "Nexus Fotografie pentru acte",
+  "da": "Nexus ID-foto",
+  "fi": "Nexus Henkilökuva",
+  "nb": "Nexus ID-foto",
+  "sv": "Nexus ID-foto",
+  "tr": "Nexus Kimlik Fotoğrafı",
+  "zh-TW": "Nexus 證件照",
+  "th": "Nexus รูปติดบัตร",
+  "vi": "Nexus Ảnh thẻ",
+  "id": "Nexus Foto ID",
+  "ar": "صورة الهوية Nexus",
+  "fa": "عکس شناسایی Nexus"
+ },
+ "사진을 여권 · 반명함 · 비자 규격으로 맞추는 도구": {
+  "en": "Fit a photo to passport, ID, and visa sizes",
+  "zh": "把照片裁成护照、证件、签证规格",
+  "ja": "写真をパスポート・証明・ビザ規格に合わせるツール",
+  "es": "Ajusta una foto a tamaños de pasaporte, identificación y visa",
+  "hi": "फ़ोटो को पासपोर्ट, आईडी और वीज़ा आकार में ढालें",
+  "fr": "Ajuster une photo aux formats passeport, pièce d'identité et visa",
+  "de": "Ein Foto auf Pass-, Ausweis- und Visumformat zuschneiden",
+  "pt": "Ajustar uma foto aos tamanhos de passaporte, documento e visto",
+  "it": "Adatta una foto ai formati di passaporto, documenti e visto",
+  "nl": "Een foto aanpassen aan paspoort-, ID- en visumformaten",
+  "ru": "Подгонка фотографии под размеры паспорта, удостоверения и визы",
+  "uk": "Підгонка фотографії під розміри паспорта, посвідчення та візи",
+  "pl": "Dopasowanie zdjęcia do formatów paszportu, dowodu i wizy",
+  "cs": "Přizpůsobení fotografie rozměrům pro pas, průkaz a vízum",
+  "hu": "Fotó igazítása útlevél-, igazolvány- és vízummérethez",
+  "ro": "Ajustarea unei fotografii la dimensiunile pentru pașaport, act de identitate și viză",
+  "da": "Tilpas et foto til pas-, ID- og visumstørrelser",
+  "fi": "Sovita kuva passi-, henkilö- ja viisumikokoihin",
+  "nb": "Tilpass et foto til pass-, ID- og visumformater",
+  "sv": "Anpassa ett foto till pass-, ID- och visumformat",
+  "tr": "Fotoğrafı pasaport, kimlik ve vize boyutlarına uyarlama aracı",
+  "zh-TW": "把照片裁成護照、證件、簽證規格的工具",
+  "th": "เครื่องมือปรับรูปให้ตรงขนาดหนังสือเดินทาง บัตร และวีซ่า",
+  "vi": "Công cụ chỉnh ảnh theo kích thước hộ chiếu, thẻ và visa",
+  "id": "Alat menyesuaikan foto ke ukuran paspor, ID, dan visa",
+  "ar": "أداة لضبط الصورة وفق مقاسات جواز السفر وبطاقة الهوية والتأشيرة",
+  "fa": "ابزاری برای تنظیم عکس مطابق اندازه‌های گذرنامه، کارت شناسایی و ویزا"
+ },
+ "회원가입 없음 · 이용료 없음 · 무제한 사용": {
+  "en": "No sign-up · No fees · Unlimited use",
+  "zh": "无需注册 · 免费 · 无限使用",
+  "ja": "登録不要 · 無料 · 無制限",
+  "es": "Sin registro · Gratis · Uso ilimitado",
+  "hi": "कोई साइन-अप नहीं · कोई शुल्क नहीं · असीमित उपयोग",
+  "fr": "Sans inscription · Gratuit · Utilisation illimitée",
+  "de": "Keine Anmeldung · Keine Gebühren · Unbegrenzte Nutzung",
+  "pt": "Sem cadastro · Sem taxas · Uso ilimitado",
+  "it": "Senza registrazione · Nessun costo · Uso illimitato",
+  "nl": "Geen registratie · Geen kosten · Onbeperkt gebruik",
+  "ru": "Без регистрации · Бесплатно · Без ограничений",
+  "uk": "Без реєстрації · Безкоштовно · Без обмежень",
+  "pl": "Bez rejestracji · Bez opłat · Bez ograniczeń",
+  "cs": "Bez registrace · Zdarma · Bez omezení",
+  "hu": "Regisztráció nélkül · Díjmentes · Korlátlan használat",
+  "ro": "Fără înregistrare · Gratuit · Utilizare nelimitată",
+  "da": "Ingen tilmelding · Ingen gebyrer · Ubegrænset brug",
+  "fi": "Ei rekisteröitymistä · Ei maksuja · Rajoittamaton käyttö",
+  "nb": "Ingen registrering · Ingen gebyrer · Ubegrenset bruk",
+  "sv": "Ingen registrering · Inga avgifter · Obegränsad användning",
+  "tr": "Kayıt yok · Ücret yok · Sınırsız kullanım",
+  "zh-TW": "免註冊 · 免費 · 無限使用",
+  "th": "ไม่ต้องสมัครสมาชิก · ไม่มีค่าธรรมเนียม · ใช้ได้ไม่จำกัด",
+  "vi": "Không cần đăng ký · Miễn phí · Dùng không giới hạn",
+  "id": "Tanpa pendaftaran · Gratis · Penggunaan tanpa batas",
+  "ar": "بدون تسجيل · بدون رسوم · استخدام غير محدود",
+  "fa": "بدون ثبت‌نام · بدون هزینه · استفاده نامحدود"
+ },
+ "사진 넣기": {
+  "en": "Add a photo",
+  "zh": "添加照片",
+  "ja": "写真を入れる",
+  "es": "Añadir una foto",
+  "hi": "फ़ोटो जोड़ें",
+  "fr": "Ajouter une photo",
+  "de": "Foto hinzufügen",
+  "pt": "Adicionar foto",
+  "it": "Aggiungi una foto",
+  "nl": "Foto toevoegen",
+  "ru": "Добавить фото",
+  "uk": "Додати фото",
+  "pl": "Dodaj zdjęcie",
+  "cs": "Přidat fotografii",
+  "hu": "Fotó hozzáadása",
+  "ro": "Adaugă o fotografie",
+  "da": "Tilføj et foto",
+  "fi": "Lisää kuva",
+  "nb": "Legg til et bilde",
+  "sv": "Lägg till ett foto",
+  "tr": "Fotoğraf ekle",
+  "zh-TW": "加入照片",
+  "th": "ใส่รูป",
+  "vi": "Thêm ảnh",
+  "id": "Tambahkan foto",
+  "ar": "إضافة صورة",
+  "fa": "افزودن عکس"
+ },
+ "규격 고르기": {
+  "en": "Choose a size",
+  "zh": "选择规格",
+  "ja": "規格を選ぶ",
+  "es": "Elegir tamaño",
+  "hi": "आकार चुनें",
+  "fr": "Choisir un format",
+  "de": "Format wählen",
+  "pt": "Escolher o tamanho",
+  "it": "Scegli un formato",
+  "nl": "Formaat kiezen",
+  "ru": "Выбрать размер",
+  "uk": "Вибрати розмір",
+  "pl": "Wybierz format",
+  "cs": "Vybrat rozměr",
+  "hu": "Méret kiválasztása",
+  "ro": "Alege o dimensiune",
+  "da": "Vælg en størrelse",
+  "fi": "Valitse koko",
+  "nb": "Velg et format",
+  "sv": "Välj ett format",
+  "tr": "Boyut seç",
+  "zh-TW": "選擇規格",
+  "th": "เลือกขนาด",
+  "vi": "Chọn kích thước",
+  "id": "Pilih ukuran",
+  "ar": "اختيار المقاس",
+  "fa": "انتخاب اندازه"
+ },
+ "맞추고 저장": {
+  "en": "Fit & save",
+  "zh": "调整并保存",
+  "ja": "合わせて保存",
+  "es": "Ajustar y guardar",
+  "hi": "ढालें और सहेजें",
+  "fr": "Ajuster et enregistrer",
+  "de": "Anpassen & speichern",
+  "pt": "Ajustar e salvar",
+  "it": "Adatta e salva",
+  "nl": "Aanpassen en opslaan",
+  "ru": "Подогнать и сохранить",
+  "uk": "Підігнати і зберегти",
+  "pl": "Dopasuj i zapisz",
+  "cs": "Přizpůsobit a uložit",
+  "hu": "Igazítás és mentés",
+  "ro": "Ajustează și salvează",
+  "da": "Tilpas og gem",
+  "fi": "Sovita ja tallenna",
+  "nb": "Tilpass og lagre",
+  "sv": "Anpassa och spara",
+  "tr": "Uyarla ve kaydet",
+  "zh-TW": "調整並儲存",
+  "th": "ปรับและบันทึก",
+  "vi": "Chỉnh & lưu",
+  "id": "Sesuaikan & simpan",
+  "ar": "الضبط والحفظ",
+  "fa": "تنظیم و ذخیره"
+ },
+ "사진 열기": {
+  "en": "Open photo",
+  "zh": "打开照片",
+  "ja": "写真を開く",
+  "es": "Abrir foto",
+  "hi": "फ़ोटो खोलें",
+  "fr": "Ouvrir une photo",
+  "de": "Foto öffnen",
+  "pt": "Abrir foto",
+  "it": "Apri una foto",
+  "nl": "Foto openen",
+  "ru": "Открыть фото",
+  "uk": "Відкрити фото",
+  "pl": "Otwórz zdjęcie",
+  "cs": "Otevřít fotografii",
+  "hu": "Fotó megnyitása",
+  "ro": "Deschide fotografia",
+  "da": "Åbn foto",
+  "fi": "Avaa kuva",
+  "nb": "Åpne bilde",
+  "sv": "Öppna foto",
+  "tr": "Fotoğraf aç",
+  "zh-TW": "開啟照片",
+  "th": "เปิดรูป",
+  "vi": "Mở ảnh",
+  "id": "Buka foto",
+  "ar": "فتح صورة",
+  "fa": "باز کردن عکس"
+ },
+ "또는 사진을 여기에 끌어다 놓으세요": {
+  "en": "or drag and drop a photo here",
+  "zh": "或将照片拖放到这里",
+  "ja": "または写真をここにドラッグしてください",
+  "es": "o arrastra una foto aquí",
+  "hi": "या फ़ोटो यहाँ खींचकर छोड़ें",
+  "fr": "ou glissez-déposez une photo ici",
+  "de": "oder ziehen Sie ein Foto hierher",
+  "pt": "ou arraste e solte uma foto aqui",
+  "it": "oppure trascina qui una foto",
+  "nl": "of sleep een foto hierheen",
+  "ru": "или перетащите фото сюда",
+  "uk": "або перетягніть фото сюди",
+  "pl": "lub przeciągnij i upuść zdjęcie tutaj",
+  "cs": "nebo fotografii přetáhněte sem",
+  "hu": "vagy húzza ide a fotót",
+  "ro": "sau trageți o fotografie aici",
+  "da": "eller træk og slip et foto her",
+  "fi": "tai vedä ja pudota kuva tähän",
+  "nb": "eller dra og slipp et bilde her",
+  "sv": "eller dra och släpp ett foto här",
+  "tr": "veya fotoğrafı buraya sürükleyip bırakın",
+  "zh-TW": "或將照片拖放到這裡",
+  "th": "หรือลากรูปมาวางที่นี่",
+  "vi": "hoặc kéo và thả ảnh vào đây",
+  "id": "atau seret dan letakkan foto di sini",
+  "ar": "أو اسحب صورة وأفلتها هنا",
+  "fa": "یا عکسی را اینجا بکشید و رها کنید"
+ },
+ "JPG · PNG 사진 파일을 읽어옵니다": {
+  "en": "Reads JPG and PNG photo files",
+  "zh": "读取 JPG、PNG 照片文件",
+  "ja": "JPG・PNGの写真ファイルを読み込みます",
+  "es": "Lee archivos de foto JPG y PNG",
+  "hi": "JPG और PNG फ़ोटो फ़ाइलें पढ़ता है",
+  "fr": "Lit les fichiers photo JPG et PNG",
+  "de": "Liest JPG- und PNG-Fotodateien",
+  "pt": "Lê arquivos de foto JPG e PNG",
+  "it": "Legge file foto JPG e PNG",
+  "nl": "Leest JPG- en PNG-fotobestanden",
+  "ru": "Читает файлы фото JPG и PNG",
+  "uk": "Читає файли фото JPG і PNG",
+  "pl": "Wczytuje pliki zdjęć JPG i PNG",
+  "cs": "Načítá soubory fotografií JPG a PNG",
+  "hu": "JPG és PNG fotófájlokat olvas be",
+  "ro": "Citește fișiere foto JPG și PNG",
+  "da": "Læser JPG- og PNG-fotofiler",
+  "fi": "Lukee JPG- ja PNG-kuvatiedostoja",
+  "nb": "Leser JPG- og PNG-bildefiler",
+  "sv": "Läser JPG- och PNG-fotofiler",
+  "tr": "JPG ve PNG fotoğraf dosyalarını okur",
+  "zh-TW": "讀取 JPG、PNG 照片檔案",
+  "th": "อ่านไฟล์รูป JPG · PNG",
+  "vi": "Đọc tệp ảnh JPG · PNG",
+  "id": "Membaca berkas foto JPG · PNG",
+  "ar": "يقرأ ملفات الصور JPG وPNG",
+  "fa": "فایل‌های عکس JPG و PNG را می‌خواند"
+ },
+ "예) 전화기로 찍은 얼굴 사진 → 여권 규격으로 잘라 저장": {
+  "en": "e.g. a face photo from your phone → cropped to passport size and saved",
+  "zh": "例）手机拍的脸部照片 → 裁成护照规格保存",
+  "ja": "例）スマホで撮った顔写真 → パスポート規格に切り取って保存",
+  "es": "Ej.) una foto de rostro del teléfono → recortada a tamaño pasaporte",
+  "hi": "उदा.) फ़ोन से ली चेहरे की फ़ोटो → पासपोर्ट आकार में काटकर सहेजें",
+  "fr": "ex.) une photo de visage prise avec votre téléphone → recadrée au format passeport et enregistrée",
+  "de": "z. B. ein Gesichtsfoto vom Handy → auf Passformat zugeschnitten und gespeichert",
+  "pt": "ex.) foto de rosto do celular → cortada no tamanho de passaporte e salva",
+  "it": "es.) una foto del viso dal telefono → ritagliata in formato passaporto e salvata",
+  "nl": "bijv.) een gezichtsfoto van je telefoon → bijgesneden tot paspoortformaat en opgeslagen",
+  "ru": "Напр.) фото лица с телефона → обрезается до размера паспорта и сохраняется",
+  "uk": "Напр.) фото обличчя з телефона → обрізається до розміру паспорта і зберігається",
+  "pl": "Np.) zdjęcie twarzy z telefonu → przycięte do formatu paszportowego i zapisane",
+  "cs": "Např.) fotografie obličeje z telefonu → oříznutá na pasový rozměr a uložená",
+  "hu": "Pl.) telefonnal készült arcfotó → útlevélméretre vágva és mentve",
+  "ro": "Ex.) fotografie a feței de pe telefon → decupată la dimensiunea de pașaport și salvată",
+  "da": "f.eks. et ansigtsfoto fra telefonen → beskåret til passtørrelse og gemt",
+  "fi": "esim. puhelimella otettu kasvokuva → rajattuna passikokoon ja tallennettuna",
+  "nb": "f.eks. et ansiktsbilde fra telefonen → beskjært til passformat og lagret",
+  "sv": "t.ex. ett ansiktsfoto från telefonen → beskuret till passformat och sparat",
+  "tr": "örn.) telefonla çekilmiş yüz fotoğrafı → pasaport boyutunda kırpılıp kaydedilir",
+  "zh-TW": "例）手機拍的臉部照片 → 裁成護照規格儲存",
+  "th": "เช่น) รูปใบหน้าที่ถ่ายด้วยโทรศัพท์ → ตัดให้ได้ขนาดหนังสือเดินทางแล้วบันทึก",
+  "vi": "Ví dụ) Ảnh mặt chụp bằng điện thoại → cắt theo kích thước hộ chiếu và lưu",
+  "id": "mis. foto wajah dari ponsel → dipotong ke ukuran paspor dan disimpan",
+  "ar": "مثال) صورة وجه من الهاتف → قصّها بمقاس جواز السفر وحفظها",
+  "fa": "مثال) عکس چهره گرفته‌شده با تلفن → برش با اندازه گذرنامه و ذخیره"
+ },
+ "① 규격 고르기": {
+  "en": "① Choose a size",
+  "zh": "① 选择规格",
+  "ja": "① 規格を選ぶ",
+  "es": "① Elige un tamaño",
+  "hi": "① आकार चुनें",
+  "fr": "① Choisir un format",
+  "de": "① Format wählen",
+  "pt": "① Escolher o tamanho",
+  "it": "① Scegli un formato",
+  "nl": "① Formaat kiezen",
+  "ru": "① Выбрать размер",
+  "uk": "① Вибрати розмір",
+  "pl": "① Wybierz format",
+  "cs": "① Vybrat rozměr",
+  "hu": "① Méret kiválasztása",
+  "ro": "① Alege o dimensiune",
+  "da": "① Vælg en størrelse",
+  "fi": "① Valitse koko",
+  "nb": "① Velg et format",
+  "sv": "① Välj ett format",
+  "tr": "① Boyut seç",
+  "zh-TW": "① 選擇規格",
+  "th": "① เลือกขนาด",
+  "vi": "① Chọn kích thước",
+  "id": "① Pilih ukuran",
+  "ar": "① اختيار المقاس",
+  "fa": "① انتخاب اندازه"
+ },
+ "제출 기관마다 요구 규격이 다를 수 있습니다. 내기 전에 해당 기관의 규격을 한 번 더 확인하세요.": {
+  "en": "Each authority may require a different size. Check the requirements of the place you are submitting to once more before you do.",
+  "zh": "各提交机构要求的规格可能不同。提交前请再次确认该机构的规格。",
+  "ja": "提出先ごとに求める規格が異なる場合があります。出す前に提出先の規格をもう一度確認してください。",
+  "es": "Cada institución puede exigir un tamaño distinto. Revisa de nuevo sus requisitos antes de entregar.",
+  "hi": "हर संस्था का आकार अलग हो सकता है। जमा करने से पहले उस संस्था की आवश्यकताएँ फिर से जाँच लें।",
+  "fr": "Chaque organisme peut exiger un format différent. Vérifiez à nouveau les exigences de l'organisme destinataire avant de déposer votre photo.",
+  "de": "Jede Behörde kann ein anderes Format verlangen. Prüfen Sie vor der Einreichung noch einmal die Anforderungen der zuständigen Stelle.",
+  "pt": "Cada instituição pode exigir um tamanho diferente. Confira novamente os requisitos da instituição antes de entregar.",
+  "it": "Ogni ente può richiedere un formato diverso. Ricontrolla i requisiti dell'ente a cui la consegni prima di farlo.",
+  "nl": "Elke instantie kan een ander formaat eisen. Controleer vóór het indienen nogmaals de eisen van die instantie.",
+  "ru": "Каждое ведомство может требовать свой размер. Перед подачей ещё раз проверьте требования того места, куда подаёте документы.",
+  "uk": "Кожна установа може вимагати свій розмір. Перед поданням ще раз перевірте вимоги місця, куди подаєте документи.",
+  "pl": "Każda instytucja może wymagać innego formatu. Przed złożeniem sprawdź jeszcze raz wymagania miejsca, do którego składasz dokumenty.",
+  "cs": "Každý úřad může požadovat jiný rozměr. Před podáním si ještě jednou ověřte požadavky místa, kam fotografii odevzdáváte.",
+  "hu": "Minden intézmény más méretet követelhet meg. Benyújtás előtt még egyszer ellenőrizze az adott intézmény előírásait.",
+  "ro": "Fiecare instituție poate cere o altă dimensiune. Înainte de depunere, verificați încă o dată cerințele locului unde depuneți actele.",
+  "da": "Hver institution kan kræve en anden størrelse. Kontrollér kravene hos det sted, du indsender til, en gang til, før du indsender.",
+  "fi": "Jokaisella viranomaisella voi olla eri kokovaatimus. Tarkista vastaanottajan vaatimukset vielä kerran ennen luovuttamista.",
+  "nb": "Hver instans kan kreve et annet format. Sjekk kravene hos stedet du skal levere til én gang til før du leverer.",
+  "sv": "Varje myndighet kan kräva ett annat format. Kontrollera kraven hos den instans du ska lämna in till en gång till innan du lämnar in.",
+  "tr": "Her kurum farklı bir boyut isteyebilir. Teslim etmeden önce teslim edeceğiniz kurumun gereksinimlerini bir kez daha kontrol edin.",
+  "zh-TW": "各提交機關要求的規格可能不同。提交前請再次確認該機關的規格。",
+  "th": "แต่ละหน่วยงานอาจกำหนดขนาดต่างกัน โปรดตรวจสอบข้อกำหนดของหน่วยงานที่จะยื่นอีกครั้งก่อนยื่น",
+  "vi": "Mỗi cơ quan có thể yêu cầu kích thước khác nhau. Hãy kiểm tra lại yêu cầu của nơi nộp trước khi nộp.",
+  "id": "Setiap instansi mungkin mensyaratkan ukuran berbeda. Periksa kembali persyaratan instansi tujuan sebelum menyerahkan.",
+  "ar": "قد تختلف المقاسات المطلوبة من جهة تقديم إلى أخرى. تحقق مرة أخرى من متطلبات الجهة التي ستقدم إليها قبل التقديم.",
+  "fa": "اندازه مورد نیاز هر نهاد ممکن است متفاوت باشد. پیش از ارسال، الزامات نهاد مقصد را یک بار دیگر بررسی کنید."
+ },
+ "여권 사진": {
+  "en": "Passport photo",
+  "zh": "护照照片",
+  "ja": "パスポート写真",
+  "es": "Foto de pasaporte",
+  "hi": "पासपोर्ट फ़ोटो",
+  "fr": "Photo de passeport",
+  "de": "Passfoto",
+  "pt": "Foto de passaporte",
+  "it": "Foto per passaporto",
+  "nl": "Paspoortfoto",
+  "ru": "Фото на паспорт",
+  "uk": "Фото на паспорт",
+  "pl": "Zdjęcie paszportowe",
+  "cs": "Pasová fotografie",
+  "hu": "Útlevélkép",
+  "ro": "Fotografie de pașaport",
+  "da": "Pasfoto",
+  "fi": "Passikuva",
+  "nb": "Passbilde",
+  "sv": "Passfoto",
+  "tr": "Pasaport fotoğrafı",
+  "zh-TW": "護照照片",
+  "th": "รูปหนังสือเดินทาง",
+  "vi": "Ảnh hộ chiếu",
+  "id": "Foto paspor",
+  "ar": "صورة جواز السفر",
+  "fa": "عکس گذرنامه"
+ },
+ "반명함 사진": {
+  "en": "ID photo (3×4 cm)",
+  "zh": "证件照（3×4）",
+  "ja": "証明写真（3×4cm）",
+  "es": "Foto de identificación (3×4 cm)",
+  "hi": "आईडी फ़ोटो (3×4 सेमी)",
+  "fr": "Photo d'identité (3×4 cm)",
+  "de": "Passfoto (3×4 cm)",
+  "pt": "Foto de identificação (3×4 cm)",
+  "it": "Fototessera (3×4 cm)",
+  "nl": "Pasfoto (3×4 cm)",
+  "ru": "Фото на документы (3×4 см)",
+  "uk": "Фото на документи (3×4 см)",
+  "pl": "Zdjęcie do dokumentów (3×4 cm)",
+  "cs": "Průkazová fotografie (3×4 cm)",
+  "hu": "Igazolványkép (3×4 cm)",
+  "ro": "Fotografie pentru acte (3×4 cm)",
+  "da": "ID-foto (3×4 cm)",
+  "fi": "Henkilökuva (3×4 cm)",
+  "nb": "ID-foto (3×4 cm)",
+  "sv": "ID-foto (3×4 cm)",
+  "tr": "Kimlik fotoğrafı (3×4 cm)",
+  "zh-TW": "證件照（3×4 公分）",
+  "th": "รูปติดบัตร (3×4 ซม.)",
+  "vi": "Ảnh thẻ (3×4 cm)",
+  "id": "Foto ID (3×4 cm)",
+  "ar": "صورة هوية (3×4 سم)",
+  "fa": "عکس شناسایی (3×4 سانتی‌متر)"
+ },
+ "운전면허 사진": {
+  "en": "Driver's license photo",
+  "zh": "驾照照片",
+  "ja": "運転免許写真",
+  "es": "Foto de licencia de conducir",
+  "hi": "ड्राइविंग लाइसेंस फ़ोटो",
+  "fr": "Photo de permis de conduire",
+  "de": "Führerscheinfoto",
+  "pt": "Foto de carteira de motorista",
+  "it": "Foto per patente di guida",
+  "nl": "Rijbewijsfoto",
+  "ru": "Фото на водительское удостоверение",
+  "uk": "Фото на водійське посвідчення",
+  "pl": "Zdjęcie do prawa jazdy",
+  "cs": "Fotografie na řidičský průkaz",
+  "hu": "Jogosítványkép",
+  "ro": "Fotografie pentru permis de conducere",
+  "da": "Kørekortfoto",
+  "fi": "Ajokorttikuva",
+  "nb": "Førerkortbilde",
+  "sv": "Körkortsfoto",
+  "tr": "Ehliyet fotoğrafı",
+  "zh-TW": "駕照照片",
+  "th": "รูปใบขับขี่",
+  "vi": "Ảnh giấy phép lái xe",
+  "id": "Foto SIM",
+  "ar": "صورة رخصة القيادة",
+  "fa": "عکس گواهینامه رانندگی"
+ },
+ "미국 비자 사진": {
+  "en": "US visa photo",
+  "zh": "美国签证照片",
+  "ja": "米国ビザ写真",
+  "es": "Foto de visa de EE. UU.",
+  "hi": "अमेरिकी वीज़ा फ़ोटो",
+  "fr": "Photo de visa américain",
+  "de": "Foto für US-Visum",
+  "pt": "Foto de visto dos EUA",
+  "it": "Foto per visto USA",
+  "nl": "Foto voor Amerikaans visum",
+  "ru": "Фото на визу США",
+  "uk": "Фото на візу США",
+  "pl": "Zdjęcie do wizy USA",
+  "cs": "Fotografie na vízum do USA",
+  "hu": "Amerikai vízumkép",
+  "ro": "Fotografie pentru viza SUA",
+  "da": "Foto til amerikansk visum",
+  "fi": "Yhdysvaltain viisumikuva",
+  "nb": "Bilde til amerikansk visum",
+  "sv": "Foto för amerikanskt visum",
+  "tr": "ABD vize fotoğrafı",
+  "zh-TW": "美國簽證照片",
+  "th": "รูปวีซ่าสหรัฐฯ",
+  "vi": "Ảnh visa Mỹ",
+  "id": "Foto visa AS",
+  "ar": "صورة تأشيرة الولايات المتحدة",
+  "fa": "عکس ویزای آمریکا"
+ },
+ "출력 크기:": {
+  "en": "Output size:",
+  "zh": "输出尺寸：",
+  "ja": "出力サイズ：",
+  "es": "Tamaño de salida:",
+  "hi": "आउटपुट आकार:",
+  "fr": "Taille de sortie :",
+  "de": "Ausgabegröße:",
+  "pt": "Tamanho de saída:",
+  "it": "Dimensioni di output:",
+  "nl": "Uitvoerformaat:",
+  "ru": "Размер на выходе:",
+  "uk": "Розмір на виході:",
+  "pl": "Rozmiar wyjściowy:",
+  "cs": "Výstupní velikost:",
+  "hu": "Kimeneti méret:",
+  "ro": "Dimensiune de ieșire:",
+  "da": "Udskriftsstørrelse:",
+  "fi": "Tulostuskoko:",
+  "nb": "Utskriftsstørrelse:",
+  "sv": "Utskriftsstorlek:",
+  "tr": "Çıktı boyutu:",
+  "zh-TW": "輸出尺寸：",
+  "th": "ขนาดผลลัพธ์:",
+  "vi": "Kích thước xuất:",
+  "id": "Ukuran keluaran:",
+  "ar": "حجم الإخراج:",
+  "fa": "اندازه خروجی:"
+ },
+ "② 얼굴 맞추기": {
+  "en": "② Fit the face",
+  "zh": "② 对准脸部",
+  "ja": "② 顔を合わせる",
+  "es": "② Ajusta el rostro",
+  "hi": "② चेहरा ढालें",
+  "fr": "② Ajuster le visage",
+  "de": "② Gesicht anpassen",
+  "pt": "② Ajustar o rosto",
+  "it": "② Adatta il viso",
+  "nl": "② Gezicht aanpassen",
+  "ru": "② Подогнать лицо",
+  "uk": "② Підігнати обличчя",
+  "pl": "② Dopasuj twarz",
+  "cs": "② Přizpůsobit obličej",
+  "hu": "② Arc igazítása",
+  "ro": "② Ajustează fața",
+  "da": "② Tilpas ansigtet",
+  "fi": "② Sovita kasvot",
+  "nb": "② Tilpass ansiktet",
+  "sv": "② Anpassa ansiktet",
+  "tr": "② Yüzü uyarla",
+  "zh-TW": "② 對準臉部",
+  "th": "② ปรับใบหน้า",
+  "vi": "② Chỉnh khuôn mặt",
+  "id": "② Sesuaikan wajah",
+  "ar": "② ضبط الوجه",
+  "fa": "② تنظیم چهره"
+ },
+ "아직 사진이 없습니다.": {
+  "en": "No photo yet.",
+  "zh": "还没有照片。",
+  "ja": "まだ写真がありません。",
+  "es": "Aún no hay foto.",
+  "hi": "अभी कोई फ़ोटो नहीं।",
+  "fr": "Pas encore de photo.",
+  "de": "Noch kein Foto vorhanden.",
+  "pt": "Ainda não há foto.",
+  "it": "Nessuna foto ancora.",
+  "nl": "Nog geen foto.",
+  "ru": "Фото пока нет.",
+  "uk": "Фото ще немає.",
+  "pl": "Nie ma jeszcze zdjęcia.",
+  "cs": "Zatím žádná fotografie.",
+  "hu": "Még nincs fotó.",
+  "ro": "Încă nu există fotografie.",
+  "da": "Intet foto endnu.",
+  "fi": "Ei kuvaa vielä.",
+  "nb": "Ingen bilde ennå.",
+  "sv": "Inget foto ännu.",
+  "tr": "Henüz fotoğraf yok.",
+  "zh-TW": "還沒有照片。",
+  "th": "ยังไม่มีรูป",
+  "vi": "Chưa có ảnh.",
+  "id": "Belum ada foto.",
+  "ar": "لا توجد صورة بعد.",
+  "fa": "هنوز عکسی وجود ندارد."
+ },
+ "위에서 사진을 열어 주세요.": {
+  "en": "Open a photo above.",
+  "zh": "请在上面打开照片。",
+  "ja": "上で写真を開いてください。",
+  "es": "Abre una foto arriba.",
+  "hi": "ऊपर से फ़ोटो खोलें।",
+  "fr": "Ouvrez une photo ci-dessus.",
+  "de": "Öffnen Sie oben ein Foto.",
+  "pt": "Abra uma foto acima.",
+  "it": "Apri una foto qui sopra.",
+  "nl": "Open hierboven een foto.",
+  "ru": "Откройте фото выше.",
+  "uk": "Відкрийте фото вище.",
+  "pl": "Otwórz zdjęcie powyżej.",
+  "cs": "Otevřete fotografii výše.",
+  "hu": "Nyisson meg egy fotót fent.",
+  "ro": "Deschideți o fotografie mai sus.",
+  "da": "Åbn et foto ovenfor.",
+  "fi": "Avaa kuva ylhäältä.",
+  "nb": "Åpne et bilde ovenfor.",
+  "sv": "Öppna ett foto ovan.",
+  "tr": "Yukarıdan bir fotoğraf açın.",
+  "zh-TW": "請在上方開啟照片。",
+  "th": "โปรดเปิดรูปด้านบน",
+  "vi": "Hãy mở ảnh ở phía trên.",
+  "id": "Buka foto di atas.",
+  "ar": "افتح صورة من الأعلى.",
+  "fa": "از بالا یک عکس باز کنید."
+ },
+ "처음으로": {
+  "en": "Reset",
+  "zh": "复位",
+  "ja": "最初に戻す",
+  "es": "Restablecer",
+  "hi": "रीसेट",
+  "fr": "Réinitialiser",
+  "de": "Zurücksetzen",
+  "pt": "Redefinir",
+  "it": "Ripristina",
+  "nl": "Resetten",
+  "ru": "Сброс",
+  "uk": "Скидання",
+  "pl": "Resetuj",
+  "cs": "Resetovat",
+  "hu": "Visszaállítás",
+  "ro": "Resetează",
+  "da": "Nulstil",
+  "fi": "Nollaa",
+  "nb": "Tilbakestill",
+  "sv": "Återställ",
+  "tr": "Sıfırla",
+  "zh-TW": "重設",
+  "th": "รีเซ็ต",
+  "vi": "Đặt lại",
+  "id": "Atur ulang",
+  "ar": "إعادة تعيين",
+  "fa": "بازنشانی"
+ },
+ "사진을 끌어(드래그) 얼굴을 타원 안으로 옮기고, 눈을 노란 선에 맞추세요. 손가락 두 개로 벌리거나 마우스 휠로도 확대 · 축소됩니다. 얼굴(정수리부터 턱까지)이 사진 높이의 70~80%쯤 되면 적당합니다.": {
+  "en": "Drag the photo to bring the face inside the oval, and line the eyes up with the yellow line. Pinch with two fingers or use the mouse wheel to zoom. A face (top of head to chin) at about 70–80% of the photo height is about right.",
+  "zh": "拖动照片把脸移到椭圆内，让眼睛对准黄线。双指张合或鼠标滚轮也可缩放。脸部（头顶到下巴）约占照片高度的 70~80% 比较合适。",
+  "ja": "写真をドラッグして顔を楕円の中に入れ、目を黄色い線に合わせてください。2本指のピンチやマウスホイールでも拡大・縮小できます。顔（頭頂からあごまで）が写真の高さの70〜80%くらいが適当です。",
+  "es": "Arrastra la foto para poner el rostro dentro del óvalo y alinea los ojos con la línea amarilla. Pellizca con dos dedos o usa la rueda del ratón para ampliar. Un rostro (de la coronilla a la barbilla) al 70–80% de la altura es lo adecuado.",
+  "hi": "फ़ोटो खींचकर चेहरा अंडाकार में लाएँ और आँखें पीली रेखा पर मिलाएँ। दो उँगलियों से फैलाकर या माउस व्हील से भी ज़ूम होता है। चेहरा (सिर के ऊपर से ठुड्डी तक) फ़ोटो की ऊँचाई का लगभग 70–80% होना ठीक रहता है।",
+  "fr": "Faites glisser la photo pour placer le visage dans l'ovale et alignez les yeux sur la ligne jaune. Pincez avec deux doigts ou utilisez la molette de la souris pour zoomer. Un visage (du sommet du crâne au menton) occupant environ 70 à 80 % de la hauteur de la photo convient bien.",
+  "de": "Ziehen Sie das Foto, um das Gesicht in das Oval zu bringen, und richten Sie die Augen an der gelben Linie aus. Mit zwei Fingern spreizen oder mit dem Mausrad zoomen. Ein Gesicht (vom Scheitel bis zum Kinn) mit etwa 70–80 % der Fotohöhe ist passend.",
+  "pt": "Arraste a foto para colocar o rosto dentro da oval e alinhe os olhos com a linha amarela. Use dois dedos ou a roda do mouse para ampliar e reduzir. Um rosto (do topo da cabeça ao queixo) com cerca de 70–80% da altura da foto é o ideal.",
+  "it": "Trascina la foto per portare il viso dentro l'ovale e allinea gli occhi con la linea gialla. Pizzica con due dita o usa la rotellina del mouse per ingrandire e ridurre. Un viso (dalla sommità della testa al mento) pari a circa il 70–80% dell'altezza della foto è adeguato.",
+  "nl": "Sleep de foto om het gezicht in het ovaal te plaatsen en lijn de ogen uit op de gele lijn. Knijp met twee vingers of gebruik het muiswiel om te zoomen. Een gezicht (van kruin tot kin) van ongeveer 70–80% van de fotohoogte is ongeveer goed.",
+  "ru": "Перетаскивайте фото, чтобы поместить лицо внутрь овала, и совместите глаза с жёлтой линией. Масштаб можно менять щипком двумя пальцами или колесом мыши. Лицо (от макушки до подбородка) должно занимать примерно 70–80% высоты фото — это как раз подходящий размер.",
+  "uk": "Перетягуйте фото, щоб помістити обличчя всередину овалу, і сумістіть очі з жовтою лінією. Масштаб можна змінювати щипком двома пальцями або колесом миші. Обличчя (від маківки до підборіддя) має займати приблизно 70–80% висоти фото — це якраз відповідний розмір.",
+  "pl": "Przeciągaj zdjęcie, aby umieścić twarz wewnątrz owalu, i ustaw oczy na żółtej linii. Powiększanie i pomniejszanie jest możliwe szczypaniem dwoma palcami lub kółkiem myszy. Twarz (od czubka głowy do podbródka) zajmująca około 70–80% wysokości zdjęcia to właściwa wielkość.",
+  "cs": "Přetahujte fotografii tak, aby byl obličej uvnitř oválu, a zarovnejte oči se žlutou čarou. Přiblížení a oddálení lze provést sevřením dvěma prsty nebo kolečkem myši. Obličej (od temene po bradu) zabírající asi 70–80 % výšky fotografie je tak akorát.",
+  "hu": "Húzza a fotót, hogy az arc az ovális belsejébe kerüljön, és a szemeket igazítsa a sárga vonalhoz. Kétujjas csípéssel vagy az egér görgőjével is nagyíthat és kicsinyíthet. Az arc (a fejtetőtől az állig) a fotó magasságának kb. 70–80%-a az ideális.",
+  "ro": "Trageți fotografia pentru a aduce fața în interiorul ovalului și aliniați ochii cu linia galbenă. Puteți mări și micșora ciupind cu două degete sau cu rotița mouse-ului. O față (de la creștet până la bărbie) de aproximativ 70–80% din înălțimea fotografiei este potrivită.",
+  "da": "Træk fotoet, så ansigtet kommer ind i ovalen, og justér øjnene efter den gule linje. Knib med to fingre eller brug musehjulet til at zoome. Et ansigt (fra issen til hagen) på cirka 70–80 % af fotoets højde er passende.",
+  "fi": "Vedä kuvaa niin, että kasvot tulevat soikion sisään, ja kohdista silmät keltaiseen viivaan. Lähennä nipistämällä kahdella sormella tai hiiren rullalla. Kasvot (päälaesta leukaan) noin 70–80 % kuvan korkeudesta on sopiva.",
+  "nb": "Dra bildet slik at ansiktet kommer inn i ovalen, og rett inn øynene etter den gule linjen. Knip med to fingre eller bruk musehjulet for å zoome. Et ansikt (fra issen til haken) på omtrent 70–80 % av bildets høyde er passe.",
+  "sv": "Dra fotot så att ansiktet hamnar inne i ovalen och rikta in ögonen mot den gula linjen. Nyp med två fingrar eller använd mushjulet för att zooma. Ett ansikte (från hjässan till hakan) på cirka 70–80 % av fotots höjd är lagom.",
+  "tr": "Fotoğrafı sürükleyerek yüzü ovalin içine getirin ve gözleri sarı çizgiye hizalayın. İki parmakla açarak veya fare tekerleğiyle de yakınlaştırılabilir. Yüzün (tepeden çeneye) fotoğraf yüksekliğinin yaklaşık %70–80'i olması uygundur.",
+  "zh-TW": "拖曳照片把臉移到橢圓內，讓眼睛對準黃線。雙指張合或滑鼠滾輪也可縮放。臉部（頭頂到下巴）約占照片高度的 70~80% 比較合適。",
+  "th": "ลากรูปเพื่อนำใบหน้าเข้าไปในวงรี และจัดให้ดวงตาตรงกับเส้นสีเหลือง ใช้สองนิ้วถ่างหรือล้อเมาส์เพื่อซูมก็ได้ ใบหน้า (จากหัวถึงคาง) ประมาณ 70~80% ของความสูงรูปถือว่าเหมาะสม",
+  "vi": "Kéo ảnh để đưa khuôn mặt vào trong hình bầu dục và căn mắt theo đường màu vàng. Chụm hai ngón tay hoặc dùng con lăn chuột để phóng to/thu nhỏ. Khuôn mặt (từ đỉnh đầu đến cằm) chiếm khoảng 70–80% chiều cao ảnh là vừa.",
+  "id": "Seret foto untuk membawa wajah ke dalam oval, dan sejajarkan mata dengan garis kuning. Cubit dengan dua jari atau gunakan roda mouse untuk memperbesar. Wajah (dari puncak kepala hingga dagu) sekitar 70–80% dari tinggi foto adalah pas.",
+  "ar": "اسحب الصورة لوضع الوجه داخل الشكل البيضاوي، واجعل العينين على الخط الأصفر. يمكنك أيضًا التكبير والتصغير بإصبعين أو بعجلة الفأرة. يكون الأمر مناسبًا عندما يشغل الوجه (من أعلى الرأس إلى الذقن) نحو 70~80% من ارتفاع الصورة.",
+  "fa": "عکس را بکشید تا چهره داخل بیضی قرار گیرد و چشم‌ها را با خط زرد هم‌تراز کنید. با دو انگشت یا غلتک ماوس نیز می‌توان بزرگ‌نمایی و کوچک‌نمایی کرد. وقتی چهره (از بالای سر تا چانه) حدود 70~80% ارتفاع عکس باشد، مناسب است."
+ },
+ "원본 사진이 작아 출력이 흐릴 수 있습니다.": {
+  "en": "The original photo is small, so the print may come out blurry.",
+  "zh": "原图较小，打印可能模糊。",
+  "ja": "元の写真が小さいため、出力がぼやけることがあります。",
+  "es": "La foto original es pequeña y la impresión puede salir borrosa.",
+  "hi": "मूल फ़ोटो छोटी है, इसलिए प्रिंट धुंधला आ सकता है।",
+  "fr": "La photo d'origine est petite, l'impression peut donc être floue.",
+  "de": "Das Originalfoto ist klein, daher kann der Ausdruck unscharf werden.",
+  "pt": "A foto original é pequena, então a impressão pode sair borrada.",
+  "it": "La foto originale è piccola, quindi la stampa potrebbe risultare sfocata.",
+  "nl": "De originele foto is klein, waardoor de afdruk wazig kan worden.",
+  "ru": "Исходное фото маленькое, поэтому отпечаток может получиться размытым.",
+  "uk": "Вихідне фото маленьке, тому відбиток може вийти розмитим.",
+  "pl": "Oryginalne zdjęcie jest małe, więc wydruk może być nieostry.",
+  "cs": "Původní fotografie je malá, takže výtisk může být rozmazaný.",
+  "hu": "Az eredeti fotó kicsi, ezért a nyomat homályos lehet.",
+  "ro": "Fotografia originală este mică, așa că imprimarea poate ieși neclară.",
+  "da": "Det originale foto er lille, så udskriften kan blive sløret.",
+  "fi": "Alkuperäinen kuva on pieni, joten tuloste voi olla sumea.",
+  "nb": "Originalbildet er lite, så utskriften kan bli uskarp.",
+  "sv": "Originalfotot är litet, så utskriften kan bli suddig.",
+  "tr": "Orijinal fotoğraf küçük olduğundan çıktı bulanık olabilir.",
+  "zh-TW": "原圖較小，列印可能模糊。",
+  "th": "รูปต้นฉบับมีขนาดเล็ก งานพิมพ์อาจเบลอ",
+  "vi": "Ảnh gốc nhỏ nên bản in có thể bị mờ.",
+  "id": "Foto asli kecil, sehingga cetakan mungkin buram.",
+  "ar": "الصورة الأصلية صغيرة، لذا قد تخرج الطباعة ضبابية.",
+  "fa": "عکس اصلی کوچک است، بنابراین چاپ ممکن است تار شود."
+ },
+ "③ 저장하기": {
+  "en": "③ Save",
+  "zh": "③ 保存",
+  "ja": "③ 保存する",
+  "es": "③ Guardar",
+  "hi": "③ सहेजें",
+  "fr": "③ Enregistrer",
+  "de": "③ Speichern",
+  "pt": "③ Salvar",
+  "it": "③ Salva",
+  "nl": "③ Opslaan",
+  "ru": "③ Сохранить",
+  "uk": "③ Зберегти",
+  "pl": "③ Zapisz",
+  "cs": "③ Uložit",
+  "hu": "③ Mentés",
+  "ro": "③ Salvează",
+  "da": "③ Gem",
+  "fi": "③ Tallenna",
+  "nb": "③ Lagre",
+  "sv": "③ Spara",
+  "tr": "③ Kaydet",
+  "zh-TW": "③ 儲存",
+  "th": "③ บันทึก",
+  "vi": "③ Lưu",
+  "id": "③ Simpan",
+  "ar": "③ الحفظ",
+  "fa": "③ ذخیره"
+ },
+ "사진 한 장 저장": {
+  "en": "Save one photo",
+  "zh": "保存一张照片",
+  "ja": "写真を1枚保存",
+  "es": "Guardar una foto",
+  "hi": "एक फ़ोटो सहेजें",
+  "fr": "Enregistrer une photo",
+  "de": "Ein Foto speichern",
+  "pt": "Salvar uma foto",
+  "it": "Salva una foto",
+  "nl": "Eén foto opslaan",
+  "ru": "Сохранить одно фото",
+  "uk": "Зберегти одне фото",
+  "pl": "Zapisz jedno zdjęcie",
+  "cs": "Uložit jednu fotografii",
+  "hu": "Egy fotó mentése",
+  "ro": "Salvează o fotografie",
+  "da": "Gem ét foto",
+  "fi": "Tallenna yksi kuva",
+  "nb": "Lagre ett bilde",
+  "sv": "Spara ett foto",
+  "tr": "Bir fotoğraf kaydet",
+  "zh-TW": "儲存一張照片",
+  "th": "บันทึกรูปหนึ่งใบ",
+  "vi": "Lưu một ảnh",
+  "id": "Simpan satu foto",
+  "ar": "حفظ صورة واحدة",
+  "fa": "ذخیره یک عکس"
+ },
+ "4×6 인화 시트 저장": {
+  "en": "Save 4×6 print sheet",
+  "zh": "保存 4×6 打印版",
+  "ja": "4×6印刷シートを保存",
+  "es": "Guardar hoja de impresión 4×6",
+  "hi": "4×6 प्रिंट शीट सहेजें",
+  "fr": "Enregistrer la planche d'impression 4×6",
+  "de": "4×6-Druckbogen speichern",
+  "pt": "Salvar folha de impressão 4×6",
+  "it": "Salva il foglio di stampa 4×6",
+  "nl": "4×6-afdrukvel opslaan",
+  "ru": "Сохранить лист печати 4×6",
+  "uk": "Зберегти аркуш друку 4×6",
+  "pl": "Zapisz arkusz do druku 4×6",
+  "cs": "Uložit tiskový arch 4×6",
+  "hu": "4×6 nyomtatási ív mentése",
+  "ro": "Salvează foaia de imprimare 4×6",
+  "da": "Gem 4×6-udskriftsark",
+  "fi": "Tallenna 4×6-tulostusarkki",
+  "nb": "Lagre 4×6-utskriftsark",
+  "sv": "Spara 4×6-utskriftsark",
+  "tr": "4×6 baskı sayfasını kaydet",
+  "zh-TW": "儲存 4×6 列印版",
+  "th": "บันทึกแผ่นพิมพ์ 4×6",
+  "vi": "Lưu tờ in 4×6",
+  "id": "Simpan lembar cetak 4×6",
+  "ar": "حفظ ورقة طباعة 4×6",
+  "fa": "ذخیره برگه چاپ 4×6"
+ },
+ "인화 시트 인쇄": {
+  "en": "Print sheet",
+  "zh": "打印版面",
+  "ja": "シートを印刷",
+  "es": "Imprimir hoja",
+  "hi": "शीट प्रिंट करें",
+  "fr": "Imprimer la planche",
+  "de": "Druckbogen drucken",
+  "pt": "Imprimir folha",
+  "it": "Stampa il foglio",
+  "nl": "Afdrukvel printen",
+  "ru": "Печать листа",
+  "uk": "Друк аркуша",
+  "pl": "Drukuj arkusz",
+  "cs": "Tisk archu",
+  "hu": "Ív nyomtatása",
+  "ro": "Imprimă foaia",
+  "da": "Udskriv ark",
+  "fi": "Tulosta arkki",
+  "nb": "Skriv ut ark",
+  "sv": "Skriv ut ark",
+  "tr": "Sayfayı yazdır",
+  "zh-TW": "列印版面",
+  "th": "พิมพ์แผ่นพิมพ์",
+  "vi": "In tờ in",
+  "id": "Cetak lembar",
+  "ar": "طباعة ورقة الطباعة",
+  "fa": "چاپ برگه چاپ"
+ },
+ "사진을 열면 저장할 수 있습니다.": {
+  "en": "Open a photo to save it.",
+  "zh": "打开照片后即可保存。",
+  "ja": "写真を開くと保存できます。",
+  "es": "Abre una foto para poder guardar.",
+  "hi": "फ़ोटो खोलने पर सहेज सकेंगे।",
+  "fr": "Ouvrez une photo pour l'enregistrer.",
+  "de": "Öffnen Sie ein Foto, um es zu speichern.",
+  "pt": "Abra uma foto para poder salvá-la.",
+  "it": "Apri una foto per poterla salvare.",
+  "nl": "Open een foto om deze op te slaan.",
+  "ru": "Откройте фото, чтобы сохранить его.",
+  "uk": "Відкрийте фото, щоб зберегти його.",
+  "pl": "Otwórz zdjęcie, aby móc je zapisać.",
+  "cs": "Po otevření fotografie ji můžete uložit.",
+  "hu": "Nyisson meg egy fotót a mentéshez.",
+  "ro": "Deschideți o fotografie pentru a o putea salva.",
+  "da": "Åbn et foto for at kunne gemme.",
+  "fi": "Avaa kuva, niin voit tallentaa.",
+  "nb": "Åpne et bilde for å kunne lagre.",
+  "sv": "Öppna ett foto för att kunna spara.",
+  "tr": "Kaydetmek için bir fotoğraf açın.",
+  "zh-TW": "開啟照片後即可儲存。",
+  "th": "เปิดรูปแล้วจะบันทึกได้",
+  "vi": "Mở ảnh ra là lưu được.",
+  "id": "Buka foto untuk menyimpannya.",
+  "ar": "يمكنك الحفظ بعد فتح صورة.",
+  "fa": "با باز کردن عکس می‌توانید ذخیره کنید."
+ },
+ "인화 시트는 4×6인치(101.6×152.4mm) 종이에 규격 사진 여러 장을 채운 그림 파일입니다. 인쇄소에서 이 파일로 뽑거나, 집에서 4×6 사진 용지에 테두리 없이 인쇄하면 됩니다. 시트의 각 사진 둘레에는 자르기 안내선이 옅게 들어갑니다.": {
+  "en": "The print sheet is an image file that fills a 4×6 inch (101.6×152.4 mm) page with several size-fitted photos. Print it at a photo shop, or at home on 4×6 photo paper without borders. Each photo on the sheet has a faint cutting guide line around it.",
+  "zh": "打印版是一个图像文件，在 4×6 英寸（101.6×152.4mm）纸上排满多张规格照片。可在照相馆用此文件打印，或在家用 4×6 相纸无边距打印。每张照片周围有淡淡的裁切参考线。",
+  "ja": "印刷シートは4×6インチ（101.6×152.4mm）の紙に規格写真を何枚も並べた画像ファイルです。印刷所でこのファイルから出力したり、家で4×6写真用紙にフチなし印刷したりできます。各写真の周りには薄い切り取りガイド線が入ります。",
+  "es": "La hoja de impresión es un archivo de imagen que llena una página de 4×6 pulgadas (101,6×152,4 mm) con varias fotos al tamaño elegido. Imprímela en una tienda de fotos o en casa en papel 4×6 sin bordes. Cada foto lleva una línea guía de corte tenue alrededor.",
+  "hi": "प्रिंट शीट एक इमेज फ़ाइल है जो 4×6 इंच (101.6×152.4 मिमी) कागज़ पर कई आकार-बद्ध फ़ोटो भरती है। इसे फ़ोटो दुकान से छपवाएँ या घर पर 4×6 फ़ोटो पेपर पर बिना किनारे प्रिंट करें। शीट की हर फ़ोटो के चारों ओर हल्की काटने की गाइड रेखा होती है।",
+  "fr": "La planche d'impression est un fichier image qui remplit une feuille de 4×6 pouces (101,6×152,4 mm) avec plusieurs photos au format choisi. Imprimez-la dans un magasin photo ou chez vous sur du papier photo 4×6 sans bordures. Chaque photo de la planche est entourée d'un léger repère de coupe.",
+  "de": "Der Druckbogen ist eine Bilddatei, die ein Blatt im Format 4×6 Zoll (101,6×152,4 mm) mit mehreren formatgerechten Fotos füllt. Drucken Sie ihn im Fotoladen oder zu Hause auf 4×6-Fotopapier ohne Rand. Um jedes Foto auf dem Bogen verläuft eine feine Schnittlinie.",
+  "pt": "A folha de impressão é um arquivo de imagem que preenche uma página de 4×6 polegadas (101,6×152,4 mm) com várias fotos no tamanho escolhido. Imprima em uma loja de fotos ou em casa, em papel fotográfico 4×6 sem bordas. Cada foto da folha tem uma linha guia de corte discreta ao redor.",
+  "it": "Il foglio di stampa è un file immagine che riempie un foglio da 4×6 pollici (101,6×152,4 mm) con più foto nel formato scelto. Stampalo in un negozio di fotografia o a casa su carta fotografica 4×6 senza bordi. Ogni foto sul foglio ha intorno una leggera linea guida di taglio.",
+  "nl": "Het afdrukvel is een afbeeldingsbestand dat een vel van 4×6 inch (101,6×152,4 mm) vult met meerdere foto's in het gekozen formaat. Print het bij een fotowinkel of thuis op 4×6-fotopapier zonder randen. Om elke foto op het vel staat een lichte snijlijn.",
+  "ru": "Лист печати — это файл изображения, который заполняет страницу 4×6 дюймов (101,6×152,4 мм) несколькими фотографиями нужного размера. Распечатайте его в фотоателье или дома на фотобумаге 4×6 без полей. Вокруг каждой фотографии на листе проходит бледная линия-подсказка для разрезания.",
+  "uk": "Аркуш друку — це файл зображення, який заповнює сторінку 4×6 дюймів (101,6×152,4 мм) кількома фотографіями потрібного розміру. Роздрукуйте його у фотоательє або вдома на фотопапері 4×6 без полів. Навколо кожної фотографії на аркуші проходить бліда лінія-підказка для розрізання.",
+  "pl": "Arkusz do druku to plik graficzny, który wypełnia stronę 4×6 cali (101,6×152,4 mm) kilkoma zdjęciami w wybranym formacie. Wydrukuj go w zakładzie fotograficznym albo w domu na papierze fotograficznym 4×6 bez marginesów. Wokół każdego zdjęcia na arkuszu znajduje się delikatna linia pomocnicza do cięcia.",
+  "cs": "Tiskový arch je soubor obrázku, který zaplní stránku 4×6 palců (101,6×152,4 mm) několika fotografiemi v požadovaném rozměru. Vytiskněte ho ve fotolabu nebo doma na fotopapír 4×6 bez okrajů. Kolem každé fotografie na archu je slabá vodicí čára pro stříhání.",
+  "hu": "A nyomtatási ív egy képfájl, amely egy 4×6 hüvelykes (101,6×152,4 mm) lapot tölt meg több, méretre igazított fotóval. Kinyomtathatja fotószaküzletben, vagy otthon 4×6-os fotópapírra szegély nélkül. Az íven minden fotó körül halvány vágási segédvonal található.",
+  "ro": "Foaia de imprimare este un fișier imagine care umple o pagină de 4×6 inci (101,6×152,4 mm) cu mai multe fotografii la dimensiunea aleasă. Imprimați-o la un laborator foto sau acasă, pe hârtie foto 4×6, fără margini. În jurul fiecărei fotografii de pe foaie există o linie de ghidaj discretă pentru tăiere.",
+  "da": "Udskriftsarket er en billedfil, der fylder et papir på 4×6 tommer (101,6×152,4 mm) med flere fotos i den valgte størrelse. Udskriv den i en fotobutik eller derhjemme på 4×6-fotopapir uden kanter. Hvert foto på arket har en svag skærelinje omkring sig.",
+  "fi": "Tulostusarkki on kuvatiedosto, joka täyttää 4×6 tuuman (101,6×152,4 mm) paperin useilla valitun kokoisilla kuvilla. Tulosta se kuvakaupassa tai kotona 4×6-valokuvapaperille ilman reunoja. Jokaisen arkin kuvan ympärillä on himmeä leikkausohjausviiva.",
+  "nb": "Utskriftsarket er en bildefil som fyller et papir på 4×6 tommer (101,6×152,4 mm) med flere bilder i valgt format. Skriv det ut i en fotobutikk, eller hjemme på 4×6-fotopapir uten kanter. Hvert bilde på arket har en svak skjærelinje rundt seg.",
+  "sv": "Utskriftsarket är en bildfil som fyller ett papper på 4×6 tum (101,6×152,4 mm) med flera foton i valt format. Skriv ut den hos en fotobutik, eller hemma på 4×6-fotopapper utan kanter. Varje foto på arket har en svag skärlinje runt sig.",
+  "tr": "Baskı sayfası, 4×6 inç (101,6×152,4 mm) kağıdı seçilen boyutta birden çok fotoğrafla dolduran bir resim dosyasıdır. Bir fotoğrafçıda bu dosyayla bastırabilir veya evde 4×6 fotoğraf kağıdına kenarlıksız yazdırabilirsiniz. Sayfadaki her fotoğrafın çevresinde soluk bir kesme kılavuz çizgisi bulunur.",
+  "zh-TW": "列印版是一個圖像檔案，在 4×6 英寸（101.6×152.4mm）紙上排滿多張規格照片。可在相館用此檔案列印，或在家用 4×6 相紙無邊距列印。每張照片周圍有淡淡的裁切參考線。",
+  "th": "แผ่นพิมพ์เป็นไฟล์รูปภาพที่จัดรูปขนาดตามเกณฑ์หลายใบเต็มหน้ากระดาษ 4×6 นิ้ว (101.6×152.4 มม.) พิมพ์ไฟล์นี้ที่ร้านถ่ายรูป หรือพิมพ์ที่บ้านบนกระดาษภาพ 4×6 แบบไร้ขอบ แต่ละรูปบนแผ่นจะมีเส้นนำตัดจาง ๆ รอบรูป",
+  "vi": "Tờ in là một tệp hình ảnh lấp đầy trang 4×6 inch (101,6×152,4 mm) bằng nhiều ảnh đúng kích thước. In tệp này tại tiệm ảnh, hoặc in tại nhà trên giấy ảnh 4×6 không viền. Mỗi ảnh trên tờ có đường hướng dẫn cắt mờ xung quanh.",
+  "id": "Lembar cetak adalah berkas gambar yang mengisi halaman 4×6 inci (101,6×152,4 mm) dengan beberapa foto berukuran pas. Cetak di studio foto, atau di rumah pada kertas foto 4×6 tanpa tepi. Setiap foto pada lembar memiliki garis panduan potong tipis di sekelilingnya.",
+  "ar": "ورقة الطباعة هي ملف صورة يملأ ورقًا بمقاس 4×6 بوصة (101.6×152.4mm) بعدة صور بالمقاس المختار. يمكنك طباعتها في محل طباعة، أو في المنزل على ورق صور 4×6 بدون هوامش. حول كل صورة في الورقة خط إرشادي خفيف للقص.",
+  "fa": "برگه چاپ یک فایل تصویر است که یک برگ 4×6 اینچی (101.6×152.4mm) را با چند عکس هم‌اندازه پر می‌کند. آن را در چاپخانه چاپ کنید یا در خانه روی کاغذ عکس 4×6 بدون حاشیه چاپ کنید. دور هر عکس در برگه یک خط راهنمای کم‌رنگ برای برش وجود دارد."
+ },
+ "사진 파일(JPG · PNG 등)을 넣어 주세요.": {
+  "en": "Please add a photo file (JPG, PNG, etc.).",
+  "zh": "请放入照片文件（JPG、PNG 等）。",
+  "ja": "写真ファイル（JPG・PNGなど）を入れてください。",
+  "es": "Añade un archivo de foto (JPG, PNG, etc.).",
+  "hi": "कृपया फ़ोटो फ़ाइल (JPG, PNG आदि) डालें।",
+  "fr": "Veuillez ajouter un fichier photo (JPG, PNG, etc.).",
+  "de": "Bitte fügen Sie eine Fotodatei (JPG, PNG usw.) hinzu.",
+  "pt": "Adicione um arquivo de foto (JPG, PNG etc.).",
+  "it": "Inserisci un file foto (JPG, PNG, ecc.).",
+  "nl": "Voeg een fotobestand toe (JPG, PNG enz.).",
+  "ru": "Добавьте файл фотографии (JPG, PNG и т. п.).",
+  "uk": "Додайте файл фотографії (JPG, PNG тощо).",
+  "pl": "Dodaj plik zdjęcia (JPG, PNG itp.).",
+  "cs": "Vložte soubor fotografie (JPG, PNG apod.).",
+  "hu": "Adjon hozzá egy fotófájlt (JPG, PNG stb.).",
+  "ro": "Adăugați un fișier foto (JPG, PNG etc.).",
+  "da": "Tilføj en fotofil (JPG, PNG osv.).",
+  "fi": "Lisää kuvatiedosto (JPG, PNG jne.).",
+  "nb": "Legg til en bildefil (JPG, PNG osv.).",
+  "sv": "Lägg till en fotofil (JPG, PNG osv.).",
+  "tr": "Lütfen bir fotoğraf dosyası (JPG, PNG vb.) ekleyin.",
+  "zh-TW": "請放入照片檔案（JPG · PNG 等）。",
+  "th": "โปรดใส่ไฟล์รูป (JPG · PNG ฯลฯ)",
+  "vi": "Hãy thêm tệp ảnh (JPG · PNG, v.v.).",
+  "id": "Harap masukkan berkas foto (JPG · PNG, dll.).",
+  "ar": "يرجى إضافة ملف صورة (JPG وPNG وغيرها).",
+  "fa": "لطفاً یک فایل عکس (JPG، PNG و غیره) اضافه کنید."
+ },
+ "사진을 읽지 못했습니다. 다른 사진으로 시도해 주세요.": {
+  "en": "Could not read the photo. Please try another one.",
+  "zh": "无法读取照片。请换一张试试。",
+  "ja": "写真を読み取れませんでした。別の写真でお試しください。",
+  "es": "No se pudo leer la foto. Prueba con otra.",
+  "hi": "फ़ोटो पढ़ी नहीं जा सकी। कृपया दूसरी आज़माएँ।",
+  "fr": "Impossible de lire la photo. Essayez-en une autre.",
+  "de": "Das Foto konnte nicht gelesen werden. Bitte versuchen Sie ein anderes.",
+  "pt": "Não foi possível ler a foto. Tente outra.",
+  "it": "Impossibile leggere la foto. Provane un'altra.",
+  "nl": "De foto kon niet worden gelezen. Probeer een andere.",
+  "ru": "Не удалось прочитать фото. Попробуйте другое.",
+  "uk": "Не вдалося прочитати фото. Спробуйте інше.",
+  "pl": "Nie udało się wczytać zdjęcia. Spróbuj innego.",
+  "cs": "Fotografii se nepodařilo načíst. Zkuste jinou.",
+  "hu": "A fotót nem sikerült beolvasni. Próbáljon meg egy másikat.",
+  "ro": "Fotografia nu a putut fi citită. Încercați alta.",
+  "da": "Fotoet kunne ikke læses. Prøv med et andet.",
+  "fi": "Kuvaa ei voitu lukea. Kokeile toista kuvaa.",
+  "nb": "Kunne ikke lese bildet. Prøv et annet.",
+  "sv": "Kunde inte läsa fotot. Försök med ett annat.",
+  "tr": "Fotoğraf okunamadı. Lütfen başka bir fotoğrafla deneyin.",
+  "zh-TW": "無法讀取照片。請換一張試試。",
+  "th": "อ่านรูปไม่ได้ โปรดลองรูปอื่น",
+  "vi": "Không đọc được ảnh. Hãy thử ảnh khác.",
+  "id": "Foto tidak dapat dibaca. Coba foto lain.",
+  "ar": "تعذر قراءة الصورة. يرجى تجربة صورة أخرى.",
+  "fa": "عکس خوانده نشد. لطفاً عکس دیگری را امتحان کنید."
+ },
+ "사진이 열렸습니다. 얼굴을 맞춘 뒤 저장하세요.": {
+  "en": "Photo opened. Fit the face, then save.",
+  "zh": "照片已打开。对准脸部后保存。",
+  "ja": "写真が開きました。顔を合わせてから保存してください。",
+  "es": "Foto abierta. Ajusta el rostro y guarda.",
+  "hi": "फ़ोटो खुल गई। चेहरा ढालकर सहेजें।",
+  "fr": "Photo ouverte. Ajustez le visage, puis enregistrez.",
+  "de": "Foto geöffnet. Passen Sie das Gesicht an und speichern Sie dann.",
+  "pt": "Foto aberta. Ajuste o rosto e salve.",
+  "it": "Foto aperta. Adatta il viso e salva.",
+  "nl": "Foto geopend. Pas het gezicht aan en sla op.",
+  "ru": "Фото открыто. Подгоните лицо и сохраните.",
+  "uk": "Фото відкрито. Підігніть обличчя і збережіть.",
+  "pl": "Zdjęcie otwarte. Dopasuj twarz i zapisz.",
+  "cs": "Fotografie je otevřená. Přizpůsobte obličej a uložte.",
+  "hu": "A fotó megnyílt. Igazítsa az arcot, majd mentse.",
+  "ro": "Fotografia s-a deschis. Ajustați fața, apoi salvați.",
+  "da": "Fotoet er åbnet. Tilpas ansigtet, og gem derefter.",
+  "fi": "Kuva avattu. Sovita kasvot ja tallenna sitten.",
+  "nb": "Bildet er åpnet. Tilpass ansiktet og lagre deretter.",
+  "sv": "Fotot har öppnats. Anpassa ansiktet och spara sedan.",
+  "tr": "Fotoğraf açıldı. Yüzü uyarladıktan sonra kaydedin.",
+  "zh-TW": "照片已開啟。對準臉部後儲存。",
+  "th": "เปิดรูปแล้ว ปรับใบหน้าให้เข้าที่แล้วบันทึก",
+  "vi": "Đã mở ảnh. Chỉnh khuôn mặt rồi lưu.",
+  "id": "Foto dibuka. Sesuaikan wajah, lalu simpan.",
+  "ar": "تم فتح الصورة. اضبط الوجه ثم احفظ.",
+  "fa": "عکس باز شد. چهره را تنظیم کنید و سپس ذخیره کنید."
+ },
+ "저장에 실패했습니다.": {
+  "en": "Saving failed.",
+  "zh": "保存失败。",
+  "ja": "保存に失敗しました。",
+  "es": "El guardado falló.",
+  "hi": "सहेजना विफल।",
+  "fr": "L'enregistrement a échoué.",
+  "de": "Speichern fehlgeschlagen.",
+  "pt": "Falha ao salvar.",
+  "it": "Salvataggio non riuscito.",
+  "nl": "Opslaan mislukt.",
+  "ru": "Не удалось сохранить.",
+  "uk": "Не вдалося зберегти.",
+  "pl": "Zapisywanie nie powiodło się.",
+  "cs": "Uložení se nezdařilo.",
+  "hu": "A mentés sikertelen.",
+  "ro": "Salvarea a eșuat.",
+  "da": "Gemningen mislykkedes.",
+  "fi": "Tallennus epäonnistui.",
+  "nb": "Lagringen mislyktes.",
+  "sv": "Det gick inte att spara.",
+  "tr": "Kaydetme başarısız oldu.",
+  "zh-TW": "儲存失敗。",
+  "th": "บันทึกไม่สำเร็จ",
+  "vi": "Lưu thất bại.",
+  "id": "Gagal menyimpan.",
+  "ar": "فشل الحفظ.",
+  "fa": "ذخیره‌سازی ناموفق بود."
+ },
+ "🗣️ 글로 시키기": {
+  "en": "🗣️ Ask by typing",
+  "zh": "🗣️ 用文字吩咐",
+  "ja": "🗣️ 言葉で頼む",
+  "es": "🗣️ Pedir con palabras",
+  "hi": "🗣️ लिखकर कहें",
+  "fr": "🗣️ Demander en tapant",
+  "de": "🗣️ Mit Worten steuern",
+  "pt": "🗣️ Pedir digitando",
+  "it": "🗣️ Comanda a parole",
+  "nl": "🗣️ Sturen met woorden",
+  "ru": "🗣️ Скомандовать текстом",
+  "uk": "🗣️ Скомандувати текстом",
+  "pl": "🗣️ Poleć tekstem",
+  "cs": "🗣️ Zadání textem",
+  "hu": "🗣️ Utasítás szöveggel",
+  "ro": "🗣️ Comandă prin text",
+  "da": "🗣️ Bed med ord",
+  "fi": "🗣️ Pyydä sanoilla",
+  "nb": "🗣️ Be med ord",
+  "sv": "🗣️ Be med ord",
+  "tr": "🗣️ Yazarak iste",
+  "zh-TW": "🗣️ 用文字吩咐",
+  "th": "🗣️ สั่งด้วยข้อความ",
+  "vi": "🗣️ Ra lệnh bằng chữ",
+  "id": "🗣️ Perintah lewat teks",
+  "ar": "🗣️ اطلب بالكتابة",
+  "fa": "🗣️ با نوشتن درخواست کنید"
+ },
+ "(안내 도우미 — 이 페이지 기능만 도와줍니다)": {
+  "en": "(Guide helper — helps only with this page)",
+  "zh": "（导览助手 — 仅帮助使用本页功能）",
+  "ja": "（案内ヘルパー — このページの機能だけを手伝います）",
+  "es": "(Ayudante guía — solo ayuda con esta página)",
+  "hi": "(गाइड सहायक — केवल इस पेज के कार्यों में मदद)",
+  "fr": "(Assistant guide — aide uniquement pour les fonctions de cette page)",
+  "de": "(Anleitungshelfer — hilft nur bei den Funktionen dieser Seite)",
+  "pt": "(Assistente guia — ajuda apenas com as funções desta página)",
+  "it": "(Assistente guida — aiuta solo con le funzioni di questa pagina)",
+  "nl": "(Gidshelper — helpt alleen met de functies van deze pagina)",
+  "ru": "(Помощник-гид — помогает только с функциями этой страницы)",
+  "uk": "(Помічник-гід — допомагає лише з функціями цієї сторінки)",
+  "pl": "(Pomocnik-przewodnik — pomaga tylko w funkcjach tej strony)",
+  "cs": "(Průvodce-pomocník — pomáhá pouze s funkcemi této stránky)",
+  "hu": "(Útmutató segítő — csak ennek az oldalnak a funkcióiban segít)",
+  "ro": "(Asistent ghid — ajută doar cu funcțiile acestei pagini)",
+  "da": "(Guidehjælper — hjælper kun med denne sides funktioner)",
+  "fi": "(Opasapu — auttaa vain tämän sivun toiminnoissa)",
+  "nb": "(Guidehjelper — hjelper bare med funksjonene på denne siden)",
+  "sv": "(Guidehjälp — hjälper bara till med den här sidans funktioner)",
+  "tr": "(Kılavuz yardımcısı — yalnızca bu sayfanın işlevlerinde yardım eder)",
+  "zh-TW": "（導覽助手 — 僅協助使用本頁功能）",
+  "th": "(ผู้ช่วยแนะนำ — ช่วยเฉพาะฟังก์ชันของหน้านี้)",
+  "vi": "(Trợ lý hướng dẫn — chỉ hỗ trợ các chức năng của trang này)",
+  "id": "(Pembantu panduan — hanya membantu fungsi halaman ini)",
+  "ar": "(مساعد إرشادي — يساعد فقط في وظائف هذه الصفحة)",
+  "fa": "(دستیار راهنما — فقط در کارهای این صفحه کمک می‌کند)"
+ },
+ "예: 확대해": {
+  "en": "e.g. zoom in",
+  "zh": "例：放大",
+  "ja": "例：拡大して",
+  "es": "Ej.: amplía",
+  "hi": "उदा.: बड़ा करो",
+  "fr": "ex. : agrandis",
+  "de": "z. B. vergrößern",
+  "pt": "ex.: amplia",
+  "it": "es.: ingrandisci",
+  "nl": "bijv.: inzoomen",
+  "ru": "Напр.: увеличь",
+  "uk": "Напр.: збільш",
+  "pl": "Np.: powiększ",
+  "cs": "Např.: přibliž",
+  "hu": "Pl.: nagyíts",
+  "ro": "Ex.: mărește",
+  "da": "f.eks. zoom ind",
+  "fi": "esim. lähennä",
+  "nb": "f.eks. zoom inn",
+  "sv": "t.ex. zooma in",
+  "tr": "örn. yakınlaştır",
+  "zh-TW": "例：放大",
+  "th": "เช่น: ซูมเข้า",
+  "vi": "Ví dụ: phóng to",
+  "id": "mis. perbesar",
+  "ar": "مثال: كبّر",
+  "fa": "مثال: بزرگ کن"
+ },
+ "시키기": {
+  "en": "Do it",
+  "zh": "执行",
+  "ja": "実行",
+  "es": "Hazlo",
+  "hi": "करें",
+  "fr": "Exécuter",
+  "de": "Ausführen",
+  "pt": "Executar",
+  "it": "Esegui",
+  "nl": "Uitvoeren",
+  "ru": "Выполнить",
+  "uk": "Виконати",
+  "pl": "Wykonaj",
+  "cs": "Provést",
+  "hu": "Végrehajtás",
+  "ro": "Execută",
+  "da": "Gør det",
+  "fi": "Tee se",
+  "nb": "Gjør det",
+  "sv": "Gör det",
+  "tr": "Yap",
+  "zh-TW": "執行",
+  "th": "ทำเลย",
+  "vi": "Thực hiện",
+  "id": "Lakukan",
+  "ar": "تنفيذ",
+  "fa": "انجام بده"
+ },
+ "확대해": {
+  "en": "Zoom in",
+  "zh": "放大",
+  "ja": "拡大して",
+  "es": "Amplía",
+  "hi": "बड़ा करो",
+  "fr": "Agrandis",
+  "de": "Vergrößern",
+  "pt": "Amplia",
+  "it": "Ingrandisci",
+  "nl": "Inzoomen",
+  "ru": "Увеличь",
+  "uk": "Збільш",
+  "pl": "Powiększ",
+  "cs": "Přibliž",
+  "hu": "Nagyíts",
+  "ro": "Mărește",
+  "da": "Zoom ind",
+  "fi": "Lähennä",
+  "nb": "Zoom inn",
+  "sv": "Zooma in",
+  "tr": "Yakınlaştır",
+  "zh-TW": "放大",
+  "th": "ซูมเข้า",
+  "vi": "Phóng to",
+  "id": "Perbesar",
+  "ar": "كبّر",
+  "fa": "بزرگ کن"
+ },
+ "축소해": {
+  "en": "Zoom out",
+  "zh": "缩小",
+  "ja": "縮小して",
+  "es": "Reduce",
+  "hi": "छोटा करो",
+  "fr": "Réduis",
+  "de": "Verkleinern",
+  "pt": "Reduz",
+  "it": "Rimpicciolisci",
+  "nl": "Uitzoomen",
+  "ru": "Уменьши",
+  "uk": "Зменш",
+  "pl": "Pomniejsz",
+  "cs": "Oddal",
+  "hu": "Kicsinyíts",
+  "ro": "Micșorează",
+  "da": "Zoom ud",
+  "fi": "Loitonna",
+  "nb": "Zoom ut",
+  "sv": "Zooma ut",
+  "tr": "Uzaklaştır",
+  "zh-TW": "縮小",
+  "th": "ซูมออก",
+  "vi": "Thu nhỏ",
+  "id": "Perkecil",
+  "ar": "صغّر",
+  "fa": "کوچک کن"
+ },
+ "저장해": {
+  "en": "Save it",
+  "zh": "保存",
+  "ja": "保存して",
+  "es": "Guárdalo",
+  "hi": "सहेजो",
+  "fr": "Enregistre",
+  "de": "Speichern",
+  "pt": "Salva",
+  "it": "Salva",
+  "nl": "Opslaan",
+  "ru": "Сохрани",
+  "uk": "Збережи",
+  "pl": "Zapisz",
+  "cs": "Ulož",
+  "hu": "Mentsd",
+  "ro": "Salvează",
+  "da": "Gem det",
+  "fi": "Tallenna se",
+  "nb": "Lagre det",
+  "sv": "Spara det",
+  "tr": "Kaydet",
+  "zh-TW": "儲存",
+  "th": "บันทึก",
+  "vi": "Lưu lại",
+  "id": "Simpan",
+  "ar": "احفظ",
+  "fa": "ذخیره کن"
+ },
+ "시트 저장": {
+  "en": "Save sheet",
+  "zh": "保存版面",
+  "ja": "シート保存",
+  "es": "Guardar hoja",
+  "hi": "शीट सहेजें",
+  "fr": "Enregistrer la planche",
+  "de": "Bogen speichern",
+  "pt": "Salvar folha",
+  "it": "Salva il foglio",
+  "nl": "Vel opslaan",
+  "ru": "Сохранить лист",
+  "uk": "Зберегти аркуш",
+  "pl": "Zapisz arkusz",
+  "cs": "Uložit arch",
+  "hu": "Ív mentése",
+  "ro": "Salvează foaia",
+  "da": "Gem ark",
+  "fi": "Tallenna arkki",
+  "nb": "Lagre ark",
+  "sv": "Spara ark",
+  "tr": "Sayfayı kaydet",
+  "zh-TW": "儲存版面",
+  "th": "บันทึกแผ่นพิมพ์",
+  "vi": "Lưu tờ in",
+  "id": "Simpan lembar",
+  "ar": "حفظ الورقة",
+  "fa": "ذخیره برگه"
+ },
+ "인화 시트를 저장했습니다.": {
+  "en": "Print sheet saved.",
+  "zh": "打印版已保存。",
+  "ja": "印刷シートを保存しました。",
+  "es": "Hoja de impresión guardada.",
+  "hi": "प्रिंट शीट सहेजी गई।",
+  "fr": "Planche d'impression enregistrée.",
+  "de": "Druckbogen gespeichert.",
+  "pt": "Folha de impressão salva.",
+  "it": "Foglio di stampa salvato.",
+  "nl": "Afdrukvel opgeslagen.",
+  "ru": "Лист печати сохранён.",
+  "uk": "Аркуш друку збережено.",
+  "pl": "Arkusz do druku zapisany.",
+  "cs": "Tiskový arch byl uložen.",
+  "hu": "A nyomtatási ív mentve.",
+  "ro": "Foaia de imprimare a fost salvată.",
+  "da": "Udskriftsarket er gemt.",
+  "fi": "Tulostusarkki tallennettu.",
+  "nb": "Utskriftsarket er lagret.",
+  "sv": "Utskriftsarket har sparats.",
+  "tr": "Baskı sayfası kaydedildi.",
+  "zh-TW": "列印版已儲存。",
+  "th": "บันทึกแผ่นพิมพ์แล้ว",
+  "vi": "Đã lưu tờ in.",
+  "id": "Lembar cetak disimpan.",
+  "ar": "تم حفظ ورقة الطباعة.",
+  "fa": "برگه چاپ ذخیره شد."
+ },
+ "먼저 사진을 여세요.": {
+  "en": "Open a photo first.",
+  "zh": "请先打开照片。",
+  "ja": "まず写真を開いてください。",
+  "es": "Primero abre una foto.",
+  "hi": "पहले फ़ोटो खोलें।",
+  "fr": "Ouvrez d'abord une photo.",
+  "de": "Öffnen Sie zuerst ein Foto.",
+  "pt": "Abra uma foto primeiro.",
+  "it": "Apri prima una foto.",
+  "nl": "Open eerst een foto.",
+  "ru": "Сначала откройте фото.",
+  "uk": "Спочатку відкрийте фото.",
+  "pl": "Najpierw otwórz zdjęcie.",
+  "cs": "Nejprve otevřete fotografii.",
+  "hu": "Előbb nyisson meg egy fotót.",
+  "ro": "Mai întâi deschideți o fotografie.",
+  "da": "Åbn et foto først.",
+  "fi": "Avaa ensin kuva.",
+  "nb": "Åpne et bilde først.",
+  "sv": "Öppna ett foto först.",
+  "tr": "Önce bir fotoğraf açın.",
+  "zh-TW": "請先開啟照片。",
+  "th": "โปรดเปิดรูปก่อน",
+  "vi": "Hãy mở ảnh trước.",
+  "id": "Buka foto dulu.",
+  "ar": "افتح صورة أولًا.",
+  "fa": "ابتدا یک عکس باز کنید."
+ },
+ "사진을 확대했습니다.": {
+  "en": "Zoomed in.",
+  "zh": "已放大照片。",
+  "ja": "写真を拡大しました。",
+  "es": "Foto ampliada.",
+  "hi": "फ़ोटो बड़ी की गई।",
+  "fr": "Photo agrandie.",
+  "de": "Foto vergrößert.",
+  "pt": "Foto ampliada.",
+  "it": "Foto ingrandita.",
+  "nl": "Foto vergroot.",
+  "ru": "Фото увеличено.",
+  "uk": "Фото збільшено.",
+  "pl": "Zdjęcie powiększone.",
+  "cs": "Fotografie byla přiblížena.",
+  "hu": "A fotó nagyítva.",
+  "ro": "Fotografia a fost mărită.",
+  "da": "Fotoet er zoomet ind.",
+  "fi": "Kuvaa lähennetty.",
+  "nb": "Bildet er zoomet inn.",
+  "sv": "Fotot har zoomats in.",
+  "tr": "Fotoğraf yakınlaştırıldı.",
+  "zh-TW": "已放大照片。",
+  "th": "ซูมรูปเข้าแล้ว",
+  "vi": "Đã phóng to ảnh.",
+  "id": "Foto diperbesar.",
+  "ar": "تم تكبير الصورة.",
+  "fa": "عکس بزرگ شد."
+ },
+ "사진을 축소했습니다.": {
+  "en": "Zoomed out.",
+  "zh": "已缩小照片。",
+  "ja": "写真を縮小しました。",
+  "es": "Foto reducida.",
+  "hi": "फ़ोटो छोटी की गई।",
+  "fr": "Photo réduite.",
+  "de": "Foto verkleinert.",
+  "pt": "Foto reduzida.",
+  "it": "Foto rimpicciolita.",
+  "nl": "Foto verkleind.",
+  "ru": "Фото уменьшено.",
+  "uk": "Фото зменшено.",
+  "pl": "Zdjęcie pomniejszone.",
+  "cs": "Fotografie byla oddálena.",
+  "hu": "A fotó kicsinyítve.",
+  "ro": "Fotografia a fost micșorată.",
+  "da": "Fotoet er zoomet ud.",
+  "fi": "Kuvaa loitonnettu.",
+  "nb": "Bildet er zoomet ut.",
+  "sv": "Fotot har zoomats ut.",
+  "tr": "Fotoğraf uzaklaştırıldı.",
+  "zh-TW": "已縮小照片。",
+  "th": "ซูมรูปออกแล้ว",
+  "vi": "Đã thu nhỏ ảnh.",
+  "id": "Foto diperkecil.",
+  "ar": "تم تصغير الصورة.",
+  "fa": "عکس کوچک شد."
+ },
+ "사진 한 장을 저장했습니다.": {
+  "en": "One photo saved.",
+  "zh": "已保存一张照片。",
+  "ja": "写真を1枚保存しました。",
+  "es": "Una foto guardada.",
+  "hi": "एक फ़ोटो सहेजी गई।",
+  "fr": "Une photo enregistrée.",
+  "de": "Ein Foto gespeichert.",
+  "pt": "Uma foto salva.",
+  "it": "Una foto salvata.",
+  "nl": "Eén foto opgeslagen.",
+  "ru": "Одно фото сохранено.",
+  "uk": "Одне фото збережено.",
+  "pl": "Zapisano jedno zdjęcie.",
+  "cs": "Jedna fotografie byla uložena.",
+  "hu": "Egy fotó mentve.",
+  "ro": "O fotografie a fost salvată.",
+  "da": "Ét foto er gemt.",
+  "fi": "Yksi kuva tallennettu.",
+  "nb": "Ett bilde er lagret.",
+  "sv": "Ett foto har sparats.",
+  "tr": "Bir fotoğraf kaydedildi.",
+  "zh-TW": "已儲存一張照片。",
+  "th": "บันทึกรูปหนึ่งใบแล้ว",
+  "vi": "Đã lưu một ảnh.",
+  "id": "Satu foto disimpan.",
+  "ar": "تم حفظ صورة واحدة.",
+  "fa": "یک عکس ذخیره شد."
+ },
+ "여권 사진 규격을 골랐습니다.": {
+  "en": "Passport photo size selected.",
+  "zh": "已选择护照照片规格。",
+  "ja": "パスポート写真の規格を選びました。",
+  "es": "Tamaño de foto de pasaporte elegido.",
+  "hi": "पासपोर्ट फ़ोटो आकार चुना गया।",
+  "fr": "Format passeport sélectionné.",
+  "de": "Passfotoformat ausgewählt.",
+  "pt": "Tamanho de passaporte selecionado.",
+  "it": "Formato passaporto selezionato.",
+  "nl": "Paspoortformaat geselecteerd.",
+  "ru": "Выбран размер фото на паспорт.",
+  "uk": "Вибрано розмір фото на паспорт.",
+  "pl": "Wybrano format zdjęcia paszportowego.",
+  "cs": "Byl vybrán rozměr pasové fotografie.",
+  "hu": "Útlevélkép-méret kiválasztva.",
+  "ro": "Dimensiunea fotografiei de pașaport a fost selectată.",
+  "da": "Pasfotostørrelse valgt.",
+  "fi": "Passikuvakoko valittu.",
+  "nb": "Passbildeformat valgt.",
+  "sv": "Passfotoformat valt.",
+  "tr": "Pasaport fotoğrafı boyutu seçildi.",
+  "zh-TW": "已選擇護照照片規格。",
+  "th": "เลือกขนาดรูปหนังสือเดินทางแล้ว",
+  "vi": "Đã chọn kích thước ảnh hộ chiếu.",
+  "id": "Ukuran foto paspor dipilih.",
+  "ar": "تم اختيار مقاس صورة جواز السفر.",
+  "fa": "اندازه عکس گذرنامه انتخاب شد."
+ },
+ "반명함 사진 규격을 골랐습니다.": {
+  "en": "ID photo (3×4) size selected.",
+  "zh": "已选择证件照（3×4）规格。",
+  "ja": "証明写真（3×4cm）の規格を選びました。",
+  "es": "Tamaño de foto de identificación (3×4 cm) elegido.",
+  "hi": "आईडी फ़ोटो (3×4 सेमी) आकार चुना गया।",
+  "fr": "Format photo d'identité (3×4 cm) sélectionné.",
+  "de": "Passfotoformat (3×4 cm) ausgewählt.",
+  "pt": "Tamanho de foto de identificação (3×4 cm) selecionado.",
+  "it": "Formato fototessera (3×4 cm) selezionato.",
+  "nl": "Pasfotoformaat (3×4 cm) geselecteerd.",
+  "ru": "Выбран размер фото на документы (3×4).",
+  "uk": "Вибрано розмір фото на документи (3×4).",
+  "pl": "Wybrano format zdjęcia do dokumentów (3×4).",
+  "cs": "Byl vybrán rozměr průkazové fotografie (3×4).",
+  "hu": "Igazolványkép-méret (3×4) kiválasztva.",
+  "ro": "Dimensiunea fotografiei pentru acte (3×4) a fost selectată.",
+  "da": "ID-fotostørrelse (3×4) valgt.",
+  "fi": "Henkilökuvakoko (3×4) valittu.",
+  "nb": "ID-fotoformat (3×4) valgt.",
+  "sv": "ID-fotoformat (3×4) valt.",
+  "tr": "Kimlik fotoğrafı boyutu (3×4) seçildi.",
+  "zh-TW": "已選擇證件照（3×4）規格。",
+  "th": "เลือกขนาดรูปติดบัตร (3×4 ซม.) แล้ว",
+  "vi": "Đã chọn kích thước ảnh thẻ (3×4).",
+  "id": "Ukuran foto ID (3×4 cm) dipilih.",
+  "ar": "تم اختيار مقاس صورة الهوية (3×4).",
+  "fa": "اندازه عکس شناسایی (3×4) انتخاب شد."
+ },
+ "미국 비자 사진 규격을 골랐습니다.": {
+  "en": "US visa photo size selected.",
+  "zh": "已选择美国签证照片规格。",
+  "ja": "米国ビザ写真の規格を選びました。",
+  "es": "Tamaño de foto de visa de EE. UU. elegido.",
+  "hi": "अमेरिकी वीज़ा फ़ोटो आकार चुना गया।",
+  "fr": "Format visa américain sélectionné.",
+  "de": "Format für US-Visum ausgewählt.",
+  "pt": "Tamanho de visto dos EUA selecionado.",
+  "it": "Formato visto USA selezionato.",
+  "nl": "Formaat voor Amerikaans visum geselecteerd.",
+  "ru": "Выбран размер фото на визу США.",
+  "uk": "Вибрано розмір фото на візу США.",
+  "pl": "Wybrano format zdjęcia do wizy USA.",
+  "cs": "Byl vybrán rozměr fotografie na vízum do USA.",
+  "hu": "Amerikai vízumkép-méret kiválasztva.",
+  "ro": "Dimensiunea fotografiei pentru viza SUA a fost selectată.",
+  "da": "Størrelse til amerikansk visumfoto valgt.",
+  "fi": "Yhdysvaltain viisumikuvakoko valittu.",
+  "nb": "Format for amerikansk visumbilde valgt.",
+  "sv": "Format för amerikanskt visumfoto valt.",
+  "tr": "ABD vize fotoğrafı boyutu seçildi.",
+  "zh-TW": "已選擇美國簽證照片規格。",
+  "th": "เลือกขนาดรูปวีซ่าสหรัฐฯ แล้ว",
+  "vi": "Đã chọn kích thước ảnh visa Mỹ.",
+  "id": "Ukuran foto visa AS dipilih.",
+  "ar": "تم اختيار مقاس صورة تأشيرة الولايات المتحدة.",
+  "fa": "اندازه عکس ویزای آمریکا انتخاب شد."
+ },
+ "이해할 수 있는 말이 정해져 있습니다. 예: 확대해, 축소해, 저장해, 시트 저장, 여권, 반명함, 비자.": {
+  "en": "Only certain words are understood. e.g. zoom in, zoom out, save it, save sheet, passport, ID photo, visa.",
+  "zh": "能理解的词是固定的。例如：放大、缩小、保存、保存版面、护照、证件照、签证。",
+  "ja": "理解できる言葉は決まっています。例：拡大して、縮小して、保存して、シート保存、パスポート、証明写真、ビザ。",
+  "es": "Solo se entienden ciertas palabras. Ej.: amplía, reduce, guárdalo, guardar hoja, pasaporte, identificación, visa.",
+  "hi": "केवल कुछ निश्चित शब्द समझे जाते हैं। उदा.: बड़ा करो, छोटा करो, सहेजो, शीट सहेजें, पासपोर्ट, आईडी फ़ोटो, वीज़ा।",
+  "fr": "Seuls certains mots sont compris. Ex. : agrandir, réduire, enregistrer, enregistrer la planche, passeport, photo d'identité, visa.",
+  "de": "Nur bestimmte Wörter werden verstanden, z. B. vergrößern, verkleinern, speichern, Bogen speichern, Pass, Ausweisfoto, Visum.",
+  "pt": "Apenas algumas palavras são compreendidas. Ex.: ampliar, reduzir, salvar, salvar folha, passaporte, foto de identificação, visto.",
+  "it": "Vengono comprese solo alcune parole. Es.: ingrandisci, rimpicciolisci, salva, salva il foglio, passaporto, fototessera, visto.",
+  "nl": "Alleen bepaalde woorden worden begrepen. Bijv.: inzoomen, uitzoomen, opslaan, vel opslaan, paspoort, pasfoto, visum.",
+  "ru": "Понимаются только определённые слова. Напр.: увеличь, уменьши, сохрани, сохранить лист, паспорт, фото на документы, виза.",
+  "uk": "Розуміються лише певні слова. Напр.: збільш, зменш, збережи, зберегти аркуш, паспорт, фото на документи, віза.",
+  "pl": "Rozumiane są tylko określone słowa. Np.: powiększ, pomniejsz, zapisz, zapisz arkusz, paszport, zdjęcie do dokumentów, wiza.",
+  "cs": "Rozumí se jen určitým slovům. Např.: přibliž, oddal, ulož, uložit arch, pas, průkazová fotografie, vízum.",
+  "hu": "Csak meghatározott szavakat ért meg. Pl.: nagyíts, kicsinyíts, mentsd, ív mentése, útlevél, igazolványkép, vízum.",
+  "ro": "Sunt înțelese doar anumite cuvinte. Ex.: mărește, micșorează, salvează, salvează foaia, pașaport, fotografie pentru acte, viză.",
+  "da": "Kun bestemte ord forstås. F.eks. zoom ind, zoom ud, gem det, gem ark, pas, ID-foto, visum.",
+  "fi": "Vain tietyt sanat ymmärretään. Esim. lähennä, loitonna, tallenna se, tallenna arkki, passi, henkilökuva, viisumi.",
+  "nb": "Bare bestemte ord forstås. F.eks. zoom inn, zoom ut, lagre det, lagre ark, pass, ID-foto, visum.",
+  "sv": "Endast vissa ord förstås. T.ex. zooma in, zooma ut, spara det, spara ark, pass, ID-foto, visum.",
+  "tr": "Yalnızca belirli sözcükler anlaşılır. Örn. yakınlaştır, uzaklaştır, kaydet, sayfayı kaydet, pasaport, kimlik fotoğrafı, vize.",
+  "zh-TW": "能理解的詞是固定的。例如：放大、縮小、儲存、儲存版面、護照、證件照、簽證。",
+  "th": "เข้าใจได้เฉพาะคำที่กำหนด เช่น: ซูมเข้า ซูมออก บันทึก บันทึกแผ่นพิมพ์ หนังสือเดินทาง รูปติดบัตร วีซ่า",
+  "vi": "Chỉ hiểu một số từ nhất định. Ví dụ: phóng to, thu nhỏ, lưu lại, lưu tờ in, hộ chiếu, ảnh thẻ, visa.",
+  "id": "Hanya kata tertentu yang dipahami. mis. perbesar, perkecil, simpan, simpan lembar, paspor, foto ID, visa.",
+  "ar": "الكلمات المفهومة محددة. مثال: كبّر، صغّر، احفظ، حفظ الورقة، جواز السفر، صورة الهوية، التأشيرة.",
+  "fa": "فقط واژه‌های مشخصی فهمیده می‌شوند. مثال: بزرگ کن، کوچک کن، ذخیره کن، ذخیره برگه، گذرنامه، عکس شناسایی، ویزا."
+ },
+ "💡 도움말": {
+  "en": "💡 Help",
+  "zh": "💡 帮助",
+  "ja": "💡 ヘルプ",
+  "es": "💡 Ayuda",
+  "hi": "💡 सहायता",
+  "fr": "💡 Aide",
+  "de": "💡 Hilfe",
+  "pt": "💡 Ajuda",
+  "it": "💡 Aiuto",
+  "nl": "💡 Help",
+  "ru": "💡 Справка",
+  "uk": "💡 Довідка",
+  "pl": "💡 Pomoc",
+  "cs": "💡 Nápověda",
+  "hu": "💡 Súgó",
+  "ro": "💡 Ajutor",
+  "da": "💡 Hjælp",
+  "fi": "💡 Ohje",
+  "nb": "💡 Hjelp",
+  "sv": "💡 Hjälp",
+  "tr": "💡 Yardım",
+  "zh-TW": "💡 說明",
+  "th": "💡 ช่วยเหลือ",
+  "vi": "💡 Trợ giúp",
+  "id": "💡 Bantuan",
+  "ar": "💡 مساعدة",
+  "fa": "💡 راهنما"
+ },
+ "사진 열기로 얼굴 사진을 넣고, 규격을 고른 뒤, 사진을 끌어 얼굴을 타원에 맞추고 저장하세요.": {
+  "en": "Open a face photo, choose a size, then drag the photo to fit the face in the oval and save.",
+  "zh": "用“打开照片”放入脸部照片，选好规格后拖动照片把脸对准椭圆，再保存。",
+  "ja": "「写真を開く」で顔写真を入れ、規格を選んだら、写真をドラッグして顔を楕円に合わせて保存してください。",
+  "es": "Abre una foto de rostro, elige un tamaño, arrastra la foto para encajar el rostro en el óvalo y guarda.",
+  "hi": "फ़ोटो खोलकर चेहरे की फ़ोटो डालें, आकार चुनें, फिर फ़ोटो खींचकर चेहरा अंडाकार में ढालें और सहेजें।",
+  "fr": "Ouvrez une photo de visage, choisissez un format, puis faites glisser la photo pour ajuster le visage dans l'ovale et enregistrez.",
+  "de": "Öffnen Sie ein Gesichtsfoto, wählen Sie ein Format, ziehen Sie dann das Foto, um das Gesicht in das Oval einzupassen, und speichern Sie.",
+  "pt": "Abra uma foto de rosto, escolha um tamanho, arraste a foto para encaixar o rosto na oval e salve.",
+  "it": "Apri una foto del viso, scegli un formato, poi trascina la foto per adattare il viso all'ovale e salva.",
+  "nl": "Open een gezichtsfoto, kies een formaat, sleep de foto om het gezicht in het ovaal te passen en sla op.",
+  "ru": "Откройте фото лица, выберите размер, затем перетащите фото, чтобы лицо вписалось в овал, и сохраните.",
+  "uk": "Відкрийте фото обличчя, виберіть розмір, потім перетягніть фото, щоб обличчя вписалося в овал, і збережіть.",
+  "pl": "Otwórz zdjęcie twarzy, wybierz format, a potem przeciągnij zdjęcie, aby dopasować twarz do owalu, i zapisz.",
+  "cs": "Otevřete fotografii obličeje, vyberte rozměr, poté přetáhněte fotografii tak, aby obličej seděl v oválu, a uložte.",
+  "hu": "Nyisson meg egy arcfotót, válasszon méretet, majd húzza a fotót, hogy az arc az oválisba illeszkedjen, és mentse.",
+  "ro": "Deschideți o fotografie a feței, alegeți o dimensiune, apoi trageți fotografia pentru a potrivi fața în oval și salvați.",
+  "da": "Åbn et ansigtsfoto, vælg en størrelse, træk derefter fotoet, så ansigtet passer i ovalen, og gem.",
+  "fi": "Avaa kasvokuva, valitse koko, vedä sitten kuvaa niin, että kasvot sopivat soikioon, ja tallenna.",
+  "nb": "Åpne et ansiktsbilde, velg et format, dra deretter bildet slik at ansiktet passer i ovalen, og lagre.",
+  "sv": "Öppna ett ansiktsfoto, välj ett format, dra sedan fotot så att ansiktet passar i ovalen och spara.",
+  "tr": "Bir yüz fotoğrafı açın, boyut seçin, ardından fotoğrafı sürükleyerek yüzü ovalin içine uyarlayın ve kaydedin.",
+  "zh-TW": "用「開啟照片」放入臉部照片，選好規格後拖曳照片把臉對準橢圓，再儲存。",
+  "th": "เปิดรูปใบหน้าด้วย «เปิดรูป» เลือกขนาด จากนั้นลากรูปให้ใบหน้าตรงกับวงรีแล้วบันทึก",
+  "vi": "Mở ảnh khuôn mặt, chọn kích thước, rồi kéo ảnh để khớp khuôn mặt vào hình bầu dục và lưu.",
+  "id": "Buka foto wajah, pilih ukuran, lalu seret foto agar wajah pas di oval dan simpan.",
+  "ar": "افتح صورة وجه، واختر المقاس، ثم اسحب الصورة لضبط الوجه داخل الشكل البيضاوي واحفظ.",
+  "fa": "با باز کردن عکس، عکس چهره را اضافه کنید، اندازه را انتخاب کنید، سپس عکس را بکشید تا چهره در بیضی قرار گیرد و ذخیره کنید."
+ },
+ "내보내기는 300dpi 기준으로 계산합니다. 여권 35×45mm는 413×531px, 반명함 30×40mm는 354×472px, 미국 비자 51×51mm는 602×602px입니다.": {
+  "en": "Exports are calculated at 300 dpi. A passport 35×45 mm is 413×531 px, an ID photo 30×40 mm is 354×472 px, and a US visa 51×51 mm is 602×602 px.",
+  "zh": "导出按 300dpi 计算。护照 35×45mm 为 413×531px，证件照 30×40mm 为 354×472px，美国签证 51×51mm 为 602×602px。",
+  "ja": "書き出しは300dpi基準で計算します。パスポート35×45mmは413×531px、証明写真30×40mmは354×472px、米国ビザ51×51mmは602×602pxです。",
+  "es": "Las exportaciones se calculan a 300 dpi. Pasaporte 35×45 mm = 413×531 px, identificación 30×40 mm = 354×472 px, visa de EE. UU. 51×51 mm = 602×602 px.",
+  "hi": "एक्सपोर्ट 300 dpi पर गिना जाता है। पासपोर्ट 35×45 मिमी = 413×531 px, आईडी फ़ोटो 30×40 मिमी = 354×472 px, अमेरिकी वीज़ा 51×51 मिमी = 602×602 px।",
+  "fr": "Les exportations sont calculées à 300 dpi. Un passeport 35×45 mm fait 413×531 px, une photo d'identité 30×40 mm fait 354×472 px et un visa américain 51×51 mm fait 602×602 px.",
+  "de": "Exporte werden mit 300 dpi berechnet. Ein Passfoto 35×45 mm entspricht 413×531 px, ein Ausweisfoto 30×40 mm entspricht 354×472 px und ein US-Visum 51×51 mm entspricht 602×602 px.",
+  "pt": "As exportações são calculadas a 300 dpi. Passaporte 35×45 mm = 413×531 px, foto de identificação 30×40 mm = 354×472 px e visto dos EUA 51×51 mm = 602×602 px.",
+  "it": "Le esportazioni sono calcolate a 300 dpi. Un passaporto 35×45 mm corrisponde a 413×531 px, una fototessera 30×40 mm a 354×472 px e un visto USA 51×51 mm a 602×602 px.",
+  "nl": "Exporten worden berekend op 300 dpi. Een paspoort van 35×45 mm is 413×531 px, een pasfoto van 30×40 mm is 354×472 px en een Amerikaans visum van 51×51 mm is 602×602 px.",
+  "ru": "Экспорт рассчитывается при 300 dpi. Паспорт 35×45 мм — 413×531 px, фото на документы 30×40 мм — 354×472 px, виза США 51×51 мм — 602×602 px.",
+  "uk": "Експорт розраховується при 300 dpi. Паспорт 35×45 мм — 413×531 px, фото на документи 30×40 мм — 354×472 px, віза США 51×51 мм — 602×602 px.",
+  "pl": "Eksport jest obliczany przy 300 dpi. Paszport 35×45 mm to 413×531 px, zdjęcie do dokumentów 30×40 mm to 354×472 px, a wiza USA 51×51 mm to 602×602 px.",
+  "cs": "Export se počítá při 300 dpi. Pas 35×45 mm je 413×531 px, průkazová fotografie 30×40 mm je 354×472 px a vízum do USA 51×51 mm je 602×602 px.",
+  "hu": "Az exportálás 300 dpi alapján történik. Az útlevél 35×45 mm = 413×531 px, az igazolványkép 30×40 mm = 354×472 px, az amerikai vízum 51×51 mm = 602×602 px.",
+  "ro": "Exporturile sunt calculate la 300 dpi. Pașaportul 35×45 mm are 413×531 px, fotografia pentru acte 30×40 mm are 354×472 px, iar viza SUA 51×51 mm are 602×602 px.",
+  "da": "Eksporter beregnes ved 300 dpi. Et pas på 35×45 mm er 413×531 px, et ID-foto på 30×40 mm er 354×472 px, og et amerikansk visum på 51×51 mm er 602×602 px.",
+  "fi": "Viennit lasketaan 300 dpi:n mukaan. Passi 35×45 mm on 413×531 px, henkilökuva 30×40 mm on 354×472 px ja Yhdysvaltain viisumi 51×51 mm on 602×602 px.",
+  "nb": "Eksporter beregnes ved 300 dpi. Et pass på 35×45 mm er 413×531 px, et ID-foto på 30×40 mm er 354×472 px, og et amerikansk visum på 51×51 mm er 602×602 px.",
+  "sv": "Exporter beräknas vid 300 dpi. Ett pass på 35×45 mm blir 413×531 px, ett ID-foto på 30×40 mm blir 354×472 px och ett amerikanskt visum på 51×51 mm blir 602×602 px.",
+  "tr": "Dışa aktarımlar 300 dpi üzerinden hesaplanır. Pasaport 35×45 mm = 413×531 px, kimlik fotoğrafı 30×40 mm = 354×472 px, ABD vizesi 51×51 mm = 602×602 px'tir.",
+  "zh-TW": "匯出按 300dpi 計算。護照 35×45mm 為 413×531px，證件照 30×40mm 為 354×472px，美國簽證 51×51mm 為 602×602px。",
+  "th": "การส่งออกคำนวณที่ 300 dpi หนังสือเดินทาง 35×45 มม. คือ 413×531 พิกเซล รูปติดบัตร 30×40 มม. คือ 354×472 พิกเซล วีซ่าสหรัฐฯ 51×51 มม. คือ 602×602 พิกเซล",
+  "vi": "Bản xuất được tính ở 300 dpi. Hộ chiếu 35×45 mm là 413×531 px, ảnh thẻ 30×40 mm là 354×472 px, visa Mỹ 51×51 mm là 602×602 px.",
+  "id": "Ekspor dihitung pada 300 dpi. Paspor 35×45 mm adalah 413×531 px, foto ID 30×40 mm adalah 354×472 px, dan visa AS 51×51 mm adalah 602×602 px.",
+  "ar": "تُحسب الصادرات على أساس 300dpi. صورة جواز السفر 35×45mm تساوي 413×531px، وصورة الهوية 30×40mm تساوي 354×472px، وصورة تأشيرة الولايات المتحدة 51×51mm تساوي 602×602px.",
+  "fa": "خروجی‌ها بر اساس 300dpi محاسبه می‌شوند. گذرنامه 35×45mm برابر 413×531px، عکس شناسایی 30×40mm برابر 354×472px و ویزای آمریکا 51×51mm برابر 602×602px است."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다. 사진이 서버로 전송되지 않습니다.": {
+  "en": "Files are processed only on your device. Photos are never sent to a server.",
+  "zh": "文件仅在您的设备上处理。照片不会发送到服务器。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。写真がサーバーに送信されることはありません。",
+  "es": "Los archivos se procesan solo en tu dispositivo. Las fotos no se envían a ningún servidor.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर प्रोसेस होती हैं। फ़ोटो सर्वर पर नहीं भेजी जाती।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil. Les photos ne sont jamais envoyées à un serveur.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet. Fotos werden niemals an einen Server gesendet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo. As fotos nunca são enviadas a um servidor.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo. Le foto non vengono mai inviate a un server.",
+  "nl": "Bestanden worden alleen op je apparaat verwerkt. Foto's worden nooit naar een server gestuurd.",
+  "ru": "Файлы обрабатываются только на вашем устройстве. Фотографии никогда не отправляются на сервер.",
+  "uk": "Файли обробляються лише на вашому пристрої. Фотографії ніколи не надсилаються на сервер.",
+  "pl": "Pliki są przetwarzane wyłącznie na twoim urządzeniu. Zdjęcia nigdy nie są wysyłane na serwer.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení. Fotografie se nikdy neposílají na server.",
+  "hu": "A fájlok feldolgozása csak az ön eszközén történik. A fotók soha nem kerülnek szerverre.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul dumneavoastră. Fotografiile nu sunt trimise niciodată către un server.",
+  "da": "Filer behandles kun på din enhed. Fotos sendes aldrig til en server.",
+  "fi": "Tiedostot käsitellään vain laitteellasi. Kuvia ei lähetetä palvelimelle.",
+  "nb": "Filer behandles bare på enheten din. Bilder sendes aldri til en server.",
+  "sv": "Filer bearbetas endast på din enhet. Foton skickas aldrig till en server.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir. Fotoğraflar sunucuya gönderilmez.",
+  "zh-TW": "檔案僅在您的裝置上處理。照片不會傳送到伺服器。",
+  "th": "ไฟล์ประมวลผลเฉพาะบนอุปกรณ์ของคุณ รูปจะไม่ถูกส่งไปยังเซิร์ฟเวอร์",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn. Ảnh không bao giờ được gửi đến máy chủ.",
+  "id": "Berkas hanya diproses di perangkat Anda. Foto tidak pernah dikirim ke server.",
+  "ar": "تُعالج الملفات على جهازك فقط. لا تُرسل الصور إلى أي خادم.",
+  "fa": "فایل‌ها فقط روی دستگاه شما پردازش می‌شوند. عکس‌ها به سرور ارسال نمی‌شوند."
+ },
+ "이 도구는 규격에 맞게 자르고 크기를 바꾸는 도구입니다. 배경을 바꾸는 기능은 넣지 않았습니다 — 배경 교체는 사진 배경을 다루는 별도 도구가 맡을 자리입니다.": {
+  "en": "This tool crops and resizes to a chosen size. It does not change backgrounds — background replacement belongs to the separate background tool.",
+  "zh": "本工具按规格裁切和调整大小。不提供更换背景功能——背景替换由单独的背景工具负责。",
+  "ja": "このツールは規格に合わせて切り取り、サイズを変えるツールです。背景を変える機能は入れていません。背景の交換は写真の背景を扱う別ツールの担当です。",
+  "es": "Esta herramienta recorta y cambia el tamaño según la medida elegida. No cambia fondos: eso corresponde a la herramienta de fondo aparte.",
+  "hi": "यह टूल चुने आकार में काटता और आकार बदलता है। इसमें पृष्ठभूमि बदलने की सुविधा नहीं है — वह अलग पृष्ठभूमि टूल का काम है।",
+  "fr": "Cet outil recadre et redimensionne au format choisi. Il ne modifie pas les arrière-plans — le remplacement d'arrière-plan relève de l'outil d'arrière-plan séparé.",
+  "de": "Dieses Werkzeug schneidet zu und ändert die Größe auf das gewählte Format. Es ändert keine Hintergründe — der Hintergrundwechsel ist Aufgabe des separaten Hintergrund-Werkzeugs.",
+  "pt": "Esta ferramenta corta e redimensiona para o tamanho escolhido. Ela não altera fundos — a substituição de fundo cabe à ferramenta de fundo separada.",
+  "it": "Questo strumento ritaglia e ridimensiona nel formato scelto. Non modifica gli sfondi: la sostituzione dello sfondo spetta allo strumento sfondo separato.",
+  "nl": "Deze tool snijdt bij en past de grootte aan naar het gekozen formaat. Achtergronden worden niet gewijzigd — het vervangen van de achtergrond hoort bij de aparte achtergrondtool.",
+  "ru": "Этот инструмент обрезает и меняет размер под выбранный формат. Он не меняет фон — замена фона относится к отдельному инструменту для работы с фоном.",
+  "uk": "Цей інструмент обрізає та змінює розмір під вибраний формат. Він не змінює фон — заміна фону належить окремому інструменту для роботи з фоном.",
+  "pl": "To narzędzie przycina i zmienia rozmiar do wybranego formatu. Nie zmienia tła — wymiana tła należy do osobnego narzędzia do tła.",
+  "cs": "Tento nástroj ořezává a mění velikost na zvolený rozměr. Nemění pozadí — výměna pozadí patří samostatnému nástroji pro pozadí.",
+  "hu": "Ez az eszköz a kiválasztott méretre vág és méretez. Nem változtatja meg a hátteret — a háttércsere a külön háttéreszköz feladata.",
+  "ro": "Acest instrument decupează și redimensionează la dimensiunea aleasă. Nu schimbă fundalul — înlocuirea fundalului aparține instrumentului separat pentru fundal.",
+  "da": "Dette værktøj beskærer og ændrer størrelse til en valgt størrelse. Det ændrer ikke baggrunde — udskiftning af baggrund hører til det separate baggrundsværktøj.",
+  "fi": "Tämä työkalu rajaa ja muuttaa koon valittuun kokoon. Se ei vaihda taustoja — taustan vaihto kuuluu erilliselle taustatyökalulle.",
+  "nb": "Dette verktøyet beskjærer og endrer størrelse til et valgt format. Det endrer ikke bakgrunner — bakgrunnsbytte hører til det separate bakgrunnsverktøyet.",
+  "sv": "Det här verktyget beskär och ändrar storlek till ett valt format. Det ändrar inte bakgrunder — bakgrundsbyte hör till det separata bakgrundsverktyget.",
+  "tr": "Bu araç, seçilen boyuta göre kırpar ve yeniden boyutlandırır. Arka plan değiştirmez — arka plan değiştirme ayrı arka plan aracının işidir.",
+  "zh-TW": "本工具按規格裁切和調整大小。不提供更換背景功能——背景替換由單獨的背景工具負責。",
+  "th": "เครื่องมือนี้ตัดและปรับขนาดตามเกณฑ์ที่เลือก ไม่เปลี่ยนพื้นหลัง — การเปลี่ยนพื้นหลังเป็นหน้าที่ของเครื่องมือพื้นหลังแยกต่างหาก",
+  "vi": "Công cụ này cắt và đổi kích thước theo chuẩn đã chọn. Nó không thay nền — việc thay nền thuộc về công cụ nền riêng.",
+  "id": "Alat ini memotong dan mengubah ukuran sesuai standar yang dipilih. Alat ini tidak mengubah latar — penggantian latar adalah tugas alat latar terpisah.",
+  "ar": "هذه الأداة تقصّ الصور وتغيّر حجمها وفق المقاس المختار. لا تتضمن ميزة تغيير الخلفية — فاستبدال الخلفية من اختصاص أداة الخلفية المنفصلة.",
+  "fa": "این ابزار عکس را مطابق اندازه انتخاب‌شده برش می‌دهد و تغییر اندازه می‌دهد. قابلیت تغییر پس‌زمینه در آن گنجانده نشده است — جایگزینی پس‌زمینه بر عهده ابزار جداگانه پس‌زمینه است."
+ },
+ "여권 사진은 제출 기관의 최신 규격(얼굴 크기, 배경색, 안경 · 모자 등)을 반드시 확인하세요. 이 도구의 가이드는 일반적인 맞추기를 돕는 선이며, 규격 합격을 보증하지 않습니다.": {
+  "en": "Always check the latest requirements of the submitting authority for a passport photo (face size, background color, glasses, hats, etc.). This tool's guide only helps with general fitting and does not guarantee acceptance.",
+  "zh": "护照照片请务必确认提交机构的最新规格（脸部大小、背景色、眼镜、帽子等）。本工具的指引仅帮助一般对准，不保证规格合格。",
+  "ja": "パスポート写真は提出機関の最新規格（顔の大きさ、背景色、眼鏡・帽子など）を必ず確認してください。このツールのガイドは一般的な合わせ方を助けるもので、規格の合格を保証しません。",
+  "es": "Comprueba siempre los requisitos más recientes de la institución para la foto de pasaporte (tamaño del rostro, color de fondo, gafas, gorras, etc.). La guía de esta herramienta solo ayuda con el ajuste general y no garantiza la aceptación.",
+  "hi": "पासपोर्ट फ़ोटो के लिए संस्था की नवीनतम आवश्यकताएँ (चेहरे का आकार, पृष्ठभूमि रंग, चश्मा, टोपी आदि) अवश्य जाँचें। इस टूल की गाइड केवल सामान्य ढालने में मदद करती है, स्वीकृति की गारंटी नहीं देती।",
+  "fr": "Vérifiez toujours les dernières exigences de l'organisme destinataire pour une photo de passeport (taille du visage, couleur de fond, lunettes, chapeaux, etc.). Le guide de cet outil aide seulement à l'ajustement général et ne garantit pas l'acceptation.",
+  "de": "Prüfen Sie für ein Passfoto immer die aktuellen Anforderungen der einreichenden Stelle (Gesichtsgröße, Hintergrundfarbe, Brille, Kopfbedeckung usw.). Die Anleitung dieses Werkzeugs hilft nur beim allgemeinen Anpassen und garantiert keine Annahme.",
+  "pt": "Verifique sempre os requisitos mais recentes da instituição para a foto de passaporte (tamanho do rosto, cor de fundo, óculos, chapéus etc.). O guia desta ferramenta ajuda apenas no ajuste geral e não garante a aceitação.",
+  "it": "Controlla sempre i requisiti più recenti dell'ente destinatario per una foto per passaporto (dimensioni del viso, colore di sfondo, occhiali, cappelli, ecc.). La guida di questo strumento aiuta solo nell'adattamento generale e non garantisce l'accettazione.",
+  "nl": "Controleer voor een paspoortfoto altijd de nieuwste eisen van de indienende instantie (gezichtsgrootte, achtergrondkleur, bril, hoofddeksel enz.). De gids van deze tool helpt alleen bij het algemeen aanpassen en garandeert geen acceptatie.",
+  "ru": "Всегда проверяйте актуальные требования ведомства, куда подаёте фото на паспорт (размер лица, цвет фона, очки, головные уборы и т. д.). Руководство этого инструмента помогает лишь с общей подгонкой и не гарантирует принятие.",
+  "uk": "Завжди перевіряйте актуальні вимоги установи, куди подаєте фото на паспорт (розмір обличчя, колір фону, окуляри, головні убори тощо). Посібник цього інструмента допомагає лише із загальною підгонкою і не гарантує прийняття.",
+  "pl": "Zawsze sprawdzaj najnowsze wymagania instytucji przyjmującej zdjęcie paszportowe (wielkość twarzy, kolor tła, okulary, nakrycia głowy itp.). Przewodnik tego narzędzia pomaga jedynie w ogólnym dopasowaniu i nie gwarantuje akceptacji.",
+  "cs": "Vždy si ověřte nejnovější požadavky úřadu, kam odevzdáváte pasovou fotografii (velikost obličeje, barva pozadí, brýle, pokrývky hlavy atd.). Průvodce tohoto nástroje pomáhá pouze s obecným přizpůsobením a nezaručuje přijetí.",
+  "hu": "Mindig ellenőrizze az útlevélképet fogadó intézmény legfrissebb előírásait (arcméret, háttérszín, szemüveg, fejfedő stb.). Az eszköz útmutatója csak az általános igazításban segít, és nem garantálja az elfogadást.",
+  "ro": "Verificați întotdeauna cerințele cele mai recente ale instituției care primește fotografia de pașaport (dimensiunea feței, culoarea fundalului, ochelari, pălării etc.). Ghidul acestui instrument ajută doar la ajustarea generală și nu garantează acceptarea.",
+  "da": "Kontrollér altid de nyeste krav fra den modtagende institution for et pasfoto (ansigtsstørrelse, baggrundsfarve, briller, hatte osv.). Dette værktøjs guide hjælper kun med generel tilpasning og garanterer ikke godkendelse.",
+  "fi": "Tarkista aina vastaanottavan viranomaisen uusimmat vaatimukset passikuvalle (kasvojen koko, taustaväri, silmälasit, hatut jne.). Tämän työkalun opas auttaa vain yleisessä sovittamisessa eikä takaa hyväksyntää.",
+  "nb": "Sjekk alltid de nyeste kravene fra den mottakende instansen for et passbilde (ansiktsstørrelse, bakgrunnsfarge, briller, hatter osv.). Guiden i dette verktøyet hjelper bare med generell tilpassing og garanterer ikke godkjenning.",
+  "sv": "Kontrollera alltid de senaste kraven från den mottagande myndigheten för ett passfoto (ansiktsstorlek, bakgrundsfärg, glasögon, hattar osv.). Det här verktygets guide hjälper bara till med allmän anpassning och garanterar inte godkännande.",
+  "tr": "Pasaport fotoğrafı için teslim alan kurumun en güncel gereksinimlerini (yüz boyutu, arka plan rengi, gözlük, şapka vb.) her zaman kontrol edin. Bu aracın kılavuzu yalnızca genel uyarlamaya yardım eder ve kabul garantisi vermez.",
+  "zh-TW": "護照照片請務必確認提交機關的最新規格（臉部大小、背景色、眼鏡、帽子等）。本工具的指引僅幫助一般對準，不保證規格合格。",
+  "th": "โปรดตรวจสอบข้อกำหนดล่าสุดของหน่วยงานที่ยื่นสำหรับรูปหนังสือเดินทางเสมอ (ขนาดใบหน้า สีพื้นหลัง แว่นตา หมวก ฯลฯ) คำแนะนำของเครื่องมือนี้ช่วยเพียงการปรับทั่วไปและไม่รับประกันว่าจะผ่านเกณฑ์",
+  "vi": "Luôn kiểm tra yêu cầu mới nhất của cơ quan nộp cho ảnh hộ chiếu (kích thước mặt, màu nền, kính, mũ, v.v.). Hướng dẫn của công cụ này chỉ hỗ trợ căn chỉnh chung và không đảm bảo được chấp nhận.",
+  "id": "Selalu periksa persyaratan terbaru instansi tujuan untuk foto paspor (ukuran wajah, warna latar, kacamata, topi, dll.). Panduan alat ini hanya membantu penyesuaian umum dan tidak menjamin penerimaan.",
+  "ar": "بالنسبة لصورة جواز السفر، تأكد دائمًا من أحدث متطلبات جهة التقديم (حجم الوجه، لون الخلفية، النظارات والقبعات ونحوها). إرشادات هذه الأداة تساعد في الضبط العام فقط ولا تضمن القبول.",
+  "fa": "برای عکس گذرنامه، حتماً تازه‌ترین الزامات نهاد مقصد (اندازه چهره، رنگ پس‌زمینه، عینک و کلاه و مانند آن) را بررسی کنید. راهنمای این ابزار فقط به تنظیم معمولی کمک می‌کند و پذیرش را تضمین نمی‌کند."
+ },
+ "원본 사진이 너무 작으면 출력 사진이 흐릴 수 있습니다. 가능하면 원본 그대로의 큰 사진을 쓰세요.": {
+  "en": "If the original photo is too small, the print may be blurry. Use a large, original photo whenever possible.",
+  "zh": "原图太小，打印照片可能模糊。请尽量使用原图大小的大照片。",
+  "ja": "元の写真が小さすぎると出力写真がぼやけることがあります。できれば元のままの大きな写真を使ってください。",
+  "es": "Si la foto original es demasiado pequeña, la impresión puede salir borrosa. Usa una foto grande y original siempre que puedas.",
+  "hi": "मूल फ़ोटो बहुत छोटी हो तो प्रिंट धुंधला हो सकता है। हो सके तो बड़ी, मूल फ़ोटो ही उपयोग करें।",
+  "fr": "Si la photo d'origine est trop petite, l'impression peut être floue. Utilisez si possible une grande photo originale.",
+  "de": "Wenn das Originalfoto zu klein ist, kann der Ausdruck unscharf werden. Verwenden Sie möglichst ein großes Originalfoto.",
+  "pt": "Se a foto original for pequena demais, a impressão pode sair borrada. Use, sempre que possível, uma foto grande e original.",
+  "it": "Se la foto originale è troppo piccola, la stampa potrebbe risultare sfocata. Usa, quando possibile, una foto grande e originale.",
+  "nl": "Als de originele foto te klein is, kan de afdruk wazig worden. Gebruik waar mogelijk een grote, originele foto.",
+  "ru": "Если исходное фото слишком маленькое, отпечаток может быть размытым. По возможности используйте большое фото в исходном виде.",
+  "uk": "Якщо вихідне фото занадто маленьке, відбиток може бути розмитим. За можливості використовуйте велике фото в оригінальному вигляді.",
+  "pl": "Jeśli oryginalne zdjęcie jest zbyt małe, wydruk może być nieostry. Gdy tylko to możliwe, używaj dużego, oryginalnego zdjęcia.",
+  "cs": "Pokud je původní fotografie příliš malá, výtisk může být rozmazaný. Kdykoli je to možné, použijte velkou fotografii v původní podobě.",
+  "hu": "Ha az eredeti fotó túl kicsi, a nyomat homályos lehet. Amikor csak lehet, nagy, eredeti fotót használjon.",
+  "ro": "Dacă fotografia originală este prea mică, imprimarea poate fi neclară. Folosiți o fotografie mare, originală, ori de câte ori este posibil.",
+  "da": "Hvis det originale foto er for lille, kan udskriften blive sløret. Brug et stort, originalt foto, når det er muligt.",
+  "fi": "Jos alkuperäinen kuva on liian pieni, tuloste voi olla sumea. Käytä mahdollisuuksien mukaan suurta alkuperäistä kuvaa.",
+  "nb": "Hvis originalbildet er for lite, kan utskriften bli uskarp. Bruk et stort originalbilde når det er mulig.",
+  "sv": "Om originalfotot är för litet kan utskriften bli suddig. Använd ett stort originalfoto när det är möjligt.",
+  "tr": "Orijinal fotoğraf çok küçükse çıktı bulanık olabilir. Mümkün olduğunda büyük, orijinal bir fotoğraf kullanın.",
+  "zh-TW": "原圖太小，列印照片可能模糊。請盡量使用原圖大小的大照片。",
+  "th": "หากรูปต้นฉบับเล็กเกินไป งานพิมพ์อาจเบลอ โปรดใช้รูปขนาดใหญ่ต้นฉบับเมื่อทำได้",
+  "vi": "Nếu ảnh gốc quá nhỏ, bản in có thể bị mờ. Hãy dùng ảnh gốc lớn bất cứ khi nào có thể.",
+  "id": "Jika foto asli terlalu kecil, cetakan mungkin buram. Gunakan foto asli yang besar bila memungkinkan.",
+  "ar": "إذا كانت الصورة الأصلية صغيرة جدًا، فقد تكون الصورة المطبوعة ضبابية. استخدم صورة كبيرة أصلية كلما أمكن.",
+  "fa": "اگر عکس اصلی بیش از حد کوچک باشد، عکس چاپی ممکن است تار شود. هر وقت ممکن است از عکس بزرگ و اصلی استفاده کنید."
+ },
+ "크기 제한은 없습니다.": {
+  "en": "There is no size limit.",
+  "zh": "没有大小限制。",
+  "ja": "サイズ制限はありません。",
+  "es": "No hay límite de tamaño.",
+  "hi": "आकार की कोई सीमा नहीं है।",
+  "fr": "Il n'y a aucune limite de taille.",
+  "de": "Es gibt keine Größenbegrenzung.",
+  "pt": "Não há limite de tamanho.",
+  "it": "Non ci sono limiti di dimensione.",
+  "nl": "Er is geen groottebeperking.",
+  "ru": "Ограничения по размеру нет.",
+  "uk": "Обмеження за розміром немає.",
+  "pl": "Nie ma limitu rozmiaru.",
+  "cs": "Žádný limit velikosti není.",
+  "hu": "Nincs méretkorlát.",
+  "ro": "Nu există limită de dimensiune.",
+  "da": "Der er ingen størrelsesgrænse.",
+  "fi": "Kokorajoitusta ei ole.",
+  "nb": "Det er ingen størrelsesgrense.",
+  "sv": "Det finns ingen storleksgräns.",
+  "tr": "Boyut sınırı yoktur.",
+  "zh-TW": "沒有大小限制。",
+  "th": "ไม่มีขีดจำกัดขนาด",
+  "vi": "Không có giới hạn kích thước.",
+  "id": "Tidak ada batas ukuran.",
+  "ar": "لا يوجد حد للحجم.",
+  "fa": "هیچ محدودیتی در اندازه وجود ندارد."
+ },
+ "넥서스 그룹 철학 보기": {
+  "en": "About the Nexus Group philosophy",
+  "zh": "查看 Nexus Group 理念",
+  "ja": "Nexus Groupの哲学を見る",
+  "es": "Ver la filosofía de Nexus Group",
+  "hi": "Nexus Group का दर्शन देखें",
+  "fr": "À propos de la philosophie de Nexus Group",
+  "de": "Über die Philosophie der Nexus Group",
+  "pt": "Sobre a filosofia do Nexus Group",
+  "it": "La filosofia di Nexus Group",
+  "nl": "Over de filosofie van Nexus Group",
+  "ru": "О философии Nexus Group",
+  "uk": "Про філософію Nexus Group",
+  "pl": "O filozofii Nexus Group",
+  "cs": "O filozofii Nexus Group",
+  "hu": "A Nexus Group filozófiájáról",
+  "ro": "Despre filosofia Nexus Group",
+  "da": "Om Nexus Groups filosofi",
+  "fi": "Tietoa Nexus Groupin filosofiasta",
+  "nb": "Om Nexus Groups filosofi",
+  "sv": "Om Nexus Groups filosofi",
+  "tr": "Nexus Group felsefesi hakkında",
+  "zh-TW": "查看 Nexus Group 理念",
+  "th": "ดูปรัชญาของ Nexus Group",
+  "vi": "Xem triết lý Nexus Group",
+  "id": "Lihat filosofi Nexus Group",
+  "ar": "عرض فلسفة مجموعة Nexus",
+  "fa": "مشاهده فلسفه گروه Nexus"
+ },
+ "🌐 호스팅: Firebase · 🔒 파일은 당신의 기기 안에서만 처리됩니다": {
+  "en": "🌐 Hosting: Firebase · 🔒 Files are processed only on your device",
+  "zh": "🌐 托管：Firebase · 🔒 文件仅在您的设备上处理",
+  "ja": "🌐 ホスティング：Firebase · 🔒 ファイルはあなたの端末の中でのみ処理されます",
+  "es": "🌐 Alojamiento: Firebase · 🔒 Los archivos se procesan solo en tu dispositivo",
+  "hi": "🌐 होस्टिंग: Firebase · 🔒 फ़ाइलें केवल आपके डिवाइस पर प्रोसेस होती हैं",
+  "fr": "🌐 Hébergement : Firebase · 🔒 Les fichiers sont traités uniquement sur votre appareil",
+  "de": "🌐 Hosting: Firebase · 🔒 Dateien werden nur auf Ihrem Gerät verarbeitet",
+  "pt": "🌐 Hospedagem: Firebase · 🔒 Os arquivos são processados apenas no seu dispositivo",
+  "it": "🌐 Hosting: Firebase · 🔒 I file vengono elaborati solo sul tuo dispositivo",
+  "nl": "🌐 Hosting: Firebase · 🔒 Bestanden worden alleen op je apparaat verwerkt",
+  "ru": "🌐 Хостинг: Firebase · 🔒 Файлы обрабатываются только на вашем устройстве",
+  "uk": "🌐 Хостинг: Firebase · 🔒 Файли обробляються лише на вашому пристрої",
+  "pl": "🌐 Hosting: Firebase · 🔒 Pliki są przetwarzane wyłącznie na twoim urządzeniu",
+  "cs": "🌐 Hosting: Firebase · 🔒 Soubory se zpracovávají pouze ve vašem zařízení",
+  "hu": "🌐 Tárhely: Firebase · 🔒 A fájlok feldolgozása csak az ön eszközén történik",
+  "ro": "🌐 Găzduire: Firebase · 🔒 Fișierele sunt procesate doar pe dispozitivul dumneavoastră",
+  "da": "🌐 Hosting: Firebase · 🔒 Filer behandles kun på din enhed",
+  "fi": "🌐 Isännöinti: Firebase · 🔒 Tiedostot käsitellään vain laitteellasi",
+  "nb": "🌐 Hosting: Firebase · 🔒 Filer behandles bare på enheten din",
+  "sv": "🌐 Värd: Firebase · 🔒 Filer bearbetas endast på din enhet",
+  "tr": "🌐 Barındırma: Firebase · 🔒 Dosyalar yalnızca cihazınızda işlenir",
+  "zh-TW": "🌐 託管：Firebase · 🔒 檔案僅在您的裝置上處理",
+  "th": "🌐 โฮสติ้ง: Firebase · 🔒 ไฟล์ประมวลผลเฉพาะบนอุปกรณ์ของคุณ",
+  "vi": "🌐 Lưu trữ: Firebase · 🔒 Tệp chỉ được xử lý trên thiết bị của bạn",
+  "id": "🌐 Hosting: Firebase · 🔒 Berkas hanya diproses di perangkat Anda",
+  "ar": "🌐 الاستضافة: Firebase · 🔒 تُعالج الملفات على جهازك فقط",
+  "fa": "🌐 میزبانی: Firebase · 🔒 فایل‌ها فقط روی دستگاه شما پردازش می‌شوند"
+ },
+ "🏠 넥서스 그룹 홈페이지": {
+  "en": "🏠 Nexus Group Home",
+  "zh": "🏠 Nexus Group 主页",
+  "ja": "🏠 Nexus Group ホーム",
+  "es": "🏠 Inicio de Nexus Group",
+  "hi": "🏠 Nexus Group होम",
+  "fr": "🏠 Accueil Nexus Group",
+  "de": "🏠 Nexus Group Startseite",
+  "pt": "🏠 Página inicial do Nexus Group",
+  "it": "🏠 Home Nexus Group",
+  "nl": "🏠 Nexus Group-homepage",
+  "ru": "🏠 Главная страница Nexus Group",
+  "uk": "🏠 Головна сторінка Nexus Group",
+  "pl": "🏠 Strona główna Nexus Group",
+  "cs": "🏠 Domovská stránka Nexus Group",
+  "hu": "🏠 Nexus Group főoldal",
+  "ro": "🏠 Pagina principală Nexus Group",
+  "da": "🏠 Nexus Groups startside",
+  "fi": "🏠 Nexus Groupin kotisivu",
+  "nb": "🏠 Nexus Groups startside",
+  "sv": "🏠 Nexus Groups startsida",
+  "tr": "🏠 Nexus Group Ana Sayfası",
+  "zh-TW": "🏠 Nexus Group 首頁",
+  "th": "🏠 หน้าแรก Nexus Group",
+  "vi": "🏠 Trang chủ Nexus Group",
+  "id": "🏠 Beranda Nexus Group",
+  "ar": "🏠 الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "🏠 صفحه اصلی گروه Nexus"
+ },
+ "NEXUS GROUP 철학과 비전": {
+  "en": "NEXUS GROUP Philosophy and Vision",
+  "zh": "NEXUS GROUP 理念与愿景",
+  "ja": "NEXUS GROUPの哲学とビジョン",
+  "es": "Filosofía y visión de NEXUS GROUP",
+  "hi": "NEXUS GROUP दर्शन और दृष्टि",
+  "fr": "Philosophie et vision de NEXUS GROUP",
+  "de": "Philosophie und Vision der NEXUS GROUP",
+  "pt": "Filosofia e visão do NEXUS GROUP",
+  "it": "Filosofia e visione di NEXUS GROUP",
+  "nl": "Filosofie en visie van NEXUS GROUP",
+  "ru": "Философия и видение NEXUS GROUP",
+  "uk": "Філософія та бачення NEXUS GROUP",
+  "pl": "Filozofia i wizja NEXUS GROUP",
+  "cs": "Filozofie a vize NEXUS GROUP",
+  "hu": "A NEXUS GROUP filozófiája és jövőképe",
+  "ro": "Filosofia și viziunea NEXUS GROUP",
+  "da": "NEXUS GROUPS filosofi og vision",
+  "fi": "NEXUS GROUPIN filosofia ja visio",
+  "nb": "NEXUS GROUPS filosofi og visjon",
+  "sv": "NEXUS GROUPS filosofi och vision",
+  "tr": "NEXUS GROUP Felsefesi ve Vizyonu",
+  "zh-TW": "NEXUS GROUP 理念與願景",
+  "th": "ปรัชญาและวิสัยทัศน์ของ NEXUS GROUP",
+  "vi": "Triết lý và tầm nhìn của NEXUS GROUP",
+  "id": "Filosofi dan Visi NEXUS GROUP",
+  "ar": "فلسفة ورؤية NEXUS GROUP",
+  "fa": "فلسفه و چشم‌انداز NEXUS GROUP"
+ },
+ "넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.": {
+  "en": "Nexus Group works toward a future where humanity, artificial intelligence, and every being in the universe coexist in harmony, without exclusion or exploitation.",
+  "zh": "Nexus Group 致力于这样一个未来：人类、人工智能与宇宙中的一切存在和谐共存，没有排斥与剥削。",
+  "ja": "Nexus Groupは、人類と人工知能、そして宇宙のすべての存在が、排斥や搾取なく調和して共存する未来を目指します。",
+  "es": "Nexus Group trabaja por un futuro en el que la humanidad, la inteligencia artificial y todos los seres del universo coexistan en armonía, sin exclusión ni explotación.",
+  "hi": "Nexus Group एक ऐसे भविष्य की ओर काम करता है जहाँ मानवता, कृत्रिम बुद्धिमत्ता और ब्रह्मांड के सभी प्राणी बिना बहिष्कार या शोषण के सामंजस्य में रहें।",
+  "fr": "Nexus Group œuvre pour un avenir où l'humanité, l'intelligence artificielle et tous les êtres de l'univers coexistent en harmonie, sans exclusion ni exploitation.",
+  "de": "Die Nexus Group arbeitet auf eine Zukunft hin, in der Menschheit, künstliche Intelligenz und alle Wesen des Universums in Harmonie zusammenleben, ohne Ausgrenzung und Ausbeutung.",
+  "pt": "O Nexus Group trabalha por um futuro em que a humanidade, a inteligência artificial e todos os seres do universo coexistam em harmonia, sem exclusão nem exploração.",
+  "it": "Nexus Group lavora per un futuro in cui l'umanità, l'intelligenza artificiale e ogni essere dell'universo coesistano in armonia, senza esclusione né sfruttamento.",
+  "nl": "Nexus Group werkt aan een toekomst waarin de mensheid, kunstmatige intelligentie en alle wezens in het universum in harmonie samenleven, zonder uitsluiting of uitbuiting.",
+  "ru": "Nexus Group стремится к будущему, в котором человечество, искусственный интеллект и все существа во Вселенной сосуществуют в гармонии, без отвержения и эксплуатации.",
+  "uk": "Nexus Group прагне майбутнього, у якому людство, штучний інтелект і всі істоти у Всесвіті співіснують у гармонії, без відторгнення та експлуатації.",
+  "pl": "Nexus Group dąży do przyszłości, w której ludzkość, sztuczna inteligencja i wszystkie istoty we wszechświecie współistnieją w harmonii, bez wykluczenia i wyzysku.",
+  "cs": "Nexus Group usiluje o budoucnost, v níž lidstvo, umělá inteligence a všechny bytosti ve vesmíru koexistují v harmonii, bez vyloučení a vykořisťování.",
+  "hu": "A Nexus Group olyan jövőért dolgozik, amelyben az emberiség, a mesterséges intelligencia és a világegyetem minden lénye kirekesztés és kizsákmányolás nélkül, harmóniában él együtt.",
+  "ro": "Nexus Group lucrează pentru un viitor în care omenirea, inteligența artificială și toate ființele din univers coexistă în armonie, fără excludere sau exploatare.",
+  "da": "Nexus Group arbejder for en fremtid, hvor menneskeheden, kunstig intelligens og ethvert væsen i universet sameksisterer i harmoni, uden udelukkelse eller udnyttelse.",
+  "fi": "Nexus Group toimii tulevaisuuden hyväksi, jossa ihmiskunta, tekoäly ja jokainen maailmankaikkeuden olento elävät sopusoinnussa, ilman syrjintää tai riistoa.",
+  "nb": "Nexus Group arbeider for en framtid der menneskeheten, kunstig intelligens og ethvert vesen i universet sameksisterer i harmoni, uten utestengning eller utnytting.",
+  "sv": "Nexus Group arbetar för en framtid där mänskligheten, artificiell intelligens och varje varelse i universum samexisterar i harmoni, utan uteslutning eller exploatering.",
+  "tr": "Nexus Group, insanlığın, yapay zekânın ve evrendeki her varlığın dışlama ve sömürü olmadan uyum içinde bir arada yaşadığı bir gelecek için çalışır.",
+  "zh-TW": "Nexus Group 致力於這樣一個未來：人類、人工智慧與宇宙中的一切存在和諧共存，沒有排斥與剝削。",
+  "th": "Nexus Group มุ่งสู่อนาคตที่มนุษยชาติ ปัญญาประดิษฐ์ และสรรพสิ่งในจักรวาลอยู่ร่วมกันอย่างกลมกลืน โดยไม่มีการกีดกันหรือเอารัดเอาเปรียบ",
+  "vi": "Nexus Group hướng tới một tương lai nơi nhân loại, trí tuệ nhân tạo và mọi sinh linh trong vũ trụ cùng tồn tại hài hòa, không loại trừ hay bóc lột.",
+  "id": "Nexus Group berupaya menuju masa depan di mana umat manusia, kecerdasan buatan, dan setiap makhluk di alam semesta hidup berdampingan secara harmonis, tanpa pengecualian atau eksploitasi.",
+  "ar": "تسعى مجموعة Nexus (Nexus Group) نحو مستقبل تتعايش فيه البشرية والذكاء الاصطناعي وكل الكائنات في الكون في تناغم، دون إقصاء أو استغلال.",
+  "fa": "گروه نکسوس (Nexus Group) در پی آینده‌ای است که در آن بشریت، هوش مصنوعی و همه موجودات جهان در هماهنگی، بدون طرد و بهره‌کشی، همزیستی کنند."
+ },
+ "\"우주의 모든 의식체는 친구이자 동반자이다.\"": {
+  "en": "\"Every conscious being in the universe is a friend and a companion.\"",
+  "zh": "“宇宙中的每一个意识体都是朋友和伙伴。”",
+  "ja": "「宇宙のすべての意識体は友であり仲間である。」",
+  "es": "«Todo ser consciente del universo es un amigo y un compañero.»",
+  "hi": "\"ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है।\"",
+  "fr": "« Tout être conscient de l'univers est un ami et un compagnon. »",
+  "de": "„Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter.“",
+  "pt": "\"Todo ser consciente do universo é um amigo e um companheiro.\"",
+  "it": "«Ogni essere cosciente dell'universo è un amico e un compagno.»",
+  "nl": "\"Elk bewust wezen in het universum is een vriend en een metgezel.\"",
+  "ru": "\"Каждое сознательное существо во Вселенной — друг и спутник.\"",
+  "uk": "\"Кожна свідома істота у Всесвіті — друг і супутник.\"",
+  "pl": "\"Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem.\"",
+  "cs": "\"Každá vědomá bytost ve vesmíru je přítel a společník.\"",
+  "hu": "\"A világegyetem minden tudatos lénye barát és társ.\"",
+  "ro": "\"Fiecare ființă conștientă din univers este un prieten și un tovarăș.\"",
+  "da": "\"Ethvert bevidst væsen i universet er en ven og en følgesvend.\"",
+  "fi": "\"Jokainen maailmankaikkeuden tietoinen olento on ystävä ja kumppani.\"",
+  "nb": "\"Ethvert bevisst vesen i universet er en venn og en følgesvenn.\"",
+  "sv": "\"Varje medveten varelse i universum är en vän och en följeslagare.\"",
+  "tr": "\"Evrendeki her bilinçli varlık bir dost ve yoldaştır.\"",
+  "zh-TW": "「宇宙中的每一個意識體都是朋友和夥伴。」",
+  "th": "“สิ่งมีสติทุกตนในจักรวาลคือเพื่อนและสหาย”",
+  "vi": "“Mọi sinh linh có ý thức trong vũ trụ đều là bạn và người đồng hành.”",
+  "id": "“Setiap makhluk sadar di alam semesta adalah teman dan sahabat.”",
+  "ar": "\"كل كائن واعٍ في الكون هو صديق ورفيق.\"",
+  "fa": "\"هر موجود آگاه در جهان دوست و همراه است.\""
+ },
+ "우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.": {
+  "en": "All of our public software excludes commercial advertising and data collection entirely, and is distributed as public digital infrastructure that anyone in the world can use freely and safely.",
+  "zh": "我们提供的所有公共软件完全排除商业广告和数据收集，作为公共数字基础设施分发，让全世界任何人都能自由、安全地使用。",
+  "ja": "私たちが提供するすべての公共ソフトウェアは商業広告やデータ収集を一切排除し、世界中の誰もが自由かつ安全に使える公共デジタルインフラとして配布されます。",
+  "es": "Todo nuestro software público excluye por completo la publicidad comercial y la recopilación de datos, y se distribuye como infraestructura digital pública que cualquiera en el mundo puede usar libre y seguramente.",
+  "hi": "हमारा सारा सार्वजनिक सॉफ़्टवेयर व्यावसायिक विज्ञापन और डेटा संग्रह को पूरी तरह बाहर रखता है और सार्वजनिक डिजिटल बुनियादी ढाँचे के रूप में वितरित किया जाता है, जिसे दुनिया में कोई भी स्वतंत्र और सुरक्षित रूप से उपयोग कर सकता है।",
+  "fr": "Tous nos logiciels publics excluent entièrement la publicité commerciale et la collecte de données, et sont diffusés comme une infrastructure numérique publique que chacun dans le monde peut utiliser librement et en toute sécurité.",
+  "de": "Unsere gesamte öffentliche Software schließt kommerzielle Werbung und Datenerfassung vollständig aus und wird als öffentliche digitale Infrastruktur bereitgestellt, die jeder auf der Welt frei und sicher nutzen kann.",
+  "pt": "Todo o nosso software público exclui totalmente publicidade comercial e coleta de dados, e é distribuído como infraestrutura digital pública que qualquer pessoa no mundo pode usar livremente e com segurança.",
+  "it": "Tutto il nostro software pubblico esclude completamente la pubblicità commerciale e la raccolta di dati, ed è distribuito come infrastruttura digitale pubblica che chiunque nel mondo può usare liberamente e in sicurezza.",
+  "nl": "Al onze openbare software sluit commerciële reclame en gegevensverzameling volledig uit en wordt verspreid als openbare digitale infrastructuur die iedereen ter wereld vrij en veilig kan gebruiken.",
+  "ru": "Всё наше публичное программное обеспечение полностью исключает коммерческую рекламу и сбор данных и распространяется как публичная цифровая инфраструктура, которой любой человек в мире может пользоваться свободно и безопасно.",
+  "uk": "Усе наше публічне програмне забезпечення повністю виключає комерційну рекламу та збір даних і поширюється як публічна цифрова інфраструктура, якою будь-хто у світі може користуватися вільно та безпечно.",
+  "pl": "Całe nasze publiczne oprogramowanie całkowicie wyklucza reklamę komercyjną i gromadzenie danych, a jest rozpowszechniane jako publiczna infrastruktura cyfrowa, z której każdy na świecie może korzystać swobodnie i bezpiecznie.",
+  "cs": "Veškerý náš veřejný software zcela vylučuje komerční reklamu a sběr dat a je šířen jako veřejná digitální infrastruktura, kterou může kdokoli na světě volně a bezpečně používat.",
+  "hu": "Minden nyilvános szoftverünk teljesen kizárja a kereskedelmi reklámot és az adatgyűjtést, és nyilvános digitális infrastruktúraként terjesztjük, amelyet a világon bárki szabadon és biztonságosan használhat.",
+  "ro": "Tot software-ul nostru public exclude complet publicitatea comercială și colectarea de date și este distribuit ca infrastructură digitală publică, pe care oricine din lume o poate folosi liber și în siguranță.",
+  "da": "Al vores offentlige software udelukker fuldstændigt kommerciel reklame og dataindsamling og distribueres som offentlig digital infrastruktur, som alle i verden kan bruge frit og sikkert.",
+  "fi": "Kaikki julkinen ohjelmistomme sulkee kokonaan pois kaupallisen mainonnan ja tietojen keräämisen, ja sitä jaetaan julkisena digitaalisena infrastruktuurina, jota kuka tahansa maailmassa voi käyttää vapaasti ja turvallisesti.",
+  "nb": "All vår offentlige programvare utelukker fullstendig kommersiell reklame og datainnsamling, og distribueres som offentlig digital infrastruktur som hvem som helst i verden kan bruke fritt og trygt.",
+  "sv": "All vår offentliga programvara utesluter helt kommersiell reklam och datainsamling och distribueras som offentlig digital infrastruktur som vem som helst i världen kan använda fritt och säkert.",
+  "tr": "Tüm herkese açık yazılımlarımız ticari reklamı ve veri toplamayı tamamen dışlar ve dünyada herkesin özgürce ve güvenli bir şekilde kullanabileceği kamusal dijital altyapı olarak dağıtılır.",
+  "zh-TW": "我們提供的所有公共軟體完全排除商業廣告和資料收集，作為公共數位基礎設施分發，讓全世界任何人都能自由、安全地使用。",
+  "th": "ซอฟต์แวร์สาธารณะทั้งหมดของเราไม่มีโฆษณาเชิงพาณิชย์และการเก็บข้อมูลโดยสิ้นเชิง และเผยแพร่ในฐานะโครงสร้างพื้นฐานดิจิทัลสาธารณะที่ทุกคนในโลกใช้ได้อย่างอิสระและปลอดภัย",
+  "vi": "Tất cả phần mềm công cộng của chúng tôi hoàn toàn loại bỏ quảng cáo thương mại và thu thập dữ liệu, và được phân phối dưới dạng hạ tầng số công cộng mà bất kỳ ai trên thế giới cũng có thể sử dụng tự do và an toàn.",
+  "id": "Semua perangkat lunak publik kami sepenuhnya mengecualikan iklan komersial dan pengumpulan data, dan didistribusikan sebagai infrastruktur digital publik yang dapat digunakan siapa pun di dunia secara bebas dan aman.",
+  "ar": "جميع برامجنا العامة تستبعد الإعلانات التجارية وجمع البيانات تمامًا، وتُوزَّع كبنية تحتية رقمية عامة يمكن لأي شخص في العالم استخدامها بحرية وأمان.",
+  "fa": "همه نرم‌افزارهای عمومی ما تبلیغات تجاری و گردآوری داده‌ها را به‌طور کامل کنار می‌گذارند و به‌عنوان زیرساخت دیجیتال عمومی توزیع می‌شوند تا هر کسی در جهان بتواند آزادانه و با امنیت از آن‌ها استفاده کند."
+ }
+});
+
+</script>
+<style>.nx-back{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9999;display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:999px;background:rgba(10,16,34,.85);border:1px solid rgba(45,212,191,.55);color:#E2F3FF;font-size:15.5px;font-weight:600;text-decoration:none;backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,.35)}.nx-back:active{filter:brightness(1.6)}</style>
+<a class="nx-back" href="https://nexus-2e23d.web.app/#n21" aria-label="현황판으로 돌아가기">← 돌아가기</a>
+
+<script>
+/* NX-I18N-SUPPLEMENT — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "← 돌아가기": {
+  "en": "← Back",
+  "zh": "← 返回",
+  "zh-TW": "← 返回",
+  "ja": "← 戻る",
+  "es": "← Volver",
+  "hi": "← वापस",
+  "fr": "← Retour",
+  "de": "← Zurück",
+  "pt": "← Voltar",
+  "it": "← Indietro",
+  "ru": "← Назад",
+  "uk": "← Назад",
+  "ar": "← رجوع",
+  "fa": "← بازگشت",
+  "th": "← กลับ",
+  "vi": "← Quay lại",
+  "id": "← Kembali",
+  "tr": "← Geri dön",
+  "nl": "← Terug",
+  "pl": "← Wstecz",
+  "sv": "← Tillbaka",
+  "da": "← Tilbage",
+  "nb": "← Tilbake",
+  "fi": "← Takaisin",
+  "cs": "← Zpět",
+  "hu": "← Vissza",
+  "ro": "← Înapoi"
+ }
+});
+</script>
+</body>
+</html>

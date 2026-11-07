@@ -1,0 +1,21 @@
+{
+  "name": "넥서스 오디오 컷",
+  "short_name": "오디오 컷",
+  "description": "가입 없이 무료로 쓰는 기기 안 파일 도구",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B0F19",
+  "theme_color": "#0B0F19",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

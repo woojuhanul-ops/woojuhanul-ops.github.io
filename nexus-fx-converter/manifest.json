@@ -1,0 +1,1 @@
+{"background_color":"#0B0F19","description":"여러 나라 돈을 서로 바꾸어 계산하는 도구","display":"standalone","icons":[{"sizes":"192x192","src":"/icon-192.png","type":"image/png"},{"sizes":"512x512","src":"/icon-512.png","type":"image/png"}],"name":"넥서스 환율 변환","short_name":"환율 변환","start_url":"/","theme_color":"#0B0F19"}

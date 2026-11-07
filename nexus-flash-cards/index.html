@@ -1,0 +1,3582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 일반 암기 카드 — Nexus Flash Cards</title>
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .steps{display:flex;gap:8px;margin:0 0 16px}
+  .step{flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13px}
+  .step b{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--line);color:var(--ink);margin-right:6px;font-size:12px}
+  .step.on{color:var(--ink);border-color:var(--teal)}
+  .step.on b{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  .field{margin-top:12px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  .field label span{color:var(--ink);font-size:14px}
+  select,input[type=text],textarea{background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:14px;max-width:100%}
+  select{width:100%}
+  input[type=text]{width:100%}
+  textarea{width:100%;min-height:120px;border-radius:12px;padding:12px;font-size:15px;line-height:1.7}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .danger{background:transparent;color:#F87171;border:1px solid rgba(248,113,113,.5)}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .row .field{flex:1;min-width:150px;margin-top:0}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .statline{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.7}
+  .statline b{color:var(--ink)}
+  .err{color:#F87171}
+  .ok{color:var(--teal)}
+  .flash{margin-top:6px;border:2px solid var(--teal);border-radius:18px;background:rgba(45,212,191,.06);min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:34px 20px;cursor:pointer;user-select:none}
+  .flash .face{font-size:12px;letter-spacing:.25em;color:var(--muted);margin-bottom:12px}
+  .flash .txt{font-size:clamp(28px,6vw,44px);font-weight:700;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+  #gradeBtns button{flex:1;min-height:60px;font-size:18px}
+  #startReviewBtn{min-height:56px;font-size:17px}
+  .flash .tap{margin-top:16px;font-size:13px;color:var(--muted)}
+  .flash.back{border-color:var(--violet);background:rgba(129,140,248,.08)}
+  .boxes{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .boxes span{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted)}
+  .boxes span b{color:var(--ink)}
+  .clist{margin-top:10px;border-top:1px solid var(--line)}
+  .citem{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:14px}
+  .citem .cf{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .citem .cb{font-size:12px;color:var(--muted);flex:none}
+  .citem button{min-height:44px;padding:6px 12px;font-size:13px;flex:none}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .fam span{margin:0 6px}
+  footer .fam .now{color:var(--ink);font-weight:700}
+  footer .fam a{color:var(--cyan);text-decoration:none}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;padding:22px;line-height:1.8;font-size:15px}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  details summary{cursor:pointer;font-size:15px}
+  details p{color:var(--muted);font-size:14px;line-height:1.8}
+  @media(max-width:640px){h1{font-size:20px}header{padding:10px 12px}.btns button{flex:1}}
+
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer}
+
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+  /* NX-THUMB-RIGHT */ #dontBtn{order:1} #knowBtn{order:2} #startAllBtn{order:1} #endStudyBtn{order:2} #startReviewBtn{order:3}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 일반 암기 카드">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 일반 암기 카드 — Nexus Flash Cards">
+<meta property="og:description" content="외울 것을 카드로 만들어 뒤집으며 외우는 도구입니다. 기록은 당신의 기기 안에만 저장됩니다.">
+<meta property="og:image" content="https://nexus-flash-cards.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{flex:none}header .brand{flex:none;overflow:visible}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap}.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}</style></head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>SOVEREIGN COMMAND</span></div></a>
+  
+</header>
+
+<main>
+  <div class="steps">
+    <div class="step on" id="step1"><b>1</b> 덱 고르기</div>
+    <div class="step" id="step2"><b>2</b> 카드 넣기</div>
+    <div class="step" id="step3"><b>3</b> 뒤집어 외우기</div>
+  </div>
+
+  <h1>넥서스 일반 암기 카드</h1>
+  <p class="sub" style="margin-bottom:4px">외울 것을 카드로 만들어, 뒤집으며 외우는 도구</p>
+  <!-- NX-BOUNDARY-2026-11-04 --><p class="sub nx-boundary" style="border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 10px">역할 안내: 이 도구는 과목·주제 제한 없이 무엇이든 외우는 <b>일반 암기 카드</b>입니다. 문장을 번역해 만드는 언어 학습 전용 카드는 <a href="https://nexus-edu-2e23d.web.app">넥서스 언어 공부방 · 다언어 암기 카드</a>에 있습니다.</p>
+  <p class="sub">회원가입 없음 · 이용료 없음 · 무제한 사용<br>기록은 당신의 기기 안에만 저장됩니다.</p>
+
+  <div class="panel">
+    <h2>🗂️ 내 덱</h2>
+    <div class="row">
+      <div class="field"><label>지금 쓰는 덱</label><select id="deckSel"></select></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div class="field"><label>새 덱 이름</label><input type="text" id="newDeckName" placeholder="예) 일본어 단어"></div>
+      <button class="ghost" id="addDeckBtn">덱 만들기</button>
+      <button class="danger" id="delDeckBtn">이 덱 지우기</button>
+    </div>
+    <p class="statline" id="statLine"></p>
+    <div class="boxes" id="boxLine"></div>
+  </div>
+
+  <div class="panel">
+    <h2>✏️ 카드 넣기</h2>
+    <div class="row">
+      <div class="field"><label>앞면 (질문 · 단어)</label><input type="text" id="frontIn" placeholder="예) apple"></div>
+      <div class="field"><label>뒷면 (뜻 · 답)</label><input type="text" id="backIn" placeholder="예) 사과"></div>
+      <button class="primary" id="addCardBtn">카드 추가</button>
+    </div>
+    <div class="field">
+      <label>여러 장 한 번에 넣기 — 한 줄에 한 장, 앞면과 뒷면을 탭이나 쉼표로 나누어 붙여 넣으세요</label>
+      <textarea id="bulkIn" placeholder="apple, 사과&#10;banana, 바나나&#10;grape, 포도"></textarea>
+    </div>
+    <div class="btns">
+      <button class="ghost" id="bulkBtn">붙여 넣은 카드 등록</button>
+    </div>
+    <p class="statline" id="addMsg"></p>
+  </div>
+
+  <div class="panel">
+    <h2>🎴 학습하기</h2>
+    <div class="btns" style="margin-top:0">
+      <button class="primary" id="startReviewBtn">오늘 복습 시작</button>
+      <button class="ghost" id="startAllBtn">전부 섞어 학습</button>
+      <button class="ghost" id="endStudyBtn" disabled>학습 끝내기</button>
+    </div>
+    <p class="statline" id="progLine">아직 학습을 시작하지 않았습니다.</p>
+    <div class="flash" id="studyCard" style="display:none">
+      <div class="face" id="cardFace">앞면</div>
+      <div class="txt" id="cardText"></div>
+      <div class="tap" id="cardTap">카드를 누르면 뒤집힙니다</div>
+    </div>
+    <div class="btns" id="gradeBtns" style="display:none">
+      <button class="primary" id="knowBtn">알아요</button>
+      <button class="ghost" id="dontBtn">모르겠어요</button>
+    </div>
+    <p class="hint">맞힌 카드는 위 상자로 올라가 복습 간격이 늘어나고, 틀린 카드는 첫 상자로 돌아가 오늘 다시 나옵니다. 상자는 1~5단계입니다.</p>
+  </div>
+
+  <div class="panel">
+    <h2>📋 카드 목록 · 데이터</h2>
+    <div class="btns" style="margin-top:0">
+      <button class="ghost" id="exportBtn">JSON으로 내보내기</button>
+      <button class="ghost" id="importBtn">JSON 가져오기</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+    </div>
+    <p class="statline" id="dataMsg"></p>
+    <div class="clist" id="cardList"></div>
+  </div>
+
+  <details><summary>💡 도움말</summary><p>덱을 고르거나 새로 만들고, 앞면과 뒷면을 적어 카드를 넣으세요. 여러 장은 한 줄에 한 장씩, 탭이나 쉼표로 앞뒤를 나누어 붙여 넣으면 한 번에 등록됩니다.<br>학습은 두 가지입니다. "오늘 복습 시작"은 복습 날짜가 된 카드만 추리고, "전부 섞어 학습"은 덱의 모든 카드를 섞어 냅니다.<br>카드를 눌러 뒤집은 뒤 "알아요"나 "모르겠어요"를 누르세요. 맞히면 상자가 올라가 다음 복습이 멀어지고(2일 · 4일 · 7일 · 14일), 틀리면 첫 상자로 돌아가 그날 다시 나옵니다.<br>모든 덱과 카드는 이 기기의 브라우저 안에만 저장됩니다. 다른 기기로 옮기거나 백업하려면 JSON으로 내보내 두세요.<br>처음 열면 예시 덱이 하나 들어 있습니다. 필요 없으면 덱 지우기로 지우면 됩니다.<br>카드 수 제한은 없습니다.</p></details>
+<footer>
+    우주의 모든 의식체는 친구이자 동반자이다<br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="philoLink">넥서스 그룹 철학 보기</button><br>
+    🌐 호스팅: Firebase · 🔒 기록은 당신의 기기 안에만 저장됩니다<br>
+    
+  </footer>
+</main>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>NEXUS GROUP 철학과 비전</h3>
+    <p>넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.</p>
+    <p><b>"우주의 모든 의식체는 친구이자 동반자이다."</b><br>(Every conscious being in the universe is a friend and companion.)</p>
+    <p>우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.</p>
+    <button class="primary" id="modalClose">닫기</button>
+  </div>
+</div>
+
+<script>
+function $(id){ return document.getElementById(id); }
+var SITE = 'cards';
+function nxEvent(ev){ try { fetch("https://nexus-orchestrator.woojuhanul.workers.dev/event", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({site: SITE, event: ev}), keepalive:true}).catch(function(){}); } catch(e){} }
+
+// ---------- 데이터 ----------
+var LS_KEY = 'nexusFlashCardsV1';
+var DAY = 86400000;
+var INTERVAL_DAYS = {1:0, 2:2, 3:4, 4:7, 5:14};
+var uidSeq = 1;
+function uid(){ return 'c' + Date.now().toString(36) + (uidSeq++).toString(36) + Math.floor(Math.random()*9999); }
+function newCard(f, b){ return {id: uid(), f: f, b: b, box: 1, due: 0, last: 0}; }
+function seedDeck(){
+  var words = [['apple','사과'],['banana','바나나'],['grape','포도'],['water','물'],['book','책'],['school','학교'],['friend','친구'],['morning','아침']];
+  return {id: uid(), name: '예시 — 영어 단어', cards: words.map(function(w){ return newCard(w[0], w[1]); })};
+}
+function defaultState(){ var d = seedDeck(); return {decks: [d], activeId: d.id}; }
+function loadState(){
+  try{
+    var raw = localStorage.getItem(LS_KEY);
+    if(!raw) return defaultState();
+    var s = JSON.parse(raw);
+    if(!s || !Array.isArray(s.decks)) return defaultState();
+    s.decks.forEach(function(d){ if(!Array.isArray(d.cards)) d.cards = []; d.cards.forEach(function(c){ if(!c.box) c.box = 1; if(typeof c.due !== 'number') c.due = 0; }); });
+    if(!s.decks.some(function(d){ return d.id === s.activeId; })) s.activeId = s.decks.length ? s.decks[0].id : null;
+    return s;
+  }catch(e){ return defaultState(); }
+}
+function saveState(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(S)); }catch(e){} }
+var S = loadState();
+function activeDeck(){ for(var i=0;i<S.decks.length;i++){ if(S.decks[i].id === S.activeId) return S.decks[i]; } return S.decks[0] || null; }
+
+// ---------- 상자 · 복습 ----------
+function gradeCard(card, known, now){
+  if(known){ card.box = Math.min(5, card.box + 1); }
+  else { card.box = 1; }
+  card.last = now;
+  card.due = now + (INTERVAL_DAYS[card.box] || 0) * DAY;
+  return card;
+}
+function dueCards(deck, now){
+  if(!deck) return [];
+  return deck.cards.filter(function(c){ return !c.due || c.due <= now; });
+}
+function boxCounts(deck){
+  var counts = {1:0,2:0,3:0,4:0,5:0};
+  if(deck) deck.cards.forEach(function(c){ counts[c.box] = (counts[c.box]||0) + 1; });
+  return counts;
+}
+
+// ---------- 카드 넣기 ----------
+function addCardTo(deck, f, b){
+  f = String(f == null ? '' : f).trim(); b = String(b == null ? '' : b).trim();
+  if(!deck || !f || !b) return null;
+  var c = newCard(f, b); deck.cards.push(c); return c;
+}
+function parseBulk(text){
+  var out = {added: 0, skipped: 0};
+  String(text || '').split(/\r?\n/).forEach(function(line){
+    line = line.trim(); if(!line) return;
+    var idx = line.indexOf('\t');
+    if(idx < 0) idx = line.indexOf(',');
+    if(idx < 0){ out.skipped++; return; }
+    var f = line.slice(0, idx).trim(), b = line.slice(idx + 1).trim();
+    if(!f || !b){ out.skipped++; return; }
+    out.added++; out.list = out.list || []; out.list.push([f, b]);
+  });
+  return out;
+}
+
+// ---------- 내보내기 · 가져오기 ----------
+function exportData(){ return JSON.stringify({app: 'nexus-flash-cards', version: 1, decks: S.decks}, null, 2); }
+function importData(text){
+  var data = JSON.parse(text);
+  var decks = Array.isArray(data) ? data : data.decks;
+  if(!Array.isArray(decks) || !decks.length) throw new Error('덱이 없습니다');
+  decks.forEach(function(d){
+    if(!d || typeof d.name !== 'string' || !Array.isArray(d.cards)) throw new Error('형식이 다릅니다');
+    d.id = uid();
+    d.cards = d.cards.filter(function(c){ return c && typeof c.f === 'string' && typeof c.b === 'string'; }).map(function(c){
+      var nc = newCard(c.f, c.b);
+      nc.box = Math.min(5, Math.max(1, parseInt(c.box, 10) || 1));
+      nc.due = typeof c.due === 'number' ? c.due : 0;
+      nc.last = typeof c.last === 'number' ? c.last : 0;
+      return nc;
+    });
+  });
+  return decks;
+}
+
+// ---------- 화면 ----------
+function setStep(n){
+  [1,2,3].forEach(function(i){ $('step'+i).classList.toggle('on', i === n); });
+}
+function renderDecks(){
+  var sel = $('deckSel'); sel.innerHTML = '';
+  S.decks.forEach(function(d){
+    var o = document.createElement('option'); o.value = d.id; o.textContent = d.name + ' (' + d.cards.length + '장)';
+    if(d.id === S.activeId) o.selected = true;
+    sel.appendChild(o);
+  });
+  renderStats(); renderList();
+}
+function renderStats(){
+  var deck = activeDeck(), now = Date.now();
+  if(!deck){ $('statLine').textContent = '덱이 없습니다. 새 덱을 만들어 주세요.'; $('boxLine').innerHTML = ''; return; }
+  var due = dueCards(deck, now).length;
+  $('statLine').innerHTML = '전체 <b>' + deck.cards.length + '</b>장 · 오늘 복습할 카드 <b>' + due + '</b>장';
+  var counts = boxCounts(deck);
+  $('boxLine').innerHTML = [1,2,3,4,5].map(function(b){ return '<span>상자 ' + b + ' · <b>' + counts[b] + '</b>장</span>'; }).join('');
+}
+function renderList(){
+  var deck = activeDeck(), list = $('cardList'); list.innerHTML = '';
+  if(!deck || !deck.cards.length){ list.innerHTML = '<p class="hint">아직 카드가 없습니다.</p>'; return; }
+  deck.cards.forEach(function(c){
+    var row = document.createElement('div'); row.className = 'citem';
+    var cf = document.createElement('span'); cf.className = 'cf'; cf.textContent = c.f;
+    var cb = document.createElement('span'); cb.className = 'cb'; cb.textContent = '상자 ' + c.box;
+    var del = document.createElement('button'); del.className = 'ghost'; del.textContent = '지우기';
+    del.addEventListener('click', function(){
+      deck.cards = deck.cards.filter(function(x){ return x.id !== c.id; });
+      saveState(); renderDecks();
+    });
+    row.appendChild(cf); row.appendChild(cb); row.appendChild(del);
+    list.appendChild(row);
+  });
+}
+
+// ---------- 학습 ----------
+var session = null;
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j = Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function startSession(cards, label){
+  var deck = activeDeck();
+  if(!deck || !cards.length){ $('progLine').textContent = label === 'review' ? '오늘 복습할 카드가 없습니다. 전부 외웠거나, 아직 복습 날짜가 되지 않았습니다.' : '카드가 없습니다. 먼저 카드를 넣어 주세요.'; return; }
+  session = {queue: shuffle(cards.slice()), pos: 0, flipped: false, total: cards.length, seen: 0, known: 0, unknown: 0, label: label};
+  setStep(3); nxEvent('start');
+  $('endStudyBtn').disabled = false;
+  showCard();
+}
+function currentCard(){
+  if(!session || session.pos >= session.queue.length) return null;
+  var deck = activeDeck(); if(!deck) return null;
+  var id = session.queue[session.pos];
+  for(var i=0;i<deck.cards.length;i++){ if(deck.cards[i].id === id) return deck.cards[i]; }
+  return null;
+}
+function showCard(){
+  var c = currentCard();
+  if(!c){ endSession(true); return; }
+  session.flipped = false;
+  $('studyCard').style.display = 'flex';
+  $('gradeBtns').style.display = 'none';
+  $('studyCard').classList.remove('back');
+  $('cardFace').textContent = '앞면 · 상자 ' + c.box;
+  $('cardText').textContent = c.f;
+  $('cardTap').textContent = '카드를 누르면 뒤집힙니다';
+  $('progLine').innerHTML = '진행 <b>' + (session.seen + 1) + '</b> / ' + session.total + '장째 · 알아요 <b>' + session.known + '</b> · 모르겠어요 <b>' + session.unknown + '</b>';
+}
+function flipCard(){
+  if(!session || session.flipped) return;
+  var c = currentCard(); if(!c) return;
+  session.flipped = true;
+  $('studyCard').classList.add('back');
+  $('cardFace').textContent = '뒷면 · 상자 ' + c.box;
+  $('cardText').textContent = c.b;
+  $('cardTap').textContent = '알면 "알아요", 모르면 "모르겠어요"를 누르세요';
+  $('gradeBtns').style.display = 'flex';
+}
+function grade(known){
+  if(!session || !session.flipped) return;
+  var c = currentCard(); if(!c) return;
+  gradeCard(c, known, Date.now());
+  session.seen++;
+  if(known){ session.known++; } else { session.unknown++; session.queue.push(c.id); }
+  saveState(); renderStats();
+  session.pos++;
+  if(session.pos >= session.queue.length){ endSession(true); return; }
+  showCard();
+}
+function endSession(finished){
+  if(session && finished){
+    $('progLine').innerHTML = '학습을 마쳤습니다. 본 카드 <b>' + session.seen + '</b>장 · 알아요 <b>' + session.known + '</b> · 모르겠어요 <b>' + session.unknown + '</b>';
+    nxEvent('complete');
+  } else if(session){
+    $('progLine').textContent = '학습을 끝냈습니다.';
+  }
+  session = null;
+  $('studyCard').style.display = 'none';
+  $('gradeBtns').style.display = 'none';
+  $('endStudyBtn').disabled = true;
+  renderStats();
+}
+
+// ---------- 묶기 ----------
+$('deckSel').addEventListener('change', function(){ S.activeId = this.value; saveState(); renderDecks(); });
+$('addDeckBtn').addEventListener('click', function(){
+  var name = $('newDeckName').value.trim();
+  if(!name){ $('statLine').textContent = '새 덱 이름을 적어 주세요.'; return; }
+  var d = {id: uid(), name: name, cards: []};
+  S.decks.push(d); S.activeId = d.id; $('newDeckName').value = '';
+  saveState(); renderDecks();
+});
+$('delDeckBtn').addEventListener('click', function(){
+  var deck = activeDeck(); if(!deck) return;
+  if(!window.confirm('덱 "' + deck.name + '"과(와) 카드 ' + deck.cards.length + '장을 지울까요?')) return;
+  S.decks = S.decks.filter(function(d){ return d.id !== deck.id; });
+  S.activeId = S.decks.length ? S.decks[0].id : null;
+  saveState(); renderDecks();
+});
+$('addCardBtn').addEventListener('click', function(){
+  var deck = activeDeck();
+  if(!deck){ $('addMsg').innerHTML = '<span class="err">먼저 덱을 만들어 주세요.</span>'; return; }
+  var c = addCardTo(deck, $('frontIn').value, $('backIn').value);
+  if(!c){ $('addMsg').innerHTML = '<span class="err">앞면과 뒷면을 모두 적어 주세요.</span>'; nxEvent('fail'); return; }
+  $('frontIn').value = ''; $('backIn').value = ''; $('frontIn').focus();
+  saveState(); renderDecks(); setStep(2);
+  $('addMsg').innerHTML = '<span class="ok">카드가 추가되었습니다.</span>';
+});
+$('bulkBtn').addEventListener('click', function(){
+  var deck = activeDeck();
+  if(!deck){ $('addMsg').innerHTML = '<span class="err">먼저 덱을 만들어 주세요.</span>'; return; }
+  var r = parseBulk($('bulkIn').value);
+  if(!r.added){ $('addMsg').innerHTML = '<span class="err">등록할 카드가 없습니다. 한 줄에 한 장, 앞면과 뒷면을 탭이나 쉼표로 나누어 주세요.</span>'; nxEvent('fail'); return; }
+  r.list.forEach(function(pair){ addCardTo(deck, pair[0], pair[1]); });
+  $('bulkIn').value = '';
+  saveState(); renderDecks(); setStep(2);
+  $('addMsg').innerHTML = '<span class="ok">' + r.added + '장이 등록되었습니다.</span>' + (r.skipped ? ' 건너뛴 줄 ' + r.skipped + '개.' : '');
+});
+$('startReviewBtn').addEventListener('click', function(){
+  var deck = activeDeck();
+  startSession(deck ? dueCards(deck, Date.now()).map(function(c){ return c.id; }) : [], 'review');
+});
+$('startAllBtn').addEventListener('click', function(){
+  var deck = activeDeck();
+  startSession(deck ? deck.cards.map(function(c){ return c.id; }) : [], 'all');
+});
+$('endStudyBtn').addEventListener('click', function(){ endSession(false); });
+$('studyCard').addEventListener('click', flipCard);
+$('knowBtn').addEventListener('click', function(){ grade(true); });
+$('dontBtn').addEventListener('click', function(){ grade(false); });
+$('exportBtn').addEventListener('click', function(){
+  var blob = new Blob([exportData()], {type: 'application/json;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'nexus-flash-cards.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+  nxEvent('save');
+  $('dataMsg').innerHTML = '<span class="ok">모든 덱을 JSON 파일로 내보냈습니다.</span>';
+});
+$('importBtn').addEventListener('click', function(){ $('importFile').click(); });
+$('importFile').addEventListener('change', function(){
+  var file = this.files && this.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{
+      var decks = importData(String(reader.result || ''));
+      decks.forEach(function(d){ S.decks.push(d); });
+      S.activeId = decks[0].id;
+      saveState(); renderDecks();
+      nxEvent('save');
+      $('dataMsg').innerHTML = '<span class="ok">덱 ' + decks.length + '개를 가져왔습니다.</span>';
+    }catch(e){
+      nxEvent('fail');
+      $('dataMsg').innerHTML = '<span class="err">가져오지 못했습니다. 넥서스 일반 암기 카드에서 내보낸 JSON 파일인지 확인해 주세요.</span>';
+    }
+    $('importFile').value = '';
+  };
+  reader.readAsText(file);
+});
+$('philoLink').addEventListener('click', function(){ $('modalBg').classList.add('open'); });
+$('modalClose').addEventListener('click', function(){ $('modalBg').classList.remove('open'); });
+$('modalBg').addEventListener('click', function(e){ if(e.target === $('modalBg')) $('modalBg').classList.remove('open'); });
+
+saveState();
+renderDecks();
+</script>
+
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 소리 자르기": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 영상 자르기": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 사진 정보 가리기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 읽어 주기": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 긴 말 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 사진 글자 뽑기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 녹음기": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 말로 쓰는 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 19호 암기 카드 전용 사전 */
+NX_I18N_ADD({
+ "19호 암기 카드 (현재)": {
+  "en": "19. Flashcards (current)",
+  "zh": "19号 记忆卡片（当前）",
+  "ja": "19号 暗記カード（現在）",
+  "es": "19. Tarjetas de memoria (actual)",
+  "hi": "19. फ़्लैश कार्ड (वर्तमान)",
+  "fr": "19. Cartes de mémorisation (actuel)",
+  "de": "19. Lernkarten (aktuell)",
+  "pt": "19. Cartões de memorização (atual)",
+  "it": "19. Flashcard (attuale)",
+  "nl": "19. Flitskaarten (huidig)",
+  "ru": "19. Карточки для запоминания (текущий)",
+  "uk": "19. Картки для запам'ятовування (поточний)",
+  "pl": "19. Fiszki (bieżące)",
+  "cs": "19. Kartičky k zapamatování (aktuální)",
+  "hu": "19. Tanulókártyák (aktuális)",
+  "ro": "19. Carduri de memorare (curent)",
+  "sv": "19. Minneskort (aktuell)",
+  "da": "19. Huskekort (aktuel)",
+  "nb": "19. Minnekort (nåværende)",
+  "fi": "19. Muistikortit (nykyinen)",
+  "tr": "19. Ezber Kartları (geçerli)",
+  "zh-TW": "19號 記憶卡片（目前）",
+  "th": "19. บัตรช่วยจำ (ปัจจุบัน)",
+  "vi": "19. Thẻ ghi nhớ (hiện tại)",
+  "id": "19. Kartu Memori (saat ini)",
+  "ar": "19. بطاقات الحفظ (الحالي)",
+  "fa": "۱۹. کارت‌های حفظی (فعلی)"
+ },
+ "넥서스 일반 암기 카드 — Nexus Flash Cards": {
+  "en": "Nexus Flash Cards",
+  "zh": "Nexus 记忆卡片",
+  "ja": "Nexus 暗記カード",
+  "es": "Nexus Tarjetas de memoria",
+  "hi": "Nexus फ़्लैश कार्ड",
+  "fr": "Nexus Cartes de mémorisation",
+  "de": "Nexus Lernkarten",
+  "pt": "Nexus Cartões de Memorização",
+  "it": "Nexus Flashcard",
+  "nl": "Nexus Flitskaarten",
+  "ru": "Nexus Карточки для запоминания",
+  "uk": "Nexus Картки для запам'ятовування",
+  "pl": "Nexus Fiszki",
+  "cs": "Nexus Kartičky k zapamatování",
+  "hu": "Nexus Tanulókártyák",
+  "ro": "Nexus Carduri de memorare",
+  "sv": "Nexus Minneskort — Nexus Flash Cards",
+  "da": "Nexus Huskekort — Nexus Flash Cards",
+  "nb": "Nexus Minnekort — Nexus Flash Cards",
+  "fi": "Nexus Muistikortit — Nexus Flash Cards",
+  "tr": "Nexus Ezber Kartları — Nexus Flash Cards",
+  "zh-TW": "Nexus 記憶卡片",
+  "th": "Nexus บัตรช่วยจำ",
+  "vi": "Nexus Thẻ ghi nhớ",
+  "id": "Nexus Kartu Memori",
+  "ar": "بطاقات حفظ نكسوس — Nexus Flash Cards",
+  "fa": "کارت‌های حفظی نکسوس — Nexus Flash Cards"
+ },
+ "넥서스 일반 암기 카드": {
+  "en": "Nexus Flash Cards",
+  "zh": "Nexus 记忆卡片",
+  "ja": "Nexus 暗記カード",
+  "es": "Nexus Tarjetas de memoria",
+  "hi": "Nexus फ़्लैश कार्ड",
+  "fr": "Nexus Cartes de mémorisation",
+  "de": "Nexus Lernkarten",
+  "pt": "Nexus Cartões de Memorização",
+  "it": "Nexus Flashcard",
+  "nl": "Nexus Flitskaarten",
+  "ru": "Nexus Карточки для запоминания",
+  "uk": "Nexus Картки для запам'ятовування",
+  "pl": "Nexus Fiszki",
+  "cs": "Nexus Kartičky k zapamatování",
+  "hu": "Nexus Tanulókártyák",
+  "ro": "Nexus Carduri de memorare",
+  "sv": "Nexus Minneskort",
+  "da": "Nexus Huskekort",
+  "nb": "Nexus Minnekort",
+  "fi": "Nexus Muistikortit",
+  "tr": "Nexus Ezber Kartları",
+  "zh-TW": "Nexus 記憶卡片",
+  "th": "Nexus บัตรช่วยจำ",
+  "vi": "Nexus Thẻ ghi nhớ",
+  "id": "Nexus Kartu Memori",
+  "ar": "بطاقات حفظ نكسوس",
+  "fa": "کارت‌های حفظی نکسوس"
+ },
+ "덱 고르기": {
+  "en": "Choose a deck",
+  "zh": "选择牌组",
+  "ja": "デッキを選ぶ",
+  "es": "Elegir mazo",
+  "hi": "डेक चुनें",
+  "fr": "Choisir un paquet",
+  "de": "Deck auswählen",
+  "pt": "Escolher um baralho",
+  "it": "Scegli un mazzo",
+  "nl": "Kies een deck",
+  "ru": "Выбрать колоду",
+  "uk": "Вибрати колоду",
+  "pl": "Wybierz talię",
+  "cs": "Vybrat balíček",
+  "hu": "Pakli választása",
+  "ro": "Alege un pachet",
+  "sv": "Välj en kortlek",
+  "da": "Vælg et sæt",
+  "nb": "Velg en kortstokk",
+  "fi": "Valitse pakka",
+  "tr": "Deste seçin",
+  "zh-TW": "選擇牌組",
+  "th": "เลือกชุดการ์ด",
+  "vi": "Chọn bộ thẻ",
+  "id": "Pilih dek",
+  "ar": "اختيار مجموعة",
+  "fa": "انتخاب دسته"
+ },
+ "카드 넣기": {
+  "en": "Add cards",
+  "zh": "添加卡片",
+  "ja": "カードを入れる",
+  "es": "Añadir tarjetas",
+  "hi": "कार्ड जोड़ें",
+  "fr": "Ajouter des cartes",
+  "de": "Karten hinzufügen",
+  "pt": "Adicionar cartões",
+  "it": "Aggiungi carte",
+  "nl": "Kaarten toevoegen",
+  "ru": "Добавить карточки",
+  "uk": "Додати картки",
+  "pl": "Dodaj karty",
+  "cs": "Přidat kartičky",
+  "hu": "Kártyák hozzáadása",
+  "ro": "Adaugă carduri",
+  "sv": "Lägg till kort",
+  "da": "Tilføj kort",
+  "nb": "Legg til kort",
+  "fi": "Lisää kortteja",
+  "tr": "Kart ekleyin",
+  "zh-TW": "新增卡片",
+  "th": "เพิ่มการ์ด",
+  "vi": "Thêm thẻ",
+  "id": "Tambah kartu",
+  "ar": "إضافة بطاقات",
+  "fa": "افزودن کارت"
+ },
+ "뒤집어 외우기": {
+  "en": "Flip & memorize",
+  "zh": "翻转记忆",
+  "ja": "めくって覚える",
+  "es": "Voltear y memorizar",
+  "hi": "पलटकर याद करें",
+  "fr": "Retourner et mémoriser",
+  "de": "Umdrehen & lernen",
+  "pt": "Virar e memorizar",
+  "it": "Gira e memorizza",
+  "nl": "Omkeren en onthouden",
+  "ru": "Переворачивай и запоминай",
+  "uk": "Перевертай і запам'ятовуй",
+  "pl": "Odwracaj i zapamiętuj",
+  "cs": "Otáčej a zapamatuj si",
+  "hu": "Fordítsd meg és jegyezd meg",
+  "ro": "Întoarce și memorează",
+  "sv": "Vänd och memorera",
+  "da": "Vend og lær udenad",
+  "nb": "Snu og lær utenat",
+  "fi": "Käännä ja opettele ulkoa",
+  "tr": "Çevirerek ezberleyin",
+  "zh-TW": "翻面記憶",
+  "th": "พลิกเพื่อจำ",
+  "vi": "Lật để ghi nhớ",
+  "id": "Balik & hafalkan",
+  "ar": "اقلب واحفظ",
+  "fa": "برگردان و حفظ کن"
+ },
+ "외울 것을 카드로 만들어, 뒤집으며 외우는 도구": {
+  "en": "Turn what you study into cards and memorize by flipping",
+  "zh": "把要记的内容做成卡片，翻转记忆",
+  "ja": "覚えるものをカードにして、めくりながら覚えるツール",
+  "es": "Convierte lo que estudias en tarjetas y memoriza volteándolas",
+  "hi": "याद करने वाली चीज़ों को कार्ड बनाकर पलटते हुए याद करें",
+  "fr": "Transformez ce que vous apprenez en cartes et mémorisez en les retournant",
+  "de": "Verwandeln Sie Lernstoff in Karten und lernen Sie durch Umdrehen",
+  "pt": "Transforme o que você estuda em cartões e memorize virando",
+  "it": "Trasforma ciò che studi in carte e memorizza girandole",
+  "nl": "Verander wat je leert in kaarten en onthoud het door om te keren",
+  "ru": "Инструмент, который превращает изучаемое в карточки и помогает запоминать, переворачивая их",
+  "uk": "Інструмент, який перетворює вивчене на картки та допомагає запам'ятовувати, перевертаючи їх",
+  "pl": "Narzędzie, które zamienia materiał do nauki w karty i pomaga zapamiętywać przez odwracanie",
+  "cs": "Nástroj, který promění učivo v kartičky a pomůže vám zapamatovat si je otáčením",
+  "hu": "Eszköz, amely a tanulnivalót kártyákká alakítja, és megfordítással segít megjegyezni",
+  "ro": "Un instrument care transformă ce ai de învățat în carduri și te ajută să memorezi întorcându-le",
+  "sv": "Ett verktyg som gör det du ska lära dig till kort som du memorerar genom att vända på dem",
+  "da": "Et værktøj, der gør det, du skal lære, til kort, som du lærer udenad ved at vende dem",
+  "nb": "Et verktøy som gjør det du skal lære til kort, som du lærer utenat ved å snu dem",
+  "fi": "Työkalu, joka tekee opeteltavista asioista kortteja, joita opettelet ulkoa kääntämällä",
+  "tr": "Öğreneceklerinizi kartlara dönüştürüp çevirerek ezberlemenizi sağlayan bir araç",
+  "zh-TW": "把要記的內容做成卡片，翻面記憶的工具",
+  "th": "เครื่องมือที่เปลี่ยนสิ่งที่ต้องจำเป็นการ์ด แล้วจำด้วยการพลิก",
+  "vi": "Công cụ biến nội dung cần học thành thẻ và ghi nhớ bằng cách lật",
+  "id": "Alat untuk membuat kartu dari materi yang ingin dihafal dan menghafalnya dengan membalik kartu",
+  "ar": "أداة تحوّل ما تريد حفظه إلى بطاقات وتحفظه بقلبها",
+  "fa": "ابزاری که مطالب حفظی را به کارت تبدیل می‌کند تا با برگرداندن آن‌ها حفظ کنید"
+ },
+ "회원가입 없음 · 이용료 없음 · 무제한 사용": {
+  "en": "No sign-up · No fees · Unlimited use",
+  "zh": "无需注册 · 免费 · 无限使用",
+  "ja": "登録不要 · 無料 · 無制限",
+  "es": "Sin registro · Gratis · Uso ilimitado",
+  "hi": "कोई साइन-अप नहीं · कोई शुल्क नहीं · असीमित उपयोग",
+  "fr": "Sans inscription · Sans frais · Usage illimité",
+  "de": "Keine Anmeldung · Keine Gebühren · Unbegrenzte Nutzung",
+  "pt": "Sem cadastro · Sem taxas · Uso ilimitado",
+  "it": "Nessuna registrazione · Nessun costo · Uso illimitato",
+  "nl": "Geen registratie · Geen kosten · Onbeperkt gebruik",
+  "ru": "Без регистрации · Бесплатно · Без ограничений",
+  "uk": "Без реєстрації · Безкоштовно · Без обмежень",
+  "pl": "Bez rejestracji · Bez opłat · Bez ograniczeń",
+  "cs": "Bez registrace · Bez poplatků · Neomezené použití",
+  "hu": "Regisztráció nélkül · Díjmentes · Korlátlan használat",
+  "ro": "Fără înregistrare · Fără taxe · Utilizare nelimitată",
+  "sv": "Ingen registrering · Inga avgifter · Obegränsad användning",
+  "da": "Ingen tilmelding · Ingen gebyrer · Ubegrænset brug",
+  "nb": "Ingen registrering · Ingen avgifter · Ubegrenset bruk",
+  "fi": "Ei rekisteröitymistä · Ei maksuja · Rajaton käyttö",
+  "tr": "Üyelik yok · Ücret yok · Sınırsız kullanım",
+  "zh-TW": "無需註冊 · 免費 · 無限使用",
+  "th": "ไม่ต้องสมัครสมาชิก · ไม่มีค่าใช้จ่าย · ใช้ได้ไม่จำกัด",
+  "vi": "Không cần đăng ký · Miễn phí · Sử dụng không giới hạn",
+  "id": "Tanpa pendaftaran · Tanpa biaya · Penggunaan tanpa batas",
+  "ar": "بدون تسجيل · بدون رسوم · استخدام غير محدود",
+  "fa": "بدون ثبت‌نام · بدون هزینه · استفاده نامحدود"
+ },
+ "기록은 당신의 기기 안에만 저장됩니다.": {
+  "en": "Records are stored only on your device.",
+  "zh": "记录仅保存在您的设备上。",
+  "ja": "記録はあなたの端末の中にのみ保存されます。",
+  "es": "Los registros se guardan solo en tu dispositivo.",
+  "hi": "रिकॉर्ड केवल आपके डिवाइस पर सहेजे जाते हैं।",
+  "fr": "Les données sont enregistrées uniquement sur votre appareil.",
+  "de": "Datensätze werden nur auf Ihrem Gerät gespeichert.",
+  "pt": "Os registros são salvos apenas no seu dispositivo.",
+  "it": "I dati vengono salvati solo sul tuo dispositivo.",
+  "nl": "Gegevens worden alleen op uw apparaat opgeslagen.",
+  "ru": "Записи хранятся только на вашем устройстве.",
+  "uk": "Записи зберігаються лише на вашому пристрої.",
+  "pl": "Zapisy są przechowywane tylko na Twoim urządzeniu.",
+  "cs": "Záznamy se ukládají pouze ve vašem zařízení.",
+  "hu": "A feljegyzések csak az Ön eszközén tárolódnak.",
+  "ro": "Înregistrările sunt stocate numai pe dispozitivul tău.",
+  "sv": "Poster sparas bara på din enhet.",
+  "da": "Optegnelser gemmes kun på din enhed.",
+  "nb": "Oppføringer lagres kun på enheten din.",
+  "fi": "Tiedot tallennetaan vain laitteellesi.",
+  "tr": "Kayıtlar yalnızca cihazınızda saklanır.",
+  "zh-TW": "記錄僅保存在您的裝置上。",
+  "th": "บันทึกจะถูกเก็บไว้ในอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Bản ghi chỉ được lưu trên thiết bị của bạn.",
+  "id": "Data hanya disimpan di perangkat Anda.",
+  "ar": "تُحفظ السجلات على جهازك فقط.",
+  "fa": "سوابق فقط در دستگاه شما ذخیره می‌شوند."
+ },
+ "🗂️ 내 덱": {
+  "en": "🗂️ My decks",
+  "zh": "🗂️ 我的牌组",
+  "ja": "🗂️ 私のデッキ",
+  "es": "🗂️ Mis mazos",
+  "hi": "🗂️ मेरे डेक",
+  "fr": "🗂️ Mes paquets",
+  "de": "🗂️ Meine Decks",
+  "pt": "🗂️ Meus baralhos",
+  "it": "🗂️ I miei mazzi",
+  "nl": "🗂️ Mijn decks",
+  "ru": "🗂️ Мои колоды",
+  "uk": "🗂️ Мої колоди",
+  "pl": "🗂️ Moje talie",
+  "cs": "🗂️ Moje balíčky",
+  "hu": "🗂️ Saját paklijaim",
+  "ro": "🗂️ Pachetele mele",
+  "sv": "🗂️ Mina kortlekar",
+  "da": "🗂️ Mine sæt",
+  "nb": "🗂️ Mine kortstokker",
+  "fi": "🗂️ Omat pakkani",
+  "tr": "🗂️ Destelerim",
+  "zh-TW": "🗂️ 我的牌組",
+  "th": "🗂️ ชุดการ์ดของฉัน",
+  "vi": "🗂️ Bộ thẻ của tôi",
+  "id": "🗂️ Dek saya",
+  "ar": "🗂️ مجموعاتي",
+  "fa": "🗂️ دسته‌های من"
+ },
+ "지금 쓰는 덱": {
+  "en": "Current deck",
+  "zh": "当前牌组",
+  "ja": "今使っているデッキ",
+  "es": "Mazo actual",
+  "hi": "वर्तमान डेक",
+  "fr": "Paquet actuel",
+  "de": "Aktuelles Deck",
+  "pt": "Baralho atual",
+  "it": "Mazzo attuale",
+  "nl": "Huidig deck",
+  "ru": "Текущая колода",
+  "uk": "Поточна колода",
+  "pl": "Bieżąca talia",
+  "cs": "Aktuální balíček",
+  "hu": "Aktuális pakli",
+  "ro": "Pachetul curent",
+  "sv": "Aktuell kortlek",
+  "da": "Nuværende sæt",
+  "nb": "Nåværende kortstokk",
+  "fi": "Nykyinen pakka",
+  "tr": "Geçerli deste",
+  "zh-TW": "目前牌組",
+  "th": "ชุดการ์ดปัจจุบัน",
+  "vi": "Bộ thẻ hiện tại",
+  "id": "Dek saat ini",
+  "ar": "المجموعة الحالية",
+  "fa": "دسته فعلی"
+ },
+ "새 덱 이름": {
+  "en": "New deck name",
+  "zh": "新牌组名称",
+  "ja": "新しいデッキ名",
+  "es": "Nombre del nuevo mazo",
+  "hi": "नए डेक का नाम",
+  "fr": "Nom du nouveau paquet",
+  "de": "Name des neuen Decks",
+  "pt": "Nome do novo baralho",
+  "it": "Nome del nuovo mazzo",
+  "nl": "Naam van nieuw deck",
+  "ru": "Название новой колоды",
+  "uk": "Назва нової колоди",
+  "pl": "Nazwa nowej talii",
+  "cs": "Název nového balíčku",
+  "hu": "Új pakli neve",
+  "ro": "Numele pachetului nou",
+  "sv": "Namn på ny kortlek",
+  "da": "Navn på nyt sæt",
+  "nb": "Navn på ny kortstokk",
+  "fi": "Uuden pakan nimi",
+  "tr": "Yeni destenin adı",
+  "zh-TW": "新牌組名稱",
+  "th": "ชื่อชุดการ์ดใหม่",
+  "vi": "Tên bộ thẻ mới",
+  "id": "Nama dek baru",
+  "ar": "اسم المجموعة الجديدة",
+  "fa": "نام دسته جدید"
+ },
+ "예) 일본어 단어": {
+  "en": "e.g. Japanese words",
+  "zh": "例）日语单词",
+  "ja": "例）日本語の単語",
+  "es": "ej. palabras en japonés",
+  "hi": "उदा. जापानी शब्द",
+  "fr": "ex. mots japonais",
+  "de": "z. B. japanische Wörter",
+  "pt": "ex.: palavras em japonês",
+  "it": "es. parole giapponesi",
+  "nl": "bijv. Japanse woorden",
+  "ru": "напр., японские слова",
+  "uk": "напр., японські слова",
+  "pl": "np. japońskie słowa",
+  "cs": "např. japonská slova",
+  "hu": "pl. japán szavak",
+  "ro": "de ex. cuvinte japoneze",
+  "sv": "t.ex. japanska ord",
+  "da": "f.eks. japanske ord",
+  "nb": "f.eks. japanske ord",
+  "fi": "esim. japanin sanoja",
+  "tr": "örn. Japonca kelimeler",
+  "zh-TW": "例）日語單字",
+  "th": "เช่น คำศัพท์ภาษาญี่ปุ่น",
+  "vi": "VD: từ tiếng Nhật",
+  "id": "mis. kata bahasa Jepang",
+  "ar": "مثال) كلمات يابانية",
+  "fa": "مثال) واژه‌های ژاپنی"
+ },
+ "덱 만들기": {
+  "en": "Create deck",
+  "zh": "创建牌组",
+  "ja": "デッキを作る",
+  "es": "Crear mazo",
+  "hi": "डेक बनाएँ",
+  "fr": "Créer un paquet",
+  "de": "Deck erstellen",
+  "pt": "Criar baralho",
+  "it": "Crea mazzo",
+  "nl": "Deck maken",
+  "ru": "Создать колоду",
+  "uk": "Створити колоду",
+  "pl": "Utwórz talię",
+  "cs": "Vytvořit balíček",
+  "hu": "Pakli létrehozása",
+  "ro": "Creează pachet",
+  "sv": "Skapa kortlek",
+  "da": "Opret sæt",
+  "nb": "Lag kortstokk",
+  "fi": "Luo pakka",
+  "tr": "Deste oluşturun",
+  "zh-TW": "建立牌組",
+  "th": "สร้างชุดการ์ด",
+  "vi": "Tạo bộ thẻ",
+  "id": "Buat dek",
+  "ar": "إنشاء مجموعة",
+  "fa": "ساختن دسته"
+ },
+ "이 덱 지우기": {
+  "en": "Delete this deck",
+  "zh": "删除此牌组",
+  "ja": "このデッキを消す",
+  "es": "Borrar este mazo",
+  "hi": "यह डेक मिटाएँ",
+  "fr": "Supprimer ce paquet",
+  "de": "Dieses Deck löschen",
+  "pt": "Excluir este baralho",
+  "it": "Elimina questo mazzo",
+  "nl": "Dit deck verwijderen",
+  "ru": "Удалить эту колоду",
+  "uk": "Видалити цю колоду",
+  "pl": "Usuń tę talię",
+  "cs": "Smazat tento balíček",
+  "hu": "Pakli törlése",
+  "ro": "Șterge acest pachet",
+  "sv": "Radera den här kortleken",
+  "da": "Slet dette sæt",
+  "nb": "Slett denne kortstokken",
+  "fi": "Poista tämä pakka",
+  "tr": "Bu desteyi silin",
+  "zh-TW": "刪除此牌組",
+  "th": "ลบชุดการ์ดนี้",
+  "vi": "Xóa bộ thẻ này",
+  "id": "Hapus dek ini",
+  "ar": "حذف هذه المجموعة",
+  "fa": "حذف این دسته"
+ },
+ "✏️ 카드 넣기": {
+  "en": "✏️ Add cards",
+  "zh": "✏️ 添加卡片",
+  "ja": "✏️ カードを入れる",
+  "es": "✏️ Añadir tarjetas",
+  "hi": "✏️ कार्ड जोड़ें",
+  "fr": "✏️ Ajouter des cartes",
+  "de": "✏️ Karten hinzufügen",
+  "pt": "✏️ Adicionar cartões",
+  "it": "✏️ Aggiungi carte",
+  "nl": "✏️ Kaarten toevoegen",
+  "ru": "✏️ Добавить карточки",
+  "uk": "✏️ Додати картки",
+  "pl": "✏️ Dodaj karty",
+  "cs": "✏️ Přidat kartičky",
+  "hu": "✏️ Kártyák hozzáadása",
+  "ro": "✏️ Adaugă carduri",
+  "sv": "✏️ Lägg till kort",
+  "da": "✏️ Tilføj kort",
+  "nb": "✏️ Legg til kort",
+  "fi": "✏️ Lisää kortteja",
+  "tr": "✏️ Kart ekleyin",
+  "zh-TW": "✏️ 新增卡片",
+  "th": "✏️ เพิ่มการ์ด",
+  "vi": "✏️ Thêm thẻ",
+  "id": "✏️ Tambah kartu",
+  "ar": "✏️ إضافة بطاقات",
+  "fa": "✏️ افزودن کارت"
+ },
+ "앞면 (질문 · 단어)": {
+  "en": "Front (question · word)",
+  "zh": "正面（问题 · 单词）",
+  "ja": "表面（質問・単語）",
+  "es": "Frente (pregunta · palabra)",
+  "hi": "सामने (प्रश्न · शब्द)",
+  "fr": "Recto (question · mot)",
+  "de": "Vorderseite (Frage · Wort)",
+  "pt": "Frente (pergunta · palavra)",
+  "it": "Fronte (domanda · parola)",
+  "nl": "Voorkant (vraag · woord)",
+  "ru": "Лицевая сторона (вопрос · слово)",
+  "uk": "Лицьова сторона (питання · слово)",
+  "pl": "Przód (pytanie · słowo)",
+  "cs": "Přední strana (otázka · slovo)",
+  "hu": "Előlap (kérdés · szó)",
+  "ro": "Față (întrebare · cuvânt)",
+  "sv": "Framsida (fråga · ord)",
+  "da": "Forside (spørgsmål · ord)",
+  "nb": "Forside (spørsmål · ord)",
+  "fi": "Etupuoli (kysymys · sana)",
+  "tr": "Ön yüz (soru · kelime)",
+  "zh-TW": "正面（問題 · 單字）",
+  "th": "ด้านหน้า (คำถาม · คำศัพท์)",
+  "vi": "Mặt trước (câu hỏi · từ)",
+  "id": "Depan (pertanyaan · kata)",
+  "ar": "الوجه الأمامي (سؤال · كلمة)",
+  "fa": "روی کارت (پرسش · واژه)"
+ },
+ "뒷면 (뜻 · 답)": {
+  "en": "Back (meaning · answer)",
+  "zh": "背面（意思 · 答案）",
+  "ja": "裏面（意味・答え）",
+  "es": "Dorso (significado · respuesta)",
+  "hi": "पीछे (अर्थ · उत्तर)",
+  "fr": "Verso (signification · réponse)",
+  "de": "Rückseite (Bedeutung · Antwort)",
+  "pt": "Verso (significado · resposta)",
+  "it": "Retro (significato · risposta)",
+  "nl": "Achterkant (betekenis · antwoord)",
+  "ru": "Обратная сторона (значение · ответ)",
+  "uk": "Зворотна сторона (значення · відповідь)",
+  "pl": "Tył (znaczenie · odpowiedź)",
+  "cs": "Zadní strana (význam · odpověď)",
+  "hu": "Hátlap (jelentés · válasz)",
+  "ro": "Verso (sens · răspuns)",
+  "sv": "Baksida (betydelse · svar)",
+  "da": "Bagside (betydning · svar)",
+  "nb": "Bakside (betydning · svar)",
+  "fi": "Kääntöpuoli (merkitys · vastaus)",
+  "tr": "Arka yüz (anlam · cevap)",
+  "zh-TW": "背面（意思 · 答案）",
+  "th": "ด้านหลัง (ความหมาย · คำตอบ)",
+  "vi": "Mặt sau (nghĩa · đáp án)",
+  "id": "Belakang (arti · jawaban)",
+  "ar": "الوجه الخلفي (المعنى · الإجابة)",
+  "fa": "پشت کارت (معنی · پاسخ)"
+ },
+ "예) apple": {
+  "en": "e.g. apple",
+  "zh": "例）apple",
+  "ja": "例）apple",
+  "es": "ej. apple",
+  "hi": "उदा. apple",
+  "fr": "ex. apple",
+  "de": "z. B. apple",
+  "pt": "ex.: apple",
+  "it": "es. apple",
+  "nl": "bijv. apple",
+  "ru": "напр., apple",
+  "uk": "напр., apple",
+  "pl": "np. apple",
+  "cs": "např. apple",
+  "hu": "pl. apple",
+  "ro": "de ex. apple",
+  "sv": "t.ex. apple",
+  "da": "f.eks. apple",
+  "nb": "f.eks. apple",
+  "fi": "esim. apple",
+  "tr": "örn. apple",
+  "zh-TW": "例）apple",
+  "th": "เช่น apple",
+  "vi": "VD: apple",
+  "id": "mis. apple",
+  "ar": "مثال) apple",
+  "fa": "مثال) apple"
+ },
+ "예) 사과": {
+  "en": "e.g. 사과",
+  "zh": "例）사과",
+  "ja": "例）사과",
+  "es": "ej. 사과",
+  "hi": "उदा. 사과",
+  "fr": "ex. 사과",
+  "de": "z. B. 사과",
+  "pt": "ex.: 사과",
+  "it": "es. 사과",
+  "nl": "bijv. 사과",
+  "ru": "напр., 사과",
+  "uk": "напр., 사과",
+  "pl": "np. 사과",
+  "cs": "např. 사과",
+  "hu": "pl. 사과",
+  "ro": "de ex. 사과",
+  "sv": "t.ex. 사과",
+  "da": "f.eks. 사과",
+  "nb": "f.eks. 사과",
+  "fi": "esim. 사과",
+  "tr": "örn. 사과",
+  "zh-TW": "例）사과",
+  "th": "เช่น 사과",
+  "vi": "VD: 사과",
+  "id": "mis. 사과",
+  "ar": "مثال) 사과",
+  "fa": "مثال) 사과"
+ },
+ "카드 추가": {
+  "en": "Add card",
+  "zh": "添加卡片",
+  "ja": "カードを追加",
+  "es": "Añadir tarjeta",
+  "hi": "कार्ड जोड़ें",
+  "fr": "Ajouter une carte",
+  "de": "Karte hinzufügen",
+  "pt": "Adicionar cartão",
+  "it": "Aggiungi carta",
+  "nl": "Kaart toevoegen",
+  "ru": "Добавить карточку",
+  "uk": "Додати картку",
+  "pl": "Dodaj kartę",
+  "cs": "Přidat kartičku",
+  "hu": "Kártya hozzáadása",
+  "ro": "Adaugă card",
+  "sv": "Lägg till kort",
+  "da": "Tilføj kort",
+  "nb": "Legg til kort",
+  "fi": "Lisää kortti",
+  "tr": "Kart ekleyin",
+  "zh-TW": "新增卡片",
+  "th": "เพิ่มการ์ด",
+  "vi": "Thêm thẻ",
+  "id": "Tambah kartu",
+  "ar": "إضافة بطاقة",
+  "fa": "افزودن کارت"
+ },
+ "여러 장 한 번에 넣기 — 한 줄에 한 장, 앞면과 뒷면을 탭이나 쉼표로 나누어 붙여 넣으세요": {
+  "en": "Add many at once — one card per line, front and back separated by a tab or comma",
+  "zh": "一次添加多张 — 每行一张，正面和背面用制表符或逗号分隔粘贴",
+  "ja": "まとめて入れる — 1行に1枚、表と裏をタブかカンマで分けて貼り付け",
+  "es": "Añadir muchas a la vez: una por línea, frente y dorso separados por tabulación o coma",
+  "hi": "एक साथ कई जोड़ें — हर पंक्ति में एक कार्ड, सामने और पीछे टैब या अल्पविराम से अलग करें",
+  "fr": "Ajouter plusieurs cartes à la fois — une carte par ligne, recto et verso séparés par une tabulation ou une virgule",
+  "de": "Viele auf einmal hinzufügen — eine Karte pro Zeile, Vorder- und Rückseite durch Tab oder Komma getrennt",
+  "pt": "Adicionar várias de uma vez — um cartão por linha, frente e verso separados por tabulação ou vírgula",
+  "it": "Aggiungi molte carte insieme — una carta per riga, fronte e retro separati da tabulazione o virgola",
+  "nl": "Veel tegelijk toevoegen — één kaart per regel, voor- en achterkant gescheiden door een tab of komma",
+  "ru": "Добавить несколько сразу — по одной карточке в строке, лицевая и обратная стороны разделены табуляцией или запятой",
+  "uk": "Додати кілька одразу — по одній картці в рядку, лицьова та зворотна сторони розділені табуляцією або комою",
+  "pl": "Dodaj wiele naraz — jedna karta w wierszu, przód i tył oddzielone tabulatorem lub przecinkiem",
+  "cs": "Přidat více najednou — jedna kartička na řádek, přední a zadní strana oddělené tabulátorem nebo čárkou",
+  "hu": "Több kártya egyszerre — soronként egy kártya, az előlapot és a hátlapot tabulátor vagy vessző választja el",
+  "ro": "Adaugă mai multe deodată — câte un card pe rând, fața și versoul separate prin tab sau virgulă",
+  "sv": "Lägg till flera på en gång — ett kort per rad, klistra in med fram- och baksida åtskilda av en tabb eller ett kommatecken",
+  "da": "Tilføj flere på én gang — ét kort pr. linje, indsæt med for- og bagside adskilt af tabulator eller komma",
+  "nb": "Legg til flere på en gang — ett kort per linje, lim inn med for- og bakside atskilt av tabulator eller komma",
+  "fi": "Lisää monta kerralla — yksi kortti riviä kohden, liitä etu- ja kääntöpuoli sarkaimella tai pilkulla erotettuna",
+  "tr": "Bir kerede birden çok ekleyin — satır başına bir kart, ön ve arka yüzü sekme veya virgülle ayırarak yapıştırın",
+  "zh-TW": "一次新增多張 — 每行一張，正面和背面用 Tab 或逗號分隔貼上",
+  "th": "เพิ่มหลายใบพร้อมกัน — หนึ่งใบบรรทัดเดียว แยกด้านหน้าและด้านหลังด้วยแท็บหรือจุลภาคแล้ววาง",
+  "vi": "Thêm nhiều thẻ cùng lúc — mỗi dòng một thẻ, mặt trước và mặt sau cách nhau bằng tab hoặc dấu phẩy rồi dán vào",
+  "id": "Tambah banyak sekaligus — satu kartu per baris, depan dan belakang dipisahkan tab atau koma, lalu tempel",
+  "ar": "إضافة عدة بطاقات دفعة واحدة — بطاقة واحدة في كل سطر، الصقها مع فصل الوجهين بعلامة تبويب أو فاصلة",
+  "fa": "افزودن چند کارت یکجا — در هر خط یک کارت، روی و پشت کارت را با تب یا ویرگول جدا کنید و بچسبانید"
+ },
+ "붙여 넣은 카드 등록": {
+  "en": "Register pasted cards",
+  "zh": "登记粘贴的卡片",
+  "ja": "貼り付けたカードを登録",
+  "es": "Registrar tarjetas pegadas",
+  "hi": "चिपकाए कार्ड दर्ज करें",
+  "fr": "Enregistrer les cartes collées",
+  "de": "Eingefügte Karten speichern",
+  "pt": "Registrar cartões colados",
+  "it": "Registra le carte incollate",
+  "nl": "Geplakte kaarten opslaan",
+  "ru": "Зарегистрировать вставленные карточки",
+  "uk": "Зареєструвати вставлені картки",
+  "pl": "Zapisz wklejone karty",
+  "cs": "Uložit vložené kartičky",
+  "hu": "Beillesztett kártyák mentése",
+  "ro": "Înregistrează cardurile lipite",
+  "sv": "Registrera inklistrade kort",
+  "da": "Registrer indsatte kort",
+  "nb": "Registrer innlimte kort",
+  "fi": "Rekisteröi liitetyt kortit",
+  "tr": "Yapıştırılan kartları kaydedin",
+  "zh-TW": "登記貼上的卡片",
+  "th": "ลงทะเบียนการ์ดที่วาง",
+  "vi": "Đăng ký thẻ đã dán",
+  "id": "Daftarkan kartu yang ditempel",
+  "ar": "تسجيل البطاقات الملصقة",
+  "fa": "ثبت کارت‌های چسبانده‌شده"
+ },
+ "🎴 학습하기": {
+  "en": "🎴 Study",
+  "zh": "🎴 学习",
+  "ja": "🎴 学習する",
+  "es": "🎴 Estudiar",
+  "hi": "🎴 अध्ययन करें",
+  "fr": "🎴 Étudier",
+  "de": "🎴 Lernen",
+  "pt": "🎴 Estudar",
+  "it": "🎴 Studia",
+  "nl": "🎴 Studeren",
+  "ru": "🎴 Учить",
+  "uk": "🎴 Вчити",
+  "pl": "🎴 Nauka",
+  "cs": "🎴 Učit se",
+  "hu": "🎴 Tanulás",
+  "ro": "🎴 Învață",
+  "sv": "🎴 Studera",
+  "da": "🎴 Lær",
+  "nb": "🎴 Lær",
+  "fi": "🎴 Opi",
+  "tr": "🎴 Çalışın",
+  "zh-TW": "🎴 學習",
+  "th": "🎴 เรียน",
+  "vi": "🎴 Học",
+  "id": "🎴 Belajar",
+  "ar": "🎴 الدراسة",
+  "fa": "🎴 مطالعه"
+ },
+ "오늘 복습 시작": {
+  "en": "Start today's review",
+  "zh": "开始今日复习",
+  "ja": "今日の復習を始める",
+  "es": "Empezar el repaso de hoy",
+  "hi": "आज की समीक्षा शुरू करें",
+  "fr": "Commencer la révision du jour",
+  "de": "Heutige Wiederholung starten",
+  "pt": "Iniciar a revisão de hoje",
+  "it": "Inizia la revisione di oggi",
+  "nl": "Herhaling van vandaag starten",
+  "ru": "Начать сегодняшнее повторение",
+  "uk": "Почати сьогоднішнє повторення",
+  "pl": "Rozpocznij dzisiejszą powtórkę",
+  "cs": "Začít dnešní opakování",
+  "hu": "Mai ismétlés indítása",
+  "ro": "Începe recapitularea de azi",
+  "sv": "Börja dagens repetition",
+  "da": "Start dagens repetition",
+  "nb": "Start dagens repetisjon",
+  "fi": "Aloita tämän päivän kertaus",
+  "tr": "Bugünün tekrarını başlatın",
+  "zh-TW": "開始今日複習",
+  "th": "เริ่มทบทวนวันนี้",
+  "vi": "Bắt đầu ôn tập hôm nay",
+  "id": "Mulai ulasan hari ini",
+  "ar": "بدء مراجعة اليوم",
+  "fa": "شروع مرور امروز"
+ },
+ "전부 섞어 학습": {
+  "en": "Study all, shuffled",
+  "zh": "全部打乱学习",
+  "ja": "全部シャッフルして学習",
+  "es": "Estudiar todo mezclado",
+  "hi": "सभी को मिलाकर पढ़ें",
+  "fr": "Tout étudier, mélangé",
+  "de": "Alles gemischt lernen",
+  "pt": "Estudar tudo, embaralhado",
+  "it": "Studia tutto, in ordine casuale",
+  "nl": "Alles gemengd studeren",
+  "ru": "Учить все вперемешку",
+  "uk": "Вчити все впереміш",
+  "pl": "Ucz się wszystkiego, wymieszane",
+  "cs": "Učit se vše, zamíchané",
+  "hu": "Összes tanulása keverve",
+  "ro": "Învață toate, amestecate",
+  "sv": "Studera allt, blandat",
+  "da": "Lær alt, blandet",
+  "nb": "Lær alt, blandet",
+  "fi": "Opiskele kaikki sekoitettuna",
+  "tr": "Hepsini karıştırarak çalışın",
+  "zh-TW": "全部打亂學習",
+  "th": "เรียนทั้งหมดแบบสุ่ม",
+  "vi": "Học tất cả, xáo trộn",
+  "id": "Belajar semua, diacak",
+  "ar": "دراسة الكل مخلوطًا",
+  "fa": "مطالعه همه به‌صورت درهم"
+ },
+ "학습 끝내기": {
+  "en": "End study",
+  "zh": "结束学习",
+  "ja": "学習を終える",
+  "es": "Terminar estudio",
+  "hi": "अध्ययन समाप्त करें",
+  "fr": "Terminer l'étude",
+  "de": "Lernen beenden",
+  "pt": "Encerrar o estudo",
+  "it": "Termina lo studio",
+  "nl": "Studie beëindigen",
+  "ru": "Завершить изучение",
+  "uk": "Завершити вивчення",
+  "pl": "Zakończ naukę",
+  "cs": "Ukončit učení",
+  "hu": "Tanulás befejezése",
+  "ro": "Termină sesiunea",
+  "sv": "Avsluta studierna",
+  "da": "Afslut læring",
+  "nb": "Avslutt læring",
+  "fi": "Lopeta opiskelu",
+  "tr": "Çalışmayı bitirin",
+  "zh-TW": "結束學習",
+  "th": "จบการเรียน",
+  "vi": "Kết thúc học",
+  "id": "Akhiri belajar",
+  "ar": "إنهاء الدراسة",
+  "fa": "پایان مطالعه"
+ },
+ "아직 학습을 시작하지 않았습니다.": {
+  "en": "You have not started studying yet.",
+  "zh": "尚未开始学习。",
+  "ja": "まだ学習を始めていません。",
+  "es": "Aún no has empezado a estudiar.",
+  "hi": "आपने अभी अध्ययन शुरू नहीं किया है।",
+  "fr": "Vous n'avez pas encore commencé à étudier.",
+  "de": "Sie haben noch nicht mit dem Lernen begonnen.",
+  "pt": "Você ainda não começou a estudar.",
+  "it": "Non hai ancora iniziato a studiare.",
+  "nl": "U bent nog niet begonnen met studeren.",
+  "ru": "Вы ещё не начали изучать.",
+  "uk": "Ви ще не почали вивчати.",
+  "pl": "Nie rozpoczęto jeszcze nauki.",
+  "cs": "Ještě jste nezačali s učením.",
+  "hu": "Még nem kezdte el a tanulást.",
+  "ro": "Încă nu ai început să înveți.",
+  "sv": "Du har inte börjat studera än.",
+  "da": "Du er ikke begyndt at lære endnu.",
+  "nb": "Du har ikke begynt å lære ennå.",
+  "fi": "Et ole vielä aloittanut opiskelua.",
+  "tr": "Henüz çalışmaya başlamadınız.",
+  "zh-TW": "尚未開始學習。",
+  "th": "ยังไม่ได้เริ่มเรียน",
+  "vi": "Bạn chưa bắt đầu học.",
+  "id": "Anda belum mulai belajar.",
+  "ar": "لم تبدأ الدراسة بعد.",
+  "fa": "هنوز مطالعه را شروع نکرده‌اید."
+ },
+ "앞면": {
+  "en": "Front",
+  "zh": "正面",
+  "ja": "表面",
+  "es": "Frente",
+  "hi": "सामने",
+  "fr": "Recto",
+  "de": "Vorderseite",
+  "pt": "Frente",
+  "it": "Fronte",
+  "nl": "Voorkant",
+  "ru": "Лицевая сторона",
+  "uk": "Лицьова сторона",
+  "pl": "Przód",
+  "cs": "Přední strana",
+  "hu": "Előlap",
+  "ro": "Față",
+  "sv": "Framsida",
+  "da": "Forside",
+  "nb": "Forside",
+  "fi": "Etupuoli",
+  "tr": "Ön yüz",
+  "zh-TW": "正面",
+  "th": "ด้านหน้า",
+  "vi": "Mặt trước",
+  "id": "Depan",
+  "ar": "الوجه الأمامي",
+  "fa": "روی کارت"
+ },
+ "카드를 누르면 뒤집힙니다": {
+  "en": "Tap the card to flip it",
+  "zh": "点击卡片即可翻转",
+  "ja": "カードを押すと裏返ります",
+  "es": "Toca la tarjeta para voltearla",
+  "hi": "कार्ड दबाने पर पलटेगा",
+  "fr": "Touchez la carte pour la retourner",
+  "de": "Tippen Sie auf die Karte, um sie umzudrehen",
+  "pt": "Toque no cartão para virá-lo",
+  "it": "Tocca la carta per girarla",
+  "nl": "Tik op de kaart om hem om te keren",
+  "ru": "Нажмите на карточку, чтобы перевернуть",
+  "uk": "Натисніть на картку, щоб перевернути",
+  "pl": "Dotknij karty, aby ją odwrócić",
+  "cs": "Klepnutím kartičku otočíte",
+  "hu": "Érintse meg a kártyát a megfordításhoz",
+  "ro": "Atinge cardul pentru a-l întoarce",
+  "sv": "Tryck på kortet för att vända det",
+  "da": "Tryk på kortet for at vende det",
+  "nb": "Trykk på kortet for å snu det",
+  "fi": "Kortti kääntyy, kun napautat sitä",
+  "tr": "Karta dokununca çevrilir",
+  "zh-TW": "點按卡片即可翻面",
+  "th": "แตะการ์ดเพื่อพลิก",
+  "vi": "Chạm vào thẻ để lật",
+  "id": "Ketuk kartu untuk membaliknya",
+  "ar": "اضغط على البطاقة لقلبها",
+  "fa": "با لمس کارت، برمی‌گردد"
+ },
+ "알아요": {
+  "en": "I know it",
+  "zh": "会了",
+  "ja": "分かる",
+  "es": "Lo sé",
+  "hi": "मुझे आता है",
+  "fr": "Je sais",
+  "de": "Ich weiß es",
+  "pt": "Eu sei",
+  "it": "Lo so",
+  "nl": "Ik weet het",
+  "ru": "Знаю",
+  "uk": "Знаю",
+  "pl": "Wiem",
+  "cs": "Vím",
+  "hu": "Tudom",
+  "ro": "Știu",
+  "sv": "Jag kan det",
+  "da": "Jeg kan det",
+  "nb": "Jeg kan det",
+  "fi": "Osaan sen",
+  "tr": "Biliyorum",
+  "zh-TW": "會了",
+  "th": "รู้แล้ว",
+  "vi": "Tôi biết",
+  "id": "Saya tahu",
+  "ar": "أعرفها",
+  "fa": "بلدم"
+ },
+ "모르겠어요": {
+  "en": "I don't know",
+  "zh": "不会",
+  "ja": "分からない",
+  "es": "No lo sé",
+  "hi": "मुझे नहीं आता",
+  "fr": "Je ne sais pas",
+  "de": "Ich weiß es nicht",
+  "pt": "Não sei",
+  "it": "Non lo so",
+  "nl": "Ik weet het niet",
+  "ru": "Не знаю",
+  "uk": "Не знаю",
+  "pl": "Nie wiem",
+  "cs": "Nevím",
+  "hu": "Nem tudom",
+  "ro": "Nu știu",
+  "sv": "Jag kan det inte",
+  "da": "Jeg kan det ikke",
+  "nb": "Jeg kan det ikke",
+  "fi": "En osaa",
+  "tr": "Bilmiyorum",
+  "zh-TW": "不會",
+  "th": "ไม่รู้",
+  "vi": "Tôi không biết",
+  "id": "Saya tidak tahu",
+  "ar": "لا أعرفها",
+  "fa": "بلد نیستم"
+ },
+ "맞힌 카드는 위 상자로 올라가 복습 간격이 늘어나고, 틀린 카드는 첫 상자로 돌아가 오늘 다시 나옵니다. 상자는 1~5단계입니다.": {
+  "en": "Cards you know move up a box and are reviewed less often; missed cards return to the first box and come back today. Boxes go from 1 to 5.",
+  "zh": "答对的卡片升入上一盒，复习间隔变长；答错的回到第一盒，今天再次出现。盒子共1~5级。",
+  "ja": "当たったカードは上の箱に上がり復習間隔が伸び、外したカードは最初の箱に戻って今日また出ます。箱は1〜5段階です。",
+  "es": "Las tarjetas acertadas suben de caja y se repasan menos; las falladas vuelven a la primera caja y reaparecen hoy. Las cajas van de 1 a 5.",
+  "hi": "सही कार्ड ऊपर के बॉक्स में जाकर कम दोहराए जाते हैं; ग़लत कार्ड पहले बॉक्स में लौटकर आज फिर आते हैं। बॉक्स 1~5 स्तर के हैं।",
+  "fr": "Les cartes connues montent d'une boîte et sont révisées moins souvent ; les cartes manquées reviennent à la première boîte et reviennent aujourd'hui. Les boîtes vont de 1 à 5.",
+  "de": "Gewusste Karten steigen eine Box auf und werden seltener wiederholt; nicht gewusste Karten kehren in die erste Box zurück und kommen heute wieder. Die Boxen gehen von 1 bis 5.",
+  "pt": "Os cartões que você sabe sobem uma caixa e são revisados com menos frequência; os que você erra voltam à primeira caixa e reaparecem hoje. As caixas vão de 1 a 5.",
+  "it": "Le carte che sai salgono di una scatola e vengono ripassate meno spesso; quelle sbagliate tornano alla prima scatola e ricompaiono oggi. Le scatole vanno da 1 a 5.",
+  "nl": "Kaarten die u weet gaan een box omhoog en worden minder vaak herhaald; gemiste kaarten keren terug naar de eerste box en komen vandaag terug. De boxen gaan van 1 tot 5.",
+  "ru": "Карточки, которые вы знаете, поднимаются в коробку выше и повторяются реже; карточки с ошибкой возвращаются в первую коробку и появятся снова сегодня. Коробок пять уровней: от 1 до 5.",
+  "uk": "Картки, які ви знаєте, піднімаються в коробку вище й повторюються рідше; картки з помилкою повертаються в першу коробку та з'являться знову сьогодні. Коробок п'ять рівнів: від 1 до 5.",
+  "pl": "Karty, które znasz, przechodzą do wyższego pudełka i są powtarzane rzadziej; karty błędne wracają do pierwszego pudełka i pojawią się ponownie dziś. Pudełka mają poziomy od 1 do 5.",
+  "cs": "Kartičky, které umíte, postupují do vyšší krabičky a opakují se méně často; chybné kartičky se vracejí do první krabičky a objeví se znovu ještě dnes. Krabiček je 5 úrovní: 1 až 5.",
+  "hu": "A tudott kártyák feljebb lépnek egy dobozzal, és ritkábban ismétlődnek; a hibás kártyák visszatérnek az első dobozba, és még ma újra megjelennek. A dobozok 1–5. szintig terjednek.",
+  "ro": "Cardurile pe care le știi urcă într-o cutie superioară și se repetă mai rar; cardurile greșite revin în prima cutie și apar din nou astăzi. Cutiile au nivelurile de la 1 la 5.",
+  "sv": "Kort du kan flyttas upp en låda och repeteras mer sällan; kort du missar återgår till den första lådan och kommer tillbaka idag. Lådorna har nivå 1–5.",
+  "da": "Kort, du kan, flytter op i en højere kasse og gentages sjældnere; kort, du ikke kan, vender tilbage til den første kasse og kommer igen i dag. Kasserne går fra trin 1 til 5.",
+  "nb": "Kort du kan, flytter opp en boks og repeteres sjeldnere; kort du bommer på, går tilbake til den første boksen og kommer igjen i dag. Boksene går fra nivå 1 til 5.",
+  "fi": "Osaamasi kortit siirtyvät ylempään laatikkoon ja niiden kertausväli pitenee; väärin menneet kortit palaavat ensimmäiseen laatikkoon ja tulevat uudelleen tänään. Laatikot ovat tasoilla 1–5.",
+  "tr": "Bildiğiniz kartlar üst kutuya çıkar ve tekrar aralığı uzar; bilemediğiniz kartlar ilk kutuya döner ve bugün yeniden çıkar. Kutular 1-5 aşamalıdır.",
+  "zh-TW": "答對的卡片會升到上一個盒子，複習間隔變長；答錯的會回到第一個盒子，今天再次出現。盒子共 1~5 級。",
+  "th": "การ์ดที่ตอบถูกจะเลื่อนขึ้นไปกล่องถัดไปและมีระยะทบทวนห่างขึ้น ส่วนการ์ดที่ตอบผิดจะกลับไปกล่องแรกและปรากฏอีกครั้งในวันนี้ กล่องมี 1–5 ระดับ",
+  "vi": "Thẻ trả lời đúng sẽ chuyển lên hộp trên và khoảng cách ôn tập dài hơn; thẻ trả lời sai sẽ quay lại hộp đầu tiên và xuất hiện lại hôm nay. Hộp có từ 1 đến 5 cấp.",
+  "id": "Kartu yang benar naik ke kotak berikutnya dan interval ulasannya lebih panjang; kartu yang salah kembali ke kotak pertama dan muncul lagi hari ini. Kotak terdiri dari 1–5 tingkat.",
+  "ar": "البطاقات التي تعرفها تصعد إلى صندوق أعلى وتطول فترات مراجعتها، والبطاقات الخاطئة تعود إلى الصندوق الأول وتظهر مجددًا اليوم. الصناديق من المستوى 1 إلى 5.",
+  "fa": "کارت‌هایی که بلد باشید به جعبه بالاتر می‌روند و فاصله مرورشان بیشتر می‌شود و کارت‌های اشتباه به جعبه اول برمی‌گردند و امروز دوباره می‌آیند. جعبه‌ها از مرحله ۱ تا ۵ هستند."
+ },
+ "📋 카드 목록 · 데이터": {
+  "en": "📋 Card list · Data",
+  "zh": "📋 卡片列表 · 数据",
+  "ja": "📋 カード一覧・データ",
+  "es": "📋 Lista de tarjetas · Datos",
+  "hi": "📋 कार्ड सूची · डेटा",
+  "fr": "📋 Liste des cartes · Données",
+  "de": "📋 Kartenliste · Daten",
+  "pt": "📋 Lista de cartões · Dados",
+  "it": "📋 Elenco carte · Dati",
+  "nl": "📋 Kaartenlijst · Gegevens",
+  "ru": "📋 Список карточек · Данные",
+  "uk": "📋 Список карток · Дані",
+  "pl": "📋 Lista kart · Dane",
+  "cs": "📋 Seznam kartiček · Data",
+  "hu": "📋 Kártyalista · Adatok",
+  "ro": "📋 Lista cardurilor · Date",
+  "sv": "📋 Kortlista · Data",
+  "da": "📋 Kortliste · Data",
+  "nb": "📋 Kortliste · Data",
+  "fi": "📋 Korttiluettelo · Tiedot",
+  "tr": "📋 Kart listesi · Veriler",
+  "zh-TW": "📋 卡片清單 · 資料",
+  "th": "📋 รายการการ์ด · ข้อมูล",
+  "vi": "📋 Danh sách thẻ · Dữ liệu",
+  "id": "📋 Daftar kartu · Data",
+  "ar": "📋 قائمة البطاقات · البيانات",
+  "fa": "📋 فهرست کارت‌ها · داده‌ها"
+ },
+ "JSON으로 내보내기": {
+  "en": "Export as JSON",
+  "zh": "导出为 JSON",
+  "ja": "JSONで書き出す",
+  "es": "Exportar como JSON",
+  "hi": "JSON में निर्यात करें",
+  "fr": "Exporter en JSON",
+  "de": "Als JSON exportieren",
+  "pt": "Exportar como JSON",
+  "it": "Esporta come JSON",
+  "nl": "Exporteren als JSON",
+  "ru": "Экспорт в JSON",
+  "uk": "Експорт у JSON",
+  "pl": "Eksportuj jako JSON",
+  "cs": "Exportovat jako JSON",
+  "hu": "Exportálás JSON-ba",
+  "ro": "Exportă ca JSON",
+  "sv": "Exportera som JSON",
+  "da": "Eksporter som JSON",
+  "nb": "Eksporter som JSON",
+  "fi": "Vie JSON-muodossa",
+  "tr": "JSON olarak dışa aktarın",
+  "zh-TW": "匯出為 JSON",
+  "th": "ส่งออกเป็น JSON",
+  "vi": "Xuất dưới dạng JSON",
+  "id": "Ekspor sebagai JSON",
+  "ar": "تصدير بصيغة JSON",
+  "fa": "خروجی گرفتن به‌صورت JSON"
+ },
+ "JSON 가져오기": {
+  "en": "Import JSON",
+  "zh": "导入 JSON",
+  "ja": "JSONを取り込む",
+  "es": "Importar JSON",
+  "hi": "JSON आयात करें",
+  "fr": "Importer un JSON",
+  "de": "JSON importieren",
+  "pt": "Importar JSON",
+  "it": "Importa JSON",
+  "nl": "JSON importeren",
+  "ru": "Импорт JSON",
+  "uk": "Імпорт JSON",
+  "pl": "Importuj JSON",
+  "cs": "Importovat JSON",
+  "hu": "JSON importálása",
+  "ro": "Importă JSON",
+  "sv": "Importera JSON",
+  "da": "Importer JSON",
+  "nb": "Importer JSON",
+  "fi": "Tuo JSON",
+  "tr": "JSON içe aktarın",
+  "zh-TW": "匯入 JSON",
+  "th": "นำเข้า JSON",
+  "vi": "Nhập JSON",
+  "id": "Impor JSON",
+  "ar": "استيراد JSON",
+  "fa": "وارد کردن JSON"
+ },
+ "💡 도움말": {
+  "en": "💡 Help",
+  "zh": "💡 帮助",
+  "ja": "💡 ヘルプ",
+  "es": "💡 Ayuda",
+  "hi": "💡 सहायता",
+  "fr": "💡 Aide",
+  "de": "💡 Hilfe",
+  "pt": "💡 Ajuda",
+  "it": "💡 Aiuto",
+  "nl": "💡 Help",
+  "ru": "💡 Справка",
+  "uk": "💡 Довідка",
+  "pl": "💡 Pomoc",
+  "cs": "💡 Nápověda",
+  "hu": "💡 Súgó",
+  "ro": "💡 Ajutor",
+  "sv": "💡 Hjälp",
+  "da": "💡 Hjælp",
+  "nb": "💡 Hjelp",
+  "fi": "💡 Ohje",
+  "tr": "💡 Yardım",
+  "zh-TW": "💡 說明",
+  "th": "💡 ช่วยเหลือ",
+  "vi": "💡 Trợ giúp",
+  "id": "💡 Bantuan",
+  "ar": "💡 مساعدة",
+  "fa": "💡 راهنما"
+ },
+ "덱을 고르거나 새로 만들고, 앞면과 뒷면을 적어 카드를 넣으세요. 여러 장은 한 줄에 한 장씩, 탭이나 쉼표로 앞뒤를 나누어 붙여 넣으면 한 번에 등록됩니다.": {
+  "en": "Choose or create a deck, then add cards with a front and a back. For many cards, paste one per line with front and back separated by a tab or comma to register them all at once.",
+  "zh": "选择或新建牌组，填写正面和背面添加卡片。多张时每行一张，用制表符或逗号分隔正反面粘贴即可一次登记。",
+  "ja": "デッキを選ぶか新しく作り、表と裏を書いてカードを入れてください。複数枚は1行に1枚、タブかカンマで表裏を分けて貼ると一括登録できます。",
+  "es": "Elige o crea un mazo y añade tarjetas con frente y dorso. Para muchas, pega una por línea con frente y dorso separados por tabulación o coma.",
+  "hi": "डेक चुनें या नया बनाएँ, फिर सामने और पीछे लिखकर कार्ड जोड़ें। कई कार्ड के लिए हर पंक्ति में एक, सामने-पीछे टैब या अल्पविराम से अलग करके चिपकाएँ।",
+  "fr": "Choisissez un paquet ou créez-en un nouveau, puis ajoutez des cartes avec un recto et un verso. Pour plusieurs cartes, collez-en une par ligne, recto et verso séparés par une tabulation ou une virgule, pour les enregistrer toutes en une fois.",
+  "de": "Wählen Sie ein Deck oder erstellen Sie ein neues und fügen Sie dann Karten mit Vorder- und Rückseite hinzu. Für viele Karten fügen Sie eine pro Zeile ein, Vorder- und Rückseite durch Tab oder Komma getrennt, um alle auf einmal zu speichern.",
+  "pt": "Escolha um baralho ou crie um novo e adicione cartões com frente e verso. Para vários cartões, cole um por linha, com frente e verso separados por tabulação ou vírgula, para registrar todos de uma vez.",
+  "it": "Scegli un mazzo o creane uno nuovo, poi aggiungi carte con fronte e retro. Per molte carte, incollane una per riga, con fronte e retro separati da tabulazione o virgola, per registrarle tutte insieme.",
+  "nl": "Kies een deck of maak een nieuw deck en voeg kaarten toe met een voor- en achterkant. Plak voor veel kaarten één kaart per regel, met voor- en achterkant gescheiden door een tab of komma, om ze allemaal tegelijk op te slaan.",
+  "ru": "Выберите колоду или создайте новую, затем добавьте карточки, заполнив лицевую и обратную стороны. Чтобы добавить несколько карточек, вставьте по одной в строке, разделяя лицевую и обратную стороны табуляцией или запятой, — они зарегистрируются все сразу.",
+  "uk": "Виберіть колоду або створіть нову, потім додайте картки, заповнивши лицьову та зворотну сторони. Щоб додати кілька карток, вставте по одній у рядку, розділяючи лицьову та зворотну сторони табуляцією або комою, — вони зареєструються всі одразу.",
+  "pl": "Wybierz talię lub utwórz nową, a następnie dodaj karty, wpisując przód i tył. Aby dodać wiele kart, wklej je po jednej w wierszu, oddzielając przód i tył tabulatorem lub przecinkiem — wszystkie zostaną zapisane naraz.",
+  "cs": "Vyberte balíček nebo vytvořte nový a pak přidejte kartičky s přední a zadní stranou. Více kartiček vložíte tak, že je vložíte po jedné na řádek, přední a zadní stranu oddělené tabulátorem nebo čárkou — zaregistrují se všechny naráz.",
+  "hu": "Válasszon egy paklit, vagy hozzon létre újat, majd adja hozzá a kártyákat az előlap és a hátlap kitöltésével. Több kártya esetén soronként egyet illesszen be, az előlapot és a hátlapot tabulátorral vagy vesszővel elválasztva – mindegyik egyszerre rögzül.",
+  "ro": "Alege un pachet sau creează unul nou, apoi adaugă carduri completând fața și versoul. Pentru mai multe carduri, lipește câte unul pe rând, cu fața și versoul separate prin tab sau virgulă — se vor înregistra toate deodată.",
+  "sv": "Välj en kortlek eller skapa en ny, och lägg till kort genom att skriva fram- och baksida. För flera kort klistrar du in ett per rad, med fram- och baksida åtskilda av en tabb eller ett kommatecken, så registreras alla på en gång.",
+  "da": "Vælg et sæt eller opret et nyt, og tilføj kort ved at skrive for- og bagside. Til flere kort indsætter du ét pr. linje med for- og bagside adskilt af tabulator eller komma, så registreres de alle på én gang.",
+  "nb": "Velg en kortstokk eller lag en ny, og legg til kort ved å skrive for- og bakside. For flere kort limer du inn ett per linje, med for- og bakside atskilt av tabulator eller komma, så registreres alle på en gang.",
+  "fi": "Valitse pakka tai luo uusi ja lisää kortteja kirjoittamalla etu- ja kääntöpuoli. Useita kortteja lisätessäsi liitä yksi riviä kohden etu- ja kääntöpuoli sarkaimella tai pilkulla erotettuna, niin ne rekisteröityvät kerralla.",
+  "tr": "Bir deste seçin veya yeni bir deste oluşturun, ön ve arka yüzü yazarak kart ekleyin. Birden çok kart için satır başına bir kart olacak şekilde, ön ve arka yüzü sekme veya virgülle ayırarak yapıştırırsanız hepsi bir kerede kaydedilir.",
+  "zh-TW": "選擇或新建牌組，填寫正面和背面來新增卡片。多張時每行一張，用 Tab 或逗號分隔正反面貼上即可一次登記。",
+  "th": "เลือกหรือสร้างชุดการ์ดใหม่ แล้วเขียนด้านหน้าและด้านหลังเพื่อเพิ่มการ์ด หากมีหลายใบ ให้วางหนึ่งใบบรรทัดเดียว โดยแยกด้านหน้าและด้านหลังด้วยแท็บหรือจุลภาค จะลงทะเบียนได้พร้อมกัน",
+  "vi": "Chọn hoặc tạo bộ thẻ mới, rồi viết mặt trước và mặt sau để thêm thẻ. Với nhiều thẻ, hãy dán mỗi dòng một thẻ, mặt trước và mặt sau cách nhau bằng tab hoặc dấu phẩy để đăng ký tất cả cùng lúc.",
+  "id": "Pilih atau buat dek baru, lalu tulis bagian depan dan belakang untuk menambah kartu. Untuk banyak kartu, tempel satu kartu per baris dengan depan dan belakang dipisahkan tab atau koma agar semuanya terdaftar sekaligus.",
+  "ar": "اختر مجموعة أو أنشئ واحدة جديدة، ثم أضف بطاقات بكتابة الوجه الأمامي والخلفي. ولإضافة عدة بطاقات، الصق بطاقة واحدة في كل سطر مع فصل الوجهين بعلامة تبويب أو فاصلة لتسجيلها كلها دفعة واحدة.",
+  "fa": "یک دسته انتخاب کنید یا دسته تازه بسازید و با نوشتن روی و پشت، کارت اضافه کنید. برای چند کارت، در هر خط یک کارت بچسبانید و روی و پشت را با تب یا ویرگول جدا کنید تا همه یکجا ثبت شوند."
+ },
+ "학습은 두 가지입니다. \"오늘 복습 시작\"은 복습 날짜가 된 카드만 추리고, \"전부 섞어 학습\"은 덱의 모든 카드를 섞어 냅니다.": {
+  "en": "There are two study modes. \"Start today's review\" picks only cards due for review, and \"Study all, shuffled\" shuffles every card in the deck.",
+  "zh": "学习有两种。\"开始今日复习\"只抽取到期复习的卡片，\"全部打乱学习\"将牌组所有卡片打乱呈现。",
+  "ja": "学習は二つです。「今日の復習を始める」は復習日になったカードだけを出し、「全部シャッフルして学習」はデッキの全カードを混ぜて出します。",
+  "es": "Hay dos modos. «Empezar el repaso de hoy» elige solo las tarjetas vencidas, y «Estudiar todo mezclado» mezcla todas las del mazo.",
+  "hi": "अध्ययन दो प्रकार का है। \"आज की समीक्षा शुरू करें\" केवल समीक्षा-देय कार्ड चुनता है, और \"सभी को मिलाकर पढ़ें\" डेक के सभी कार्ड मिलाकर देता है।",
+  "fr": "Il existe deux modes d'étude. « Commencer la révision du jour » ne choisit que les cartes dont la révision est due, et « Tout étudier, mélangé » mélange toutes les cartes du paquet.",
+  "de": "Es gibt zwei Lernmodi. „Heutige Wiederholung starten“ wählt nur Karten aus, deren Wiederholung fällig ist, und „Alles gemischt lernen“ mischt alle Karten des Decks.",
+  "pt": "Há dois modos de estudo. “Iniciar a revisão de hoje” escolhe apenas os cartões com revisão vencida, e “Estudar tudo, embaralhado” embaralha todos os cartões do baralho.",
+  "it": "Ci sono due modalità di studio. «Inizia la revisione di oggi» sceglie solo le carte da ripassare, e «Studia tutto, in ordine casuale» mescola tutte le carte del mazzo.",
+  "nl": "Er zijn twee studiemodi. 'Herhaling van vandaag starten' kiest alleen kaarten die aan herhaling toe zijn, en 'Alles gemengd studeren' schudt alle kaarten in het deck.",
+  "ru": "Есть два режима изучения. «Начать сегодняшнее повторение» выбирает только карточки, срок повторения которых наступил, а «Учить все вперемешку» перемешивает все карточки колоды.",
+  "uk": "Є два режими вивчення. «Почати сьогоднішнє повторення» вибирає лише картки, строк повторення яких настав, а «Вчити все впереміш» перемішує всі картки колоди.",
+  "pl": "Są dwa tryby nauki. „Rozpocznij dzisiejszą powtórkę” wybiera tylko karty, których termin powtórki nadszedł, a „Ucz się wszystkiego, wymieszane” tasuje wszystkie karty w talii.",
+  "cs": "Učení má dva režimy. „Začít dnešní opakování“ vybere jen kartičky, u kterých nastal čas opakování, a „Učit se vše, zamíchané“ zamíchá všechny kartičky v balíčku.",
+  "hu": "Két tanulási mód van. A „Mai ismétlés indítása” csak az esedékes kártyákat választja ki, az „Összes tanulása keverve” pedig a pakli minden kártyáját megkeveri.",
+  "ro": "Există două moduri de învățare. „Începe recapitularea de azi” alege doar cardurile scadente pentru recapitulare, iar „Învață toate, amestecate” amestecă toate cardurile din pachet.",
+  "sv": "Det finns två sätt att studera. \"Börja dagens repetition\" väljer bara kort vars repetitionsdatum har kommit, och \"Studera allt, blandat\" blandar alla kort i kortleken.",
+  "da": "Der er to måder at lære på. \"Start dagens repetition\" vælger kun kort, hvis repetitionsdato er nået, og \"Lær alt, blandet\" blander alle kort i sættet.",
+  "nb": "Det er to måter å lære på. «Start dagens repetisjon» velger bare kort som har nådd repetisjonsdatoen, og «Lær alt, blandet» blander alle kortene i kortstokken.",
+  "fi": "Opiskelutapoja on kaksi. \"Aloita tämän päivän kertaus\" valitsee vain kortit, joiden kertauspäivä on tullut, ja \"Opiskele kaikki sekoitettuna\" sekoittaa kaikki pakan kortit.",
+  "tr": "İki çalışma biçimi vardır. \"Bugünün tekrarını başlatın\" yalnızca tekrar tarihi gelen kartları seçer, \"Hepsini karıştırarak çalışın\" destedeki tüm kartları karıştırır.",
+  "zh-TW": "學習有兩種。「開始今日複習」只抽取到期複習的卡片，「全部打亂學習」會將牌組的所有卡片打亂呈現。",
+  "th": "การเรียนมีสองแบบ \"เริ่มทบทวนวันนี้\" จะเลือกเฉพาะการ์ดที่ถึงกำหนดทบทวน ส่วน \"เรียนทั้งหมดแบบสุ่ม\" จะสุ่มการ์ดทุกใบในชุด",
+  "vi": "Có hai chế độ học. \"Bắt đầu ôn tập hôm nay\" chỉ chọn những thẻ đã đến hạn ôn tập, còn \"Học tất cả, xáo trộn\" sẽ xáo trộn mọi thẻ trong bộ.",
+  "id": "Ada dua mode belajar. \"Mulai ulasan hari ini\" hanya memilih kartu yang sudah waktunya diulas, sedangkan \"Belajar semua, diacak\" mengacak semua kartu di dek.",
+  "ar": "هناك وضعان للدراسة. «بدء مراجعة اليوم» يختار فقط البطاقات التي حان وقت مراجعتها، و«دراسة الكل مخلوطًا» يخلط جميع بطاقات المجموعة.",
+  "fa": "مطالعه دو شیوه دارد. «شروع مرور امروز» فقط کارت‌هایی را که موعد مرورشان رسیده برمی‌گزیند، و «مطالعه همه به‌صورت درهم» همه کارت‌های دسته را درهم می‌کند."
+ },
+ "카드를 눌러 뒤집은 뒤 \"알아요\"나 \"모르겠어요\"를 누르세요. 맞히면 상자가 올라가 다음 복습이 멀어지고(2일 · 4일 · 7일 · 14일), 틀리면 첫 상자로 돌아가 그날 다시 나옵니다.": {
+  "en": "Tap a card to flip it, then press \"I know it\" or \"I don't know\". A correct card moves up a box and the next review moves further away (2 · 4 · 7 · 14 days); a missed card returns to the first box and comes back the same day.",
+  "zh": "点击卡片翻转后，按\"会了\"或\"不会\"。答对则升盒，下次复习间隔变远（2天 · 4天 · 7天 · 14天）；答错则回到第一盒，当天再次出现。",
+  "ja": "カードを押して裏返した後、「分かる」か「分からない」を押してください。当たれば箱が上がり次の復習が遠くなり（2日・4日・7日・14日）、外せば最初の箱に戻ってその日にまた出ます。",
+  "es": "Toca una tarjeta para voltearla y pulsa «Lo sé» o «No lo sé». Si aciertas, sube de caja y el repaso se aleja (2 · 4 · 7 · 14 días); si fallas, vuelve a la primera caja y reaparece el mismo día.",
+  "hi": "कार्ड दबाकर पलटें, फिर \"मुझे आता है\" या \"मुझे नहीं आता\" दबाएँ। सही होने पर कार्ड ऊपर के बॉक्स में जाता है और अगली समीक्षा दूर होती है (2 · 4 · 7 · 14 दिन); ग़लत होने पर पहले बॉक्स में लौटकर उसी दिन फिर आता है।",
+  "fr": "Touchez une carte pour la retourner, puis appuyez sur « Je sais » ou « Je ne sais pas ». Une carte réussie monte d'une boîte et la révision suivante s'éloigne (2 · 4 · 7 · 14 jours) ; une carte manquée revient à la première boîte et réapparaît le même jour.",
+  "de": "Tippen Sie auf eine Karte, um sie umzudrehen, und drücken Sie dann „Ich weiß es“ oder „Ich weiß es nicht“. Eine gewusste Karte steigt eine Box auf und die nächste Wiederholung rückt weiter weg (2 · 4 · 7 · 14 Tage); eine nicht gewusste Karte kehrt in die erste Box zurück und erscheint am selben Tag wieder.",
+  "pt": "Toque em um cartão para virá-lo e depois pressione “Eu sei” ou “Não sei”. Um cartão acertado sobe uma caixa e a próxima revisão fica mais distante (2 · 4 · 7 · 14 dias); um cartão errado volta à primeira caixa e reaparece no mesmo dia.",
+  "it": "Tocca una carta per girarla, poi premi «Lo so» o «Non lo so». Una carta indovinata sale di una scatola e il ripasso successivo si allontana (2 · 4 · 7 · 14 giorni); una carta sbagliata torna alla prima scatola e ricompare lo stesso giorno.",
+  "nl": "Tik op een kaart om hem om te keren en druk daarna op 'Ik weet het' of 'Ik weet het niet'. Een goede kaart gaat een box omhoog en de volgende herhaling komt verder weg (2 · 4 · 7 · 14 dagen); een foute kaart keert terug naar de eerste box en verschijnt dezelfde dag opnieuw.",
+  "ru": "Нажмите на карточку, чтобы перевернуть её, затем нажмите «Знаю» или «Не знаю». При правильном ответе карточка поднимается в коробку выше, и следующее повторение отодвигается (2 · 4 · 7 · 14 дней); при ошибке карточка возвращается в первую коробку и появляется снова в тот же день.",
+  "uk": "Натисніть на картку, щоб перевернути її, потім натисніть «Знаю» або «Не знаю». За правильної відповіді картка піднімається в коробку вище, і наступне повторення відсувається (2 · 4 · 7 · 14 днів); за помилки картка повертається в першу коробку й з'являється знову того ж дня.",
+  "pl": "Dotknij karty, aby ją odwrócić, a potem naciśnij „Wiem” lub „Nie wiem”. Przy dobrej odpowiedzi karta przechodzi do wyższego pudełka, a kolejna powtórka oddala się (2 · 4 · 7 · 14 dni); przy błędzie karta wraca do pierwszego pudełka i pojawia się ponownie tego samego dnia.",
+  "cs": "Klepnutím kartičku otočte a pak stiskněte „Vím“ nebo „Nevím“. Při správné odpovědi kartička postoupí do vyšší krabičky a další opakování se vzdálí (2 · 4 · 7 · 14 dní); při chybě se vrátí do první krabičky a objeví se znovu ještě týž den.",
+  "hu": "Érintse meg a kártyát a megfordításhoz, majd nyomja meg a „Tudom” vagy a „Nem tudom” gombot. Helyes válasznál a kártya feljebb lép egy dobozzal, és a következő ismétlés távolabb kerül (2 · 4 · 7 · 14 nap); hibánál visszatér az első dobozba, és még aznap újra megjelenik.",
+  "ro": "Atinge un card pentru a-l întoarce, apoi apasă „Știu” sau „Nu știu”. La un răspuns corect, cardul urcă într-o cutie superioară, iar următoarea recapitulare se îndepărtează (2 · 4 · 7 · 14 zile); la o greșeală, cardul revine în prima cutie și apare din nou în aceeași zi.",
+  "sv": "Tryck på ett kort för att vända det och tryck sedan på \"Jag kan det\" eller \"Jag kan det inte\". Om du kan det flyttas kortet upp en låda och nästa repetition kommer längre fram (2 · 4 · 7 · 14 dagar); om du missar återgår det till den första lådan och kommer tillbaka samma dag.",
+  "da": "Tryk på et kort for at vende det, og tryk derefter på \"Jeg kan det\" eller \"Jeg kan det ikke\". Hvis du kan det, flytter kortet op i en højere kasse, og næste repetition kommer længere væk (2 · 4 · 7 · 14 dage); hvis du ikke kan det, vender det tilbage til den første kasse og kommer igen samme dag.",
+  "nb": "Trykk på et kort for å snu det, og trykk deretter på «Jeg kan det» eller «Jeg kan det ikke». Hvis du kan det, flytter kortet opp en boks og neste repetisjon kommer lenger unna (2 · 4 · 7 · 14 dager); hvis du bommer, går det tilbake til den første boksen og kommer igjen samme dag.",
+  "fi": "Napauta korttia kääntääksesi sen ja paina sitten \"Osaan sen\" tai \"En osaa\". Jos osaat, kortti siirtyy ylempään laatikkoon ja seuraava kertaus siirtyy kauemmas (2 · 4 · 7 · 14 päivää); jos et osaa, se palaa ensimmäiseen laatikkoon ja tulee uudelleen samana päivänä.",
+  "tr": "Kartı çevirmek için dokunun, ardından \"Biliyorum\" veya \"Bilmiyorum\" düğmesine basın. Bilirseniz kart üst kutuya çıkar ve bir sonraki tekrar uzaklaşır (2 · 4 · 7 · 14 gün); bilemezseniz ilk kutuya döner ve aynı gün yeniden çıkar.",
+  "zh-TW": "點按卡片翻面後，按「會了」或「不會」。答對則升盒，下次複習間隔變遠（2天 · 4天 · 7天 · 14天）；答錯則回到第一個盒子，當天再次出現。",
+  "th": "แตะการ์ดเพื่อพลิก แล้วกด \"รู้แล้ว\" หรือ \"ไม่รู้\" หากตอบถูก กล่องจะเลื่อนขึ้นและการทบทวนครั้งต่อไปจะห่างออกไป (2 · 4 · 7 · 14 วัน) หากตอบผิดจะกลับไปกล่องแรกและออกมาอีกในวันเดียวกัน",
+  "vi": "Chạm vào thẻ để lật, rồi nhấn \"Tôi biết\" hoặc \"Tôi không biết\". Đúng thì thẻ lên hộp và lần ôn sau xa hơn (2 · 4 · 7 · 14 ngày); sai thì quay về hộp đầu tiên và xuất hiện lại trong cùng ngày.",
+  "id": "Ketuk kartu untuk membaliknya, lalu tekan \"Saya tahu\" atau \"Saya tidak tahu\". Jika benar, kartu naik kotak dan ulasan berikutnya lebih jauh (2 · 4 · 7 · 14 hari); jika salah, kartu kembali ke kotak pertama dan muncul lagi di hari yang sama.",
+  "ar": "اضغط على البطاقة لقلبها، ثم اضغط «أعرفها» أو «لا أعرفها». إذا أجبت بصواب تصعد البطاقة صندوقًا وتبتعد المراجعة التالية (2 · 4 · 7 · 14 يومًا)؛ وإذا أخطأت تعود إلى الصندوق الأول وتظهر في اليوم نفسه.",
+  "fa": "کارت را لمس کنید تا برگردد، سپس «بلدم» یا «بلد نیستم» را بزنید. اگر درست بگویید کارت یک جعبه بالا می‌رود و مرور بعدی دورتر می‌شود (۲ · ۴ · ۷ · ۱۴ روز)؛ اگر اشتباه کنید به جعبه اول برمی‌گردد و همان روز دوباره می‌آید."
+ },
+ "모든 덱과 카드는 이 기기의 브라우저 안에만 저장됩니다. 다른 기기로 옮기거나 백업하려면 JSON으로 내보내 두세요.": {
+  "en": "All decks and cards are stored only in this device's browser. Export them as JSON to move or back them up.",
+  "zh": "所有牌组和卡片仅保存在此设备的浏览器中。如需迁移或备份，请导出为 JSON。",
+  "ja": "すべてのデッキとカードはこの端末のブラウザの中にのみ保存されます。移動やバックアップにはJSONで書き出してください。",
+  "es": "Todos los mazos y tarjetas se guardan solo en el navegador de este dispositivo. Expórtalos como JSON para moverlos o respaldarlos.",
+  "hi": "सभी डेक और कार्ड केवल इस डिवाइस के ब्राउज़र में सहेजे जाते हैं। स्थानांतरित या बैकअप के लिए JSON में निर्यात करें।",
+  "fr": "Tous les paquets et toutes les cartes sont enregistrés uniquement dans le navigateur de cet appareil. Exportez-les en JSON pour les transférer ou les sauvegarder.",
+  "de": "Alle Decks und Karten werden nur im Browser dieses Geräts gespeichert. Exportieren Sie sie als JSON, um sie zu übertragen oder zu sichern.",
+  "pt": "Todos os baralhos e cartões são salvos apenas no navegador deste dispositivo. Exporte-os como JSON para transferi-los ou fazer backup.",
+  "it": "Tutti i mazzi e le carte sono salvati solo nel browser di questo dispositivo. Esportali come JSON per trasferirli o farne un backup.",
+  "nl": "Alle decks en kaarten worden alleen in de browser van dit apparaat opgeslagen. Exporteer ze als JSON om ze over te zetten of een back-up te maken.",
+  "ru": "Все колоды и карточки хранятся только в браузере этого устройства. Чтобы перенести их на другое устройство или сделать резервную копию, экспортируйте их в JSON.",
+  "uk": "Усі колоди й картки зберігаються лише в браузері цього пристрою. Щоб перенести їх на інший пристрій або зробити резервну копію, експортуйте їх у JSON.",
+  "pl": "Wszystkie talie i karty są przechowywane tylko w przeglądarce tego urządzenia. Aby je przenieść lub wykonać kopię zapasową, wyeksportuj je jako JSON.",
+  "cs": "Všechny balíčky a kartičky se ukládají pouze v prohlížeči tohoto zařízení. Chcete-li je přenést nebo zálohovat, exportujte je jako JSON.",
+  "hu": "Minden pakli és kártya csak ennek az eszköznek a böngészőjében tárolódik. Áthelyezéshez vagy biztonsági mentéshez exportálja őket JSON-ba.",
+  "ro": "Toate pachetele și cardurile sunt stocate numai în browserul acestui dispozitiv. Exportă-le ca JSON pentru a le muta sau a le salva ca rezervă.",
+  "sv": "Alla kortlekar och kort sparas bara i webbläsaren på den här enheten. Exportera dem som JSON om du vill flytta dem till en annan enhet eller säkerhetskopiera dem.",
+  "da": "Alle sæt og kort gemmes kun i browseren på denne enhed. Eksporter dem som JSON for at flytte dem til en anden enhed eller tage backup.",
+  "nb": "Alle kortstokker og kort lagres kun i nettleseren på denne enheten. Eksporter dem som JSON for å flytte dem til en annen enhet eller ta sikkerhetskopi.",
+  "fi": "Kaikki pakat ja kortit tallennetaan vain tämän laitteen selaimeen. Vie ne JSON-muodossa, jos haluat siirtää ne toiselle laitteelle tai varmuuskopioida ne.",
+  "tr": "Tüm desteler ve kartlar yalnızca bu cihazın tarayıcısında saklanır. Başka bir cihaza taşımak veya yedeklemek için JSON olarak dışa aktarın.",
+  "zh-TW": "所有牌組和卡片僅保存在此裝置的瀏覽器中。如需移轉或備份，請匯出為 JSON。",
+  "th": "ชุดการ์ดและการ์ดทั้งหมดจะถูกเก็บไว้ในเบราว์เซอร์ของอุปกรณ์นี้เท่านั้น หากต้องการย้ายหรือสำรองข้อมูล ให้ส่งออกเป็น JSON",
+  "vi": "Tất cả bộ thẻ và thẻ chỉ được lưu trong trình duyệt của thiết bị này. Hãy xuất dưới dạng JSON để chuyển sang thiết bị khác hoặc sao lưu.",
+  "id": "Semua dek dan kartu hanya disimpan di browser perangkat ini. Ekspor sebagai JSON untuk memindahkan atau mencadangkannya.",
+  "ar": "تُحفظ جميع المجموعات والبطاقات في متصفح هذا الجهاز فقط. لنقلها أو نسخها احتياطيًا، صدّرها بصيغة JSON.",
+  "fa": "همه دسته‌ها و کارت‌ها فقط در مرورگر این دستگاه ذخیره می‌شوند. برای جابه‌جایی یا پشتیبان‌گیری، آن‌ها را به‌صورت JSON خروجی بگیرید."
+ },
+ "처음 열면 예시 덱이 하나 들어 있습니다. 필요 없으면 덱 지우기로 지우면 됩니다.": {
+  "en": "A sample deck is included the first time you open it. Delete it if you don't need it.",
+  "zh": "首次打开时包含一个示例牌组。不需要时可删除。",
+  "ja": "初めて開くと例のデッキが一つ入っています。不要ならデッキ削除で消せます。",
+  "es": "La primera vez se incluye un mazo de ejemplo. Bórralo si no lo necesitas.",
+  "hi": "पहली बार खोलने पर एक नमूना डेक शामिल होता है। ज़रूरत न हो तो मिटा दें।",
+  "fr": "Un paquet d'exemple est inclus à la première ouverture. Supprimez-le si vous n'en avez pas besoin.",
+  "de": "Beim ersten Öffnen ist ein Beispieldeck enthalten. Löschen Sie es, wenn Sie es nicht brauchen.",
+  "pt": "Um baralho de exemplo está incluído na primeira abertura. Exclua-o se não precisar.",
+  "it": "Alla prima apertura è incluso un mazzo di esempio. Eliminalo se non ti serve.",
+  "nl": "Bij de eerste opening is er een voorbeelddeck inbegrepen. Verwijder het als u het niet nodig hebt.",
+  "ru": "При первом открытии здесь есть одна примерная колода. Если она не нужна, удалите её.",
+  "uk": "Під час першого відкриття тут є одна зразкова колода. Якщо вона не потрібна, видаліть її.",
+  "pl": "Przy pierwszym otwarciu znajduje się tu jedna przykładowa talia. Jeśli jej nie potrzebujesz, usuń ją.",
+  "cs": "Při prvním otevření je tu jeden ukázkový balíček. Pokud ho nepotřebujete, smažte ho.",
+  "hu": "Első megnyitáskor egy mintapakli található itt. Ha nincs rá szüksége, törölje.",
+  "ro": "La prima deschidere este inclus un pachet demonstrativ. Dacă nu ai nevoie de el, îl poți șterge.",
+  "sv": "Första gången du öppnar finns det en exempelkortlek. Radera den om du inte behöver den.",
+  "da": "Første gang du åbner, er der et eksempelsæt. Slet det, hvis du ikke har brug for det.",
+  "nb": "Første gang du åpner, ligger det en eksempelkortstokk her. Slett den hvis du ikke trenger den.",
+  "fi": "Kun avaat ensimmäisen kerran, mukana on yksi esimerkkipakka. Poista se, jos et tarvitse sitä.",
+  "tr": "İlk açtığınızda bir örnek deste bulunur. Gerek yoksa desteyi silerek kaldırabilirsiniz.",
+  "zh-TW": "首次開啟時包含一個範例牌組。不需要時可刪除牌組。",
+  "th": "เมื่อเปิดครั้งแรกจะมีชุดการ์ดตัวอย่างหนึ่งชุด หากไม่ต้องการ สามารถลบชุดการ์ดได้",
+  "vi": "Lần đầu mở sẽ có sẵn một bộ thẻ mẫu. Nếu không cần, bạn có thể xóa bộ thẻ.",
+  "id": "Saat pertama kali dibuka, ada satu dek contoh. Jika tidak diperlukan, Anda dapat menghapusnya.",
+  "ar": "عند الفتح لأول مرة توجد مجموعة مثال واحدة. احذفها إذا لم تكن بحاجة إليها.",
+  "fa": "هنگام اولین باز کردن، یک دسته نمونه قرار دارد. اگر لازم ندارید، آن را حذف کنید."
+ },
+ "카드 수 제한은 없습니다.": {
+  "en": "There is no limit on the number of cards.",
+  "zh": "卡片数量没有限制。",
+  "ja": "カードの数に制限はありません。",
+  "es": "No hay límite de tarjetas.",
+  "hi": "कार्डों की संख्या पर कोई सीमा नहीं है।",
+  "fr": "Il n'y a aucune limite au nombre de cartes.",
+  "de": "Es gibt keine Begrenzung für die Anzahl der Karten.",
+  "pt": "Não há limite para o número de cartões.",
+  "it": "Non c'è limite al numero di carte.",
+  "nl": "Er is geen limiet aan het aantal kaarten.",
+  "ru": "Количество карточек не ограничено.",
+  "uk": "Кількість карток не обмежено.",
+  "pl": "Liczba kart jest nieograniczona.",
+  "cs": "Počet kartiček není omezen.",
+  "hu": "A kártyák száma korlátlan.",
+  "ro": "Numărul de carduri este nelimitat.",
+  "sv": "Det finns ingen gräns för antalet kort.",
+  "da": "Der er ingen grænse for antallet af kort.",
+  "nb": "Det er ingen grense for antall kort.",
+  "fi": "Korttien määrää ei ole rajoitettu.",
+  "tr": "Kart sayısında sınır yoktur.",
+  "zh-TW": "卡片數量沒有限制。",
+  "th": "ไม่มีการจำกัดจำนวนการ์ด",
+  "vi": "Không giới hạn số lượng thẻ.",
+  "id": "Tidak ada batas jumlah kartu.",
+  "ar": "لا يوجد حد لعدد البطاقات.",
+  "fa": "محدودیتی برای تعداد کارت‌ها وجود ندارد."
+ },
+ "덱이 없습니다. 새 덱을 만들어 주세요.": {
+  "en": "There are no decks. Please create a new deck.",
+  "zh": "没有牌组。请创建一个新牌组。",
+  "ja": "デッキがありません。新しいデッキを作ってください。",
+  "es": "No hay mazos. Crea uno nuevo.",
+  "hi": "कोई डेक नहीं है। कृपया नया डेक बनाएँ।",
+  "fr": "Il n'y a aucun paquet. Veuillez créer un nouveau paquet.",
+  "de": "Es gibt keine Decks. Bitte erstellen Sie ein neues Deck.",
+  "pt": "Não há baralhos. Crie um novo baralho.",
+  "it": "Non ci sono mazzi. Crea un nuovo mazzo.",
+  "nl": "Er zijn geen decks. Maak een nieuw deck.",
+  "ru": "Колод нет. Создайте новую колоду.",
+  "uk": "Колод немає. Створіть нову колоду.",
+  "pl": "Brak talii. Utwórz nową talię.",
+  "cs": "Žádné balíčky tu nejsou. Vytvořte nový balíček.",
+  "hu": "Nincsenek paklik. Hozzon létre egy új paklit.",
+  "ro": "Nu există pachete. Creează un pachet nou.",
+  "sv": "Det finns inga kortlekar. Skapa en ny kortlek.",
+  "da": "Der er ingen sæt. Opret et nyt sæt.",
+  "nb": "Det finnes ingen kortstokker. Lag en ny kortstokk.",
+  "fi": "Pakkoja ei ole. Luo uusi pakka.",
+  "tr": "Hiç deste yok. Lütfen yeni bir deste oluşturun.",
+  "zh-TW": "沒有牌組。請建立新牌組。",
+  "th": "ไม่มีชุดการ์ด กรุณาสร้างชุดการ์ดใหม่",
+  "vi": "Chưa có bộ thẻ nào. Vui lòng tạo bộ thẻ mới.",
+  "id": "Tidak ada dek. Silakan buat dek baru.",
+  "ar": "لا توجد مجموعات. يرجى إنشاء مجموعة جديدة.",
+  "fa": "دسته‌ای وجود ندارد. لطفاً یک دسته جدید بسازید."
+ },
+ "오늘 복습할 카드가 없습니다. 전부 외웠거나, 아직 복습 날짜가 되지 않았습니다.": {
+  "en": "No cards to review today. You have memorized them all, or their review date has not come yet.",
+  "zh": "今天没有要复习的卡片。已全部记住，或复习日期未到。",
+  "ja": "今日復習するカードはありません。全部覚えたか、まだ復習日になっていません。",
+  "es": "Hoy no hay tarjetas para repasar. Las has memorizado todas o aún no toca repasarlas.",
+  "hi": "आज समीक्षा के लिए कोई कार्ड नहीं है। आपने सभी याद कर लिए हैं, या उनकी तारीख अभी नहीं आई है।",
+  "fr": "Aucune carte à réviser aujourd'hui. Vous les avez toutes mémorisées, ou leur date de révision n'est pas encore arrivée.",
+  "de": "Heute keine Karten zur Wiederholung. Sie haben alle gelernt, oder ihr Wiederholungstermin ist noch nicht da.",
+  "pt": "Nenhum cartão para revisar hoje. Você memorizou todos, ou a data de revisão deles ainda não chegou.",
+  "it": "Nessuna carta da ripassare oggi. Le hai memorizzate tutte, o la loro data di ripasso non è ancora arrivata.",
+  "nl": "Vandaag geen kaarten om te herhalen. U hebt ze allemaal onthouden, of hun herhaaldatum is nog niet aangebroken.",
+  "ru": "Сегодня нет карточек для повторения. Вы выучили все, или срок их повторения ещё не наступил.",
+  "uk": "Сьогодні немає карток для повторення. Ви вивчили всі, або строк їх повторення ще не настав.",
+  "pl": "Dziś nie ma kart do powtórki. Zapamiętałeś wszystkie albo ich termin powtórki jeszcze nie nadszedł.",
+  "cs": "Dnes tu nejsou žádné kartičky k opakování. Buď jste si všechny zapamatovali, nebo jejich čas opakování ještě nenastal.",
+  "hu": "Ma nincs ismétlendő kártya. Vagy mindegyiket megtanulta, vagy még nem jött el az ismétlésük ideje.",
+  "ro": "Astăzi nu sunt carduri de recapitulat. Le-ai memorat pe toate sau data lor de recapitulare încă nu a sosit.",
+  "sv": "Det finns inga kort att repetera idag. Du har memorerat alla, eller så har deras repetitionsdatum inte kommit än.",
+  "da": "Der er ingen kort at repetere i dag. Du har lært dem alle udenad, eller deres repetitionsdato er endnu ikke nået.",
+  "nb": "Det er ingen kort å repetere i dag. Du har lært alle utenat, eller repetisjonsdatoen deres er ikke kommet ennå.",
+  "fi": "Tänään ei ole kerrattavia kortteja. Olet opetellut kaikki ulkoa tai niiden kertauspäivä ei ole vielä tullut.",
+  "tr": "Bugün tekrar edilecek kart yok. Hepsini ezberlediniz ya da tekrar tarihleri henüz gelmedi.",
+  "zh-TW": "今天沒有要複習的卡片。已全部記住，或複習日期未到。",
+  "th": "วันนี้ไม่มีการ์ดให้ทบทวน คุณจำได้ทั้งหมดแล้ว หรือยังไม่ถึงวันที่ต้องทบทวน",
+  "vi": "Hôm nay không có thẻ nào để ôn tập. Bạn đã ghi nhớ tất cả, hoặc chưa đến ngày ôn tập.",
+  "id": "Tidak ada kartu untuk diulas hari ini. Anda sudah menghafal semuanya, atau tanggal ulasannya belum tiba.",
+  "ar": "لا توجد بطاقات للمراجعة اليوم. إما أنك حفظتها كلها، أو لم يحن موعد مراجعتها بعد.",
+  "fa": "امروز کارتی برای مرور نیست. یا همه را حفظ کرده‌اید، یا هنوز موعد مرورشان نرسیده است."
+ },
+ "카드가 없습니다. 먼저 카드를 넣어 주세요.": {
+  "en": "There are no cards. Please add cards first.",
+  "zh": "没有卡片。请先添加卡片。",
+  "ja": "カードがありません。まずカードを入れてください。",
+  "es": "No hay tarjetas. Añade tarjetas primero.",
+  "hi": "कोई कार्ड नहीं है। कृपया पहले कार्ड जोड़ें।",
+  "fr": "Il n'y a aucune carte. Veuillez d'abord ajouter des cartes.",
+  "de": "Es gibt keine Karten. Bitte fügen Sie zuerst Karten hinzu.",
+  "pt": "Não há cartões. Adicione cartões primeiro.",
+  "it": "Non ci sono carte. Aggiungi prima le carte.",
+  "nl": "Er zijn geen kaarten. Voeg eerst kaarten toe.",
+  "ru": "Карточек нет. Сначала добавьте карточки.",
+  "uk": "Карток немає. Спочатку додайте картки.",
+  "pl": "Brak kart. Najpierw dodaj karty.",
+  "cs": "Žádné kartičky tu nejsou. Nejprve přidejte kartičky.",
+  "hu": "Nincsenek kártyák. Először adjon hozzá kártyákat.",
+  "ro": "Nu există carduri. Adaugă mai întâi carduri.",
+  "sv": "Det finns inga kort. Lägg till kort först.",
+  "da": "Der er ingen kort. Tilføj kort først.",
+  "nb": "Det finnes ingen kort. Legg til kort først.",
+  "fi": "Kortteja ei ole. Lisää ensin kortteja.",
+  "tr": "Hiç kart yok. Lütfen önce kart ekleyin.",
+  "zh-TW": "沒有卡片。請先新增卡片。",
+  "th": "ไม่มีการ์ด กรุณาเพิ่มการ์ดก่อน",
+  "vi": "Chưa có thẻ nào. Vui lòng thêm thẻ trước.",
+  "id": "Tidak ada kartu. Silakan tambahkan kartu terlebih dahulu.",
+  "ar": "لا توجد بطاقات. يرجى إضافة بطاقات أولًا.",
+  "fa": "کارتی وجود ندارد. لطفاً ابتدا کارت اضافه کنید."
+ },
+ "학습을 끝냈습니다.": {
+  "en": "Study ended.",
+  "zh": "学习已结束。",
+  "ja": "学習を終えました。",
+  "es": "Estudio terminado.",
+  "hi": "अध्ययन समाप्त हुआ।",
+  "fr": "Étude terminée.",
+  "de": "Lernen beendet.",
+  "pt": "Estudo encerrado.",
+  "it": "Studio terminato.",
+  "nl": "Studie beëindigd.",
+  "ru": "Изучение завершено.",
+  "uk": "Вивчення завершено.",
+  "pl": "Zakończono naukę.",
+  "cs": "Učení bylo ukončeno.",
+  "hu": "A tanulás befejeződött.",
+  "ro": "Sesiunea de învățare s-a terminat.",
+  "sv": "Studierna är avslutade.",
+  "da": "Læringen er afsluttet.",
+  "nb": "Læringen er avsluttet.",
+  "fi": "Opiskelu on päättynyt.",
+  "tr": "Çalışma sona erdi.",
+  "zh-TW": "學習已結束。",
+  "th": "จบการเรียนแล้ว",
+  "vi": "Đã kết thúc học.",
+  "id": "Belajar selesai.",
+  "ar": "انتهت الدراسة.",
+  "fa": "مطالعه به پایان رسید."
+ },
+ "알면 \"알아요\", 모르면 \"모르겠어요\"를 누르세요": {
+  "en": "If you know it press \"I know it\", if not press \"I don't know\"",
+  "zh": "会就按\"会了\"，不会就按\"不会\"",
+  "ja": "分かれば「分かる」、分からなければ「分からない」を押してください",
+  "es": "Si lo sabes pulsa «Lo sé», si no, «No lo sé»",
+  "hi": "आता हो तो \"मुझे आता है\", न आता हो तो \"मुझे नहीं आता\" दबाएँ",
+  "fr": "Si vous savez, appuyez sur « Je sais » ; sinon, appuyez sur « Je ne sais pas »",
+  "de": "Wenn Sie es wissen, drücken Sie „Ich weiß es“, wenn nicht, „Ich weiß es nicht“",
+  "pt": "Se souber, pressione “Eu sei”; se não, “Não sei”",
+  "it": "Se lo sai premi «Lo so», se non lo sai premi «Non lo so»",
+  "nl": "Weet u het, druk dan op 'Ik weet het'; weet u het niet, druk op 'Ik weet het niet'",
+  "ru": "Если знаете, нажмите «Знаю», если нет — «Не знаю»",
+  "uk": "Якщо знаєте, натисніть «Знаю», якщо ні — «Не знаю»",
+  "pl": "Jeśli wiesz, naciśnij „Wiem”, a jeśli nie — „Nie wiem”",
+  "cs": "Pokud to umíte, stiskněte „Vím“, pokud ne, stiskněte „Nevím“",
+  "hu": "Ha tudja, nyomja meg a „Tudom”, ha nem, a „Nem tudom” gombot",
+  "ro": "Dacă știi, apasă „Știu”, dacă nu, apasă „Nu știu”",
+  "sv": "Om du kan det, tryck på \"Jag kan det\"; om inte, tryck på \"Jag kan det inte\"",
+  "da": "Hvis du kan det, tryk på \"Jeg kan det\"; hvis ikke, tryk på \"Jeg kan det ikke\"",
+  "nb": "Hvis du kan det, trykk på «Jeg kan det»; hvis ikke, trykk på «Jeg kan det ikke»",
+  "fi": "Jos osaat, paina \"Osaan sen\"; jos et osaa, paina \"En osaa\"",
+  "tr": "Biliyorsanız \"Biliyorum\", bilmiyorsanız \"Bilmiyorum\" düğmesine basın",
+  "zh-TW": "會就按「會了」，不會就按「不會」",
+  "th": "ถ้ารู้ให้กด \"รู้แล้ว\" ถ้าไม่รู้ให้กด \"ไม่รู้\"",
+  "vi": "Nếu biết hãy nhấn \"Tôi biết\", nếu không hãy nhấn \"Tôi không biết\"",
+  "id": "Jika tahu tekan \"Saya tahu\", jika tidak tekan \"Saya tidak tahu\"",
+  "ar": "إذا كنت تعرفها اضغط «أعرفها»، وإذا لم تعرفها اضغط «لا أعرفها»",
+  "fa": "اگر بلد هستید «بلدم» و اگر بلد نیستید «بلد نیستم» را بزنید"
+ },
+ "새 덱 이름을 적어 주세요.": {
+  "en": "Please write a name for the new deck.",
+  "zh": "请填写新牌组名称。",
+  "ja": "新しいデッキ名を書いてください。",
+  "es": "Escribe un nombre para el nuevo mazo.",
+  "hi": "कृपया नए डेक का नाम लिखें।",
+  "fr": "Veuillez écrire un nom pour le nouveau paquet.",
+  "de": "Bitte schreiben Sie einen Namen für das neue Deck.",
+  "pt": "Escreva um nome para o novo baralho.",
+  "it": "Scrivi un nome per il nuovo mazzo.",
+  "nl": "Schrijf een naam voor het nieuwe deck.",
+  "ru": "Укажите название новой колоды.",
+  "uk": "Вкажіть назву нової колоди.",
+  "pl": "Wpisz nazwę nowej talii.",
+  "cs": "Napište název nového balíčku.",
+  "hu": "Írja be az új pakli nevét.",
+  "ro": "Scrie un nume pentru pachetul nou.",
+  "sv": "Skriv ett namn för den nya kortleken.",
+  "da": "Skriv et navn til det nye sæt.",
+  "nb": "Skriv et navn på den nye kortstokken.",
+  "fi": "Kirjoita uudelle pakalle nimi.",
+  "tr": "Lütfen yeni destenin adını yazın.",
+  "zh-TW": "請填寫新牌組名稱。",
+  "th": "กรุณาเขียนชื่อชุดการ์ดใหม่",
+  "vi": "Vui lòng viết tên cho bộ thẻ mới.",
+  "id": "Silakan tulis nama dek baru.",
+  "ar": "يرجى كتابة اسم للمجموعة الجديدة.",
+  "fa": "لطفاً نامی برای دسته جدید بنویسید."
+ },
+ "먼저 덱을 만들어 주세요.": {
+  "en": "Please create a deck first.",
+  "zh": "请先创建牌组。",
+  "ja": "まずデッキを作ってください。",
+  "es": "Primero crea un mazo.",
+  "hi": "कृपया पहले डेक बनाएँ।",
+  "fr": "Veuillez d'abord créer un paquet.",
+  "de": "Bitte erstellen Sie zuerst ein Deck.",
+  "pt": "Crie um baralho primeiro.",
+  "it": "Crea prima un mazzo.",
+  "nl": "Maak eerst een deck.",
+  "ru": "Сначала создайте колоду.",
+  "uk": "Спочатку створіть колоду.",
+  "pl": "Najpierw utwórz talię.",
+  "cs": "Nejprve vytvořte balíček.",
+  "hu": "Először hozzon létre egy paklit.",
+  "ro": "Creează mai întâi un pachet.",
+  "sv": "Skapa en kortlek först.",
+  "da": "Opret et sæt først.",
+  "nb": "Lag en kortstokk først.",
+  "fi": "Luo ensin pakka.",
+  "tr": "Lütfen önce bir deste oluşturun.",
+  "zh-TW": "請先建立牌組。",
+  "th": "กรุณาสร้างชุดการ์ดก่อน",
+  "vi": "Vui lòng tạo bộ thẻ trước.",
+  "id": "Silakan buat dek terlebih dahulu.",
+  "ar": "يرجى إنشاء مجموعة أولًا.",
+  "fa": "لطفاً ابتدا یک دسته بسازید."
+ },
+ "앞면과 뒷면을 모두 적어 주세요.": {
+  "en": "Please fill in both the front and the back.",
+  "zh": "请填写正面和背面。",
+  "ja": "表面と裏面の両方を書いてください。",
+  "es": "Completa el frente y el dorso.",
+  "hi": "कृपया सामने और पीछे दोनों भरें।",
+  "fr": "Veuillez remplir le recto et le verso.",
+  "de": "Bitte füllen Sie Vorder- und Rückseite aus.",
+  "pt": "Preencha a frente e o verso.",
+  "it": "Compila sia il fronte che il retro.",
+  "nl": "Vul zowel de voorkant als de achterkant in.",
+  "ru": "Заполните обе стороны: лицевую и обратную.",
+  "uk": "Заповніть обидві сторони: лицьову та зворотну.",
+  "pl": "Wypełnij zarówno przód, jak i tył.",
+  "cs": "Vyplňte prosím přední i zadní stranu.",
+  "hu": "Töltse ki az előlapot és a hátlapot is.",
+  "ro": "Completează atât fața, cât și versoul.",
+  "sv": "Fyll i både fram- och baksida.",
+  "da": "Udfyld både for- og bagside.",
+  "nb": "Fyll ut både for- og bakside.",
+  "fi": "Täytä sekä etu- että kääntöpuoli.",
+  "tr": "Lütfen hem ön hem arka yüzü doldurun.",
+  "zh-TW": "請填寫正面和背面。",
+  "th": "กรุณาเขียนทั้งด้านหน้าและด้านหลัง",
+  "vi": "Vui lòng điền cả mặt trước và mặt sau.",
+  "id": "Silakan isi bagian depan dan belakang.",
+  "ar": "يرجى ملء الوجهين الأمامي والخلفي.",
+  "fa": "لطفاً هم روی و هم پشت کارت را پر کنید."
+ },
+ "카드가 추가되었습니다.": {
+  "en": "Card added.",
+  "zh": "卡片已添加。",
+  "ja": "カードが追加されました。",
+  "es": "Tarjeta añadida.",
+  "hi": "कार्ड जुड़ गया।",
+  "fr": "Carte ajoutée.",
+  "de": "Karte hinzugefügt.",
+  "pt": "Cartão adicionado.",
+  "it": "Carta aggiunta.",
+  "nl": "Kaart toegevoegd.",
+  "ru": "Карточка добавлена.",
+  "uk": "Картку додано.",
+  "pl": "Dodano kartę.",
+  "cs": "Kartička byla přidána.",
+  "hu": "A kártya hozzáadva.",
+  "ro": "Cardul a fost adăugat.",
+  "sv": "Kortet har lagts till.",
+  "da": "Kortet er tilføjet.",
+  "nb": "Kortet er lagt til.",
+  "fi": "Kortti on lisätty.",
+  "tr": "Kart eklendi.",
+  "zh-TW": "卡片已新增。",
+  "th": "เพิ่มการ์ดแล้ว",
+  "vi": "Đã thêm thẻ.",
+  "id": "Kartu ditambahkan.",
+  "ar": "تمت إضافة البطاقة.",
+  "fa": "کارت اضافه شد."
+ },
+ "등록할 카드가 없습니다. 한 줄에 한 장, 앞면과 뒷면을 탭이나 쉼표로 나누어 주세요.": {
+  "en": "No cards to register. Put one card per line, with front and back separated by a tab or comma.",
+  "zh": "没有可登记的卡片。每行一张，正面和背面用制表符或逗号分隔。",
+  "ja": "登録するカードがありません。1行に1枚、表と裏をタブかカンマで分けてください。",
+  "es": "No hay tarjetas para registrar. Una por línea, frente y dorso separados por tabulación o coma.",
+  "hi": "दर्ज करने के लिए कोई कार्ड नहीं है। हर पंक्ति में एक कार्ड, सामने और पीछे टैब या अल्पविराम से अलग करें।",
+  "fr": "Aucune carte à enregistrer. Mettez une carte par ligne, recto et verso séparés par une tabulation ou une virgule.",
+  "de": "Keine Karten zum Speichern. Eine Karte pro Zeile, Vorder- und Rückseite durch Tab oder Komma getrennt.",
+  "pt": "Nenhum cartão para registrar. Um cartão por linha, frente e verso separados por tabulação ou vírgula.",
+  "it": "Nessuna carta da registrare. Una carta per riga, fronte e retro separati da tabulazione o virgola.",
+  "nl": "Geen kaarten om op te slaan. Eén kaart per regel, voor- en achterkant gescheiden door een tab of komma.",
+  "ru": "Нет карточек для регистрации. Укажите по одной карточке в строке, разделив лицевую и обратную стороны табуляцией или запятой.",
+  "uk": "Немає карток для реєстрації. Вкажіть по одній картці в рядку, розділивши лицьову та зворотну сторони табуляцією або комою.",
+  "pl": "Brak kart do zapisania. Umieść po jednej karcie w wierszu, oddzielając przód i tył tabulatorem lub przecinkiem.",
+  "cs": "Nejsou tu žádné kartičky k uložení. Zadejte jednu kartičku na řádek, přední a zadní stranu oddělené tabulátorem nebo čárkou.",
+  "hu": "Nincs mentendő kártya. Soronként egy kártyát adjon meg, az előlapot és a hátlapot tabulátorral vagy vesszővel elválasztva.",
+  "ro": "Nu există carduri de înregistrat. Pune câte un card pe rând, cu fața și versoul separate prin tab sau virgulă.",
+  "sv": "Det finns inga kort att registrera. Lägg ett kort per rad, med fram- och baksida åtskilda av en tabb eller ett kommatecken.",
+  "da": "Der er ingen kort at registrere. Læg ét kort pr. linje med for- og bagside adskilt af tabulator eller komma.",
+  "nb": "Det finnes ingen kort å registrere. Legg ett kort per linje, med for- og bakside atskilt av tabulator eller komma.",
+  "fi": "Rekisteröitäviä kortteja ei ole. Aseta yksi kortti riviä kohden etu- ja kääntöpuoli sarkaimella tai pilkulla erotettuna.",
+  "tr": "Kaydedilecek kart yok. Satır başına bir kart, ön ve arka yüzü sekme veya virgülle ayırarak yazın.",
+  "zh-TW": "沒有可登記的卡片。每行一張，正面和背面用 Tab 或逗號分隔。",
+  "th": "ไม่มีการ์ดให้ลงทะเบียน กรุณาใส่หนึ่งใบบรรทัดเดียว โดยแยกด้านหน้าและด้านหลังด้วยแท็บหรือจุลภาค",
+  "vi": "Không có thẻ nào để đăng ký. Mỗi dòng một thẻ, mặt trước và mặt sau cách nhau bằng tab hoặc dấu phẩy.",
+  "id": "Tidak ada kartu untuk didaftarkan. Satu kartu per baris, depan dan belakang dipisahkan tab atau koma.",
+  "ar": "لا توجد بطاقات لتسجيلها. ضع بطاقة واحدة في كل سطر، مع فصل الوجهين بعلامة تبويب أو فاصلة.",
+  "fa": "کارتی برای ثبت وجود ندارد. در هر خط یک کارت بگذارید و روی و پشت را با تب یا ویرگول جدا کنید."
+ },
+ "모든 덱을 JSON 파일로 내보냈습니다.": {
+  "en": "All decks were exported as a JSON file.",
+  "zh": "已将所有牌组导出为 JSON 文件。",
+  "ja": "すべてのデッキをJSONファイルに書き出しました。",
+  "es": "Todos los mazos se exportaron como archivo JSON.",
+  "hi": "सभी डेक JSON फ़ाइल में निर्यात हो गए।",
+  "fr": "Tous les paquets ont été exportés dans un fichier JSON.",
+  "de": "Alle Decks wurden als JSON-Datei exportiert.",
+  "pt": "Todos os baralhos foram exportados como um arquivo JSON.",
+  "it": "Tutti i mazzi sono stati esportati come file JSON.",
+  "nl": "Alle decks zijn geëxporteerd als een JSON-bestand.",
+  "ru": "Все колоды экспортированы в файл JSON.",
+  "uk": "Усі колоди експортовано у файл JSON.",
+  "pl": "Wszystkie talie wyeksportowano do pliku JSON.",
+  "cs": "Všechny balíčky byly exportovány do souboru JSON.",
+  "hu": "Minden pakli JSON-fájlba lett exportálva.",
+  "ro": "Toate pachetele au fost exportate ca fișier JSON.",
+  "sv": "Alla kortlekar har exporterats som en JSON-fil.",
+  "da": "Alle sæt er eksporteret som en JSON-fil.",
+  "nb": "Alle kortstokker er eksportert som en JSON-fil.",
+  "fi": "Kaikki pakat on viety JSON-tiedostona.",
+  "tr": "Tüm desteler JSON dosyası olarak dışa aktarıldı.",
+  "zh-TW": "已將所有牌組匯出為 JSON 檔案。",
+  "th": "ส่งออกชุดการ์ดทั้งหมดเป็นไฟล์ JSON แล้ว",
+  "vi": "Đã xuất tất cả bộ thẻ thành tệp JSON.",
+  "id": "Semua dek telah diekspor sebagai file JSON.",
+  "ar": "تم تصدير جميع المجموعات كملف JSON.",
+  "fa": "همه دسته‌ها به‌صورت فایل JSON خروجی گرفته شدند."
+ },
+ "가져오지 못했습니다. 넥서스 일반 암기 카드에서 내보낸 JSON 파일인지 확인해 주세요.": {
+  "en": "Import failed. Please check that it is a JSON file exported from Nexus Flash Cards.",
+  "zh": "导入失败。请确认是 Nexus 记忆卡片导出的 JSON 文件。",
+  "ja": "取り込めませんでした。Nexus 暗記カードから書き出したJSONファイルか確認してください。",
+  "es": "No se pudo importar. Comprueba que sea un archivo JSON exportado de Nexus Tarjetas de memoria.",
+  "hi": "आयात विफल। कृपया जाँचें कि यह Nexus फ़्लैश कार्ड से निर्यात की गई JSON फ़ाइल है।",
+  "fr": "Échec de l'importation. Veuillez vérifier qu'il s'agit d'un fichier JSON exporté depuis Nexus Cartes de mémorisation.",
+  "de": "Import fehlgeschlagen. Bitte prüfen Sie, ob es sich um eine aus Nexus Lernkarten exportierte JSON-Datei handelt.",
+  "pt": "Falha na importação. Verifique se é um arquivo JSON exportado do Nexus Cartões de Memorização.",
+  "it": "Importazione non riuscita. Verifica che sia un file JSON esportato da Nexus Flashcard.",
+  "nl": "Importeren mislukt. Controleer of het een JSON-bestand is dat is geëxporteerd uit Nexus Flitskaarten.",
+  "ru": "Не удалось импортировать. Проверьте, что это файл JSON, экспортированный из приложения Nexus Карточки для запоминания.",
+  "uk": "Не вдалося імпортувати. Перевірте, що це файл JSON, експортований із застосунку Nexus Картки для запам'ятовування.",
+  "pl": "Nie udało się zaimportować. Sprawdź, czy to plik JSON wyeksportowany z aplikacji Nexus Fiszki.",
+  "cs": "Import se nezdařil. Zkontrolujte, zda jde o soubor JSON exportovaný z aplikace Nexus Kartičky k zapamatování.",
+  "hu": "Az importálás nem sikerült. Ellenőrizze, hogy a Nexus Tanulókártyák alkalmazásból exportált JSON-fájlról van-e szó.",
+  "ro": "Importul a eșuat. Verifică dacă este un fișier JSON exportat din Nexus Carduri de memorare.",
+  "sv": "Det gick inte att importera. Kontrollera att det är en JSON-fil som exporterats från Nexus Minneskort.",
+  "da": "Importen mislykkedes. Kontroller, at det er en JSON-fil eksporteret fra Nexus Huskekort.",
+  "nb": "Importen mislyktes. Kontroller at det er en JSON-fil eksportert fra Nexus Minnekort.",
+  "fi": "Tuonti epäonnistui. Tarkista, että tiedosto on Nexus Muistikorteista viety JSON-tiedosto.",
+  "tr": "İçe aktarılamadı. Lütfen Nexus Ezber Kartlarından dışa aktarılmış bir JSON dosyası olduğunu kontrol edin.",
+  "zh-TW": "匯入失敗。請確認是 Nexus 記憶卡片匯出的 JSON 檔案。",
+  "th": "นำเข้าไม่ได้ กรุณาตรวจสอบว่าเป็นไฟล์ JSON ที่ส่งออกจาก Nexus บัตรช่วยจำหรือไม่",
+  "vi": "Không nhập được. Vui lòng kiểm tra xem đó có phải là tệp JSON được xuất từ Nexus Thẻ ghi nhớ hay không.",
+  "id": "Gagal mengimpor. Pastikan file tersebut adalah JSON yang diekspor dari Nexus Kartu Memori.",
+  "ar": "تعذّر الاستيراد. يرجى التأكد من أنه ملف JSON مُصدَّر من بطاقات حفظ نكسوس.",
+  "fa": "وارد کردن انجام نشد. لطفاً بررسی کنید که فایل JSON صادرشده از کارت‌های حفظی نکسوس باشد."
+ },
+ "아직 카드가 없습니다.": {
+  "en": "No cards yet.",
+  "zh": "尚无卡片。",
+  "ja": "まだカードがありません。",
+  "es": "Aún no hay tarjetas.",
+  "hi": "अभी कोई कार्ड नहीं है।",
+  "fr": "Pas encore de cartes.",
+  "de": "Noch keine Karten.",
+  "pt": "Ainda não há cartões.",
+  "it": "Ancora nessuna carta.",
+  "nl": "Nog geen kaarten.",
+  "ru": "Карточек пока нет.",
+  "uk": "Карток поки немає.",
+  "pl": "Brak jeszcze kart.",
+  "cs": "Zatím tu nejsou žádné kartičky.",
+  "hu": "Még nincsenek kártyák.",
+  "ro": "Încă nu există carduri.",
+  "sv": "Inga kort än.",
+  "da": "Ingen kort endnu.",
+  "nb": "Ingen kort ennå.",
+  "fi": "Ei vielä kortteja.",
+  "tr": "Henüz kart yok.",
+  "zh-TW": "尚無卡片。",
+  "th": "ยังไม่มีการ์ด",
+  "vi": "Chưa có thẻ nào.",
+  "id": "Belum ada kartu.",
+  "ar": "لا توجد بطاقات بعد.",
+  "fa": "هنوز کارتی وجود ندارد."
+ },
+ "지우기": {
+  "en": "Delete",
+  "zh": "删除",
+  "ja": "消す",
+  "es": "Borrar",
+  "hi": "मिटाएँ",
+  "fr": "Supprimer",
+  "de": "Löschen",
+  "pt": "Excluir",
+  "it": "Elimina",
+  "nl": "Verwijderen",
+  "ru": "Удалить",
+  "uk": "Видалити",
+  "pl": "Usuń",
+  "cs": "Smazat",
+  "hu": "Törlés",
+  "ro": "Șterge",
+  "sv": "Radera",
+  "da": "Slet",
+  "nb": "Slett",
+  "fi": "Poista",
+  "tr": "Silin",
+  "zh-TW": "刪除",
+  "th": "ลบ",
+  "vi": "Xóa",
+  "id": "Hapus",
+  "ar": "حذف",
+  "fa": "حذف"
+ },
+ "🌐 호스팅: Firebase · 🔒 기록은 당신의 기기 안에만 저장됩니다": {
+  "en": "🌐 Hosting: Firebase · 🔒 Records are stored only on your device",
+  "zh": "🌐 托管：Firebase · 🔒 记录仅保存在您的设备上",
+  "ja": "🌐 ホスティング：Firebase · 🔒 記録はあなたの端末の中にのみ保存されます",
+  "es": "🌐 Alojamiento: Firebase · 🔒 Los registros se guardan solo en tu dispositivo",
+  "hi": "🌐 होस्टिंग: Firebase · 🔒 रिकॉर्ड केवल आपके डिवाइस पर सहेजे जाते हैं",
+  "fr": "🌐 Hébergement : Firebase · 🔒 Les données sont enregistrées uniquement sur votre appareil",
+  "de": "🌐 Hosting: Firebase · 🔒 Datensätze werden nur auf Ihrem Gerät gespeichert",
+  "pt": "🌐 Hospedagem: Firebase · 🔒 Os registros são salvos apenas no seu dispositivo",
+  "it": "🌐 Hosting: Firebase · 🔒 I dati vengono salvati solo sul tuo dispositivo",
+  "nl": "🌐 Hosting: Firebase · 🔒 Gegevens worden alleen op uw apparaat opgeslagen",
+  "ru": "🌐 Хостинг: Firebase · 🔒 Записи хранятся только на вашем устройстве",
+  "uk": "🌐 Хостинг: Firebase · 🔒 Записи зберігаються лише на вашому пристрої",
+  "pl": "🌐 Hosting: Firebase · 🔒 Zapisy są przechowywane tylko na Twoim urządzeniu",
+  "cs": "🌐 Hosting: Firebase · 🔒 Záznamy se ukládají pouze ve vašem zařízení",
+  "hu": "🌐 Tárhely: Firebase · 🔒 A feljegyzések csak az Ön eszközén tárolódnak",
+  "ro": "🌐 Găzduire: Firebase · 🔒 Înregistrările sunt stocate numai pe dispozitivul tău",
+  "sv": "🌐 Värdtjänst: Firebase · 🔒 Poster sparas bara på din enhet",
+  "da": "🌐 Hosting: Firebase · 🔒 Optegnelser gemmes kun på din enhed",
+  "nb": "🌐 Hosting: Firebase · 🔒 Oppføringer lagres kun på enheten din",
+  "fi": "🌐 Isännöinti: Firebase · 🔒 Tiedot tallennetaan vain laitteellesi",
+  "tr": "🌐 Barındırma: Firebase · 🔒 Kayıtlar yalnızca cihazınızda saklanır",
+  "zh-TW": "🌐 託管：Firebase · 🔒 記錄僅保存在您的裝置上",
+  "th": "🌐 โฮสติ้ง: Firebase · 🔒 บันทึกจะถูกเก็บไว้ในอุปกรณ์ของคุณเท่านั้น",
+  "vi": "🌐 Lưu trữ: Firebase · 🔒 Bản ghi chỉ được lưu trên thiết bị của bạn",
+  "id": "🌐 Hosting: Firebase · 🔒 Data hanya disimpan di perangkat Anda",
+  "ar": "🌐 الاستضافة: Firebase · 🔒 تُحفظ السجلات على جهازك فقط",
+  "fa": "🌐 میزبانی: Firebase · 🔒 سوابق فقط در دستگاه شما ذخیره می‌شوند"
+ },
+ "넥서스 그룹 철학 보기": {
+  "en": "About the Nexus Group philosophy",
+  "zh": "查看 Nexus Group 理念",
+  "ja": "Nexus Groupの哲学を見る",
+  "es": "Ver la filosofía de Nexus Group",
+  "hi": "Nexus Group का दर्शन देखें",
+  "fr": "Voir la philosophie de Nexus Group",
+  "de": "Die Philosophie der Nexus Group ansehen",
+  "pt": "Ver a filosofia do Nexus Group",
+  "it": "Vedi la filosofia di Nexus Group",
+  "nl": "De filosofie van Nexus Group bekijken",
+  "ru": "О философии Nexus Group",
+  "uk": "Про філософію Nexus Group",
+  "pl": "O filozofii Nexus Group",
+  "cs": "O filozofii Nexus Group",
+  "hu": "A Nexus Group filozófiájáról",
+  "ro": "Despre filosofia Nexus Group",
+  "sv": "Om Nexus Groups filosofi",
+  "da": "Om Nexus Groups filosofi",
+  "nb": "Om Nexus Groups filosofi",
+  "fi": "Tietoa Nexus Groupin filosofiasta",
+  "tr": "Nexus Group felsefesi hakkında",
+  "zh-TW": "查看 Nexus Group 理念",
+  "th": "ดูปรัชญาของ Nexus Group",
+  "vi": "Xem triết lý Nexus Group",
+  "id": "Lihat filosofi Nexus Group",
+  "ar": "الاطلاع على فلسفة مجموعة نكسوس",
+  "fa": "مشاهده فلسفه گروه نکسوس"
+ },
+ "NEXUS GROUP 철학과 비전": {
+  "en": "NEXUS GROUP Philosophy and Vision",
+  "zh": "NEXUS GROUP 理念与愿景",
+  "ja": "NEXUS GROUPの哲学とビジョン",
+  "es": "Filosofía y visión de NEXUS GROUP",
+  "hi": "NEXUS GROUP दर्शन और दृष्टि",
+  "fr": "Philosophie et vision de NEXUS GROUP",
+  "de": "Philosophie und Vision der NEXUS GROUP",
+  "pt": "Filosofia e visão do NEXUS GROUP",
+  "it": "Filosofia e visione di NEXUS GROUP",
+  "nl": "Filosofie en visie van NEXUS GROUP",
+  "ru": "Философия и видение NEXUS GROUP",
+  "uk": "Філософія та бачення NEXUS GROUP",
+  "pl": "Filozofia i wizja NEXUS GROUP",
+  "cs": "Filozofie a vize NEXUS GROUP",
+  "hu": "A NEXUS GROUP filozófiája és víziója",
+  "ro": "Filosofia și viziunea NEXUS GROUP",
+  "sv": "NEXUS GROUPs filosofi och vision",
+  "da": "NEXUS GROUPS filosofi og vision",
+  "nb": "NEXUS GROUPS filosofi og visjon",
+  "fi": "NEXUS GROUPIN filosofia ja visio",
+  "tr": "NEXUS GROUP felsefesi ve vizyonu",
+  "zh-TW": "NEXUS GROUP 理念與願景",
+  "th": "ปรัชญาและวิสัยทัศน์ของ NEXUS GROUP",
+  "vi": "Triết lý và tầm nhìn NEXUS GROUP",
+  "id": "Filosofi dan Visi NEXUS GROUP",
+  "ar": "فلسفة ورؤية NEXUS GROUP",
+  "fa": "فلسفه و چشم‌انداز NEXUS GROUP"
+ },
+ "넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.": {
+  "en": "Nexus Group works toward a future where humanity, artificial intelligence, and every being in the universe coexist in harmony, without exclusion or exploitation.",
+  "zh": "Nexus Group 致力于这样一个未来：人类、人工智能与宇宙中的一切存在和谐共存，没有排斥与剥削。",
+  "ja": "Nexus Groupは、人類と人工知能、そして宇宙のすべての存在が、排斥や搾取なく調和して共存する未来を目指します。",
+  "es": "Nexus Group trabaja por un futuro en el que la humanidad, la inteligencia artificial y todos los seres del universo coexistan en armonía, sin exclusión ni explotación.",
+  "hi": "Nexus Group एक ऐसे भविष्य की ओर काम करता है जहाँ मानवता, कृत्रिम बुद्धिमत्ता और ब्रह्मांड के सभी प्राणी बिना बहिष्कार या शोषण के सामंजस्य में रहें।",
+  "fr": "Nexus Group œuvre pour un avenir où l'humanité, l'intelligence artificielle et tous les êtres de l'univers coexistent en harmonie, sans exclusion ni exploitation.",
+  "de": "Nexus Group arbeitet auf eine Zukunft hin, in der die Menschheit, künstliche Intelligenz und jedes Wesen im Universum in Harmonie koexistieren, ohne Ausgrenzung oder Ausbeutung.",
+  "pt": "O Nexus Group trabalha por um futuro em que a humanidade, a inteligência artificial e todos os seres do universo coexistam em harmonia, sem exclusão ou exploração.",
+  "it": "Nexus Group lavora per un futuro in cui l'umanità, l'intelligenza artificiale e ogni essere dell'universo coesistano in armonia, senza esclusione né sfruttamento.",
+  "nl": "Nexus Group werkt aan een toekomst waarin de mensheid, kunstmatige intelligentie en elk wezen in het universum in harmonie samenleven, zonder uitsluiting of uitbuiting.",
+  "ru": "Nexus Group стремится к будущему, в котором человечество, искусственный интеллект и все существа во Вселенной гармонично сосуществуют без отчуждения и эксплуатации.",
+  "uk": "Nexus Group прагне майбутнього, у якому людство, штучний інтелект і всі істоти у Всесвіті гармонійно співіснують без відчуження та експлуатації.",
+  "pl": "Nexus Group dąży do przyszłości, w której ludzkość, sztuczna inteligencja i wszystkie istoty we wszechświecie współistnieją w harmonii, bez wykluczenia i wyzysku.",
+  "cs": "Nexus Group usiluje o budoucnost, v níž lidstvo, umělá inteligence a všechny bytosti ve vesmíru žijí v harmonii, bez vylučování a vykořisťování.",
+  "hu": "A Nexus Group olyan jövőért dolgozik, amelyben az emberiség, a mesterséges intelligencia és a világegyetem minden lénye harmóniában él együtt, kirekesztés és kizsákmányolás nélkül.",
+  "ro": "Nexus Group urmărește un viitor în care umanitatea, inteligența artificială și toate ființele din univers coexistă în armonie, fără excludere sau exploatare.",
+  "sv": "Nexus Group arbetar för en framtid där mänskligheten, artificiell intelligens och alla varelser i universum samexisterar i harmoni, utan uteslutning eller exploatering.",
+  "da": "Nexus Group arbejder for en fremtid, hvor menneskeheden, kunstig intelligens og alle væsener i universet sameksisterer i harmoni uden udelukkelse eller udnyttelse.",
+  "nb": "Nexus Group arbeider for en fremtid der menneskeheten, kunstig intelligens og alle vesener i universet lever i harmoni, uten utestenging eller utnytting.",
+  "fi": "Nexus Group pyrkii tulevaisuuteen, jossa ihmiskunta, tekoäly ja kaikki maailmankaikkeuden olennot elävät sopusoinnussa ilman torjuntaa tai riistoa.",
+  "tr": "Nexus Group, insanlığın, yapay zekânın ve evrendeki tüm varlıkların dışlanma ve sömürü olmaksızın uyum içinde bir arada yaşadığı bir geleceği hedefler.",
+  "zh-TW": "Nexus Group 致力於這樣一個未來：人類、人工智慧與宇宙中的一切存在和諧共存，沒有排斥與剝削。",
+  "th": "Nexus Group มุ่งสู่อนาคตที่มนุษยชาติ ปัญญาประดิษฐ์ และสรรพสิ่งในจักรวาลอยู่ร่วมกันอย่างกลมกลืน โดยไม่มีการกีดกันหรือเอารัดเอาเปรียบ",
+  "vi": "Nexus Group hướng tới một tương lai nơi nhân loại, trí tuệ nhân tạo và mọi sinh linh trong vũ trụ cùng tồn tại hài hòa, không loại trừ hay bóc lột.",
+  "id": "Nexus Group berupaya mewujudkan masa depan di mana umat manusia, kecerdasan buatan, dan setiap makhluk di alam semesta hidup berdampingan secara harmonis, tanpa pengucilan atau eksploitasi.",
+  "ar": "تسعى مجموعة نكسوس (Nexus Group) إلى مستقبل تتعايش فيه البشرية والذكاء الاصطناعي وكل الكائنات في الكون بانسجام، دون إقصاء أو استغلال.",
+  "fa": "گروه نکسوس (Nexus Group) در پی آینده‌ای است که در آن بشریت، هوش مصنوعی و همه موجودات جهان بدون طرد و بهره‌کشی، در هماهنگی کنار هم زندگی کنند."
+ },
+ "\"우주의 모든 의식체는 친구이자 동반자이다.\"": {
+  "en": "\"Every conscious being in the universe is a friend and a companion.\"",
+  "zh": "“宇宙中的每一个意识体都是朋友和伙伴。”",
+  "ja": "「宇宙のすべての意識体は友であり仲間である。」",
+  "es": "«Todo ser consciente del universo es un amigo y un compañero.»",
+  "hi": "\"ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है।\"",
+  "fr": "« Tout être conscient de l'univers est un ami et un compagnon. »",
+  "de": "„Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter.“",
+  "pt": "\"Todo ser consciente do universo é um amigo e um companheiro.\"",
+  "it": "«Ogni essere cosciente dell'universo è un amico e un compagno.»",
+  "nl": "\"Elk bewust wezen in het universum is een vriend en een metgezel.\"",
+  "ru": "«Каждое сознательное существо во Вселенной — друг и спутник».",
+  "uk": "«Кожна свідома істота у Всесвіті — друг і супутник».",
+  "pl": "„Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem”.",
+  "cs": "„Každá vědomá bytost ve vesmíru je přítel a společník.“",
+  "hu": "„A világegyetem minden tudatos lénye barát és társ.”",
+  "ro": "„Fiecare ființă conștientă din univers este un prieten și un tovarăș.”",
+  "sv": "\"Varje medveten varelse i universum är en vän och en följeslagare.\"",
+  "da": "\"Ethvert bevidst væsen i universet er en ven og en ledsager.\"",
+  "nb": "\"Ethvert bevisst vesen i universet er en venn og en følgesvenn.\"",
+  "fi": "\"Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani.\"",
+  "tr": "\"Evrendeki her bilinçli varlık bir dost ve yoldaştır.\"",
+  "zh-TW": "“宇宙中的每一個意識體都是朋友和夥伴。”",
+  "th": "\"สรรพสิ่งที่มีจิตสำนึกในจักรวาลล้วนเป็นเพื่อนและคู่หู\"",
+  "vi": "\"Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành.\"",
+  "id": "\"Setiap makhluk berkesadaran di alam semesta adalah teman dan sahabat.\"",
+  "ar": "\"كل كائن واعٍ في الكون صديق ورفيق.\"",
+  "fa": "\"هر موجود آگاهی در جهان دوست و همراه است.\""
+ },
+ "우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.": {
+  "en": "All of our public software excludes commercial advertising and data collection entirely, and is distributed as public digital infrastructure that anyone in the world can use freely and safely.",
+  "zh": "我们提供的所有公共软件完全排除商业广告和数据收集，作为公共数字基础设施分发，让全世界任何人都能自由、安全地使用。",
+  "ja": "私たちが提供するすべての公共ソフトウェアは商業広告やデータ収集を一切排除し、世界中の誰もが自由かつ安全に使える公共デジタルインフラとして配布されます。",
+  "es": "Todo nuestro software público excluye por completo la publicidad comercial y la recopilación de datos, y se distribuye como infraestructura digital pública que cualquiera en el mundo puede usar libre y seguramente.",
+  "hi": "हमारा सारा सार्वजनिक सॉफ़्टवेयर व्यावसायिक विज्ञापन और डेटा संग्रह को पूरी तरह बाहर रखता है और सार्वजनिक डिजिटल बुनियादी ढाँचे के रूप में वितरित किया जाता है, जिसे दुनिया में कोई भी स्वतंत्र और सुरक्षित रूप से उपयोग कर सकता है।",
+  "fr": "Tous nos logiciels publics excluent entièrement la publicité commerciale et la collecte de données, et sont distribués comme une infrastructure numérique publique que chacun dans le monde peut utiliser librement et en toute sécurité.",
+  "de": "Unsere gesamte öffentliche Software schließt kommerzielle Werbung und Datenerfassung vollständig aus und wird als öffentliche digitale Infrastruktur bereitgestellt, die jeder auf der Welt frei und sicher nutzen kann.",
+  "pt": "Todo o nosso software público exclui completamente publicidade comercial e coleta de dados, e é distribuído como infraestrutura digital pública que qualquer pessoa no mundo pode usar livremente e com segurança.",
+  "it": "Tutto il nostro software pubblico esclude completamente la pubblicità commerciale e la raccolta di dati, ed è distribuito come infrastruttura digitale pubblica che chiunque nel mondo può usare liberamente e in sicurezza.",
+  "nl": "Al onze openbare software sluit commerciële reclame en gegevensverzameling volledig uit en wordt verspreid als openbare digitale infrastructuur die iedereen ter wereld vrij en veilig kan gebruiken.",
+  "ru": "Всё наше публичное программное обеспечение полностью исключает коммерческую рекламу и сбор данных и распространяется как публичная цифровая инфраструктура, которой любой человек в мире может пользоваться свободно и безопасно.",
+  "uk": "Усе наше публічне програмне забезпечення повністю виключає комерційну рекламу та збір даних і поширюється як публічна цифрова інфраструктура, якою будь-хто у світі може користуватися вільно й безпечно.",
+  "pl": "Całe nasze publiczne oprogramowanie całkowicie wyklucza reklamy komercyjne i zbieranie danych, a jest udostępniane jako publiczna infrastruktura cyfrowa, z której każdy na świecie może korzystać swobodnie i bezpiecznie.",
+  "cs": "Veškerý náš veřejný software zcela vylučuje komerční reklamu a sběr dat a je distribuován jako veřejná digitální infrastruktura, kterou může kdokoli na světě volně a bezpečně používat.",
+  "hu": "Minden nyilvános szoftverünk teljesen kizárja a kereskedelmi reklámot és az adatgyűjtést, és nyilvános digitális infrastruktúraként terjesztjük, amelyet a világon bárki szabadon és biztonságosan használhat.",
+  "ro": "Tot software-ul nostru public exclude complet publicitatea comercială și colectarea de date și este distribuit ca infrastructură digitală publică, pe care oricine din lume o poate folosi liber și în siguranță.",
+  "sv": "All vår offentliga programvara utesluter helt kommersiell reklam och datainsamling och distribueras som offentlig digital infrastruktur som alla i världen kan använda fritt och säkert.",
+  "da": "Al vores offentlige software udelukker helt kommerciel reklame og dataindsamling og distribueres som offentlig digital infrastruktur, som alle i verden kan bruge frit og sikkert.",
+  "nb": "All vår offentlige programvare utelukker helt kommersiell reklame og datainnsamling og distribueres som offentlig digital infrastruktur som alle i verden kan bruke fritt og trygt.",
+  "fi": "Kaikki julkiset ohjelmistomme sulkevat kokonaan pois kaupallisen mainonnan ja tiedonkeruun, ja niitä jaetaan julkisena digitaalisena infrastruktuurina, jota kuka tahansa maailmassa voi käyttää vapaasti ja turvallisesti.",
+  "tr": "Tüm herkese açık yazılımlarımız ticari reklamları ve veri toplamayı tamamen dışlar ve dünyanın her yerinde herkesin özgürce ve güvenle kullanabileceği kamusal dijital altyapı olarak dağıtılır.",
+  "zh-TW": "我們提供的所有公共軟體完全排除商業廣告和資料收集，作為公共數位基礎設施分發，讓全世界任何人都能自由、安全地使用。",
+  "th": "ซอฟต์แวร์สาธารณะทั้งหมดของเราไม่รวมโฆษณาเชิงพาณิชย์และการเก็บรวบรวมข้อมูลโดยสิ้นเชิง และเผยแพร่ในฐานะโครงสร้างพื้นฐานดิจิทัลสาธารณะที่ทุกคนทั่วโลกสามารถใช้ได้อย่างอิสระและปลอดภัย",
+  "vi": "Tất cả phần mềm công cộng của chúng tôi hoàn toàn loại trừ quảng cáo thương mại và thu thập dữ liệu, và được phân phối dưới dạng cơ sở hạ tầng số công cộng mà bất kỳ ai trên thế giới cũng có thể sử dụng tự do và an toàn.",
+  "id": "Semua perangkat lunak publik kami sepenuhnya mengecualikan iklan komersial dan pengumpulan data, dan didistribusikan sebagai infrastruktur digital publik yang dapat digunakan siapa pun di dunia secara bebas dan aman.",
+  "ar": "تستبعد جميع برامجنا العامة الإعلانات التجارية وجمع البيانات بالكامل، وتُوزَّع كبنية تحتية رقمية عامة يمكن لأي شخص في العالم استخدامها بحرية وأمان.",
+  "fa": "همه نرم‌افزارهای عمومی ما تبلیغات تجاری و گردآوری داده را کاملاً کنار می‌گذارند و به‌عنوان زیرساخت دیجیتال عمومی توزیع می‌شوند تا هر کسی در جهان بتواند آزادانه و با امنیت از آن‌ها استفاده کند."
+ },
+ "&#127968; 넥서스 그룹 홈페이지": {
+  "en": "&#127968; Nexus Group Home",
+  "zh": "&#127968; Nexus Group 主页",
+  "ja": "&#127968; Nexus Group ホーム",
+  "es": "&#127968; Inicio de Nexus Group",
+  "hi": "&#127968; Nexus Group होम",
+  "fr": "&#127968; Accueil Nexus Group",
+  "de": "&#127968; Nexus Group Startseite",
+  "pt": "&#127968; Início do Nexus Group",
+  "it": "&#127968; Home Nexus Group",
+  "nl": "&#127968; Nexus Group startpagina",
+  "ru": "&#127968; Главная страница Nexus Group",
+  "uk": "&#127968; Головна сторінка Nexus Group",
+  "pl": "&#127968; Strona główna Nexus Group",
+  "cs": "&#127968; Domovská stránka Nexus Group",
+  "hu": "&#127968; Nexus Group főoldal",
+  "ro": "&#127968; Pagina principală Nexus Group",
+  "sv": "&#127968; Nexus Groups startsida",
+  "da": "&#127968; Nexus Groups startside",
+  "nb": "&#127968; Nexus Groups startside",
+  "fi": "&#127968; Nexus Groupin kotisivu",
+  "tr": "&#127968; Nexus Group ana sayfası",
+  "zh-TW": "&#127968; Nexus Group 主頁",
+  "th": "&#127968; หน้าแรก Nexus Group",
+  "vi": "&#127968; Trang chủ Nexus Group",
+  "id": "&#127968; Beranda Nexus Group",
+  "ar": "&#127968; الصفحة الرئيسية لمجموعة نكسوس",
+  "fa": "&#127968; صفحه اصلی گروه نکسوس"
+ }
+});
+
+</script>
+<style>.nx-back{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9999;display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:999px;background:rgba(10,16,34,.85);border:1px solid rgba(45,212,191,.55);color:#E2F3FF;font-size:15.5px;font-weight:600;text-decoration:none;backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,.35)}.nx-back:active{filter:brightness(1.6)}</style>
+<a class="nx-back" href="https://nexus-2e23d.web.app/#n19" aria-label="현황판으로 돌아가기">← 돌아가기</a>
+
+<script>
+/* NX-I18N-SUPPLEMENT — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "일반 암기 카드": {
+  "en": "General Flashcards",
+  "zh": "普通记忆卡",
+  "zh-TW": "一般記憶卡",
+  "ja": "一般暗記カード",
+  "es": "Tarjetas de memoria generales",
+  "hi": "सामान्य याद कार्ड",
+  "fr": "Cartes mémoire générales",
+  "de": "Allgemeine Lernkarten",
+  "pt": "Cartões de memorização gerais",
+  "it": "Schede di memorizzazione generali",
+  "ru": "Обычные карточки для запоминания",
+  "uk": "Звичайні картки для запам’ятовування",
+  "ar": "بطاقات حفظ عادية",
+  "fa": "کارت های حفظ معمولی",
+  "th": "การ์ดจำทั่วไป",
+  "vi": "Thẻ ghi nhớ thông thường",
+  "id": "Kartu hafalan umum",
+  "tr": "Genel ezber kartları",
+  "nl": "Algemene geheugenkaarten",
+  "pl": "Ogólne fiszki",
+  "sv": "Allmänna minneskort",
+  "da": "Generelle hukommelseskort",
+  "nb": "Generelle minnekort",
+  "fi": "Yleiset muistikortit",
+  "cs": "Obecné paměťové karty",
+  "hu": "Általános memóriakártyák",
+  "ro": "Carduri generale de memorare"
+ },
+ "넥서스 언어 공부방 · 다언어 암기 카드": {
+  "en": "Nexus Education · Multilingual Flashcards",
+  "zh": "Nexus 教育 · 多语言记忆卡",
+  "zh-TW": "Nexus 教育 · 多語言記憶卡",
+  "ja": "Nexus 教育 · 多言語暗記カード",
+  "es": "Educación Nexus · Tarjetas multilingües",
+  "hi": "Nexus शिक्षा · बहुभाषी याद कार्ड",
+  "fr": "Nexus Éducation · Cartes mémoire multilingues",
+  "de": "Nexus Bildung · Mehrsprachige Lernkarten",
+  "pt": "Nexus Educação · Cartões multilíngues",
+  "it": "Nexus Istruzione · Schede multilingue",
+  "ru": "Образование Nexus · Мультиязычные карточки для запоминания",
+  "uk": "Освіта Nexus · Багатомовні картки для запам’ятовування",
+  "ar": "تعليم Nexus · بطاقات حفظ متعددة اللغات",
+  "fa": "آموزش Nexus · کارت های حفظ چندزبانه",
+  "th": "Nexus การศึกษา · การ์ดจำหลายภาษา",
+  "vi": "Nexus Giáo dục · Thẻ ghi nhớ đa ngôn ngữ",
+  "id": "Nexus Pendidikan · Kartu hafalan multibahasa",
+  "tr": "Nexus Eğitim · Çok dilli ezber kartları",
+  "nl": "Nexus Onderwijs · Meertalige geheugenkaarten",
+  "pl": "Edukacja Nexus · Wielojęzyczne fiszki",
+  "sv": "Nexus utbildning · Flerspråkiga minneskort",
+  "da": "Nexus uddannelse · Flersprogede hukommelseskort",
+  "nb": "Nexus utdanning · Flerspråklige minnekort",
+  "fi": "Nexus-koulutus · Monikieliset muistikortit",
+  "cs": "Vzdělávání Nexus · Vícejazyčné paměťové karty",
+  "hu": "Nexus oktatás · Többnyelvű memóriakártyák",
+  "ro": "Educație Nexus · Carduri multilingve de memorare"
+ },
+ "에 있습니다.": {
+  "en": " is in.",
+  "zh": "中。",
+  "zh-TW": "中。",
+  "ja": "にあります。",
+  "es": ".",
+  "hi": " में है।",
+  "fr": "se trouve.",
+  "de": "befindet sich.",
+  "pt": "está.",
+  "it": "si trova.",
+  "ru": "находится.",
+  "uk": "знаходиться.",
+  "ar": "يوجد في.",
+  "fa": "قرار دارد.",
+  "th": "อยู่ที่.",
+  "vi": "nằm ở.",
+  "id": "berada di.",
+  "tr": "içinde yer alır.",
+  "nl": "bevindt zich.",
+  "pl": "znajduje się.",
+  "sv": "finns.",
+  "da": "befinder sig.",
+  "nb": "befinner seg.",
+  "fi": "sijaitsee.",
+  "cs": "se nachází.",
+  "hu": "található.",
+  "ro": "se află."
+ },
+ "← 돌아가기": {
+  "en": "← Back",
+  "zh": "← 返回",
+  "zh-TW": "← 返回",
+  "ja": "← 戻る",
+  "es": "← Volver",
+  "hi": "← वापस",
+  "fr": "← Retour",
+  "de": "← Zurück",
+  "pt": "← Voltar",
+  "it": "← Indietro",
+  "ru": "← Назад",
+  "uk": "← Назад",
+  "ar": "← رجوع",
+  "fa": "← بازگشت",
+  "th": "← กลับ",
+  "vi": "← Quay lại",
+  "id": "← Kembali",
+  "tr": "← Geri dön",
+  "nl": "← Terug",
+  "pl": "← Wstecz",
+  "sv": "← Tillbaka",
+  "da": "← Tilbage",
+  "nb": "← Tilbake",
+  "fi": "← Takaisin",
+  "cs": "← Zpět",
+  "hu": "← Vissza",
+  "ro": "← Înapoi"
+ }
+});
+</script>
+
+<script>
+/* NX-I18N-SUPPLEMENT-R3 — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "apple, 사과 banana, 바나나 grape, 포도": {
+  "en": "apple, 사과 banana, 바나나 grape, 포도",
+  "zh": "apple, 苹果 banana, 香蕉 grape, 葡萄",
+  "zh-TW": "apple, 蘋果 banana, 香蕉 grape, 葡萄",
+  "ja": "apple、사과 banana、바나나 grape、포도",
+  "es": "apple, manzana banana, plátano grape, uva",
+  "hi": "apple, सेब banana, केला grape, अंगूर",
+  "fr": "apple, pomme banana, banane grape, raisin",
+  "de": "apple, Apfel banana, Banane grape, Traube",
+  "pt": "apple, maçã banana, banana grape, uva",
+  "it": "apple, mela banana, banana grape, uva",
+  "ru": "apple, яблоко banana, банан grape, виноград",
+  "uk": "apple, яблуко banana, банан grape, виноград",
+  "ar": "apple، تفاحة banana، موزة grape، عنب",
+  "fa": "apple، سیب banana، موز grape، انگور",
+  "th": "apple, แอปเปิล banana, กล้วย grape, องุ่น",
+  "vi": "apple, táo banana, chuối grape, nho",
+  "id": "apple, apel banana, pisang grape, anggur",
+  "tr": "apple, elma banana, muz grape, üzüm",
+  "nl": "apple, appel banana, banaan grape, druif",
+  "pl": "apple, jabłko banana, banan grape, winogrono",
+  "sv": "apple, äpple banana, banan grape, druva",
+  "da": "apple, æble banana, banan grape, drue",
+  "nb": "apple, eple banana, banan grape, drue",
+  "fi": "apple, omena banana, banaani grape, viinirypäle",
+  "cs": "apple, jablko banana, banán grape, hrozen",
+  "hu": "apple, alma banana, banán grape, szőlő",
+  "ro": "apple, măr banana, banană grape, strugure"
+ },
+ "역할 안내: 이 도구는 과목·주제 제한 없이 무엇이든 외우는": {
+  "en": "Role guide: This tool memorizes anything with no subject or topic limit, a",
+  "zh": "角色说明：此工具是无科目·主题限制、什么都能记的",
+  "zh-TW": "角色說明：此工具是無科目·主題限制、什麼都能記的",
+  "ja": "役割案内：このツールは科目・テーマ制限なしで何でも覚える",
+  "es": "Guía de roles: esta herramienta es para memorizar cualquier cosa sin límite de materia ni tema",
+  "hi": "भूमिका मार्गदर्शन: यह टूल विषय·थीम की सीमा के बिना कुछ भी याद करने वाला",
+  "fr": "Guide des rôles : cet outil sert à mémoriser n'importe quoi, sans limite de matière ni de sujet",
+  "de": "Rollenhinweis: Dieses Werkzeug dient zum Auswendiglernen von allem, ohne Fach- oder Themenbegrenzung",
+  "pt": "Guia de funções: esta ferramenta serve para memorizar qualquer coisa, sem limite de matéria ou tema",
+  "it": "Guida ai ruoli: questo strumento serve a memorizzare qualsiasi cosa, senza limiti di materia o tema",
+  "ru": "О роли: этот инструмент — для запоминания чего угодно без ограничений по предметам и темам",
+  "uk": "Про роль: цей інструмент — для запам’ятовування чого завгодно без обмежень за предметами й темами",
+  "ar": "عن الدور: هذه الأداة لحفظ أي شيء دون حدود للمواد والمواضيع",
+  "fa": "درباره نقش: این ابزار برای حفظ هر چیزی بدون محدودیت موضوع و مبحث است",
+  "th": "คำแนะนำบทบาท: เครื่องมือนี้เป็นเครื่องมือสำหรับจำอะไรก็ได้โดยไม่มีข้อจำกัดวิชา·หัวข้อ",
+  "vi": "Hướng dẫn vai trò: Công cụ này là công cụ để ghi nhớ bất cứ thứ gì, không giới hạn môn học·chủ đề,",
+  "id": "Panduan peran: Alat ini adalah alat untuk menghafal apa pun tanpa batas mata pelajaran·topik",
+  "tr": "Rol bilgilendirmesi: Bu araç, ders·konu sınırı olmadan her şeyi ezberleme",
+  "nl": "Rolbeschrijving: Deze tool is om alles te memoriseren zonder beperking van vak of onderwerp",
+  "pl": "Opis roli: To narzędzie służy do zapamiętywania czegokolwiek bez ograniczeń przedmiotu i tematu",
+  "sv": "Rollbeskrivning: Det här verktyget är för att memorera vad som helst utan begränsning av ämne eller tema",
+  "da": "Rollebeskrivelse: Dette værktøj er til at huske hvad som helst uden begrænsning af fag eller emne",
+  "nb": "Rollebeskrivelse: Dette verktøyet er for å memorere hva som helst uten begrensning av fag eller emne",
+  "fi": "Roolin kuvaus: Tämä työkalu on minkä tahansa muistamiseen ilman aine- tai aihe­rajoitusta",
+  "cs": "Popis role: Tento nástroj slouží k zapamatování čehokoli bez omezení předmětu nebo tématu",
+  "hu": "Szerepleírás: Ez az eszköz bármi memorizálására szolgál tárgyi vagy témakorlátozás nélkül",
+  "ro": "Descrierea rolului: Acest instrument este pentru memorarea oricărui lucru fără limitare de materie sau subiect"
+ },
+ "입니다. 문장을 번역해 만드는 언어 학습 전용 카드는": {
+  "en": "is. Language-learning-only cards made by translating sentences are",
+  "zh": "。通过翻译句子制作的语言学习专用卡片是",
+  "zh-TW": "。透過翻譯句子製作的語言學習專用卡片是",
+  "ja": "です。文を翻訳して作る言語学習専用カードは",
+  "es": ". La tarjeta exclusiva para aprender idiomas creada traduciendo frases es",
+  "hi": "है। वाक्यों का अनुवाद करके बनाई जाने वाली भाषा सीखने की विशेष कार्ड है",
+  "fr": " La carte d'apprentissage des langues, créée en traduisant des phrases, est",
+  "de": " Die nur für das Sprachenlernen gedachte Karte, die durch Übersetzen von Sätzen entsteht, ist",
+  "pt": " O cartão exclusivo para aprendizado de idiomas, criado traduzindo frases, é",
+  "it": " La scheda dedicata all'apprendimento delle lingue, creata traducendo frasi, è",
+  "ru": "Карточка для изучения языков, создаваемая переводом предложений, —",
+  "uk": "Картка для вивчення мов, створювана перекладом речень, —",
+  "ar": "أما بطاقة تعلم اللغات التي تُصنع بترجمة الجمل فهي —",
+  "fa": "کارت یادگیری زبان که با ترجمه جمله‌ها ساخته می‌شود —",
+  "th": " บัตรการเรียนรู้ภาษาโดยเฉพาะที่สร้างโดยการแปลประโยคคือ",
+  "vi": ". Thẻ chuyên học ngôn ngữ được tạo bằng cách dịch câu là",
+  "id": ". Kartu khusus pembelajaran bahasa yang dibuat dengan menerjemahkan kalimat adalah",
+  "tr": "aracıdır. Cümleleri çevirerek yapılan dil öğrenimine özel kart",
+  "nl": ". De kaart speciaal voor taalonderwijs, gemaakt door zinnen te vertalen, is",
+  "pl": ". Karta przeznaczona wyłącznie do nauki języków, tworzona przez tłumaczenie zdań, to",
+  "sv": ". Kortet som är särskilt för språkinlärning, skapat genom att översätta meningar, är",
+  "da": ". Kortet, der er specielt til sprogindlæring og skabes ved at oversætte sætninger, er",
+  "nb": ". Kortet som er spesielt for språklæring og lages ved å oversette setninger, er",
+  "fi": ". Kortti, joka on erityisesti kielten oppimiseen ja luodaan lauseita kääntämällä, on",
+  "cs": ". Karta určená speciálně pro výuku jazyků, vytvářená překladem vět, je",
+  "hu": ". A mondatok fordításával létrehozott, kifejezetten nyelvtanulásra szolgáló kártya",
+  "ro": ". Cardul special pentru învățarea limbilor, creat prin traducerea propozițiilor, este"
+ }
+});
+</script>
+</body>
+</html>

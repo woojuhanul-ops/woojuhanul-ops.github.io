@@ -1,0 +1,1 @@
+{"background_color":"#0B0F19","description":"말하면 글자로 받아 적는 도구","display":"standalone","icons":[{"sizes":"192x192","src":"/icon-192.png","type":"image/png"},{"sizes":"512x512","src":"/icon-512.png","type":"image/png"}],"name":"넥서스 음성 받아쓰기","short_name":"음성 받아쓰기","start_url":"/","theme_color":"#0B0F19"}

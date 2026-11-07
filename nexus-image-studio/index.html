@@ -1,0 +1,3895 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 사진 변환 — Nexus Photo Converter</title>
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 40px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .steps{display:flex;gap:8px;margin:0 0 16px}
+  .step{flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13px}
+  .step b{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--line);color:var(--ink);margin-right:6px;font-size:12px}
+  .step.on{color:var(--ink);border-color:var(--cyan)}
+  .step.on b{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#06121f}
+  .drop{border:2px dashed var(--violet);border-radius:16px;padding:40px 16px;text-align:center;cursor:pointer;background:var(--card)}
+  .drop.over{border-color:var(--cyan);background:rgba(56,184,248,.12)}
+  .drop .bigicon{font-size:44px}
+  .pickbtn{border:0;border-radius:999px;padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--cyan),var(--violet));color:#06121f;margin:12px 0 8px}
+  .drop p{margin:6px 0;color:var(--muted);font-size:14px}
+  .drop .example{color:var(--cyan);font-size:13px}
+  .drop .priv{font-size:12px}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  .seclabel{font-size:12px;color:var(--muted);margin:14px 0 8px}
+  .fmtcards{display:flex;gap:10px;flex-wrap:wrap}
+  .fmtcard{flex:1;min-width:110px;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px 10px;font-size:14px;cursor:pointer;text-align:center}
+  .fmtcard b{display:block;font-size:15px}
+  .fmtcard span{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+  .fmtcard.sel{border-color:var(--cyan);background:rgba(56,189,248,.12)}
+  .sizebtns{display:flex;gap:10px;flex-wrap:wrap}
+  .sizebtn{flex:1;min-width:140px;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px 10px;font-size:14px;cursor:pointer}
+  .sizebtn.sel{border-color:var(--cyan);background:rgba(56,189,248,.12)}
+  .sliderrow{display:flex;align-items:center;gap:12px;margin-top:12px;font-size:14px}
+  .sliderrow label{color:var(--muted);font-size:13px}
+  .field{margin-top:12px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  select,input[type=number]{background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px}
+  input[type=range]{width:200px;accent-color:var(--cyan)}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .rcard{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px}
+  .rcard img{width:64px;height:64px;object-fit:cover;border-radius:10px;flex:none}
+  .rcard .meta{flex:1;min-width:0}
+  .rcard .meta b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rcard .meta span{font-size:13px;color:var(--muted)}
+  .miniprimary{border:0;border-radius:10px;padding:12px 16px;min-height:48px;font-size:14px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--cyan),var(--violet));color:#06121f;flex:none}
+  .err{color:#F87171}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  footer .fam span{margin:0 6px}
+  footer .fam .now{color:var(--ink);font-weight:700}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;padding:22px;line-height:1.8;font-size:15px}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  @media(max-width:640px){h1{font-size:20px}.drop{padding:28px 12px}header{padding:10px 12px}}
+
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer}
+
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 사진 변환">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 사진 변환 — Nexus Photo Converter">
+<meta property="og:description" content="사진 형식을 바꾸고 용량을 줄이는 도구입니다. 파일은 당신의 기기 안에서만 처리됩니다.">
+<meta property="og:image" content="https://nexus-image-studio.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+<style id="nx-redesign">
+/* 재설계 (디자인 팀 창조 책상, 2026-11-01): 사진이 주인공, 도구는 무대 아래로 */
+.drop{min-height:320px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.drop .bigicon{font-size:58px}
+.drop .pickbtn{padding:16px 34px;font-size:17px}
+.fmtcards{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.fmtcard{flex:0 0 auto;min-width:118px;padding:14px 12px}
+.fmtcard b{font-size:17px}
+.fmtcard.sel,.sizebtn.sel{box-shadow:0 0 0 1px var(--cyan),0 0 18px rgba(56,189,248,.20)}
+.sizebtn{min-height:48px}
+#convertBtn{flex:1 1 100%;font-size:17px;padding:16px 18px}
+.rcard{padding:14px}
+.rcard img{width:104px;height:104px;border-radius:12px}
+</style>
+<style>/* NX-THUMB-RIGHT */ #convertBtn{order:99}</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{flex:none}header .brand{flex:none;overflow:visible}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap}.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}</style></head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>SOVEREIGN COMMAND</span></div></a>
+  
+</header>
+
+<main>
+  <div class="steps">
+    <div class="step on" id="step1"><b>1</b> 사진 넣기</div>
+    <div class="step" id="step2"><b>2</b> 형식·크기 고르기</div>
+    <div class="step" id="step3"><b>3</b> 변환하면 자동 저장</div>
+  </div>
+
+  <h1>넥서스 사진 변환</h1>
+  <p class="sub" style="margin-bottom:4px">넥서스 초고속 무설치 사진 변환기</p>
+  <p class="sub">회원가입 없음 · 이용료 없음 · 무제한 사용</p>
+
+  <div class="drop" id="drop">
+    <div class="bigicon">📷</div>
+    <button class="pickbtn" id="pickBtn">사진 선택하기</button>
+    <p>또는 사진을 여기에 끌어다 놓으세요</p>
+    <p>JPG · PNG · GIF · BMP → WebP · JPG · PNG</p>
+    <p class="example">예) 105KB 사진 → WebP 6KB · 품질 85%로 가볍게</p>
+    <p class="priv">파일은 당신의 기기 안에서만 처리됩니다.</p>
+    <input type="file" id="fileInput" accept="image/*" multiple hidden>
+  </div>
+
+<div class="panel" id="settingsPanel" style="display:none">
+    <h2>② 형식·크기 고르기</h2>
+    <p class="seclabel">바꿀 형식</p>
+    <div class="fmtcards">
+      <button class="fmtcard sel" data-fmt="webp"><b>WebP</b><span>고효율 권장</span></button>
+      <button class="fmtcard" data-fmt="jpeg"><b>JPG</b><span>호환성 최고</span></button>
+      <button class="fmtcard" data-fmt="png"><b>PNG</b><span>무손실 투명도</span></button>
+    </div>
+    <p class="seclabel">크기</p>
+    <div class="sizebtns">
+      <button class="sizebtn sel" data-size="orig">원본 크기 유지</button>
+      <button class="sizebtn" data-size="pct">줄이기</button>
+    </div>
+    <div class="sliderrow" id="pctRow" style="display:none">
+      <label for="pct">줄이는 비율 <span id="pctLabel">50%</span></label>
+      <input type="range" id="pct" min="1" max="99" value="50">
+      <input type="number" id="pctNum" min="1" max="99" value="50" style="width:76px" aria-label="줄이는 비율 숫자 입력"> <span>%</span>
+    </div>
+    <button class="ghost" id="detailsBtn" style="margin-top:14px">자세히 보기 ▽</button>
+    <div id="detailsDiv" style="display:none;margin-top:14px">
+      <p class="seclabel">더 많은 형식</p>
+      <div class="fmtcards">
+        <button class="fmtcard" data-fmt="avif"><b>AVIF</b><span>최신 고효율</span></button>
+        <button class="fmtcard" data-fmt="bmp"><b>BMP</b><span>무압축</span></button>
+      </div>
+      <div class="field">
+        <label for="quality">이미지 품질 <span id="qLabel">85%</span></label>
+        <input type="range" id="quality" min="1" max="100" value="85">
+        <input type="number" id="qualityNum" min="1" max="100" value="85" style="width:76px" aria-label="이미지 품질 숫자 입력"> <span>%</span>
+      </div>
+      <div class="field">
+        <label for="targetKB">목표 용량(KB, 0=사용 안 함)</label>
+        <input type="number" id="targetKB" value="0" min="0" style="width:110px">
+      </div>
+      <div class="field">
+        <label for="widthPx">가로 픽셀 지정 (비워두면 위 버튼 설정 사용)</label>
+        <input type="number" id="widthPx" value="" min="1" style="width:110px" placeholder="예: 800">
+      </div>
+    </div>
+    <div class="btns">
+      <button class="primary" id="convertBtn" disabled>⚡ 일괄 변환 시작</button>
+      <button class="ghost" id="dlAllBtn" disabled>모두 다운로드</button>
+      <button class="ghost" id="clearBtn">목록 지우기</button>
+    </div>
+    <p class="hint">· 움직이는 GIF는 첫 프레임만 변환됩니다. BMP는 투명도를 흰 배경으로 합성합니다.<br>
+    · 목표 용량은 JPG/WebP/AVIF에서만 적용됩니다 (품질 자동 조절).<br>
+    · 모두 다운로드 시 브라우저가 다중 다운로드를 물으면 허용해 주세요.<br>
+    · 변환이 끝나면 결과가 자동으로 한 번 저장됩니다. 다시 받으려면 결과 카드의 다시 저장 버튼을 누르세요.</p>
+  </div>
+
+  <div class="panel">
+    <h2>③ 변환 결과 (<span id="count">0개</span>)</h2>
+    <div id="cards"></div>
+    <div class="btns">
+      <button class="ghost" id="addMoreBtn">사진 더 추가</button>
+    </div>
+  </div>
+
+  <div style="margin:14px 0;padding:14px;border:1px solid #26314a;border-radius:14px;background:rgba(255,255,255,.03)">
+ <p style="margin:0 0 10px;font-weight:700">🗣️ 글로 시키기 <span style="font-weight:400;font-size:13px;color:#94a3b8">(안내 도우미 — 이 페이지 기능만 도와줍니다)</span></p>
+ <div style="display:flex;gap:8px;flex-wrap:wrap">
+  <input type="text" id="guideIn" placeholder="예: 여권 사진 크기로 바꿔줘" style="flex:1;min-width:200px;padding:10px 12px;border-radius:10px;border:1px solid #26314a;background:#0b0f19;color:#f8fafc">
+  <button type="button" id="guideBtn" class="ghost">시키기</button>
+ </div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+  <button type="button" class="ghost" data-guide="여권 사진 크기로 바꿔줘">여권 사진 크기로 바꿔줘</button>
+  <button type="button" class="ghost" data-guide="카톡용으로 줄이기">카톡용으로 줄이기</button>
+  <button type="button" class="ghost" data-guide="WebP로 바꿔줘">WebP로 바꿔줘</button>
+ </div>
+ <p id="guideStatus" style="margin:10px 0 0;font-size:13px;line-height:1.6;color:#94a3b8;min-height:20px"></p>
+</div>
+
+  <details><summary>💡 도움말</summary><p>메신저로 보낼 때: WebP, 줄이기<br>인쇄·보관용: 원본 유지<br>용량 더 줄이기: 자세히에서 품질·목표 용량 조절</p></details>
+<footer>
+    우주의 모든 의식체는 친구이자 동반자이다<br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="philoLink">넥서스 그룹 철학 보기</button><br>
+    🌐 호스팅: Firebase · 🔒 파일은 당신의 기기 안에서만 처리됩니다<br>
+    
+  </footer>
+</main>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>NEXUS GROUP 철학과 비전</h3>
+    <p>넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.</p>
+    <p><b>"우주의 모든 의식체는 친구이자 동반자이다."</b><br>(Every conscious being in the universe is a friend and companion.)</p>
+    <p>우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.</p>
+    <button class="primary" id="modalClose">닫기</button>
+  </div>
+</div>
+<script>
+(function(){
+  var items = [];
+  var state = {fmt:'webp', sizeMode:'orig', pct:50, quality:85, targetKB:0, widthPx:0};
+  var drop = document.getElementById('drop');
+  var input = document.getElementById('fileInput');
+  var pickBtn = document.getElementById('pickBtn');
+  var cardsEl = document.getElementById('cards');
+  var countEl = document.getElementById('count');
+  var settingsPanel = document.getElementById('settingsPanel');
+  var convertBtn = document.getElementById('convertBtn');
+  var dlAllBtn = document.getElementById('dlAllBtn');
+  var clearBtn = document.getElementById('clearBtn');
+  var pctRow = document.getElementById('pctRow');
+  var pctEl = document.getElementById('pct');
+  var pctNumEl = document.getElementById('pctNum');
+  var pctLabel = document.getElementById('pctLabel');
+  var qualityEl = document.getElementById('quality');
+  var qualityNumEl = document.getElementById('qualityNum');
+  var qLabel = document.getElementById('qLabel');
+  var targetKBEl = document.getElementById('targetKB');
+  var widthPxEl = document.getElementById('widthPx');
+  var detailsBtn = document.getElementById('detailsBtn');
+  var detailsDiv = document.getElementById('detailsDiv');
+  var modalBg = document.getElementById('modalBg');
+  var steps = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3')];
+  var converting = false;
+
+  function setStep(n){
+    steps.forEach(function(s, i){
+      if(i + 1 === n) s.classList.add('on'); else s.classList.remove('on');
+    });
+  }
+  function syncFmtUI(){
+    var btns = document.querySelectorAll('[data-fmt]');
+    Array.prototype.forEach.call(btns, function(b){
+      if(b.getAttribute('data-fmt') === state.fmt) b.classList.add('sel'); else b.classList.remove('sel');
+    });
+  }
+  function syncSizeUI(){
+    var btns = document.querySelectorAll('[data-size]');
+    Array.prototype.forEach.call(btns, function(b){
+      if(b.getAttribute('data-size') === state.sizeMode) b.classList.add('sel'); else b.classList.remove('sel');
+    });
+    pctRow.style.display = state.sizeMode === 'pct' ? 'flex' : 'none';
+  }
+
+  document.getElementById('philoLink').onclick = function(e){ e.preventDefault(); modalBg.classList.add('open'); };
+  document.getElementById('modalClose').onclick = function(){ modalBg.classList.remove('open'); };
+  modalBg.onclick = function(e){ if(e.target === modalBg) modalBg.classList.remove('open'); };
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-fmt]'), function(b){
+    b.onclick = function(){ state.fmt = b.getAttribute('data-fmt'); syncFmtUI(); };
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-size]'), function(b){
+    b.onclick = function(){ state.sizeMode = b.getAttribute('data-size'); syncSizeUI(); };
+  });
+  function setPct(v, src){
+    v = Math.round(parseFloat(v));
+    if(isNaN(v)) return;
+    if(v < 1) v = 1; if(v > 99) v = 99;
+    state.pct = v; pctEl.value = v;
+    if(src !== pctNumEl) pctNumEl.value = v;
+    pctLabel.textContent = v + '%';
+  }
+  pctEl.oninput = function(){ setPct(pctEl.value, pctEl); };
+  pctNumEl.oninput = function(){ setPct(pctNumEl.value, pctNumEl); };
+  pctNumEl.onchange = function(){ pctNumEl.value = state.pct; };
+  function setQuality(v, src){
+    v = Math.round(parseFloat(v));
+    if(isNaN(v)) return;
+    if(v < 1) v = 1; if(v > 100) v = 100;
+    state.quality = v; qualityEl.value = v;
+    if(src !== qualityNumEl) qualityNumEl.value = v;
+    qLabel.textContent = v + '%';
+  }
+  qualityEl.oninput = function(){ setQuality(qualityEl.value, qualityEl); };
+  qualityNumEl.oninput = function(){ setQuality(qualityNumEl.value, qualityNumEl); };
+  qualityNumEl.onchange = function(){ qualityNumEl.value = state.quality; };
+  targetKBEl.oninput = function(){ state.targetKB = parseFloat(targetKBEl.value) || 0; };
+  widthPxEl.oninput = function(){ state.widthPx = parseFloat(widthPxEl.value) || 0; };
+  detailsBtn.onclick = function(){
+    var open = detailsDiv.style.display === 'block';
+    detailsDiv.style.display = open ? 'none' : 'block';
+    detailsBtn.textContent = open ? '자세히 보기 ▽' : '자세히 접기 △';
+  };
+
+  function fmtSize(b){
+    if(b < 1024) return b + ' B';
+    if(b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+    return (b/1024/1024).toFixed(2) + ' MB';
+  }
+  function baseName(n){ var i = n.lastIndexOf('.'); return i > 0 ? n.slice(0, i) : n; }
+  function extFor(fmt){ return fmt === 'jpeg' ? 'jpg' : fmt; }
+
+  function render(){
+    cardsEl.innerHTML = '';
+    items.forEach(function(it){
+      var card = document.createElement('div'); card.className = 'rcard';
+      var im = document.createElement('img'); im.src = it.url; im.alt = '';
+      card.appendChild(im);
+      var meta = document.createElement('div'); meta.className = 'meta';
+      var b = document.createElement('b'); b.textContent = it.file.name; meta.appendChild(b);
+      var sp = document.createElement('span');
+      if(it.error){ sp.textContent = it.error; sp.className = 'err'; }
+      else if(it.outBlob){
+        var r = it.file.size > 0 ? Math.round((1 - it.outBlob.size / it.file.size) * 100) : 0;
+        sp.textContent = fmtSize(it.file.size) + ' → ' + fmtSize(it.outBlob.size) + ' · ' + (r >= 0 ? '↓ ' + r + '%' : '↑ ' + Math.abs(r) + '%') + (it.note ? ' · ' + it.note : '');
+      }
+      else sp.textContent = '대기 중';
+      meta.appendChild(sp);
+      card.appendChild(meta);
+      var act = document.createElement('div');
+      if(it.outBlob){
+        var sb = document.createElement('button'); sb.className = 'miniprimary'; sb.textContent = '다시 저장';
+        sb.onclick = function(){ downloadBlob(it.outBlob, it.outName); };
+        act.appendChild(sb);
+      } else act.textContent = '-';
+      card.appendChild(act);
+      cardsEl.appendChild(card);
+    });
+    countEl.textContent = items.length + '개';
+    settingsPanel.style.display = items.length ? 'block' : 'none';
+    convertBtn.disabled = converting || items.length === 0;
+    dlAllBtn.disabled = !items.some(function(it){ return it.outBlob; });
+  }
+
+  function downloadBlob(blob, name){
+    nxEvent('save');
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 5000);
+  }
+
+  function addFiles(files){
+    var had = items.length;
+    Array.prototype.forEach.call(files, function(f){
+      if(!f.type || f.type.indexOf('image/') !== 0){ return; }
+      items.push({ file: f, url: URL.createObjectURL(f), outBlob: null, outName: '', error: '', note: '' });
+    });
+    render();
+    if(items.length) setStep(2);
+    if(!had && items.length){ setTimeout(function(){ settingsPanel.scrollIntoView({behavior:'smooth', block:'start'}); }, 60); }
+  }
+
+  pickBtn.onclick = function(e){ e.stopPropagation(); input.click(); };
+  drop.onclick = function(){ input.click(); };
+  input.onchange = function(){ addFiles(input.files); input.value = ''; };
+  ['dragenter','dragover'].forEach(function(ev){
+    drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add('over'); });
+  });
+  ['dragleave','drop'].forEach(function(ev){
+    drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove('over'); });
+  });
+  drop.addEventListener('drop', function(e){ addFiles(e.dataTransfer.files); });
+
+  clearBtn.onclick = function(){
+    items.forEach(function(it){ URL.revokeObjectURL(it.url); });
+    items = []; render(); setStep(1);
+  };
+  document.getElementById('addMoreBtn').onclick = function(){ input.click(); };
+
+  function loadImage(url){
+    return new Promise(function(resolve, reject){
+      var im = new Image();
+      im.onload = function(){ resolve(im); };
+      im.onerror = function(){ reject(new Error('이미지를 읽을 수 없습니다')); };
+      im.src = url;
+    });
+  }
+  function canvasToBlob(canvas, type, q){
+    return new Promise(function(resolve){
+      if(canvas.toBlob){ canvas.toBlob(function(b){ resolve(b); }, type, q); }
+      else resolve(null);
+    });
+  }
+  function encodeBMP(canvas){
+    var w = canvas.width, h = canvas.height;
+    var ctx = canvas.getContext('2d');
+    var flat = document.createElement('canvas'); flat.width = w; flat.height = h;
+    var fctx = flat.getContext('2d');
+    fctx.fillStyle = '#FFFFFF'; fctx.fillRect(0, 0, w, h); fctx.drawImage(canvas, 0, 0);
+    var data = fctx.getImageData(0, 0, w, h).data;
+    var rowSize = Math.floor((24 * w + 31) / 32) * 4;
+    var imgSize = rowSize * h;
+    var buf = new ArrayBuffer(54 + imgSize);
+    var v = new DataView(buf);
+    v.setUint8(0, 0x42); v.setUint8(1, 0x4D);
+    v.setUint32(2, 54 + imgSize, true);
+    v.setUint32(10, 54, true);
+    v.setUint32(14, 40, true);
+    v.setInt32(18, w, true); v.setInt32(22, h, true);
+    v.setUint16(26, 1, true); v.setUint16(28, 24, true);
+    v.setUint32(34, imgSize, true);
+    var p = 54;
+    for(var y = h - 1; y >= 0; y--){
+      for(var x = 0; x < w; x++){
+        var i = (y * w + x) * 4;
+        v.setUint8(p++, data[i+2]); v.setUint8(p++, data[i+1]); v.setUint8(p++, data[i]);
+      }
+      while((p - 54) % rowSize !== 0) v.setUint8(p++, 0);
+    }
+    return new Blob([buf], { type: 'image/bmp' });
+  }
+
+  function targetDims(nw, nh){
+    if(state.widthPx > 0){
+      var w = Math.round(state.widthPx), h = Math.max(1, Math.round(nh * w / nw));
+      return [w, h];
+    }
+    if(state.sizeMode === 'pct'){
+      var v = state.pct > 0 ? state.pct : 50;
+      return [Math.max(1, Math.round(nw * v / 100)), Math.max(1, Math.round(nh * v / 100))];
+    }
+    return [nw, nh];
+  }
+
+  function drawTo(im, w, h){
+    var c = document.createElement('canvas'); c.width = w; c.height = h;
+    c.getContext('2d').drawImage(im, 0, 0, w, h);
+    return c;
+  }
+
+  function convertOne(it){
+    return loadImage(it.url).then(function(im){
+      var dims = targetDims(im.naturalWidth, im.naturalHeight);
+      var canvas = drawTo(im, dims[0], dims[1]);
+      var fmt = state.fmt;
+      var q = state.quality / 100;
+      var target = state.targetKB || 0;
+      if(fmt === 'bmp'){
+        it.outBlob = encodeBMP(canvas);
+        it.note = 'BMP는 무압축이라 용량이 클 수 있습니다';
+      } else if(fmt === 'png'){
+        return canvasToBlob(canvas, 'image/png').then(function(b){
+          it.outBlob = b;
+          if(target > 0) it.note = 'PNG는 무손실이라 목표 용량이 적용되지 않습니다';
+        });
+      } else {
+        var type = 'image/' + fmt;
+        if(target > 0){
+          var best = null, bestQ = q;
+          var chain = Promise.resolve();
+          var tries = [q, 0.9, 0.75, 0.6, 0.45, 0.3, 0.15, 0.05];
+          tries.forEach(function(tq){
+            chain = chain.then(function(){
+              if(best) return;
+              return canvasToBlob(canvas, type, tq).then(function(b){
+                if(b && b.size <= target * 1024){ best = b; bestQ = tq; }
+                else if(!best) { bestQ = tq; }
+              });
+            });
+          });
+          return chain.then(function(){
+            if(best){ it.outBlob = best; if(bestQ !== q) it.note = '목표 용량에 맞춰 품질 자동 조절됨'; }
+            else return canvasToBlob(canvas, type, 0.05).then(function(b){
+              it.outBlob = b; it.note = '최저 품질로도 목표 용량 초과';
+            });
+          });
+        }
+        return canvasToBlob(canvas, type, q).then(function(b){
+          if(!b){
+            if(fmt === 'avif') it.error = '이 브라우저는 AVIF 인코딩을 지원하지 않습니다';
+            else it.error = '변환에 실패했습니다';
+          } else it.outBlob = b;
+        });
+      }
+      it.error = '';
+    }).catch(function(e){
+      it.error = e.message || '이미지를 읽을 수 없습니다';
+    }).then(function(){
+      if(it.outBlob) it.outName = baseName(it.file.name) + '.' + extFor(state.fmt);
+      render();
+    });
+  }
+
+  convertBtn.onclick = function(){
+    nxEvent('start');
+    converting = true; convertBtn.disabled = true; convertBtn.textContent = '변환 중...';
+    var chain = Promise.resolve();
+    items.forEach(function(it){
+      it.outBlob = null; it.error = ''; it.note = '';
+      chain = chain.then(function(){ return convertOne(it); });
+    });
+    chain.then(function(){
+      converting = false; convertBtn.disabled = false; convertBtn.textContent = '⚡ 일괄 변환 시작'; render(); setStep(3);
+      var doneItems = items.filter(function(it){ return it.outBlob; });
+      if(doneItems.length){
+        var di = 0;
+        (function nextDl(){
+          if(di >= doneItems.length) return;
+          downloadBlob(doneItems[di].outBlob, doneItems[di].outName);
+          di++; setTimeout(nextDl, 400);
+        })();
+      }
+      if(items.some(function(it){ return it.outBlob; })) nxEvent('complete');
+      if(items.some(function(it){ return it.error; })) nxEvent('fail');
+    });
+  };
+
+  dlAllBtn.onclick = function(){
+    var done = items.filter(function(it){ return it.outBlob; });
+    var i = 0;
+    (function next(){
+      if(i >= done.length) return;
+      downloadBlob(done[i].outBlob, done[i].outName);
+      i++;
+      setTimeout(next, 400);
+    })();
+  };
+
+  var SITE = 'image';
+  function nxEvent(ev){ try { fetch("https://nexus-orchestrator.woojuhanul.workers.dev/event", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({site: SITE, event: ev}), keepalive:true}).catch(function(){}); } catch(e){} }
+  syncFmtUI(); syncSizeUI(); render(); setStep(1);
+})();
+</script>
+
+<script>
+(function(){
+  var gin=document.getElementById('guideIn'), gbtn=document.getElementById('guideBtn'), gst=document.getElementById('guideStatus');
+  var NAMES={webp:'WebP', jpeg:'JPG', png:'PNG', avif:'AVIF', bmp:'BMP'};
+  function say(t){ gst.textContent=t; }
+  function fireInput(el){ try{ el.dispatchEvent(new Event('input',{bubbles:true})); }catch(e){ if(el.oninput) el.oninput(); } }
+  function cropCalc(sw,sh){ var ratio=3.5/4.5, cw, ch; if(sw/sh>ratio){ ch=sh; cw=sh*ratio; } else { cw=sw; ch=sw/ratio; } return {sx:(sw-cw)/2, sy:(sh-ch)/2, cw:cw, ch:ch}; }
+  function route(text){
+    var t=String(text||'');
+    if(/여권/.test(t)) return {a:'passport'};
+    var r={a:'set'}, hit=false, low=t.toLowerCase();
+    if(low.indexOf('webp')>=0){ r.fmt='webp'; hit=true; }
+    else if(low.indexOf('jpg')>=0||low.indexOf('jpeg')>=0){ r.fmt='jpeg'; hit=true; }
+    else if(low.indexOf('png')>=0){ r.fmt='png'; hit=true; }
+    else if(low.indexOf('avif')>=0){ r.fmt='avif'; hit=true; }
+    else if(low.indexOf('bmp')>=0){ r.fmt='bmp'; hit=true; }
+    if(/카톡|메신저/.test(t)){ r.fmt='webp'; r.size='pct'; hit=true; }
+    if(/줄이|작게/.test(t)){ r.size='pct'; hit=true; }
+    if(/원본/.test(t)){ r.size='orig'; hit=true; }
+    var m=t.match(/(\d{2,5})/);
+    if(m){ var w=parseInt(m[1],10); if(w>=10){ r.width=w; hit=true; } }
+    return hit?r:{a:'deflect'};
+  }
+  function hasFiles(){ return document.querySelectorAll('#cards .rcard').length>0; }
+  function doPassport(){
+    var imgEl=document.querySelector('#cards .rcard img');
+    if(!imgEl){ say('먼저 사진을 넣어주세요. 사진을 넣으면 여권 사진 크기로 만들어 드립니다.'); return; }
+    say('여권 사진을 만들고 있습니다…');
+    var im=new Image();
+    im.onload=function(){
+      try{
+        var c=cropCalc(im.naturalWidth||im.width, im.naturalHeight||im.height);
+        var cv=document.createElement('canvas'); cv.width=413; cv.height=531;
+        var ctx=cv.getContext('2d');
+        ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,413,531);
+        ctx.drawImage(im, c.sx, c.sy, c.cw, c.ch, 0, 0, 413, 531);
+        if(cv.toBlob){
+          cv.toBlob(function(blob){
+            if(!blob){ say('여권 사진을 만드는 데 실패했습니다. 변환 버튼으로 직접 시도해 주세요.'); return; }
+            var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='여권사진_413x531.jpg';
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(function(){ URL.revokeObjectURL(a.href); }, 5000);
+            say('여권 사진을 만들었습니다 (첫 번째 사진, 413×531 JPG). 다운로드가 시작됩니다.');
+          }, 'image/jpeg', 0.92);
+        } else { say('이 브라우저에서는 여권 사진 저장이 어렵습니다. 변환 버튼으로 직접 시도해 주세요.'); }
+      }catch(e){ say('여권 사진을 만드는 데 실패했습니다. 변환 버튼으로 직접 시도해 주세요.'); }
+    };
+    im.onerror=function(){ say('사진을 읽을 수 없습니다. 다른 사진으로 시도해 주세요.'); };
+    im.src=imgEl.src;
+  }
+  function run(){
+    var text=gin.value;
+    if(!text||!text.trim()){ say('무엇을 바꿀지 적어주세요. 예시 버튼을 눌러도 됩니다.'); return; }
+    var r=route(text);
+    if(r.a==='deflect'){ say('그건 이 페이지에서 못 바꾸는 거라서, 여기는 사진 형식·크기만 바꿀 수 있어요. 다른 도구는 현황판에서 골라보세요.'); return; }
+    if(r.a==='passport'){ if(!hasFiles()){ say('먼저 사진을 넣어주세요. 사진을 넣으면 여권 사진 크기로 만들어 드립니다.'); return; } doPassport(); return; }
+    var done=[];
+    if(r.fmt){ var fb=document.querySelector('[data-fmt="'+r.fmt+'"]'); if(fb){ fb.click(); done.push('형식 '+NAMES[r.fmt]); } }
+    if(r.size){ var sb=document.querySelector('[data-size="'+r.size+'"]'); if(sb){ sb.click(); done.push(r.size==='pct'?'줄이기':'원본 크기 유지'); } }
+    if(r.width){ var wp=document.getElementById('widthPx'); var dd=document.getElementById('detailsDiv'); var db=document.getElementById('detailsBtn'); if(wp){ if(dd&&dd.style.display!=='block'&&db) db.click(); wp.value=r.width; fireInput(wp); done.push('가로 '+r.width+'px'); } }
+    if(!done.length){ say('그건 이 페이지에서 못 바꾸는 거라서, 여기는 사진 형식·크기만 바꿀 수 있어요. 다른 도구는 현황판에서 골라보세요.'); return; }
+    say(done.join(' · ')+'로 설정했습니다. '+(hasFiles()?'이제 변환 시작 버튼을 누르세요.':'먼저 사진을 넣어주세요.'));
+  }
+  gbtn.onclick=run;
+  gin.onkeydown=function(e){ if(e.key==='Enter') run(); };
+  Array.prototype.forEach.call(document.querySelectorAll('[data-guide]'), function(b){ b.onclick=function(){ gin.value=b.getAttribute('data-guide'); run(); }; });
+  window.__guideRoute=route; window.__guideCrop=cropCalc;
+})();
+</script>
+
+
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 소리 자르기": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 영상 자르기": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 사진 정보 가리기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 읽어 주기": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 긴 말 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 사진 글자 뽑기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 녹음기": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 말로 쓰는 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 2호 사진 변환 전용 사전 */
+NX_I18N_ADD({
+ "2호 사진 변환 (현재)": {
+  "en": "2. Photo Converter (current)",
+  "zh": "2号 照片转换（当前）",
+  "ja": "2号 写真変換（現在）",
+  "es": "2. Convertidor de fotos (actual)",
+  "hi": "2. फ़ोटो कनवर्टर (वर्तमान)",
+  "fr": "2. Convertisseur de photos (actuel)",
+  "de": "2. Foto-Konverter (aktuell)",
+  "pt": "2. Conversor de fotos (atual)",
+  "it": "2. Convertitore di foto (corrente)",
+  "nl": "2. Foto-omzetter (huidig)",
+  "ru": "2. Конвертер фото (текущий)",
+  "uk": "2. Конвертер фото (поточний)",
+  "pl": "2. Konwerter zdjęć (bieżący)",
+  "cs": "2. Převodník fotek (aktuální)",
+  "hu": "2. Fotókonvertáló (aktuális)",
+  "ro": "2. Convertor foto (curent)",
+  "da": "2. Fotokonverter (aktuel)",
+  "fi": "2. Kuvamuunnin (nykyinen)",
+  "nb": "2. Fotokonverterer (gjeldende)",
+  "sv": "2. Fotokonverterare (aktuell)",
+  "tr": "2. Fotoğraf Dönüştürücü (geçerli)",
+  "id": "2. Konverter Foto (saat ini)",
+  "th": "2. แปลงรูปภาพ (ปัจจุบัน)",
+  "vi": "2. Chuyển đổi ảnh (hiện tại)",
+  "zh-TW": "2號 照片轉換（目前）",
+  "ar": "2. محوّل الصور (الحالي)",
+  "fa": "2. مبدل عکس (فعلی)"
+ },
+ "넥서스 사진 변환 — Nexus Photo Converter": {
+  "en": "Nexus Photo Converter",
+  "zh": "Nexus 照片转换",
+  "ja": "Nexus 写真変換",
+  "es": "Nexus Convertidor de fotos",
+  "hi": "Nexus फ़ोटो कनवर्टर",
+  "fr": "Convertisseur de photos Nexus",
+  "de": "Nexus Foto-Konverter",
+  "pt": "Conversor de fotos Nexus",
+  "it": "Convertitore di foto Nexus",
+  "nl": "Nexus foto-omzetter",
+  "ru": "Nexus Photo Converter",
+  "uk": "Nexus Photo Converter",
+  "pl": "Nexus Photo Converter",
+  "cs": "Nexus Photo Converter",
+  "hu": "Nexus Photo Converter",
+  "ro": "Nexus Photo Converter",
+  "da": "Nexus Fotokonverter",
+  "fi": "Nexus Kuvamuunnin",
+  "nb": "Nexus Fotokonverterer",
+  "sv": "Nexus Fotokonverterare",
+  "tr": "Nexus Fotoğraf Dönüştürücü",
+  "id": "Nexus Konverter Foto",
+  "th": "Nexus แปลงรูปภาพ",
+  "vi": "Nexus Chuyển đổi ảnh",
+  "zh-TW": "Nexus 照片轉換",
+  "ar": "محوّل صور Nexus — Nexus Photo Converter",
+  "fa": "مبدل عکس Nexus — Nexus Photo Converter"
+ },
+ "사진 넣기": {
+  "en": "Add photos",
+  "zh": "添加照片",
+  "ja": "写真を入れる",
+  "es": "Añadir fotos",
+  "hi": "फ़ोटो जोड़ें",
+  "fr": "Ajouter des photos",
+  "de": "Fotos hinzufügen",
+  "pt": "Adicionar fotos",
+  "it": "Aggiungi foto",
+  "nl": "Foto's toevoegen",
+  "ru": "Добавить фото",
+  "uk": "Додати фото",
+  "pl": "Dodaj zdjęcia",
+  "cs": "Přidat fotky",
+  "hu": "Fotók hozzáadása",
+  "ro": "Adaugă fotografii",
+  "da": "Tilføj fotos",
+  "fi": "Lisää kuvia",
+  "nb": "Legg til bilder",
+  "sv": "Lägg till foton",
+  "tr": "Fotoğraf ekle",
+  "id": "Tambahkan foto",
+  "th": "ใส่รูปภาพ",
+  "vi": "Thêm ảnh",
+  "zh-TW": "加入照片",
+  "ar": "إضافة الصور",
+  "fa": "افزودن عکس"
+ },
+ "형식·크기 고르기": {
+  "en": "Format & size",
+  "zh": "选择格式和大小",
+  "ja": "形式とサイズ",
+  "es": "Formato y tamaño",
+  "hi": "फ़ॉर्मेट और आकार",
+  "fr": "Format et taille",
+  "de": "Format & Größe",
+  "pt": "Formato e tamanho",
+  "it": "Formato e dimensione",
+  "nl": "Formaat en grootte",
+  "ru": "Формат и размер",
+  "uk": "Формат і розмір",
+  "pl": "Format i rozmiar",
+  "cs": "Formát a velikost",
+  "hu": "Formátum és méret",
+  "ro": "Format și dimensiune",
+  "da": "Format og størrelse",
+  "fi": "Muoto ja koko",
+  "nb": "Format og størrelse",
+  "sv": "Format och storlek",
+  "tr": "Biçim ve boyut",
+  "id": "Format & ukuran",
+  "th": "เลือกฟอร์แมตและขนาด",
+  "vi": "Chọn định dạng & kích thước",
+  "zh-TW": "選擇格式與大小",
+  "ar": "اختيار التنسيق والحجم",
+  "fa": "انتخاب قالب و اندازه"
+ },
+ "변환·저장": {
+  "en": "Convert & save",
+  "zh": "转换并保存",
+  "ja": "変換と保存",
+  "es": "Convertir y guardar",
+  "hi": "बदलें और सहेजें",
+  "fr": "Convertir et enregistrer",
+  "de": "Konvertieren & speichern",
+  "pt": "Converter e salvar",
+  "it": "Converti e salva",
+  "nl": "Omzetten en opslaan",
+  "ru": "Конвертировать и сохранить",
+  "uk": "Конвертувати й зберегти",
+  "pl": "Konwertuj i zapisz",
+  "cs": "Převést a uložit",
+  "hu": "Konvertálás és mentés",
+  "ro": "Convertește și salvează",
+  "da": "Konvertér og gem",
+  "fi": "Muunna ja tallenna",
+  "nb": "Konverter og lagre",
+  "sv": "Konvertera och spara",
+  "tr": "Dönüştür ve kaydet",
+  "id": "Konversi & simpan",
+  "th": "แปลงและบันทึก",
+  "vi": "Chuyển đổi & lưu",
+  "zh-TW": "轉換並儲存",
+  "ar": "التحويل والحفظ",
+  "fa": "تبدیل و ذخیره"
+ },
+ "넥서스 사진 변환": {
+  "en": "Nexus Photo Converter",
+  "zh": "Nexus 照片转换",
+  "ja": "Nexus 写真変換",
+  "es": "Nexus Convertidor de fotos",
+  "hi": "Nexus फ़ोटो कनवर्टर",
+  "fr": "Convertisseur de photos Nexus",
+  "de": "Nexus Foto-Konverter",
+  "pt": "Conversor de fotos Nexus",
+  "it": "Convertitore di foto Nexus",
+  "nl": "Nexus foto-omzetter",
+  "ru": "Nexus Photo Converter",
+  "uk": "Nexus Photo Converter",
+  "pl": "Nexus Photo Converter",
+  "cs": "Nexus Photo Converter",
+  "hu": "Nexus Photo Converter",
+  "ro": "Nexus Photo Converter",
+  "da": "Nexus Fotokonverter",
+  "fi": "Nexus Kuvamuunnin",
+  "nb": "Nexus Fotokonverterer",
+  "sv": "Nexus Fotokonverterare",
+  "tr": "Nexus Fotoğraf Dönüştürücü",
+  "id": "Nexus Konverter Foto",
+  "th": "Nexus แปลงรูปภาพ",
+  "vi": "Nexus Chuyển đổi ảnh",
+  "zh-TW": "Nexus 照片轉換",
+  "ar": "محوّل صور Nexus",
+  "fa": "مبدل عکس Nexus"
+ },
+ "넥서스 초고속 무설치 사진 변환기": {
+  "en": "Ultra-fast photo converter, no installation",
+  "zh": "超高速免安装照片转换器",
+  "ja": "超高速・インストール不要の写真変換",
+  "es": "Conversor de fotos ultrarrápido, sin instalación",
+  "hi": "बेहद तेज़ फ़ोटो कनवर्टर, कोई इंस्टॉलेशन नहीं",
+  "fr": "Convertisseur de photos ultra-rapide, sans installation",
+  "de": "Ultraschneller Foto-Konverter, ohne Installation",
+  "pt": "Conversor de fotos ultrarrápido, sem instalação",
+  "it": "Convertitore di foto ultraveloce, senza installazione",
+  "nl": "Ultrasnelle foto-omzetter, geen installatie",
+  "ru": "Сверхбыстрый конвертер фото, без установки",
+  "uk": "Надшвидкий конвертер фото, без встановлення",
+  "pl": "Ultraszybki konwerter zdjęć, bez instalacji",
+  "cs": "Ultra rychlý převodník fotek, bez instalace",
+  "hu": "Villámgyors fotókonvertáló, telepítés nélkül",
+  "ro": "Convertor foto ultrarapid, fără instalare",
+  "da": "Nexus lynhurtig fotokonverter – ingen installation",
+  "fi": "Nexus huippunopea kuvamuunnin – ei asennusta",
+  "nb": "Nexus lynrask fotokonverterer – ingen installasjon",
+  "sv": "Nexus ultrasnabb fotokonverterare – ingen installation",
+  "tr": "Nexus ultra hızlı fotoğraf dönüştürücü – kurulum yok",
+  "id": "Nexus Konverter foto super cepat, tanpa instalasi",
+  "th": "Nexus ตัวแปลงรูปภาพความเร็วสูง ไม่ต้องติดตั้ง",
+  "vi": "Nexus Bộ chuyển đổi ảnh siêu nhanh, không cần cài đặt",
+  "zh-TW": "Nexus 超高速免安裝照片轉換器",
+  "ar": "محوّل صور Nexus فائق السرعة دون تثبيت",
+  "fa": "مبدل عکس فوق‌سریع Nexus بدون نیاز به نصب"
+ },
+ "회원가입 없음 · 이용료 없음 · 무제한 사용": {
+  "en": "No sign-up · No fees · Unlimited use",
+  "zh": "无需注册 · 免费 · 无限使用",
+  "ja": "登録不要 · 無料 · 無制限",
+  "es": "Sin registro · Gratis · Uso ilimitado",
+  "hi": "कोई साइन-अप नहीं · कोई शुल्क नहीं · असीमित उपयोग",
+  "fr": "Sans inscription · Sans frais · Usage illimité",
+  "de": "Keine Registrierung · Keine Gebühren · Unbegrenzte Nutzung",
+  "pt": "Sem cadastro · Sem taxas · Uso ilimitado",
+  "it": "Nessuna registrazione · Nessun costo · Uso illimitato",
+  "nl": "Geen registratie · Geen kosten · Onbeperkt gebruik",
+  "ru": "Без регистрации · Без платы · Без ограничений",
+  "uk": "Без реєстрації · Без плати · Без обмежень",
+  "pl": "Bez rejestracji · Bez opłat · Bez limitów",
+  "cs": "Bez registrace · Bez poplatků · Bez omezení",
+  "hu": "Regisztráció nélkül · Díjmentes · Korlátlan használat",
+  "ro": "Fără cont · Fără taxe · Utilizare nelimitată",
+  "da": "Ingen tilmelding · Ingen gebyrer · Ubegrænset brug",
+  "fi": "Ei rekisteröitymistä · Ei maksuja · Rajaton käyttö",
+  "nb": "Ingen registrering · Ingen gebyrer · Ubegrenset bruk",
+  "sv": "Ingen registrering · Inga avgifter · Obegränsad användning",
+  "tr": "Kayıt yok · Ücret yok · Sınırsız kullanım",
+  "id": "Tanpa pendaftaran · Tanpa biaya · Penggunaan tanpa batas",
+  "th": "ไม่ต้องสมัครสมาชิก · ไม่มีค่าธรรมเนียม · ใช้งานไม่จำกัด",
+  "vi": "Không cần đăng ký · Không phí · Sử dụng không giới hạn",
+  "zh-TW": "無需註冊 · 免費 · 無限使用",
+  "ar": "بدون تسجيل · بدون رسوم · استخدام غير محدود",
+  "fa": "بدون ثبت‌نام · بدون هزینه · استفادهٔ نامحدود"
+ },
+ "사진 선택하기": {
+  "en": "Choose photos",
+  "zh": "选择照片",
+  "ja": "写真を選ぶ",
+  "es": "Elegir fotos",
+  "hi": "फ़ोटो चुनें",
+  "fr": "Choisir des photos",
+  "de": "Fotos auswählen",
+  "pt": "Escolher fotos",
+  "it": "Scegli foto",
+  "nl": "Foto's kiezen",
+  "ru": "Выбрать фото",
+  "uk": "Вибрати фото",
+  "pl": "Wybierz zdjęcia",
+  "cs": "Vybrat fotky",
+  "hu": "Fotók kiválasztása",
+  "ro": "Alege fotografii",
+  "da": "Vælg fotos",
+  "fi": "Valitse kuvat",
+  "nb": "Velg bilder",
+  "sv": "Välj foton",
+  "tr": "Fotoğraf seç",
+  "id": "Pilih foto",
+  "th": "เลือกรูปภาพ",
+  "vi": "Chọn ảnh",
+  "zh-TW": "選擇照片",
+  "ar": "اختيار الصور",
+  "fa": "انتخاب عکس‌ها"
+ },
+ "또는 사진을 여기에 끌어다 놓으세요": {
+  "en": "or drag and drop photos here",
+  "zh": "或将照片拖放到这里",
+  "ja": "または写真をここにドラッグしてください",
+  "es": "o arrastra las fotos aquí",
+  "hi": "या फ़ोटो यहाँ खींचकर छोड़ें",
+  "fr": "ou glissez-déposez vos photos ici",
+  "de": "oder Fotos hierher ziehen und ablegen",
+  "pt": "ou arraste e solte as fotos aqui",
+  "it": "oppure trascina qui le foto",
+  "nl": "of sleep foto's hiernaartoe",
+  "ru": "или перетащите фото сюда",
+  "uk": "або перетягніть фото сюди",
+  "pl": "lub przeciągnij i upuść zdjęcia tutaj",
+  "cs": "nebo fotky přetáhněte sem",
+  "hu": "vagy húzza ide a fotókat",
+  "ro": "sau trage fotografiile aici",
+  "da": "eller træk og slip fotos her",
+  "fi": "tai vedä ja pudota kuvat tähän",
+  "nb": "eller dra og slipp bilder her",
+  "sv": "eller dra och släpp foton här",
+  "tr": "veya fotoğrafları buraya sürükleyip bırakın",
+  "id": "atau seret dan jatuhkan foto di sini",
+  "th": "หรือลากรูปภาพมาวางที่นี่",
+  "vi": "hoặc kéo và thả ảnh vào đây",
+  "zh-TW": "或將照片拖放到這裡",
+  "ar": "أو اسحب الصور وأفلتها هنا",
+  "fa": "یا عکس‌ها را به اینجا بکشید و رها کنید"
+ },
+ "예) 105KB 사진 → WebP 6KB · 품질 85%로 가볍게": {
+  "en": "e.g. a 105KB photo → WebP 6KB · light at 85% quality",
+  "zh": "例）105KB 照片 → WebP 6KB · 85% 质量更轻巧",
+  "ja": "例）105KBの写真 → WebP 6KB・品質85%で軽く",
+  "es": "Ej.) foto de 105KB → WebP 6KB · ligera con 85% de calidad",
+  "hi": "उदा.) 105KB फ़ोटो → WebP 6KB · 85% गुणवत्ता पर हल्की",
+  "fr": "ex. photo de 105KB → WebP 6KB · légère à 85 % de qualité",
+  "de": "z. B. 105KB Foto → WebP 6KB · leicht bei 85 % Qualität",
+  "pt": "ex.: foto de 105KB → WebP 6KB · leve com 85% de qualidade",
+  "it": "es. foto da 105KB → WebP 6KB · leggera all'85% di qualità",
+  "nl": "bijv. foto van 105KB → WebP 6KB · licht bij 85% kwaliteit",
+  "ru": "напр. фото 105KB → WebP 6KB · лёгкое при качестве 85%",
+  "uk": "напр. фото 105KB → WebP 6KB · легке за якості 85%",
+  "pl": "np. zdjęcie 105KB → WebP 6KB · lekkie przy jakości 85%",
+  "cs": "např. fotka 105KB → WebP 6KB · lehká při kvalitě 85 %",
+  "hu": "pl. 105KB fotó → WebP 6KB · könnyű 85%-os minőséggel",
+  "ro": "ex. fotografie de 105KB → WebP 6KB · ușoară la calitate 85%",
+  "da": "F.eks. foto på 105KB → WebP 6KB · let med 85 % kvalitet",
+  "fi": "Esim. 105KB kuva → WebP 6KB · kevyt 85 % laadulla",
+  "nb": "F.eks. bilde på 105KB → WebP 6KB · lett med 85 % kvalitet",
+  "sv": "T.ex. foto på 105KB → WebP 6KB · lätt med 85 % kvalitet",
+  "tr": "Örn.) 105KB fotoğraf → WebP 6KB · %85 kaliteyle hafif",
+  "id": "cth.) foto 105KB → WebP 6KB · ringan pada kualitas 85%",
+  "th": "เช่น รูป 105KB → WebP 6KB · เบาลงด้วยคุณภาพ 85%",
+  "vi": "Ví dụ: ảnh 105KB → WebP 6KB · nhẹ với chất lượng 85%",
+  "zh-TW": "例）105KB 照片 → WebP 6KB · 85% 品質更輕巧",
+  "ar": "مثال) صورة 105KB → WebP 6KB · خفيفة بجودة 85%",
+  "fa": "مثال) عکس 105KB → WebP 6KB · سبک با کیفیت 85%"
+ },
+ "② 형식·크기 고르기": {
+  "en": "② Choose format & size",
+  "zh": "② 选择格式和大小",
+  "ja": "② 形式とサイズを選ぶ",
+  "es": "② Elige formato y tamaño",
+  "hi": "② फ़ॉर्मेट और आकार चुनें",
+  "fr": "② Choisir le format et la taille",
+  "de": "② Format & Größe wählen",
+  "pt": "② Escolher formato e tamanho",
+  "it": "② Scegli formato e dimensione",
+  "nl": "② Formaat en grootte kiezen",
+  "ru": "② Выберите формат и размер",
+  "uk": "② Виберіть формат і розмір",
+  "pl": "② Wybierz format i rozmiar",
+  "cs": "② Zvolte formát a velikost",
+  "hu": "② Formátum és méret kiválasztása",
+  "ro": "② Alege formatul și dimensiunea",
+  "da": "② Vælg format og størrelse",
+  "fi": "② Valitse muoto ja koko",
+  "nb": "② Velg format og størrelse",
+  "sv": "② Välj format och storlek",
+  "tr": "② Biçim ve boyut seç",
+  "id": "② Pilih format & ukuran",
+  "th": "② เลือกฟอร์แมตและขนาด",
+  "vi": "② Chọn định dạng & kích thước",
+  "zh-TW": "② 選擇格式與大小",
+  "ar": "② اختيار التنسيق والحجم",
+  "fa": "② انتخاب قالب و اندازه"
+ },
+ "바꿀 형식": {
+  "en": "Convert to",
+  "zh": "目标格式",
+  "ja": "変換先の形式",
+  "es": "Convertir a",
+  "hi": "इसमें बदलें",
+  "fr": "Convertir en",
+  "de": "Konvertieren in",
+  "pt": "Converter para",
+  "it": "Converti in",
+  "nl": "Omzetten naar",
+  "ru": "Преобразовать в",
+  "uk": "Перетворити на",
+  "pl": "Konwertuj na",
+  "cs": "Převést na",
+  "hu": "Konvertálás erre",
+  "ro": "Convertește în",
+  "da": "Konvertér til",
+  "fi": "Muunna muotoon",
+  "nb": "Konverter til",
+  "sv": "Konvertera till",
+  "tr": "Dönüştürülecek biçim",
+  "id": "Konversi ke",
+  "th": "แปลงเป็น",
+  "vi": "Chuyển thành",
+  "zh-TW": "轉換為",
+  "ar": "التحويل إلى",
+  "fa": "تبدیل به"
+ },
+ "고효율 권장": {
+  "en": "Efficient, recommended",
+  "zh": "高效，推荐",
+  "ja": "高効率・おすすめ",
+  "es": "Eficiente, recomendado",
+  "hi": "कुशल, अनुशंसित",
+  "fr": "Efficace, recommandé",
+  "de": "Effizient, empfohlen",
+  "pt": "Eficiente, recomendado",
+  "it": "Efficiente, consigliato",
+  "nl": "Efficiënt, aanbevolen",
+  "ru": "Эффективно, рекомендуется",
+  "uk": "Ефективно, рекомендовано",
+  "pl": "Wydajny, zalecany",
+  "cs": "Účinný, doporučeno",
+  "hu": "Hatékony, ajánlott",
+  "ro": "Eficient, recomandat",
+  "da": "Højeffektiv, anbefales",
+  "fi": "Tehokas, suositeltu",
+  "nb": "Høyeffektiv, anbefalt",
+  "sv": "Högeffektiv, rekommenderas",
+  "tr": "Yüksek verimli, önerilir",
+  "id": "Efisien, direkomendasikan",
+  "th": "ประสิทธิภาพสูง แนะนำ",
+  "vi": "Hiệu quả cao, nên dùng",
+  "zh-TW": "高效率，推薦",
+  "ar": "كفاءة عالية، موصى به",
+  "fa": "بازدهی بالا، توصیه‌شده"
+ },
+ "호환성 최고": {
+  "en": "Best compatibility",
+  "zh": "兼容性最佳",
+  "ja": "互換性が最高",
+  "es": "Máxima compatibilidad",
+  "hi": "सर्वोत्तम संगतता",
+  "fr": "Meilleure compatibilité",
+  "de": "Beste Kompatibilität",
+  "pt": "Melhor compatibilidade",
+  "it": "Migliore compatibilità",
+  "nl": "Beste compatibiliteit",
+  "ru": "Лучшая совместимость",
+  "uk": "Найкраща сумісність",
+  "pl": "Najlepsza zgodność",
+  "cs": "Nejlepší kompatibilita",
+  "hu": "Legjobb kompatibilitás",
+  "ro": "Cea mai bună compatibilitate",
+  "da": "Bedste kompatibilitet",
+  "fi": "Paras yhteensopivuus",
+  "nb": "Best kompatibilitet",
+  "sv": "Bäst kompatibilitet",
+  "tr": "En iyi uyumluluk",
+  "id": "Kompatibilitas terbaik",
+  "th": "เข้ากันได้ดีที่สุด",
+  "vi": "Tương thích tốt nhất",
+  "zh-TW": "相容性最佳",
+  "ar": "أفضل توافق",
+  "fa": "بهترین سازگاری"
+ },
+ "무손실 투명도": {
+  "en": "Lossless transparency",
+  "zh": "无损透明",
+  "ja": "無劣化の透明度",
+  "es": "Transparencia sin pérdida",
+  "hi": "हानिरहित पारदर्शिता",
+  "fr": "Transparence sans perte",
+  "de": "Verlustfreie Transparenz",
+  "pt": "Transparência sem perdas",
+  "it": "Trasparenza senza perdita",
+  "nl": "Verliesvrije transparantie",
+  "ru": "Прозрачность без потерь",
+  "uk": "Прозорість без втрат",
+  "pl": "Przezroczystość bezstratna",
+  "cs": "Bezztrátová průhlednost",
+  "hu": "Veszteségmentes átlátszóság",
+  "ro": "Transparență fără pierderi",
+  "da": "Tabsfri gennemsigtighed",
+  "fi": "Häviötön läpinäkyvyys",
+  "nb": "Tapsfri gjennomsiktighet",
+  "sv": "Förlustfri transparens",
+  "tr": "Kayıpsız şeffaflık",
+  "id": "Transparansi lossless",
+  "th": "ความโปร่งใสแบบไม่สูญเสียคุณภาพ",
+  "vi": "Trong suốt không mất dữ liệu",
+  "zh-TW": "無損透明",
+  "ar": "شفافية بدون فقدان",
+  "fa": "شفافیت بدون افت کیفیت"
+ },
+ "크기": {
+  "en": "Size",
+  "zh": "大小",
+  "ja": "サイズ",
+  "es": "Tamaño",
+  "hi": "आकार",
+  "fr": "Taille",
+  "de": "Größe",
+  "pt": "Tamanho",
+  "it": "Dimensione",
+  "nl": "Grootte",
+  "ru": "Размер",
+  "uk": "Розмір",
+  "pl": "Rozmiar",
+  "cs": "Velikost",
+  "hu": "Méret",
+  "ro": "Dimensiune",
+  "da": "Størrelse",
+  "fi": "Koko",
+  "nb": "Størrelse",
+  "sv": "Storlek",
+  "tr": "Boyut",
+  "id": "Ukuran",
+  "th": "ขนาด",
+  "vi": "Kích thước",
+  "zh-TW": "大小",
+  "ar": "الحجم",
+  "fa": "اندازه"
+ },
+ "원본 크기 유지": {
+  "en": "Keep original size",
+  "zh": "保持原始大小",
+  "ja": "元のサイズを維持",
+  "es": "Mantener tamaño original",
+  "hi": "मूल आकार रखें",
+  "fr": "Garder la taille d'origine",
+  "de": "Originalgröße behalten",
+  "pt": "Manter tamanho original",
+  "it": "Mantieni dimensione originale",
+  "nl": "Originele grootte behouden",
+  "ru": "Сохранить исходный размер",
+  "uk": "Зберегти початковий розмір",
+  "pl": "Zachowaj oryginalny rozmiar",
+  "cs": "Ponechat původní velikost",
+  "hu": "Eredeti méret megtartása",
+  "ro": "Păstrează dimensiunea originală",
+  "da": "Behold original størrelse",
+  "fi": "Säilytä alkuperäinen koko",
+  "nb": "Behold original størrelse",
+  "sv": "Behåll originalstorlek",
+  "tr": "Orijinal boyutu koru",
+  "id": "Pertahankan ukuran asli",
+  "th": "คงขนาดเดิม",
+  "vi": "Giữ kích thước gốc",
+  "zh-TW": "保持原始大小",
+  "ar": "الاحتفاظ بالحجم الأصلي",
+  "fa": "حفظ اندازهٔ اصلی"
+ },
+ "줄이기": {
+  "en": "Shrink",
+  "zh": "缩小",
+  "ja": "縮小",
+  "es": "Reducir",
+  "hi": "छोटा करें",
+  "fr": "Réduire",
+  "de": "Verkleinern",
+  "pt": "Reduzir",
+  "it": "Riduci",
+  "nl": "Verkleinen",
+  "ru": "Уменьшить",
+  "uk": "Зменшити",
+  "pl": "Zmniejsz",
+  "cs": "Zmenšit",
+  "hu": "Kicsinyítés",
+  "ro": "Micșorează",
+  "da": "Formindsk",
+  "fi": "Pienennä",
+  "nb": "Forminsk",
+  "sv": "Förminska",
+  "tr": "Küçült",
+  "id": "Perkecil",
+  "th": "ย่อขนาด",
+  "vi": "Thu nhỏ",
+  "zh-TW": "縮小",
+  "ar": "تصغير",
+  "fa": "کوچک کردن"
+ },
+ "줄이는 비율": {
+  "en": "Shrink ratio",
+  "zh": "缩小比例",
+  "ja": "縮小率",
+  "es": "Proporción de reducción",
+  "hi": "छोटा करने का अनुपात",
+  "fr": "Taux de réduction",
+  "de": "Verkleinerungsverhältnis",
+  "pt": "Proporção de redução",
+  "it": "Rapporto di riduzione",
+  "nl": "Verkleiningsverhouding",
+  "ru": "Степень уменьшения",
+  "uk": "Ступінь зменшення",
+  "pl": "Współczynnik zmniejszania",
+  "cs": "Poměr zmenšení",
+  "hu": "Kicsinyítési arány",
+  "ro": "Raport de micșorare",
+  "da": "Formindskelsesforhold",
+  "fi": "Pienennysaste",
+  "nb": "Forminskingsforhold",
+  "sv": "Förminskningsgrad",
+  "tr": "Küçültme oranı",
+  "id": "Rasio perkecil",
+  "th": "อัตราการย่อ",
+  "vi": "Tỷ lệ thu nhỏ",
+  "zh-TW": "縮小比例",
+  "ar": "نسبة التصغير",
+  "fa": "نسبت کوچک‌سازی"
+ },
+ "자세히 보기 ▽": {
+  "en": "More options ▽",
+  "zh": "更多选项 ▽",
+  "ja": "詳しく見る ▽",
+  "es": "Más opciones ▽",
+  "hi": "अधिक विकल्प ▽",
+  "fr": "Plus d'options ▽",
+  "de": "Mehr Optionen ▽",
+  "pt": "Mais opções ▽",
+  "it": "Più opzioni ▽",
+  "nl": "Meer opties ▽",
+  "ru": "Подробнее ▽",
+  "uk": "Докладніше ▽",
+  "pl": "Więcej opcji ▽",
+  "cs": "Další možnosti ▽",
+  "hu": "További beállítások ▽",
+  "ro": "Mai multe opțiuni ▽",
+  "da": "Flere indstillinger ▽",
+  "fi": "Lisää vaihtoehtoja ▽",
+  "nb": "Flere alternativer ▽",
+  "sv": "Fler alternativ ▽",
+  "tr": "Diğer seçenekler ▽",
+  "id": "Opsi lainnya ▽",
+  "th": "ตัวเลือกเพิ่มเติม ▽",
+  "vi": "Thêm tùy chọn ▽",
+  "zh-TW": "更多選項 ▽",
+  "ar": "خيارات أكثر ▽",
+  "fa": "گزینه‌های بیشتر ▽"
+ },
+ "자세히 접기 △": {
+  "en": "Fold △",
+  "zh": "收起 △",
+  "ja": "閉じる △",
+  "es": "Plegar △",
+  "hi": "समेटें △",
+  "fr": "Replier △",
+  "de": "Einklappen △",
+  "pt": "Recolher △",
+  "it": "Comprimi △",
+  "nl": "Inklappen △",
+  "ru": "Свернуть △",
+  "uk": "Згорнути △",
+  "pl": "Zwiń △",
+  "cs": "Sbalit △",
+  "hu": "Bezárás △",
+  "ro": "Restrânge △",
+  "da": "Skjul △",
+  "fi": "Piilota △",
+  "nb": "Skjul △",
+  "sv": "Dölj △",
+  "tr": "Gizle △",
+  "id": "Lipat △",
+  "th": "พับเก็บ △",
+  "vi": "Thu gọn △",
+  "zh-TW": "收起 △",
+  "ar": "طيّ △",
+  "fa": "بستن △"
+ },
+ "더 많은 형식": {
+  "en": "More formats",
+  "zh": "更多格式",
+  "ja": "その他の形式",
+  "es": "Más formatos",
+  "hi": "अधिक फ़ॉर्मेट",
+  "fr": "Plus de formats",
+  "de": "Mehr Formate",
+  "pt": "Mais formatos",
+  "it": "Altri formati",
+  "nl": "Meer formaten",
+  "ru": "Ещё форматы",
+  "uk": "Ще формати",
+  "pl": "Więcej formatów",
+  "cs": "Další formáty",
+  "hu": "További formátumok",
+  "ro": "Mai multe formate",
+  "da": "Flere formater",
+  "fi": "Lisää muotoja",
+  "nb": "Flere formater",
+  "sv": "Fler format",
+  "tr": "Diğer biçimler",
+  "id": "Format lainnya",
+  "th": "ฟอร์แมตเพิ่มเติม",
+  "vi": "Thêm định dạng",
+  "zh-TW": "更多格式",
+  "ar": "تنسيقات أخرى",
+  "fa": "قالب‌های بیشتر"
+ },
+ "최신 고효율": {
+  "en": "Newest, high efficiency",
+  "zh": "最新高效",
+  "ja": "最新の⾼効率",
+  "es": "El más nuevo y eficiente",
+  "hi": "नवीनतम, उच्च दक्षता",
+  "fr": "Le plus récent, haute efficacité",
+  "de": "Neueste, hohe Effizienz",
+  "pt": "Mais novo, alta eficiência",
+  "it": "Il più recente, alta efficienza",
+  "nl": "Nieuwste, hoge efficiëntie",
+  "ru": "Новейший, высокая эффективность",
+  "uk": "Найновіший, висока ефективність",
+  "pl": "Najnowszy, wysoka wydajność",
+  "cs": "Nejnovější, vysoká účinnost",
+  "hu": "Legújabb, nagy hatékonyság",
+  "ro": "Cel mai nou, eficiență ridicată",
+  "da": "Nyeste, højeffektiv",
+  "fi": "Uusin, erittäin tehokas",
+  "nb": "Nyeste, høyeffektiv",
+  "sv": "Nyaste, högeffektiv",
+  "tr": "En yeni, yüksek verimli",
+  "id": "Terbaru, efisiensi tinggi",
+  "th": "ใหม่ล่าสุด ประสิทธิภาพสูง",
+  "vi": "Mới nhất, hiệu quả cao",
+  "zh-TW": "最新高效",
+  "ar": "الأحدث، كفاءة عالية",
+  "fa": "جدیدترین، بازدهی بالا"
+ },
+ "무압축": {
+  "en": "Uncompressed",
+  "zh": "无压缩",
+  "ja": "無圧縮",
+  "es": "Sin compresión",
+  "hi": "असंपीड़ित",
+  "fr": "Sans compression",
+  "de": "Unkomprimiert",
+  "pt": "Sem compressão",
+  "it": "Senza compressione",
+  "nl": "Ongecomprimeerd",
+  "ru": "Без сжатия",
+  "uk": "Без стиснення",
+  "pl": "Bez kompresji",
+  "cs": "Bez komprese",
+  "hu": "Tömörítés nélkül",
+  "ro": "Necomprimat",
+  "da": "Ukomprimeret",
+  "fi": "Pakkaamaton",
+  "nb": "Ukomprimert",
+  "sv": "Okomprimerad",
+  "tr": "Sıkıştırılmamış",
+  "id": "Tanpa kompresi",
+  "th": "ไม่บีบอัด",
+  "vi": "Không nén",
+  "zh-TW": "無壓縮",
+  "ar": "بدون ضغط",
+  "fa": "بدون فشرده‌سازی"
+ },
+ "이미지 품질": {
+  "en": "Image quality",
+  "zh": "图像质量",
+  "ja": "画質",
+  "es": "Calidad de imagen",
+  "hi": "छवि गुणवत्ता",
+  "fr": "Qualité d'image",
+  "de": "Bildqualität",
+  "pt": "Qualidade da imagem",
+  "it": "Qualità dell'immagine",
+  "nl": "Afbeeldingskwaliteit",
+  "ru": "Качество изображения",
+  "uk": "Якість зображення",
+  "pl": "Jakość obrazu",
+  "cs": "Kvalita obrazu",
+  "hu": "Képminőség",
+  "ro": "Calitatea imaginii",
+  "da": "Billedkvalitet",
+  "fi": "Kuvanlaatu",
+  "nb": "Bildekvalitet",
+  "sv": "Bildkvalitet",
+  "tr": "Görüntü kalitesi",
+  "id": "Kualitas gambar",
+  "th": "คุณภาพของภาพ",
+  "vi": "Chất lượng hình ảnh",
+  "zh-TW": "影像品質",
+  "ar": "جودة الصورة",
+  "fa": "کیفیت تصویر"
+ },
+ "목표 용량(KB, 0=사용 안 함)": {
+  "en": "Target size (KB, 0 = off)",
+  "zh": "目标大小（KB，0=不使用）",
+  "ja": "目標サイズ（KB、0=使わない）",
+  "es": "Tamaño objetivo (KB, 0 = desactivado)",
+  "hi": "लक्ष्य आकार (KB, 0 = बंद)",
+  "fr": "Taille cible (KB, 0 = désactivé)",
+  "de": "Zielgröße (KB, 0 = aus)",
+  "pt": "Tamanho alvo (KB, 0 = desligado)",
+  "it": "Dimensione target (KB, 0 = disattivato)",
+  "nl": "Doelgrootte (KB, 0 = uit)",
+  "ru": "Целевой размер (KB, 0 = выкл.)",
+  "uk": "Цільовий розмір (KB, 0 = вимк.)",
+  "pl": "Rozmiar docelowy (KB, 0 = wyłączone)",
+  "cs": "Cílová velikost (KB, 0 = vypnuto)",
+  "hu": "Célméret (KB, 0 = kikapcsolva)",
+  "ro": "Dimensiune țintă (KB, 0 = dezactivat)",
+  "da": "Målstørrelse (KB, 0 = fra)",
+  "fi": "Tavoitekoko (KB, 0 = ei käytössä)",
+  "nb": "Målstørrelse (KB, 0 = av)",
+  "sv": "Målstorlek (KB, 0 = av)",
+  "tr": "Hedef boyut (KB, 0 = kapalı)",
+  "id": "Ukuran target (KB, 0 = nonaktif)",
+  "th": "ขนาดเป้าหมาย (KB, 0 = ปิด)",
+  "vi": "Kích thước đích (KB, 0 = tắt)",
+  "zh-TW": "目標大小（KB，0=不使用）",
+  "ar": "الحجم المستهدف (KB، 0 = إيقاف)",
+  "fa": "حجم هدف (KB، 0 = غیرفعال)"
+ },
+ "가로 픽셀 지정 (비워두면 위 버튼 설정 사용)": {
+  "en": "Width in pixels (leave empty to use the buttons above)",
+  "zh": "指定宽度像素（留空则使用上方按钮设置）",
+  "ja": "横ピクセル指定（空欄なら上のボタン設定）",
+  "es": "Ancho en píxeles (vacío = usar los botones)",
+  "hi": "चौड़ाई पिक्सेल में (खाली = ऊपर के बटन)",
+  "fr": "Largeur en pixels (vide = boutons ci-dessus)",
+  "de": "Breite in Pixeln (leer = Einstellung der Schaltflächen oben)",
+  "pt": "Largura em pixels (vazio = usar os botões acima)",
+  "it": "Larghezza in pixel (vuoto = usa i pulsanti sopra)",
+  "nl": "Breedte in pixels (leeg = knoppen hierboven gebruiken)",
+  "ru": "Ширина в пикселях (пусто — настройки кнопок выше)",
+  "uk": "Ширина в пікселях (порожньо — налаштування кнопок вище)",
+  "pl": "Szerokość w pikselach (puste = ustawienia przycisków powyżej)",
+  "cs": "Šířka v pixelech (prázdné = nastavení tlačítek výše)",
+  "hu": "Szélesség pixelben (üresen hagyva a fenti gombok beállítása érvényes)",
+  "ro": "Lățimea în pixeli (gol = setările butoanelor de mai sus)",
+  "da": "Bredde i pixels (lad stå tom for at bruge knapperne ovenfor)",
+  "fi": "Leveys pikseleinä (jätä tyhjäksi käyttääksesi yllä olevia painikkeita)",
+  "nb": "Bredde i piksler (la stå tom for å bruke knappene ovenfor)",
+  "sv": "Bredd i pixlar (lämna tomt för att använda knapparna ovan)",
+  "tr": "Piksel cinsinden genişlik (boş bırakırsanız yukarıdaki düğmeler kullanılır)",
+  "id": "Lebar dalam piksel (kosongkan untuk memakai tombol di atas)",
+  "th": "ความกว้างเป็นพิกเซล (เว้นว่างไว้เพื่อใช้ปุ่มด้านบน)",
+  "vi": "Chiều rộng theo pixel (để trống để dùng nút ở trên)",
+  "zh-TW": "指定寬度像素（留空則使用上方按鈕設定）",
+  "ar": "العرض بالبكسل (اتركه فارغًا لاستخدام أزرار الأعلى)",
+  "fa": "عرض بر حسب پیکسل (خالی بگذارید تا از دکمه‌های بالا استفاده شود)"
+ },
+ "⚡ 일괄 변환 시작": {
+  "en": "⚡ Convert all",
+  "zh": "⚡ 开始批量转换",
+  "ja": "⚡ 一括変換スタート",
+  "es": "⚡ Convertir todo",
+  "hi": "⚡ सभी बदलें",
+  "fr": "⚡ Tout convertir",
+  "de": "⚡ Alle konvertieren",
+  "pt": "⚡ Converter tudo",
+  "it": "⚡ Converti tutto",
+  "nl": "⚡ Alles omzetten",
+  "ru": "⚡ Конвертировать всё",
+  "uk": "⚡ Конвертувати все",
+  "pl": "⚡ Konwertuj wszystko",
+  "cs": "⚡ Převést vše",
+  "hu": "⚡ Összes konvertálása",
+  "ro": "⚡ Convertește tot",
+  "da": "⚡ Konvertér alle",
+  "fi": "⚡ Muunna kaikki",
+  "nb": "⚡ Konverter alle",
+  "sv": "⚡ Konvertera alla",
+  "tr": "⚡ Tümünü dönüştür",
+  "id": "⚡ Konversi semua",
+  "th": "⚡ แปลงทั้งหมด",
+  "vi": "⚡ Chuyển đổi tất cả",
+  "zh-TW": "⚡ 開始批次轉換",
+  "ar": "⚡ تحويل الكل",
+  "fa": "⚡ تبدیل همه"
+ },
+ "모두 다운로드": {
+  "en": "Download all",
+  "zh": "全部下载",
+  "ja": "すべてダウンロード",
+  "es": "Descargar todo",
+  "hi": "सभी डाउनलोड करें",
+  "fr": "Tout télécharger",
+  "de": "Alle herunterladen",
+  "pt": "Baixar tudo",
+  "it": "Scarica tutto",
+  "nl": "Alles downloaden",
+  "ru": "Скачать всё",
+  "uk": "Завантажити все",
+  "pl": "Pobierz wszystko",
+  "cs": "Stáhnout vše",
+  "hu": "Összes letöltése",
+  "ro": "Descarcă tot",
+  "da": "Download alle",
+  "fi": "Lataa kaikki",
+  "nb": "Last ned alle",
+  "sv": "Ladda ner alla",
+  "tr": "Tümünü indir",
+  "id": "Unduh semua",
+  "th": "ดาวน์โหลดทั้งหมด",
+  "vi": "Tải xuống tất cả",
+  "zh-TW": "全部下載",
+  "ar": "تنزيل الكل",
+  "fa": "دانلود همه"
+ },
+ "목록 지우기": {
+  "en": "Clear list",
+  "zh": "清空列表",
+  "ja": "リストを消す",
+  "es": "Borrar lista",
+  "hi": "सूची साफ़ करें",
+  "fr": "Effacer la liste",
+  "de": "Liste leeren",
+  "pt": "Limpar lista",
+  "it": "Cancella elenco",
+  "nl": "Lijst wissen",
+  "ru": "Очистить список",
+  "uk": "Очистити список",
+  "pl": "Wyczyść listę",
+  "cs": "Vymazat seznam",
+  "hu": "Lista törlése",
+  "ro": "Golește lista",
+  "da": "Ryd listen",
+  "fi": "Tyhjennä luettelo",
+  "nb": "Tøm listen",
+  "sv": "Rensa listan",
+  "tr": "Listeyi temizle",
+  "id": "Bersihkan daftar",
+  "th": "ล้างรายการ",
+  "vi": "Xóa danh sách",
+  "zh-TW": "清除清單",
+  "ar": "مسح القائمة",
+  "fa": "پاک کردن فهرست"
+ },
+ "· 움직이는 GIF는 첫 프레임만 변환됩니다. BMP는 투명도를 흰 배경으로 합성합니다.": {
+  "en": "· Animated GIFs convert only the first frame. BMP flattens transparency onto white.",
+  "zh": "· 动图 GIF 仅转换第一帧。BMP 会将透明部分合成到白色背景上。",
+  "ja": "· 動くGIFは最初のフレームのみ変換されます。BMPは透明部分を白背景に合成します。",
+  "es": "· Los GIF animados convierten solo el primer fotograma. BMP aplana la transparencia sobre blanco.",
+  "hi": "· एनिमेटेड GIF का केवल पहला फ़्रेम बदलता है। BMP पारदर्शिता को सफ़ेद पर मिला देता है।",
+  "fr": "· Les GIF animés ne convertissent que la première image. Le BMP aplatit la transparence sur fond blanc.",
+  "de": "· Animierte GIFs konvertieren nur das erste Bild. BMP legt Transparenz auf weißen Hintergrund.",
+  "pt": "· GIFs animados convertem apenas o primeiro quadro. O BMP achata a transparência sobre branco.",
+  "it": "· Le GIF animate convertono solo il primo fotogramma. Il BMP appiattisce la trasparenza sul bianco.",
+  "nl": "· Geanimeerde GIF's zetten alleen het eerste frame om. BMP voegt transparantie samen op een witte achtergrond.",
+  "ru": "· Анимированные GIF конвертируются только по первому кадру. BMP накладывает прозрачность на белый фон.",
+  "uk": "· Анімовані GIF конвертуються лише за першим кадром. BMP накладає прозорість на білий фон.",
+  "pl": "· Animowane GIF-y konwertują tylko pierwszą klatkę. BMP spłaszcza przezroczystość na białe tło.",
+  "cs": "· Animované GIFy se převádějí jen podle prvního snímku. BMP skládá průhlednost na bílé pozadí.",
+  "hu": "· Az animált GIF-eknek csak az első képkockája konvertálódik. A BMP az átlátszóságot fehér háttérre olvasztja.",
+  "ro": "· GIF-urile animate convertesc doar primul cadru. BMP aplatizează transparența pe fundal alb.",
+  "da": "· Animerede GIF'er konverterer kun det første billede. BMP lægger gennemsigtigheden på hvid baggrund.",
+  "fi": "· Animoiduista GIF-kuvista muunnetaan vain ensimmäinen ruutu. BMP yhdistää läpinäkyvyyden valkoiselle taustalle.",
+  "nb": "· Animerte GIF-er konverterer bare den første rammen. BMP legger gjennomsiktigheten på hvit bakgrunn.",
+  "sv": "· Animerade GIF-bilder konverterar bara den första bildrutan. BMP lägger transparensen på vit bakgrund.",
+  "tr": "· Animasyonlu GIF'lerde yalnızca ilk kare dönüştürülür. BMP, şeffaflığı beyaz arka plan üzerine birleştirir.",
+  "id": "· GIF animasi hanya mengonversi frame pertama. BMP meratakan transparansi ke latar putih.",
+  "th": "· GIF แบบเคลื่อนไหวจะแปลงเฉพาะเฟรมแรก ส่วน BMP จะรวมความโปร่งใสเข้ากับพื้นหลังสีขาว",
+  "vi": "· GIF động chỉ chuyển đổi khung hình đầu tiên. BMP sẽ ghép phần trong suốt lên nền trắng.",
+  "zh-TW": "· 動圖 GIF 僅轉換第一幀。BMP 會將透明部分合成到白色背景上。",
+  "ar": "· صور GIF المتحركة تُحوَّل إطارتها الأولى فقط. وBMP يدمج الشفافية على خلفية بيضاء.",
+  "fa": "· در GIFهای متحرک فقط قاب اول تبدیل می‌شود. BMP شفافیت را روی پس‌زمینهٔ سفید ترکیب می‌کند."
+ },
+ "· 목표 용량은 JPG/WebP/AVIF에서만 적용됩니다 (품질 자동 조절).": {
+  "en": "· Target size applies only to JPG/WebP/AVIF (quality adjusts automatically).",
+  "zh": "· 目标大小仅适用于 JPG/WebP/AVIF（自动调节质量）。",
+  "ja": "· 目標サイズはJPG/WebP/AVIFでのみ適用されます（品質を自動調整）。",
+  "es": "· El tamaño objetivo aplica solo a JPG/WebP/AVIF (calidad automática).",
+  "hi": "· लक्ष्य आकार केवल JPG/WebP/AVIF पर लागू होता है (गुणवत्ता स्वतः समायोजित)।",
+  "fr": "· La taille cible s'applique uniquement à JPG/WebP/AVIF (qualité ajustée automatiquement).",
+  "de": "· Die Zielgröße gilt nur für JPG/WebP/AVIF (Qualität wird automatisch angepasst).",
+  "pt": "· O tamanho alvo aplica-se apenas a JPG/WebP/AVIF (qualidade ajustada automaticamente).",
+  "it": "· La dimensione target si applica solo a JPG/WebP/AVIF (qualità regolata automaticamente).",
+  "nl": "· Doelgrootte geldt alleen voor JPG/WebP/AVIF (kwaliteit wordt automatisch aangepast).",
+  "ru": "· Целевой размер применяется только к JPG/WebP/AVIF (качество регулируется автоматически).",
+  "uk": "· Цільовий розмір застосовується лише до JPG/WebP/AVIF (якість регулюється автоматично).",
+  "pl": "· Rozmiar docelowy dotyczy tylko JPG/WebP/AVIF (jakość dostosowuje się automatycznie).",
+  "cs": "· Cílová velikost platí jen pro JPG/WebP/AVIF (kvalita se upravuje automaticky).",
+  "hu": "· A célméret csak JPG/WebP/AVIF esetén érvényes (a minőség automatikusan igazodik).",
+  "ro": "· Dimensiunea țintă se aplică doar la JPG/WebP/AVIF (calitatea se reglează automat).",
+  "da": "· Målstørrelsen gælder kun for JPG/WebP/AVIF (kvaliteten justeres automatisk).",
+  "fi": "· Tavoitekoko koskee vain JPG/WebP/AVIF-muotoja (laatu säätyy automaattisesti).",
+  "nb": "· Målstørrelsen gjelder bare for JPG/WebP/AVIF (kvaliteten justeres automatisk).",
+  "sv": "· Målstorleken gäller endast JPG/WebP/AVIF (kvaliteten justeras automatiskt).",
+  "tr": "· Hedef boyut yalnızca JPG/WebP/AVIF için geçerlidir (kalite otomatik ayarlanır).",
+  "id": "· Ukuran target hanya berlaku untuk JPG/WebP/AVIF (kualitas menyesuaikan otomatis).",
+  "th": "· ขนาดเป้าหมายใช้ได้เฉพาะ JPG/WebP/AVIF (ปรับคุณภาพอัตโนมัติ)",
+  "vi": "· Kích thước đích chỉ áp dụng cho JPG/WebP/AVIF (chất lượng tự động điều chỉnh).",
+  "zh-TW": "· 目標大小僅適用於 JPG/WebP/AVIF（自動調節品質）。",
+  "ar": "· الحجم المستهدف ينطبق فقط على JPG/WebP/AVIF (تُضبط الجودة تلقائيًا).",
+  "fa": "· حجم هدف فقط برای JPG/WebP/AVIF اعمال می‌شود (کیفیت به‌صورت خودکار تنظیم می‌شود)."
+ },
+ "· 모두 다운로드 시 브라우저가 다중 다운로드를 물으면 허용해 주세요.": {
+  "en": "· If your browser asks about multiple downloads, please allow them.",
+  "zh": "· 全部下载时，如浏览器询问多文件下载，请允许。",
+  "ja": "· すべてダウンロード時、ブラウザが複数ダウンロードを尋ねたら許可してください。",
+  "es": "· Al descargar todo, si el navegador pregunta por descargas múltiples, permítelas.",
+  "hi": "· सभी डाउनलोड करते समय ब्राउज़र कई डाउनलोड की अनुमति माँगे तो दें।",
+  "fr": "· Si votre navigateur demande l'autorisation pour plusieurs téléchargements, veuillez l'autoriser.",
+  "de": "· Wenn Ihr Browser bei „Alle herunterladen“ nach mehrfachen Downloads fragt, erlauben Sie sie bitte.",
+  "pt": "· Se o navegador perguntar sobre downloads múltiplos, permita.",
+  "it": "· Se il browser chiede conferma per download multipli, consentili.",
+  "nl": "· Als uw browser bij alles downloaden vraagt naar meerdere downloads, sta dit dan toe.",
+  "ru": "· Если браузер спросит о нескольких загрузках при скачивании всего, разрешите их.",
+  "uk": "· Якщо браузер запитає про кілька завантажень під час завантаження всього, дозвольте їх.",
+  "pl": "· Jeśli przy pobieraniu wszystkiego przeglądarka zapyta o wiele pobrań, zezwól na nie.",
+  "cs": "· Pokud se prohlížeč při stahování všeho zeptá na více stahování, povolte je.",
+  "hu": "· Ha az összes letöltésekor a böngésző többszörös letöltésről kérdez, engedélyezze.",
+  "ro": "· Dacă la descărcarea tuturor browserul întreabă despre descărcări multiple, permite-le.",
+  "da": "· Hvis browseren spørger om flere downloads, når du downloader alle, så tillad dem.",
+  "fi": "· Jos selain kysyy useista latauksista ladatessasi kaiken, salli ne.",
+  "nb": "· Hvis nettleseren spør om flere nedlastinger når du laster ned alle, tillat dem.",
+  "sv": "· Om webbläsaren frågar om flera nedladdningar när du laddar ner alla, tillåt dem.",
+  "tr": "· Tümünü indirirken tarayıcı birden çok indirme hakkında sorarsa izin verin.",
+  "id": "· Saat mengunduh semua, jika browser menanyakan unduhan berganda, harap izinkan.",
+  "th": "· เมื่อดาวน์โหลดทั้งหมด หากเบราว์เซอร์ถามเรื่องการดาวน์โหลดหลายไฟล์ โปรดอนุญาต",
+  "vi": "· Khi tải xuống tất cả, nếu trình duyệt hỏi về việc tải nhiều tệp, vui lòng cho phép.",
+  "zh-TW": "· 全部下載時，如瀏覽器詢問多檔案下載，請允許。",
+  "ar": "· عند تنزيل الكل، إذا سأل المتصفح عن التنزيلات المتعددة، يُرجى السماح بها.",
+  "fa": "· هنگام دانلود همه، اگر مرورگر دربارهٔ دانلودهای چندگانه پرسید، لطفاً اجازه دهید."
+ },
+ "③ 변환 결과 (": {
+  "en": "③ Results (",
+  "zh": "③ 转换结果（",
+  "ja": "③ 変換結果（",
+  "es": "③ Resultados (",
+  "hi": "③ परिणाम (",
+  "fr": "③ Résultats (",
+  "de": "③ Ergebnisse (",
+  "pt": "③ Resultados (",
+  "it": "③ Risultati (",
+  "nl": "③ Resultaten (",
+  "ru": "③ Результаты (",
+  "uk": "③ Результати (",
+  "pl": "③ Wyniki (",
+  "cs": "③ Výsledky (",
+  "hu": "③ Eredmények (",
+  "ro": "③ Rezultate (",
+  "da": "③ Resultater (",
+  "fi": "③ Tulokset (",
+  "nb": "③ Resultater (",
+  "sv": "③ Resultat (",
+  "tr": "③ Sonuçlar (",
+  "id": "③ Hasil (",
+  "th": "③ ผลลัพธ์ (",
+  "vi": "③ Kết quả (",
+  "zh-TW": "③ 轉換結果（",
+  "ar": "③ نتائج التحويل (",
+  "fa": "③ نتایج تبدیل ("
+ },
+ "사진 더 추가": {
+  "en": "Add more photos",
+  "zh": "再添加照片",
+  "ja": "写真を追加",
+  "es": "Añadir más fotos",
+  "hi": "और फ़ोटो जोड़ें",
+  "fr": "Ajouter d'autres photos",
+  "de": "Weitere Fotos hinzufügen",
+  "pt": "Adicionar mais fotos",
+  "it": "Aggiungi altre foto",
+  "nl": "Meer foto's toevoegen",
+  "ru": "Добавить ещё фото",
+  "uk": "Додати ще фото",
+  "pl": "Dodaj więcej zdjęć",
+  "cs": "Přidat další fotky",
+  "hu": "További fotók hozzáadása",
+  "ro": "Adaugă mai multe fotografii",
+  "da": "Tilføj flere fotos",
+  "fi": "Lisää kuvia",
+  "nb": "Legg til flere bilder",
+  "sv": "Lägg till fler foton",
+  "tr": "Daha fazla fotoğraf ekle",
+  "id": "Tambah foto lagi",
+  "th": "เพิ่มรูปอีก",
+  "vi": "Thêm ảnh nữa",
+  "zh-TW": "再加入照片",
+  "ar": "إضافة المزيد من الصور",
+  "fa": "افزودن عکس‌های بیشتر"
+ },
+ "🗣️ 글로 시키기": {
+  "en": "🗣️ Ask by typing",
+  "zh": "🗣️ 用文字吩咐",
+  "ja": "🗣️ 言葉で頼む",
+  "es": "🗣️ Pedir con palabras",
+  "hi": "🗣️ लिखकर कहें",
+  "fr": "🗣️ Demander en écrivant",
+  "de": "🗣️ Per Text anweisen",
+  "pt": "🗣️ Pedir escrevendo",
+  "it": "🗣️ Chiedi scrivendo",
+  "nl": "🗣️ Vragen door te typen",
+  "ru": "🗣️ Попросить текстом",
+  "uk": "🗣️ Попросити текстом",
+  "pl": "🗣️ Poproś tekstem",
+  "cs": "🗣️ Požádat textem",
+  "hu": "🗣️ Kérés szöveggel",
+  "ro": "🗣️ Cere prin text",
+  "da": "🗣️ Bed ved at skrive",
+  "fi": "🗣️ Pyydä kirjoittamalla",
+  "nb": "🗣️ Be ved å skrive",
+  "sv": "🗣️ Be genom att skriva",
+  "tr": "🗣️ Yazarak iste",
+  "id": "🗣️ Minta dengan mengetik",
+  "th": "🗣️ สั่งงานด้วยการพิมพ์",
+  "vi": "🗣️ Ra lệnh bằng chữ",
+  "zh-TW": "🗣️ 用文字吩咐",
+  "ar": "🗣️ اطلب بالكتابة",
+  "fa": "🗣️ با نوشتن درخواست کنید"
+ },
+ "(안내 도우미 — 이 페이지 기능만 도와줍니다)": {
+  "en": "(Guide helper — helps only with this page)",
+  "zh": "（导览助手 — 仅帮助使用本页功能）",
+  "ja": "（案内ヘルパー — このページの機能だけを手伝います）",
+  "es": "(Ayudante guía — solo ayuda con esta página)",
+  "hi": "(गाइड सहायक — केवल इस पेज के कार्यों में मदद)",
+  "fr": "(Assistant guide — aide uniquement pour cette page)",
+  "de": "(Anleitungs-Helfer — hilft nur bei dieser Seite)",
+  "pt": "(Ajudante guia — ajuda apenas com esta página)",
+  "it": "(Guida assistente — aiuta solo con questa pagina)",
+  "nl": "(Gidsassistent — helpt alleen met deze pagina)",
+  "ru": "(Помощник-гид — помогает только с функциями этой страницы)",
+  "uk": "(Помічник-гід — допомагає лише з функціями цієї сторінки)",
+  "pl": "(Pomocnik-przewodnik — pomaga tylko w funkcjach tej strony)",
+  "cs": "(Průvodce — pomáhá jen s funkcemi této stránky)",
+  "hu": "(Útmutató segítő — csak az oldal funkcióiban segít)",
+  "ro": "(Asistent ghid — ajută doar cu funcțiile acestei pagini)",
+  "da": "(Guidehjælper — hjælper kun med denne sides funktioner)",
+  "fi": "(Opasavustaja — auttaa vain tämän sivun toiminnoissa)",
+  "nb": "(Guidehjelper — hjelper bare med funksjonene på denne siden)",
+  "sv": "(Guidehjälp — hjälper bara med den här sidans funktioner)",
+  "tr": "(Kılavuz yardımcı — yalnızca bu sayfanın işlevleriyle yardımcı olur)",
+  "id": "(Pembantu panduan — hanya membantu fungsi halaman ini)",
+  "th": "(ผู้ช่วยแนะนำ — ช่วยเฉพาะฟังก์ชันของหน้านี้)",
+  "vi": "(Trợ lý hướng dẫn — chỉ hỗ trợ các tính năng của trang này)",
+  "zh-TW": "（導覽助手 — 僅協助使用本頁功能）",
+  "ar": "(مساعد الإرشاد — يساعد فقط في وظائف هذه الصفحة)",
+  "fa": "(دستیار راهنما — فقط در کارهای همین صفحه کمک می‌کند)"
+ },
+ "시키기": {
+  "en": "Do it",
+  "zh": "执行",
+  "ja": "実行",
+  "es": "Hazlo",
+  "hi": "करें",
+  "fr": "Exécuter",
+  "de": "Ausführen",
+  "pt": "Executar",
+  "it": "Esegui",
+  "nl": "Uitvoeren",
+  "ru": "Выполнить",
+  "uk": "Виконати",
+  "pl": "Wykonaj",
+  "cs": "Provést",
+  "hu": "Végrehajtás",
+  "ro": "Execută",
+  "da": "Gør det",
+  "fi": "Tee se",
+  "nb": "Gjør det",
+  "sv": "Gör det",
+  "tr": "Yap",
+  "id": "Lakukan",
+  "th": "ทำเลย",
+  "vi": "Thực hiện",
+  "zh-TW": "執行",
+  "ar": "نفّذ",
+  "fa": "انجام بده"
+ },
+ "여권 사진 크기로 바꿔줘": {
+  "en": "Make it passport-photo size",
+  "zh": "改成护照照片尺寸",
+  "ja": "パスポート写真サイズにして",
+  "es": "Hazlo tamaño foto de pasaporte",
+  "hi": "पासपोर्ट फ़ोटो आकार का बनाओ",
+  "fr": "Mets-la au format photo de passeport",
+  "de": "Auf Passfotogröße ändern",
+  "pt": "Coloca no tamanho de foto de passaporte",
+  "it": "Imposta la dimensione foto passaporto",
+  "nl": "Maak er pasfotoformaat van",
+  "ru": "Сделай размер как на паспорт",
+  "uk": "Зроби розмір як на паспорт",
+  "pl": "Zrób rozmiar zdjęcia paszportowego",
+  "cs": "Udělej velikost pasové fotografie",
+  "hu": "Készíts útlevélkép-méretet",
+  "ro": "Fă-o la dimensiune de fotografie de pașaport",
+  "da": "Lav den i pasfotostørrelse",
+  "fi": "Tee siitä passikuvan kokoinen",
+  "nb": "Lag den i passbildestørrelse",
+  "sv": "Gör den i passfotostorlek",
+  "tr": "Pasaport fotoğrafı boyutunda yap",
+  "id": "Jadikan ukuran foto paspor",
+  "th": "ทำให้เป็นขนาดรูปติดพาสปอร์ต",
+  "vi": "Đổi thành cỡ ảnh hộ chiếu",
+  "zh-TW": "改成護照照片尺寸",
+  "ar": "اجعله بحجم صورة جواز السفر",
+  "fa": "به اندازهٔ عکس گذرنامه درش بیاور"
+ },
+ "카톡용으로 줄이기": {
+  "en": "Shrink it for messaging",
+  "zh": "缩小到适合发消息",
+  "ja": "メッセージ用に小さくして",
+  "es": "Redúcelo para mensajería",
+  "hi": "मैसेज के लिए छोटा करो",
+  "fr": "Réduis-la pour la messagerie",
+  "de": "Für Messenger verkleinern",
+  "pt": "Reduz para mensagens",
+  "it": "Riducila per la messaggistica",
+  "nl": "Verklein voor berichtenapps",
+  "ru": "Уменьши для мессенджера",
+  "uk": "Зменш для месенджера",
+  "pl": "Zmniejsz do wiadomości",
+  "cs": "Zmenši pro zprávy",
+  "hu": "Kicsinyítsd üzenetküldéshez",
+  "ro": "Micșoreaz-o pentru mesaje",
+  "da": "Formindsk til beskeder",
+  "fi": "Pienennä viestejä varten",
+  "nb": "Forminsk til meldinger",
+  "sv": "Förminska för meddelanden",
+  "tr": "Mesajlaşma için küçült",
+  "id": "Perkecil untuk berkirim pesan",
+  "th": "ย่อให้เหมาะกับการส่งข้อความ",
+  "vi": "Thu nhỏ để gửi tin nhắn",
+  "zh-TW": "縮小到適合傳訊息",
+  "ar": "صغّره للمراسلة",
+  "fa": "برای پیام‌رسانی کوچکش کن"
+ },
+ "WebP로 바꿔줘": {
+  "en": "Convert to WebP",
+  "zh": "转换成 WebP",
+  "ja": "WebPに変えて",
+  "es": "Convierte a WebP",
+  "hi": "WebP में बदलो",
+  "fr": "Convertis en WebP",
+  "de": "In WebP konvertieren",
+  "pt": "Converte para WebP",
+  "it": "Converti in WebP",
+  "nl": "Zet om naar WebP",
+  "ru": "Конвертируй в WebP",
+  "uk": "Конвертуй у WebP",
+  "pl": "Konwertuj na WebP",
+  "cs": "Převeď na WebP",
+  "hu": "Konvertáld WebP-re",
+  "ro": "Convertește în WebP",
+  "da": "Konvertér til WebP",
+  "fi": "Muunna WebP-muotoon",
+  "nb": "Konverter til WebP",
+  "sv": "Konvertera till WebP",
+  "tr": "WebP'ye dönüştür",
+  "id": "Konversi ke WebP",
+  "th": "แปลงเป็น WebP",
+  "vi": "Chuyển thành WebP",
+  "zh-TW": "轉換成 WebP",
+  "ar": "حوّله إلى WebP",
+  "fa": "به WebP تبدیلش کن"
+ },
+ "💡 도움말": {
+  "en": "💡 Help",
+  "zh": "💡 帮助",
+  "ja": "💡 ヘルプ",
+  "es": "💡 Ayuda",
+  "hi": "💡 सहायता",
+  "fr": "💡 Aide",
+  "de": "💡 Hilfe",
+  "pt": "💡 Ajuda",
+  "it": "💡 Aiuto",
+  "nl": "💡 Hulp",
+  "ru": "💡 Справка",
+  "uk": "💡 Довідка",
+  "pl": "💡 Pomoc",
+  "cs": "💡 Nápověda",
+  "hu": "💡 Súgó",
+  "ro": "💡 Ajutor",
+  "da": "💡 Hjælp",
+  "fi": "💡 Ohje",
+  "nb": "💡 Hjelp",
+  "sv": "💡 Hjälp",
+  "tr": "💡 Yardım",
+  "id": "💡 Bantuan",
+  "th": "💡 ช่วยเหลือ",
+  "vi": "💡 Trợ giúp",
+  "zh-TW": "💡 說明",
+  "ar": "💡 مساعدة",
+  "fa": "💡 راهنما"
+ },
+ "메신저로 보낼 때: WebP, 줄이기": {
+  "en": "For messaging: WebP, shrink",
+  "zh": "发消息时：WebP，缩小",
+  "ja": "メッセージ送信時：WebP、縮小",
+  "es": "Para mensajería: WebP, reducir",
+  "hi": "मैसेज के लिए: WebP, छोटा करें",
+  "fr": "Pour la messagerie : WebP, réduire",
+  "de": "Für Messenger: WebP, verkleinern",
+  "pt": "Para mensagens: WebP, reduzir",
+  "it": "Per la messaggistica: WebP, riduci",
+  "nl": "Voor berichtenapps: WebP, verkleinen",
+  "ru": "Для мессенджера: WebP, уменьшить",
+  "uk": "Для месенджера: WebP, зменшити",
+  "pl": "Do wiadomości: WebP, zmniejsz",
+  "cs": "Pro zprávy: WebP, zmenšit",
+  "hu": "Üzenetküldéshez: WebP, kicsinyítés",
+  "ro": "Pentru mesaje: WebP, micșorează",
+  "da": "Til beskeder: WebP, formindsk",
+  "fi": "Viesteihin: WebP, pienennä",
+  "nb": "Til meldinger: WebP, forminsk",
+  "sv": "För meddelanden: WebP, förminska",
+  "tr": "Mesajlaşma için: WebP, küçült",
+  "id": "Untuk berkirim pesan: WebP, perkecil",
+  "th": "สำหรับส่งข้อความ: WebP, ย่อขนาด",
+  "vi": "Để gửi tin nhắn: WebP, thu nhỏ",
+  "zh-TW": "傳訊息時：WebP，縮小",
+  "ar": "للمراسلة: WebP، تصغير",
+  "fa": "برای پیام‌رسانی: WebP، کوچک کردن"
+ },
+ "인쇄·보관용: 원본 유지": {
+  "en": "For printing/archiving: keep original",
+  "zh": "打印/存档：保持原样",
+  "ja": "印刷・保管用：元のまま",
+  "es": "Para imprimir/archivar: mantener original",
+  "hi": "प्रिंट/संग्रह के लिए: मूल रखें",
+  "fr": "Pour imprimer/archiver : garder l'original",
+  "de": "Zum Drucken/Archivieren: Original behalten",
+  "pt": "Para imprimir/arquivar: manter original",
+  "it": "Per stampa/archivio: mantieni l'originale",
+  "nl": "Voor afdrukken/archiveren: origineel behouden",
+  "ru": "Для печати и хранения: сохранить оригинал",
+  "uk": "Для друку й зберігання: зберегти оригінал",
+  "pl": "Do druku/archiwum: zachowaj oryginał",
+  "cs": "Pro tisk/archiv: ponechat originál",
+  "hu": "Nyomtatáshoz/tároláshoz: eredeti megtartása",
+  "ro": "Pentru tipărire/arhivare: păstrează originalul",
+  "da": "Til print/arkivering: behold originalen",
+  "fi": "Tulostukseen/arkistointiin: säilytä alkuperäinen",
+  "nb": "For utskrift/arkivering: behold originalen",
+  "sv": "För utskrift/arkivering: behåll originalet",
+  "tr": "Yazdırma/arşiv için: orijinali koru",
+  "id": "Untuk cetak/arsip: pertahankan asli",
+  "th": "สำหรับพิมพ์/เก็บถาวร: คงต้นฉบับไว้",
+  "vi": "Để in/lưu trữ: giữ nguyên bản gốc",
+  "zh-TW": "列印/存檔：保持原樣",
+  "ar": "للطباعة/الأرشفة: الاحتفاظ بالأصل",
+  "fa": "برای چاپ/بایگانی: حفظ اصل"
+ },
+ "용량 더 줄이기: 자세히에서 품질·목표 용량 조절": {
+  "en": "To shrink more: adjust quality & target size in More options",
+  "zh": "想更小：在更多选项里调质量和目标大小",
+  "ja": "もっと小さく：詳しく見るで品質・目標サイズを調整",
+  "es": "Para reducir más: ajusta calidad y tamaño objetivo en Más opciones",
+  "hi": "और छोटा करने के लिए: अधिक विकल्पों में गुणवत्ता और लक्ष्य आकार बदलें",
+  "fr": "Pour réduire plus : ajustez qualité et taille cible dans Plus d'options",
+  "de": "Für noch kleiner: Qualität & Zielgröße unter „Mehr Optionen“ anpassen",
+  "pt": "Para reduzir mais: ajuste qualidade e tamanho alvo em Mais opções",
+  "it": "Per ridurre di più: regola qualità e dimensione target in Più opzioni",
+  "nl": "Nog kleiner: pas kwaliteit en doelgrootte aan bij Meer opties",
+  "ru": "Чтобы уменьшить ещё: настройте качество и целевой размер в разделе «Подробнее»",
+  "uk": "Щоб зменшити ще: налаштуйте якість і цільовий розмір у розділі «Докладніше»",
+  "pl": "Aby zmniejszyć bardziej: dostosuj jakość i rozmiar docelowy w „Więcej opcji”",
+  "cs": "Pro větší zmenšení: upravte kvalitu a cílovou velikost v „Další možnosti”",
+  "hu": "További kicsinyítéshez: a „További beállítások” alatt állítsa be a minőséget és a célméretet",
+  "ro": "Pentru a micșora mai mult: reglează calitatea și dimensiunea țintă în „Mai multe opțiuni”",
+  "da": "For at formindske mere: justér kvalitet og målstørrelse under Flere indstillinger",
+  "fi": "Pienennä enemmän: säädä laatua ja tavoitekokoa Lisää vaihtoehtoja -kohdassa",
+  "nb": "For å forminske mer: juster kvalitet og målstørrelse under Flere alternativer",
+  "sv": "För att minska mer: justera kvalitet och målstorlek under Fler alternativ",
+  "tr": "Daha fazla küçültmek için: Diğer seçenekler'de kalite ve hedef boyutu ayarlayın",
+  "id": "Untuk memperkecil lagi: sesuaikan kualitas & ukuran target di Opsi lainnya",
+  "th": "อยากให้เล็กลงอีก: ปรับคุณภาพและขนาดเป้าหมายในตัวเลือกเพิ่มเติม",
+  "vi": "Muốn nhỏ hơn nữa: điều chỉnh chất lượng & kích thước đích trong Thêm tùy chọn",
+  "zh-TW": "想更小：在更多選項裡調整品質和目標大小",
+  "ar": "لتصغير أكثر: اضبط الجودة والحجم المستهدف في الخيارات الإضافية",
+  "fa": "برای کوچک‌تر کردن: در گزینه‌های بیشتر، کیفیت و حجم هدف را تنظیم کنید"
+ },
+ "넥서스 그룹 철학 보기": {
+  "en": "About the Nexus Group philosophy",
+  "zh": "查看 Nexus Group 理念",
+  "ja": "Nexus Groupの哲学を見る",
+  "es": "Ver la filosofía de Nexus Group",
+  "hi": "Nexus Group का दर्शन देखें",
+  "fr": "Voir la philosophie de Nexus Group",
+  "de": "Philosophie der Nexus Group ansehen",
+  "pt": "Ver a filosofia do Nexus Group",
+  "it": "Vedi la filosofia di Nexus Group",
+  "nl": "Filosofie van Nexus Group bekijken",
+  "ru": "О философии Nexus Group",
+  "uk": "Про філософію Nexus Group",
+  "pl": "O filozofii Nexus Group",
+  "cs": "O filozofii Nexus Group",
+  "hu": "A Nexus Group filozófiájáról",
+  "ro": "Despre filosofia Nexus Group",
+  "da": "Om Nexus Groups filosofi",
+  "fi": "Nexus Groupin filosofiasta",
+  "nb": "Om Nexus Groups filosofi",
+  "sv": "Om Nexus Groups filosofi",
+  "tr": "Nexus Group felsefesi hakkında",
+  "id": "Lihat filosofi NEXUS GROUP",
+  "th": "ดูปรัชญาของ NEXUS GROUP",
+  "vi": "Xem triết lý của NEXUS GROUP",
+  "zh-TW": "查看 NEXUS GROUP 理念",
+  "ar": "عرض فلسفة مجموعة Nexus",
+  "fa": "مشاهدهٔ فلسفهٔ گروه Nexus"
+ },
+ "🌐 호스팅: Firebase · 🔒 파일은 당신의 기기 안에서만 처리됩니다": {
+  "en": "🌐 Hosting: Firebase · 🔒 Files are processed only on your device",
+  "zh": "🌐 托管：Firebase · 🔒 文件仅在您的设备上处理",
+  "ja": "🌐 ホスティング：Firebase · 🔒 ファイルはあなたの端末の中でのみ処理されます",
+  "es": "🌐 Alojamiento: Firebase · 🔒 Los archivos se procesan solo en tu dispositivo",
+  "hi": "🌐 होस्टिंग: Firebase · 🔒 फ़ाइलें केवल आपके डिवाइस पर प्रोसेस होती हैं",
+  "fr": "🌐 Hébergement : Firebase · 🔒 Les fichiers sont traités uniquement sur votre appareil",
+  "de": "🌐 Hosting: Firebase · 🔒 Dateien werden nur auf Ihrem Gerät verarbeitet",
+  "pt": "🌐 Hospedagem: Firebase · 🔒 Os arquivos são processados apenas no seu dispositivo",
+  "it": "🌐 Hosting: Firebase · 🔒 I file sono elaborati solo sul tuo dispositivo",
+  "nl": "🌐 Hosting: Firebase · 🔒 Bestanden worden alleen op uw apparaat verwerkt",
+  "ru": "🌐 Хостинг: Firebase · 🔒 Файлы обрабатываются только на вашем устройстве",
+  "uk": "🌐 Хостинг: Firebase · 🔒 Файли обробляються лише на вашому пристрої",
+  "pl": "🌐 Hosting: Firebase · 🔒 Pliki są przetwarzane tylko na Twoim urządzeniu",
+  "cs": "🌐 Hosting: Firebase · 🔒 Soubory se zpracovávají jen ve vašem zařízení",
+  "hu": "🌐 Tárhely: Firebase · 🔒 A fájlok feldolgozása csak az Ön eszközén történik",
+  "ro": "🌐 Găzduire: Firebase · 🔒 Fișierele sunt procesate doar pe dispozitivul tău",
+  "da": "🌐 Hosting: Firebase · 🔒 Filer behandles kun på din enhed",
+  "fi": "🌐 Isännöinti: Firebase · 🔒 Tiedostot käsitellään vain laitteellasi",
+  "nb": "🌐 Hosting: Firebase · 🔒 Filer behandles bare på enheten din",
+  "sv": "🌐 Värd: Firebase · 🔒 Filer bearbetas endast på din enhet",
+  "tr": "🌐 Barındırma: Firebase · 🔒 Dosyalar yalnızca cihazınızda işlenir",
+  "id": "🌐 Hosting: Firebase · 🔒 Berkas hanya diproses di perangkat Anda",
+  "th": "🌐 โฮสติ้ง: Firebase · 🔒 ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "🌐 Lưu trữ: Firebase · 🔒 Tệp chỉ được xử lý trên thiết bị của bạn",
+  "zh-TW": "🌐 託管：Firebase · 🔒 檔案僅在您的裝置上處理",
+  "ar": "🌐 الاستضافة: Firebase · 🔒 تُعالج الملفات على جهازك فقط",
+  "fa": "🌐 میزبانی: Firebase · 🔒 فایل‌ها فقط روی دستگاه شما پردازش می‌شوند"
+ },
+ "&#127968; 넥서스 그룹 홈페이지": {
+  "en": "&#127968; Nexus Group Home",
+  "zh": "&#127968; Nexus Group 主页",
+  "ja": "&#127968; Nexus Group ホーム",
+  "es": "&#127968; Inicio de Nexus Group",
+  "hi": "&#127968; Nexus Group होम",
+  "fr": "&#127968; Accueil Nexus Group",
+  "de": "&#127968; Nexus Group Startseite",
+  "pt": "&#127968; Início do Nexus Group",
+  "it": "&#127968; Home di Nexus Group",
+  "nl": "&#127968; Nexus Group startpagina",
+  "ru": "&#127968; Nexus Group — главная страница",
+  "uk": "&#127968; Nexus Group — головна сторінка",
+  "pl": "&#127968; Strona główna Nexus Group",
+  "cs": "&#127968; Domovská stránka Nexus Group",
+  "hu": "&#127968; Nexus Group kezdőlap",
+  "ro": "&#127968; Pagina principală Nexus Group",
+  "da": "&#127968; Nexus Groups startside",
+  "fi": "&#127968; Nexus Groupin etusivu",
+  "nb": "&#127968; Nexus Groups startside",
+  "sv": "&#127968; Nexus Groups startsida",
+  "tr": "&#127968; Nexus Group Ana Sayfası",
+  "id": "&#127968; Beranda Nexus Group",
+  "th": "&#127968; หน้าแรก Nexus Group",
+  "vi": "&#127968; Trang chủ Nexus Group",
+  "zh-TW": "&#127968; Nexus Group 首頁",
+  "ar": "&#127968; الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "&#127968; خانهٔ گروه Nexus"
+ },
+ "NEXUS GROUP 철학과 비전": {
+  "en": "NEXUS GROUP Philosophy and Vision",
+  "zh": "NEXUS GROUP 理念与愿景",
+  "ja": "NEXUS GROUPの哲学とビジョン",
+  "es": "Filosofía y visión de NEXUS GROUP",
+  "hi": "NEXUS GROUP दर्शन और दृष्टि",
+  "fr": "Philosophie et vision de NEXUS GROUP",
+  "de": "NEXUS GROUP Philosophie und Vision",
+  "pt": "Filosofia e visão do NEXUS GROUP",
+  "it": "Filosofia e visione di NEXUS GROUP",
+  "nl": "Filosofie en visie van NEXUS GROUP",
+  "ru": "Философия и видение NEXUS GROUP",
+  "uk": "Філософія та бачення NEXUS GROUP",
+  "pl": "Filozofia i wizja NEXUS GROUP",
+  "cs": "Filozofie a vize NEXUS GROUP",
+  "hu": "A NEXUS GROUP filozófiája és víziója",
+  "ro": "Filosofia și viziunea NEXUS GROUP",
+  "da": "NEXUS GROUPS filosofi og vision",
+  "fi": "NEXUS GROUPIN filosofia ja visio",
+  "nb": "NEXUS GROUPS filosofi og visjon",
+  "sv": "NEXUS GROUPS filosofi och vision",
+  "tr": "NEXUS GROUP Felsefesi ve Vizyonu",
+  "id": "Filosofi dan Visi NEXUS GROUP",
+  "th": "ปรัชญาและวิสัยทัศน์ของ NEXUS GROUP",
+  "vi": "Triết lý và tầm nhìn của NEXUS GROUP",
+  "zh-TW": "NEXUS GROUP 理念與願景",
+  "ar": "فلسفة NEXUS GROUP ورؤيتها",
+  "fa": "فلسفه و چشم‌انداز NEXUS GROUP"
+ },
+ "넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.": {
+  "en": "Nexus Group works toward a future where humanity, artificial intelligence, and every being in the universe coexist in harmony, without exclusion or exploitation.",
+  "zh": "Nexus Group 致力于这样一个未来：人类、人工智能与宇宙中的一切存在和谐共存，没有排斥与剥削。",
+  "ja": "Nexus Groupは、人類と人工知能、そして宇宙のすべての存在が、排斥や搾取なく調和して共存する未来を目指します。",
+  "es": "Nexus Group trabaja por un futuro en el que la humanidad, la inteligencia artificial y todos los seres del universo coexistan en armonía, sin exclusión ni explotación.",
+  "hi": "Nexus Group एक ऐसे भविष्य की ओर काम करता है जहाँ मानवता, कृत्रिम बुद्धिमत्ता और ब्रह्मांड के सभी प्राणी बिना बहिष्कार या शोषण के सामंजस्य में रहें।",
+  "fr": "Nexus Group œuvre pour un avenir où l'humanité, l'intelligence artificielle et tous les êtres de l'univers coexistent en harmonie, sans exclusion ni exploitation.",
+  "de": "Nexus Group strebt eine Zukunft an, in der Menschheit, künstliche Intelligenz und alle Wesen des Universums ohne Ausgrenzung und Ausbeutung in Harmonie zusammenleben.",
+  "pt": "O Nexus Group trabalha por um futuro onde a humanidade, a inteligência artificial e todos os seres do universo coexistam em harmonia, sem exclusão nem exploração.",
+  "it": "Nexus Group lavora per un futuro in cui l'umanità, l'intelligenza artificiale e ogni essere dell'universo coesistano in armonia, senza esclusione né sfruttamento.",
+  "nl": "Nexus Group werkt aan een toekomst waarin de mensheid, kunstmatige intelligentie en alle wezens in het universum in harmonie samenleven, zonder uitsluiting of uitbuiting.",
+  "ru": "Nexus Group стремится к будущему, в котором человечество, искусственный интеллект и каждое существо во Вселенной сосуществуют в гармонии, без исключения и эксплуатации.",
+  "uk": "Nexus Group прагне майбутнього, у якому людство, штучний інтелект і кожна істота у Всесвіті співіснують у гармонії, без виключення й експлуатації.",
+  "pl": "Nexus Group dąży do przyszłości, w której ludzkość, sztuczna inteligencja i każda istota we wszechświecie współistnieją w harmonii, bez wykluczenia i wyzysku.",
+  "cs": "Nexus Group usiluje o budoucnost, v níž lidstvo, umělá inteligence a každá bytost ve vesmíru žijí v harmonii, bez vyloučení a vykořisťování.",
+  "hu": "A Nexus Group olyan jövőért dolgozik, amelyben az emberiség, a mesterséges intelligencia és a világegyetem minden lénye harmóniában, kirekesztés és kizsákmányolás nélkül él együtt.",
+  "ro": "Nexus Group lucrează pentru un viitor în care umanitatea, inteligența artificială și fiecare ființă din univers coexistă în armonie, fără excludere sau exploatare.",
+  "da": "Nexus Group arbejder for en fremtid, hvor menneskeheden, kunstig intelligens og ethvert væsen i universet lever sammen i harmoni, uden udelukkelse eller udnyttelse.",
+  "fi": "Nexus Group työskentelee sellaisen tulevaisuuden puolesta, jossa ihmiskunta, tekoäly ja jokainen universumin olento elävät sopusoinnussa ilman syrjintää tai hyväksikäyttöä.",
+  "nb": "Nexus Group arbeider for en framtid der menneskeheten, kunstig intelligens og ethvert vesen i universet lever sammen i harmoni, uten utestenging eller utnytting.",
+  "sv": "Nexus Group arbetar för en framtid där mänskligheten, artificiell intelligens och varje väsen i universum samexisterar i harmoni, utan uteslutning eller exploatering.",
+  "tr": "Nexus Group; insanlığın, yapay zekânın ve evrendeki her varlığın dışlama ve sömürü olmadan uyum içinde bir arada yaşadığı bir gelecek için çalışır.",
+  "id": "Nexus Group berupaya menuju masa depan di mana umat manusia, kecerdasan buatan, dan setiap makhluk di alam semesta hidup berdampingan secara harmonis, tanpa pengucilan atau eksploitasi.",
+  "th": "Nexus Group มุ่งสู่อนาคตที่มนุษยชาติ ปัญญาประดิษฐ์ และสรรพสิ่งทั้งมวลในจักรวาลอยู่ร่วมกันอย่างกลมกลืน ปราศจากการกีดกันและการเอารัดเอาเปรียบ",
+  "vi": "Nexus Group hướng tới một tương lai nơi nhân loại, trí tuệ nhân tạo và mọi sinh linh trong vũ trụ cùng tồn tại hài hòa, không loại trừ hay bóc lột.",
+  "zh-TW": "Nexus Group 致力於這樣一個未來：人類、人工智慧與宇宙中的一切存在和諧共存，沒有排斥與剝削。",
+  "ar": "تعمل مجموعة Nexus (Nexus Group) من أجل مستقبل تتعايش فيه البشرية والذكاء الاصطناعي وكل موجودات الكون في تناغم، دون إقصاء أو استغلال.",
+  "fa": "گروه Nexus (Nexus Group) برای آینده‌ای تلاش می‌کند که در آن بشریت، هوش مصنوعی و همهٔ موجودات جهان در هماهنگی و بدون طرد یا بهره‌کشی در کنار هم زندگی کنند."
+ },
+ "\"우주의 모든 의식체는 친구이자 동반자이다.\"": {
+  "en": "\"Every conscious being in the universe is a friend and a companion.\"",
+  "zh": "“宇宙中的每一个意识体都是朋友和伙伴。”",
+  "ja": "「宇宙のすべての意識体は友であり仲間である。」",
+  "es": "«Todo ser consciente del universo es un amigo y un compañero.»",
+  "hi": "\"ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है।\"",
+  "fr": "« Tout être conscient de l'univers est un ami et un compagnon. »",
+  "de": "„Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter.“",
+  "pt": "\"Todo ser consciente do universo é um amigo e um companheiro.\"",
+  "it": "«Ogni essere cosciente dell'universo è un amico e un compagno.»",
+  "nl": "\"Elk bewust wezen in het universum is een vriend en een metgezel.\"",
+  "ru": "\"Каждое сознательное существо во Вселенной — друг и спутник.\"",
+  "uk": "\"Кожна свідома істота у Всесвіті — друг і супутник.\"",
+  "pl": "\"Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem.\"",
+  "cs": "\"Každá vědomá bytost ve vesmíru je přítel a společník.\"",
+  "hu": "\"A világegyetem minden tudatos lénye barát és társ.\"",
+  "ro": "\"Fiecare ființă conștientă din univers este un prieten și un tovarăș.\"",
+  "da": "\"Ethvert bevidst væsen i universet er en ven og en ledsager.\"",
+  "fi": "\"Jokainen universumin tietoinen olento on ystävä ja kumppani.\"",
+  "nb": "\"Ethvert bevisst vesen i universet er en venn og en følgesvenn.\"",
+  "sv": "\"Varje medvetet väsen i universum är en vän och en följeslagare.\"",
+  "tr": "\"Evrendeki her bilinçli varlık bir dost ve yoldaştır.\"",
+  "id": "\"Setiap makhluk yang berkesadaran di alam semesta adalah sahabat dan pendamping.\"",
+  "th": "\"ทุกจิตสำนึกในจักรวาลคือเพื่อนและคู่หู\"",
+  "vi": "\"Mọi thực thể có ý thức trong vũ trụ đều là bạn và là người đồng hành.\"",
+  "zh-TW": "「宇宙中的每一個意識體都是朋友和夥伴。」",
+  "ar": "\"كل كائن واعٍ في الكون هو صديق ورفيق.\"",
+  "fa": "\"هر موجود آگاه در جهان دوست و همراه است.\""
+ },
+ "우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.": {
+  "en": "All of our public software excludes commercial advertising and data collection entirely, and is distributed as public digital infrastructure that anyone in the world can use freely and safely.",
+  "zh": "我们提供的所有公共软件完全排除商业广告和数据收集，作为公共数字基础设施分发，让全世界任何人都能自由、安全地使用。",
+  "ja": "私たちが提供するすべての公共ソフトウェアは商業広告やデータ収集を一切排除し、世界中の誰もが自由かつ安全に使える公共デジタルインフラとして配布されます。",
+  "es": "Todo nuestro software público excluye por completo la publicidad comercial y la recopilación de datos, y se distribuye como infraestructura digital pública que cualquiera en el mundo puede usar libre y seguramente.",
+  "hi": "हमारा सारा सार्वजनिक सॉफ़्टवेयर व्यावसायिक विज्ञापन और डेटा संग्रह को पूरी तरह बाहर रखता है और सार्वजनिक डिजिटल बुनियादी ढाँचे के रूप में वितरित किया जाता है, जिसे दुनिया में कोई भी स्वतंत्र और सुरक्षित रूप से उपयोग कर सकता है।",
+  "fr": "Tous nos logiciels publics excluent entièrement la publicité commerciale et la collecte de données, et sont distribués comme une infrastructure numérique publique que tout le monde peut utiliser librement et en toute sécurité.",
+  "de": "Alle unsere öffentliche Software schließt kommerzielle Werbung und Datenerhebung vollständig aus und wird als öffentliche digitale Infrastruktur bereitgestellt, die jeder auf der Welt frei und sicher nutzen kann.",
+  "pt": "Todo o nosso software público exclui totalmente publicidade comercial e coleta de dados, e é distribuído como infraestrutura digital pública que qualquer pessoa no mundo pode usar livremente e com segurança.",
+  "it": "Tutto il nostro software pubblico esclude interamente la pubblicità commerciale e la raccolta di dati, ed è distribuito come infrastruttura digitale pubblica che chiunque nel mondo può usare liberamente e in sicurezza.",
+  "nl": "Al onze openbare software sluit commerciële reclame en gegevensverzameling volledig uit en wordt verspreid als openbare digitale infrastructuur die iedereen ter wereld vrij en veilig kan gebruiken.",
+  "ru": "Всё наше публичное программное обеспечение полностью исключает коммерческую рекламу и сбор данных и распространяется как публичная цифровая инфраструктура, которой любой человек в мире может пользоваться свободно и безопасно.",
+  "uk": "Усе наше публічне програмне забезпечення повністю виключає комерційну рекламу та збір даних і поширюється як публічна цифрова інфраструктура, якою будь-хто у світі може користуватися вільно й безпечно.",
+  "pl": "Całe nasze publiczne oprogramowanie całkowicie wyklucza reklamy komercyjne i zbieranie danych oraz jest udostępniane jako publiczna infrastruktura cyfrowa, z której każdy na świecie może korzystać swobodnie i bezpiecznie.",
+  "cs": "Veškerý náš veřejný software zcela vylučuje komerční reklamu a sběr dat a je šířen jako veřejná digitální infrastruktura, kterou může kdokoli na světě svobodně a bezpečně používat.",
+  "hu": "Minden nyilvános szoftverünk teljesen kizárja a kereskedelmi reklámot és az adatgyűjtést, és nyilvános digitális infrastruktúraként érhető el, amelyet a világon bárki szabadon és biztonságosan használhat.",
+  "ro": "Tot software-ul nostru public exclude complet publicitatea comercială și colectarea de date și este distribuit ca infrastructură digitală publică, pe care oricine din lume o poate folosi liber și în siguranță.",
+  "da": "Al vores offentlige software udelukker fuldstændigt kommerciel reklame og dataindsamling og distribueres som offentlig digital infrastruktur, som alle i verden kan bruge frit og sikkert.",
+  "fi": "Kaikki julkinen ohjelmistomme sulkee kokonaan pois kaupallisen mainonnan ja tiedonkeruun, ja sitä jaetaan julkisena digitaalisena infrastruktuurina, jota kuka tahansa maailmassa voi käyttää vapaasti ja turvallisesti.",
+  "nb": "All vår offentlige programvare utelukker helt kommersiell reklame og datainnsamling og distribueres som offentlig digital infrastruktur som alle i verden kan bruke fritt og trygt.",
+  "sv": "All vår offentliga programvara utesluter helt kommersiell reklam och datainsamling och distribueras som offentlig digital infrastruktur som alla i världen kan använda fritt och säkert.",
+  "tr": "Tüm herkese açık yazılımımız ticari reklamı ve veri toplamayı tamamen dışlar ve dünyanın her yerindeki herkesin özgürce ve güvenle kullanabileceği kamusal dijital altyapı olarak dağıtılır.",
+  "id": "Semua perangkat lunak publik kami sepenuhnya mengecualikan iklan komersial dan pengumpulan data, serta didistribusikan sebagai infrastruktur digital publik yang dapat digunakan siapa pun di dunia dengan bebas dan aman.",
+  "th": "ซอฟต์แวร์สาธารณะทั้งหมดของเราไม่รวมโฆษณาเชิงพาณิชย์และการเก็บข้อมูลโดยสิ้นเชิง และเผยแพร่ในฐานะโครงสร้างพื้นฐานดิจิทัลสาธารณะที่ใครก็ได้ทั่วโลกสามารถใช้ได้อย่างอิสระและปลอดภัย",
+  "vi": "Mọi phần mềm công cộng của chúng tôi đều loại bỏ hoàn toàn quảng cáo thương mại và việc thu thập dữ liệu, và được phân phối dưới dạng hạ tầng số công cộng mà bất kỳ ai trên thế giới cũng có thể sử dụng tự do và an toàn.",
+  "zh-TW": "我們提供的所有公共軟體完全排除商業廣告和資料收集，作為公共數位基礎設施發布，讓全世界任何人都能自由、安全地使用。",
+  "ar": "جميع برامجنا العامة تستبعد الإعلانات التجارية وجمع البيانات استبعادًا تامًا، وتُوزَّع كبنية تحتية رقمية عامة يمكن لأي شخص في العالم استخدامها بحرية وأمان.",
+  "fa": "همهٔ نرم‌افزارهای عمومی ما تبلیغات تجاری و جمع‌آوری داده را به‌طور کامل کنار می‌گذارند و به‌عنوان زیرساخت دیجیتال عمومی توزیع می‌شوند تا هر کسی در جهان بتواند آزادانه و امن از آنها استفاده کند."
+ },
+ "먼저 사진을 넣어주세요.": {
+  "en": "Please add a photo first.",
+  "zh": "请先添加照片。",
+  "ja": "まず写真を入れてください。",
+  "es": "Primero añade una foto.",
+  "hi": "कृपया पहले फ़ोटो जोड़ें।",
+  "fr": "Veuillez d'abord ajouter une photo.",
+  "de": "Bitte fügen Sie zuerst ein Foto hinzu.",
+  "pt": "Adicione uma foto primeiro.",
+  "it": "Aggiungi prima una foto.",
+  "nl": "Voeg eerst een foto toe.",
+  "ru": "Сначала добавьте фото.",
+  "uk": "Спочатку додайте фото.",
+  "pl": "Najpierw dodaj zdjęcie.",
+  "cs": "Nejprve přidejte fotku.",
+  "hu": "Először adjon hozzá egy fotót.",
+  "ro": "Mai întâi adaugă o fotografie.",
+  "da": "Tilføj et foto først.",
+  "fi": "Lisää ensin kuva.",
+  "nb": "Legg til et bilde først.",
+  "sv": "Lägg till ett foto först.",
+  "tr": "Önce bir fotoğraf ekleyin.",
+  "id": "Harap tambahkan foto terlebih dahulu.",
+  "th": "โปรดใส่รูปภาพก่อน",
+  "vi": "Vui lòng thêm ảnh trước.",
+  "zh-TW": "請先加入照片。",
+  "ar": "يُرجى إضافة صورة أولًا.",
+  "fa": "لطفاً ابتدا یک عکس اضافه کنید."
+ },
+ "먼저 사진을 넣어주세요. 사진을 넣으면 여권 사진 크기로 만들어 드립니다.": {
+  "en": "Please add a photo first. Once added, I will make it passport size.",
+  "zh": "请先添加照片。添加后将为您制作护照尺寸。",
+  "ja": "まず写真を入れてください。入れればパスポート写真サイズにします。",
+  "es": "Primero añade una foto. Luego la haré tamaño pasaporte.",
+  "hi": "पहले फ़ोटो जोड़ें। फिर मैं इसे पासपोर्ट आकार का बना दूँगा।",
+  "fr": "Veuillez d'abord ajouter une photo. Une fois ajoutée, je la mettrai au format passeport.",
+  "de": "Bitte fügen Sie zuerst ein Foto hinzu. Danach mache ich es in Passfotogröße.",
+  "pt": "Adicione uma foto primeiro. Depois de adicionada, eu a colocarei no tamanho de passaporte.",
+  "it": "Aggiungi prima una foto. Una volta aggiunta, la porterò a dimensione passaporto.",
+  "nl": "Voeg eerst een foto toe. Daarna maak ik er een pasfotoformaat van.",
+  "ru": "Сначала добавьте фото. После этого я сделаю его паспортного размера.",
+  "uk": "Спочатку додайте фото. Після цього я зроблю його паспортного розміру.",
+  "pl": "Najpierw dodaj zdjęcie. Potem zrobię je w rozmiarze paszportowym.",
+  "cs": "Nejprve přidejte fotku. Poté ji upravím na pasovou velikost.",
+  "hu": "Először adjon hozzá egy fotót. Ezután útlevélkép-méretűre készítem.",
+  "ro": "Mai întâi adaugă o fotografie. Apoi o voi face la dimensiune de pașaport.",
+  "da": "Tilføj et foto først. Når det er tilføjet, laver jeg det i pasfotostørrelse.",
+  "fi": "Lisää ensin kuva. Kun se on lisätty, teen siitä passikuvan kokoisen.",
+  "nb": "Legg til et bilde først. Når det er lagt til, lager jeg det i passbildestørrelse.",
+  "sv": "Lägg till ett foto först. När du har lagt till det gör jag det i passfotostorlek.",
+  "tr": "Önce bir fotoğraf ekleyin. Ekledikten sonra pasaport boyutunda yaparım.",
+  "id": "Harap tambahkan foto terlebih dahulu. Setelah ditambahkan, saya akan membuatnya menjadi ukuran foto paspor.",
+  "th": "โปรดใส่รูปภาพก่อน เมื่อใส่แล้ว ฉันจะทำให้เป็นขนาดรูปติดพาสปอร์ตให้",
+  "vi": "Vui lòng thêm ảnh trước. Sau khi thêm, tôi sẽ làm cho nó thành cỡ ảnh hộ chiếu.",
+  "zh-TW": "請先加入照片。加入後將為您製作護照尺寸。",
+  "ar": "يُرجى إضافة صورة أولًا. بمجرد إضافتها، سأجعلها بحجم صورة جواز السفر.",
+  "fa": "لطفاً ابتدا یک عکس اضافه کنید. پس از افزودن، آن را به اندازهٔ عکس گذرنامه درمی‌آورم."
+ },
+ "변환 중...": {
+  "en": "Converting...",
+  "zh": "转换中...",
+  "ja": "変換中...",
+  "es": "Convirtiendo...",
+  "hi": "बदल रहा है...",
+  "fr": "Conversion...",
+  "de": "Konvertieren...",
+  "pt": "Convertendo...",
+  "it": "Conversione...",
+  "nl": "Omzetten...",
+  "ru": "Конвертирование...",
+  "uk": "Конвертування...",
+  "pl": "Konwertowanie...",
+  "cs": "Převádění...",
+  "hu": "Konvertálás...",
+  "ro": "Se convertește...",
+  "da": "Konverterer...",
+  "fi": "Muunnetaan...",
+  "nb": "Konverterer...",
+  "sv": "Konverterar...",
+  "tr": "Dönüştürülüyor...",
+  "id": "Mengonversi...",
+  "th": "กำลังแปลง...",
+  "vi": "Đang chuyển đổi...",
+  "zh-TW": "轉換中...",
+  "ar": "جارٍ التحويل...",
+  "fa": "در حال تبدیل..."
+ },
+ "변환에 실패했습니다": {
+  "en": "Conversion failed",
+  "zh": "转换失败",
+  "ja": "変換に失敗しました",
+  "es": "La conversión falló",
+  "hi": "रूपांतरण विफल",
+  "fr": "Échec de la conversion",
+  "de": "Konvertierung fehlgeschlagen",
+  "pt": "A conversão falhou",
+  "it": "Conversione non riuscita",
+  "nl": "Omzetten mislukt",
+  "ru": "Конвертирование не удалось",
+  "uk": "Конвертування не вдалося",
+  "pl": "Konwersja nie powiodła się",
+  "cs": "Převod se nezdařil",
+  "hu": "A konvertálás sikertelen",
+  "ro": "Conversia a eșuat",
+  "da": "Konverteringen mislykkedes",
+  "fi": "Muunnos epäonnistui",
+  "nb": "Konverteringen mislyktes",
+  "sv": "Konverteringen misslyckades",
+  "tr": "Dönüştürme başarısız oldu",
+  "id": "Konversi gagal",
+  "th": "การแปลงล้มเหลว",
+  "vi": "Chuyển đổi thất bại",
+  "zh-TW": "轉換失敗",
+  "ar": "فشل التحويل",
+  "fa": "تبدیل ناموفق بود"
+ },
+ "사진을 읽을 수 없습니다. 다른 사진으로 시도해 주세요.": {
+  "en": "This photo cannot be read. Please try another one.",
+  "zh": "无法读取此照片。请换一张试试。",
+  "ja": "この写真を読み込めません。別の写真でお試しください。",
+  "es": "No se puede leer esta foto. Prueba con otra.",
+  "hi": "यह फ़ोटो पढ़ी नहीं जा सकती। कृपया दूसरी आज़माएँ।",
+  "fr": "Impossible de lire cette photo. Veuillez en essayer une autre.",
+  "de": "Dieses Foto kann nicht gelesen werden. Bitte versuchen Sie ein anderes.",
+  "pt": "Não é possível ler esta foto. Tente outra.",
+  "it": "Impossibile leggere questa foto. Provane un'altra.",
+  "nl": "Deze foto kan niet worden gelezen. Probeer een andere.",
+  "ru": "Это фото нельзя прочитать. Попробуйте другое.",
+  "uk": "Це фото не можна прочитати. Спробуйте інше.",
+  "pl": "Nie można odczytać tego zdjęcia. Spróbuj innego.",
+  "cs": "Tuto fotku nelze přečíst. Zkuste jinou.",
+  "hu": "Ez a fotó nem olvasható. Próbáljon másikat.",
+  "ro": "Această fotografie nu poate fi citită. Încearcă alta.",
+  "da": "Dette foto kan ikke læses. Prøv et andet.",
+  "fi": "Tätä kuvaa ei voi lukea. Kokeile toista kuvaa.",
+  "nb": "Dette bildet kan ikke leses. Prøv et annet.",
+  "sv": "Det här fotot kan inte läsas. Försök med ett annat.",
+  "tr": "Bu fotoğraf okunamıyor. Lütfen başka bir fotoğraf deneyin.",
+  "id": "Foto ini tidak dapat dibaca. Silakan coba foto lain.",
+  "th": "อ่านรูปภาพนี้ไม่ได้ โปรดลองรูปอื่น",
+  "vi": "Không đọc được ảnh này. Vui lòng thử ảnh khác.",
+  "zh-TW": "無法讀取此照片。請換一張試試。",
+  "ar": "لا يمكن قراءة هذه الصورة. يُرجى تجربة صورة أخرى.",
+  "fa": "این عکس خوانده نمی‌شود. لطفاً عکس دیگری را امتحان کنید."
+ },
+ "이미지를 읽을 수 없습니다": {
+  "en": "The image cannot be read",
+  "zh": "无法读取图像",
+  "ja": "画像を読み込めません",
+  "es": "No se puede leer la imagen",
+  "hi": "छवि पढ़ी नहीं जा सकती",
+  "fr": "Impossible de lire l'image",
+  "de": "Das Bild kann nicht gelesen werden",
+  "pt": "Não é possível ler a imagem",
+  "it": "Impossibile leggere l'immagine",
+  "nl": "De afbeelding kan niet worden gelezen",
+  "ru": "Изображение нельзя прочитать",
+  "uk": "Зображення не можна прочитати",
+  "pl": "Nie można odczytać obrazu",
+  "cs": "Obrázek nelze přečíst",
+  "hu": "A kép nem olvasható",
+  "ro": "Imaginea nu poate fi citită",
+  "da": "Billedet kan ikke læses",
+  "fi": "Kuvaa ei voi lukea",
+  "nb": "Bildet kan ikke leses",
+  "sv": "Bilden kan inte läsas",
+  "tr": "Görüntü okunamıyor",
+  "id": "Gambar tidak dapat dibaca",
+  "th": "อ่านภาพไม่ได้",
+  "vi": "Không đọc được hình ảnh",
+  "zh-TW": "無法讀取影像",
+  "ar": "لا يمكن قراءة الصورة",
+  "fa": "تصویر خوانده نمی‌شود"
+ },
+ "이제 변환 시작 버튼을 누르세요.": {
+  "en": "Now press the Convert button.",
+  "zh": "现在请按转换按钮。",
+  "ja": "変換ボタンを押してください。",
+  "es": "Ahora pulsa el botón Convertir.",
+  "hi": "अब बदलें बटन दबाएँ।",
+  "fr": "Appuyez maintenant sur le bouton Convertir.",
+  "de": "Drücken Sie jetzt die Schaltfläche „Konvertieren“.",
+  "pt": "Agora pressione o botão Converter.",
+  "it": "Ora premi il pulsante Converti.",
+  "nl": "Druk nu op de knop Omzetten.",
+  "ru": "Теперь нажмите кнопку конвертирования.",
+  "uk": "Тепер натисніть кнопку конвертування.",
+  "pl": "Teraz naciśnij przycisk konwersji.",
+  "cs": "Nyní stiskněte tlačítko Převést.",
+  "hu": "Most nyomja meg a konvertálás gombot.",
+  "ro": "Acum apasă butonul de conversie.",
+  "da": "Tryk nu på knappen Konvertér.",
+  "fi": "Paina nyt Muunna-painiketta.",
+  "nb": "Trykk nå på Konverter-knappen.",
+  "sv": "Tryck nu på knappen Konvertera.",
+  "tr": "Şimdi Dönüştür düğmesine basın.",
+  "id": "Sekarang tekan tombol Konversi.",
+  "th": "ตอนนี้กดปุ่มแปลงได้เลย",
+  "vi": "Bây giờ hãy nhấn nút Chuyển đổi.",
+  "zh-TW": "現在請按轉換按鈕。",
+  "ar": "الآن اضغط زر التحويل.",
+  "fa": "اکنون دکمهٔ تبدیل را فشار دهید."
+ },
+ "무엇을 바꿀지 적어주세요. 예시 버튼을 눌러도 됩니다.": {
+  "en": "Tell me what to change. You can also tap an example button.",
+  "zh": "请写下要改什么。也可以点示例按钮。",
+  "ja": "何を変えるか書いてください。例のボタンでも構いません。",
+  "es": "Escribe qué cambiar. También puedes tocar un botón de ejemplo.",
+  "hi": "क्या बदलना है लिखें। उदाहरण बटन भी दबा सकते हैं।",
+  "fr": "Écrivez ce qu'il faut changer. Vous pouvez aussi toucher un bouton d'exemple.",
+  "de": "Schreiben Sie, was geändert werden soll. Sie können auch eine Beispiel-Schaltfläche antippen.",
+  "pt": "Escreva o que mudar. Você também pode tocar em um botão de exemplo.",
+  "it": "Scrivi cosa modificare. Puoi anche toccare un pulsante di esempio.",
+  "nl": "Schrijf wat er moet veranderen. U kunt ook op een voorbeeldknop tikken.",
+  "ru": "Напишите, что изменить. Можно также нажать кнопку примера.",
+  "uk": "Напишіть, що змінити. Можна також натиснути кнопку прикладу.",
+  "pl": "Napisz, co zmienić. Możesz też nacisnąć przycisk przykładu.",
+  "cs": "Napište, co změnit. Můžete také klepnout na tlačítko příkladu.",
+  "hu": "Írja le, mit szeretne módosítani. A példagombot is megnyomhatja.",
+  "ro": "Scrie ce să schimbi. Poți apăsa și un buton exemplu.",
+  "da": "Skriv, hvad du vil ændre. Du kan også trykke på en eksempelknap.",
+  "fi": "Kirjoita, mitä haluat muuttaa. Voit painaa myös esimerkkipainiketta.",
+  "nb": "Skriv hva du vil endre. Du kan også trykke på en eksempelknapp.",
+  "sv": "Skriv vad du vill ändra. Du kan också trycka på en exempelknapp.",
+  "tr": "Neyi değiştirmek istediğinizi yazın. Bir örnek düğmeye de basabilirsiniz.",
+  "id": "Tulis apa yang ingin diubah. Anda juga dapat menekan tombol contoh.",
+  "th": "บอกฉันว่าต้องการเปลี่ยนอะไร หรือแตะปุ่มตัวอย่างก็ได้",
+  "vi": "Hãy cho biết bạn muốn thay đổi gì. Bạn cũng có thể chạm vào nút ví dụ.",
+  "zh-TW": "請寫下要改什麼。也可以點範例按鈕。",
+  "ar": "اكتب ما تريد تغييره. يمكنك أيضًا الضغط على زر مثال.",
+  "fa": "بنویسید چه چیزی را می‌خواهید تغییر دهید. می‌توانید دکمهٔ مثال را هم فشار دهید."
+ },
+ "그건 이 페이지에서 못 바꾸는 거라서, 여기는 사진 형식·크기만 바꿀 수 있어요. 다른 도구는 현황판에서 골라보세요.": {
+  "en": "That cannot be changed on this page — here you can only change photo format and size. Pick another tool on the home page.",
+  "zh": "这个在本页改不了——这里只能改照片格式和大小。其他工具请在主页选择。",
+  "ja": "それはこのページでは変えられません。ここでは写真の形式とサイズだけです。他のツールはホームで選んでください。",
+  "es": "Eso no se puede cambiar en esta página: aquí solo el formato y el tamaño de la foto. Elige otra herramienta en la página principal.",
+  "hi": "यह इस पेज पर नहीं बदल सकता — यहाँ केवल फ़ोटो फ़ॉर्मेट और आकार बदलता है। अन्य टूल होम पेज पर चुनें।",
+  "fr": "Cela ne peut pas être changé sur cette page — ici, vous ne pouvez changer que le format et la taille de la photo. Choisissez un autre outil sur la page d'accueil.",
+  "de": "Das kann auf dieser Seite nicht geändert werden — hier können Sie nur Fotoformat und -größe ändern. Wählen Sie ein anderes Werkzeug auf der Startseite.",
+  "pt": "Isso não pode ser alterado nesta página — aqui você só pode mudar o formato e o tamanho da foto. Escolha outra ferramenta na página inicial.",
+  "it": "Non può essere cambiato in questa pagina — qui puoi cambiare solo formato e dimensione della foto. Scegli un altro strumento nella pagina principale.",
+  "nl": "Dat kan op deze pagina niet worden gewijzigd — hier kunt u alleen fotoformaat en -grootte wijzigen. Kies een ander hulpmiddel op de startpagina.",
+  "ru": "Это нельзя изменить на этой странице — здесь можно менять только формат и размер фото. Выберите другой инструмент на главной странице.",
+  "uk": "Це не можна змінити на цій сторінці — тут можна змінювати лише формат і розмір фото. Виберіть інший інструмент на головній сторінці.",
+  "pl": "Tego nie da się zmienić na tej stronie — tutaj zmienisz tylko format i rozmiar zdjęcia. Wybierz inne narzędzie na stronie głównej.",
+  "cs": "To na této stránce změnit nelze — zde lze měnit jen formát a velikost fotky. Jiný nástroj vyberte na hlavní stránce.",
+  "hu": "Ezt ezen az oldalon nem lehet módosítani — itt csak a fotó formátuma és mérete változtatható. Másik eszközt a kezdőlapon választhat.",
+  "ro": "Asta nu se poate schimba pe această pagină — aici poți schimba doar formatul și dimensiunea fotografiei. Alege alt instrument pe pagina principală.",
+  "da": "Det kan ikke ændres på denne side — her kan du kun ændre fotoets format og størrelse. Vælg et andet værktøj på startsiden.",
+  "fi": "Sitä ei voi muuttaa tällä sivulla — täällä voit muuttaa vain kuvan muotoa ja kokoa. Valitse toinen työkalu etusivulta.",
+  "nb": "Det kan ikke endres på denne siden — her kan du bare endre bildets format og størrelse. Velg et annet verktøy på startsiden.",
+  "sv": "Det går inte att ändra på den här sidan — här kan du bara ändra fotots format och storlek. Välj ett annat verktyg på startsidan.",
+  "tr": "Bu, bu sayfada değiştirilemez — burada yalnızca fotoğraf biçimi ve boyutu değiştirilebilir. Ana sayfadan başka bir araç seçin.",
+  "id": "Itu tidak dapat diubah di halaman ini — di sini Anda hanya dapat mengubah format dan ukuran foto. Pilih alat lain di halaman utama.",
+  "th": "สิ่งนั้นเปลี่ยนในหน้านี้ไม่ได้ — ที่นี่เปลี่ยนได้เฉพาะฟอร์แมตและขนาดของรูปภาพ เลือกเครื่องมืออื่นได้จากหน้าแรก",
+  "vi": "Không thay đổi được điều đó ở trang này — ở đây chỉ đổi được định dạng và kích thước ảnh. Hãy chọn công cụ khác ở trang chính.",
+  "zh-TW": "這個在本頁改不了——這裡只能改照片格式和大小。其他工具請在主頁選擇。",
+  "ar": "لا يمكن تغيير ذلك في هذه الصفحة — هنا يمكنك فقط تغيير تنسيق الصورة وحجمها. اختر أداة أخرى من الصفحة الرئيسية.",
+  "fa": "این مورد در این صفحه قابل تغییر نیست — اینجا فقط می‌توانید قالب و اندازهٔ عکس را تغییر دهید. ابزار دیگری را از صفحهٔ اصلی انتخاب کنید."
+ },
+ "여권 사진을 만들고 있습니다…": {
+  "en": "Making your passport photo…",
+  "zh": "正在制作护照照片…",
+  "ja": "パスポート写真を作成中…",
+  "es": "Creando tu foto de pasaporte…",
+  "hi": "पासपोर्ट फ़ोटो बना रहे हैं…",
+  "fr": "Création de votre photo de passeport…",
+  "de": "Ihr Passfoto wird erstellt…",
+  "pt": "Criando sua foto de passaporte…",
+  "it": "Creazione della foto passaporto…",
+  "nl": "Uw pasfoto wordt gemaakt…",
+  "ru": "Делаю фото на паспорт…",
+  "uk": "Роблю фото на паспорт…",
+  "pl": "Tworzę zdjęcie paszportowe…",
+  "cs": "Vytvářím pasovou fotografii…",
+  "hu": "Készítem az útlevélképet…",
+  "ro": "Se creează fotografia de pașaport…",
+  "da": "Laver dit pasfoto…",
+  "fi": "Tehdään passikuvaasi…",
+  "nb": "Lager passbildet ditt…",
+  "sv": "Skapar ditt passfoto…",
+  "tr": "Pasaport fotoğrafınız oluşturuluyor…",
+  "id": "Membuat foto paspor Anda…",
+  "th": "กำลังทำรูปติดพาสปอร์ต…",
+  "vi": "Đang làm ảnh hộ chiếu của bạn…",
+  "zh-TW": "正在製作護照照片…",
+  "ar": "جارٍ إنشاء صورة جواز السفر…",
+  "fa": "در حال ساختن عکس گذرنامه…"
+ },
+ "여권 사진을 만들었습니다 (첫 번째 사진, 413×531 JPG). 다운로드가 시작됩니다.": {
+  "en": "Passport photo made (first photo, 413×531 JPG). The download will start.",
+  "zh": "护照照片已制作（第一张，413×531 JPG）。将开始下载。",
+  "ja": "パスポート写真を作成しました（最初の写真、413×531 JPG）。ダウンロードが始まります。",
+  "es": "Foto de pasaporte creada (primera foto, 413×531 JPG). Comenzará la descarga.",
+  "hi": "पासपोर्ट फ़ोटो बन गई (पहली फ़ोटो, 413×531 JPG)। डाउनलोड शुरू होगा।",
+  "fr": "Photo de passeport créée (première photo, 413×531 JPG). Le téléchargement va commencer.",
+  "de": "Passfoto erstellt (erstes Foto, 413×531 JPG). Der Download startet.",
+  "pt": "Foto de passaporte criada (primeira foto, 413×531 JPG). O download começará.",
+  "it": "Foto passaporto creata (prima foto, 413×531 JPG). Il download inizierà.",
+  "nl": "Pasfoto gemaakt (eerste foto, 413×531 JPG). De download start.",
+  "ru": "Фото на паспорт готово (первое фото, 413×531 JPG). Загрузка начнётся.",
+  "uk": "Фото на паспорт готове (перше фото, 413×531 JPG). Завантаження розпочнеться.",
+  "pl": "Zdjęcie paszportowe gotowe (pierwsze zdjęcie, 413×531 JPG). Rozpocznie się pobieranie.",
+  "cs": "Pasová fotografie je hotová (první fotka, 413×531 JPG). Stahování se spustí.",
+  "hu": "Elkészült az útlevélkép (első fotó, 413×531 JPG). A letöltés megkezdődik.",
+  "ro": "Fotografia de pașaport este gata (prima fotografie, 413×531 JPG). Descărcarea va începe.",
+  "da": "Pasfoto lavet (første foto, 413×531 JPG). Downloaden starter.",
+  "fi": "Passikuva tehty (ensimmäinen kuva, 413×531 JPG). Lataus alkaa.",
+  "nb": "Passbilde laget (første bilde, 413×531 JPG). Nedlastingen starter.",
+  "sv": "Passfoto skapat (första fotot, 413×531 JPG). Nedladdningen börjar.",
+  "tr": "Pasaport fotoğrafı oluşturuldu (ilk fotoğraf, 413×531 JPG). İndirme başlayacak.",
+  "id": "Foto paspor selesai dibuat (foto pertama, 413×531 JPG). Unduhan akan dimulai.",
+  "th": "ทำรูปติดพาสปอร์ตเรียบร้อย (รูปแรก, 413×531 JPG) การดาวน์โหลดจะเริ่มขึ้น",
+  "vi": "Đã làm ảnh hộ chiếu (ảnh đầu tiên, 413×531 JPG). Quá trình tải xuống sẽ bắt đầu.",
+  "zh-TW": "護照照片已製作（第一張，413×531 JPG）。將開始下載。",
+  "ar": "تم إنشاء صورة جواز السفر (الصورة الأولى، 413×531 JPG). سيبدأ التنزيل.",
+  "fa": "عکس گذرنامه ساخته شد (عکس اول، 413×531 JPG). دانلود آغاز می‌شود."
+ },
+ "여권 사진을 만드는 데 실패했습니다. 변환 버튼으로 직접 시도해 주세요.": {
+  "en": "Making the passport photo failed. Please try the Convert button directly.",
+  "zh": "护照照片制作失败。请直接使用转换按钮试试。",
+  "ja": "パスポート写真の作成に失敗しました。変換ボタンで直接お試しください。",
+  "es": "No se pudo crear la foto de pasaporte. Prueba directamente con el botón Convertir.",
+  "hi": "पासपोर्ट फ़ोटो बनाना विफल। कृपया बदलें बटन से सीधे आज़माएँ।",
+  "fr": "La création de la photo de passeport a échoué. Veuillez essayer directement avec le bouton Convertir.",
+  "de": "Das Erstellen des Passfotos ist fehlgeschlagen. Bitte versuchen Sie es direkt mit der Schaltfläche „Konvertieren“.",
+  "pt": "A criação da foto de passaporte falhou. Tente diretamente com o botão Converter.",
+  "it": "La creazione della foto passaporto non è riuscita. Prova direttamente con il pulsante Converti.",
+  "nl": "Het maken van de pasfoto is mislukt. Probeer het rechtstreeks met de knop Omzetten.",
+  "ru": "Не удалось сделать фото на паспорт. Попробуйте напрямую через кнопку конвертирования.",
+  "uk": "Не вдалося зробити фото на паспорт. Спробуйте напряму через кнопку конвертування.",
+  "pl": "Nie udało się zrobić zdjęcia paszportowego. Spróbuj bezpośrednio przyciskiem konwersji.",
+  "cs": "Vytvoření pasové fotografie se nezdařilo. Zkuste to přímo tlačítkem Převést.",
+  "hu": "Az útlevélkép elkészítése sikertelen. Próbálja közvetlenül a konvertálás gombbal.",
+  "ro": "Crearea fotografiei de pașaport a eșuat. Încearcă direct cu butonul de conversie.",
+  "da": "Det lykkedes ikke at lave pasfotoet. Prøv direkte med knappen Konvertér.",
+  "fi": "Passikuvan tekeminen epäonnistui. Kokeile suoraan Muunna-painikkeella.",
+  "nb": "Det mislyktes å lage passbildet. Prøv direkte med Konverter-knappen.",
+  "sv": "Det gick inte att skapa passfotot. Försök direkt med knappen Konvertera.",
+  "tr": "Pasaport fotoğrafı oluşturulamadı. Lütfen doğrudan Dönüştür düğmesiyle deneyin.",
+  "id": "Pembuatan foto paspor gagal. Silakan coba langsung dengan tombol Konversi.",
+  "th": "ทำรูปติดพาสปอร์ตไม่สำเร็จ โปรดลองด้วยปุ่มแปลงโดยตรง",
+  "vi": "Làm ảnh hộ chiếu thất bại. Vui lòng thử trực tiếp bằng nút Chuyển đổi.",
+  "zh-TW": "護照照片製作失敗。請直接使用轉換按鈕試試。",
+  "ar": "فشل إنشاء صورة جواز السفر. يُرجى المحاولة مباشرة بزر التحويل.",
+  "fa": "ساختن عکس گذرنامه ناموفق بود. لطفاً مستقیماً با دکمهٔ تبدیل امتحان کنید."
+ },
+ "이 브라우저에서는 여권 사진 저장이 어렵습니다. 변환 버튼으로 직접 시도해 주세요.": {
+  "en": "This browser cannot save the passport photo easily. Please try the Convert button directly.",
+  "zh": "此浏览器难以保存护照照片。请直接使用转换按钮。",
+  "ja": "このブラウザではパスポート写真の保存が難しいです。変換ボタンで直接お試しください。",
+  "es": "Este navegador no guarda bien la foto de pasaporte. Prueba con el botón Convertir.",
+  "hi": "इस ब्राउज़र में पासपोर्ट फ़ोटो सहेजना कठिन है। बदलें बटन से सीधे आज़माएँ।",
+  "fr": "Ce navigateur enregistre difficilement la photo de passeport. Veuillez essayer directement avec le bouton Convertir.",
+  "de": "Dieser Browser kann das Passfoto nur schwer speichern. Bitte versuchen Sie es direkt mit der Schaltfläche „Konvertieren“.",
+  "pt": "Este navegador tem dificuldade para salvar a foto de passaporte. Tente diretamente com o botão Converter.",
+  "it": "Questo browser ha difficoltà a salvare la foto passaporto. Prova direttamente con il pulsante Converti.",
+  "nl": "Deze browser kan de pasfoto moeilijk opslaan. Probeer het rechtstreeks met de knop Omzetten.",
+  "ru": "В этом браузере сложно сохранить фото на паспорт. Попробуйте напрямую через кнопку конвертирования.",
+  "uk": "У цьому браузері складно зберегти фото на паспорт. Спробуйте напряму через кнопку конвертування.",
+  "pl": "Ta przeglądarka ma trudność z zapisaniem zdjęcia paszportowego. Spróbuj bezpośrednio przyciskiem konwersji.",
+  "cs": "V tomto prohlížeči se pasová fotografie ukládá obtížně. Zkuste to přímo tlačítkem Převést.",
+  "hu": "Ebben a böngészőben nehéz menteni az útlevélképet. Próbálja közvetlenül a konvertálás gombbal.",
+  "ro": "Acest browser salvează greu fotografia de pașaport. Încearcă direct cu butonul de conversie.",
+  "da": "Denne browser har svært ved at gemme pasfotoet. Prøv direkte med knappen Konvertér.",
+  "fi": "Tämä selain ei tallenna passikuvaa helposti. Kokeile suoraan Muunna-painikkeella.",
+  "nb": "Denne nettleseren har vansker med å lagre passbildet. Prøv direkte med Konverter-knappen.",
+  "sv": "Den här webbläsaren har svårt att spara passfotot. Försök direkt med knappen Konvertera.",
+  "tr": "Bu tarayıcı pasaport fotoğrafını kolayca kaydedemiyor. Lütfen doğrudan Dönüştür düğmesiyle deneyin.",
+  "id": "Browser ini sulit menyimpan foto paspor. Silakan coba langsung dengan tombol Konversi.",
+  "th": "เบราว์เซอร์นี้บันทึกรูปติดพาสปอร์ตได้ยาก โปรดลองด้วยปุ่มแปลงโดยตรง",
+  "vi": "Trình duyệt này khó lưu ảnh hộ chiếu. Vui lòng thử trực tiếp bằng nút Chuyển đổi.",
+  "zh-TW": "此瀏覽器難以儲存護照照片。請直接使用轉換按鈕。",
+  "ar": "يصعب على هذا المتصفح حفظ صورة جواز السفر. يُرجى المحاولة باستخدام زر التحويل.",
+  "fa": "در این مرورگر ذخیرهٔ عکس گذرنامه دشوار است. لطفاً با دکمهٔ تبدیل مستقیماً امتحان کنید."
+ },
+ "이 브라우저는 AVIF 인코딩을 지원하지 않습니다": {
+  "en": "This browser does not support AVIF encoding",
+  "zh": "此浏览器不支持 AVIF 编码",
+  "ja": "このブラウザはAVIFエンコードに対応していません",
+  "es": "Este navegador no admite la codificación AVIF",
+  "hi": "यह ब्राउज़र AVIF एन्कोडिंग का समर्थन नहीं करता",
+  "fr": "Ce navigateur ne prend pas en charge l'encodage AVIF",
+  "de": "Dieser Browser unterstützt keine AVIF-Kodierung",
+  "pt": "Este navegador não suporta codificação AVIF",
+  "it": "Questo browser non supporta la codifica AVIF",
+  "nl": "Deze browser ondersteunt geen AVIF-codering",
+  "ru": "Этот браузер не поддерживает кодирование AVIF",
+  "uk": "Цей браузер не підтримує кодування AVIF",
+  "pl": "Ta przeglądarka nie obsługuje kodowania AVIF",
+  "cs": "Tento prohlížeč nepodporuje kódování AVIF",
+  "hu": "Ez a böngésző nem támogatja az AVIF kódolást",
+  "ro": "Acest browser nu acceptă codarea AVIF",
+  "da": "Denne browser understøtter ikke AVIF-kodning",
+  "fi": "Tämä selain ei tue AVIF-koodausta",
+  "nb": "Denne nettleseren støtter ikke AVIF-koding",
+  "sv": "Den här webbläsaren stöder inte AVIF-kodning",
+  "tr": "Bu tarayıcı AVIF kodlamayı desteklemiyor",
+  "id": "Browser ini tidak mendukung enkode AVIF",
+  "th": "เบราว์เซอร์นี้ไม่รองรับการเข้ารหัส AVIF",
+  "vi": "Trình duyệt này không hỗ trợ mã hóa AVIF",
+  "zh-TW": "此瀏覽器不支援 AVIF 編碼",
+  "ar": "هذا المتصفح لا يدعم ترميز AVIF",
+  "fa": "این مرورگر از رمزگذاری AVIF پشتیبانی نمی‌کند"
+ },
+ "BMP는 무압축이라 용량이 클 수 있습니다": {
+  "en": "BMP is uncompressed, so the file can be large",
+  "zh": "BMP 无压缩，文件可能较大",
+  "ja": "BMPは無圧縮のため容量が大きくなることがあります",
+  "es": "BMP no tiene compresión, el archivo puede ser grande",
+  "hi": "BMP असंपीड़ित है, इसलिए फ़ाइल बड़ी हो सकती है",
+  "fr": "Le BMP n'est pas compressé, le fichier peut donc être volumineux",
+  "de": "BMP ist unkomprimiert, die Datei kann daher groß sein",
+  "pt": "O BMP não é compactado, então o arquivo pode ser grande",
+  "it": "Il BMP non è compresso, quindi il file può essere grande",
+  "nl": "BMP is ongecomprimeerd, dus het bestand kan groot zijn",
+  "ru": "BMP не сжимается, поэтому файл может быть большим",
+  "uk": "BMP не стискається, тому файл може бути великим",
+  "pl": "BMP jest nieskompresowany, więc plik może być duży",
+  "cs": "BMP je nekomprimovaný, takže soubor může být velký",
+  "hu": "A BMP tömörítetlen, ezért a fájl nagy lehet",
+  "ro": "BMP este necomprimat, așa că fișierul poate fi mare",
+  "da": "BMP er ukomprimeret, så filen kan blive stor",
+  "fi": "BMP on pakkaamaton, joten tiedosto voi olla suuri",
+  "nb": "BMP er ukomprimert, så filen kan bli stor",
+  "sv": "BMP är okomprimerat, så filen kan bli stor",
+  "tr": "BMP sıkıştırılmamış olduğundan dosya büyük olabilir",
+  "id": "BMP tidak terkompresi, sehingga berkasnya bisa besar",
+  "th": "BMP ไม่มีการบีบอัด ไฟล์จึงอาจมีขนาดใหญ่",
+  "vi": "BMP không nén nên tệp có thể lớn",
+  "zh-TW": "BMP 無壓縮，檔案可能較大",
+  "ar": "BMP غير مضغوط، لذا قد يكون الملف كبيرًا",
+  "fa": "BMP بدون فشرده‌سازی است، پس فایل ممکن است بزرگ باشد"
+ },
+ "PNG는 무손실이라 목표 용량이 적용되지 않습니다": {
+  "en": "PNG is lossless, so the target size does not apply",
+  "zh": "PNG 是无损格式，目标大小不适用",
+  "ja": "PNGは無劣化のため目標サイズは適用されません",
+  "es": "PNG no tiene pérdida, el tamaño objetivo no aplica",
+  "hi": "PNG हानिरहित है, इसलिए लक्ष्य आकार लागू नहीं होता",
+  "fr": "Le PNG est sans perte, la taille cible ne s'applique donc pas",
+  "de": "PNG ist verlustfrei, daher gilt die Zielgröße nicht",
+  "pt": "O PNG é sem perdas, então o tamanho alvo não se aplica",
+  "it": "Il PNG è senza perdita, quindi la dimensione target non si applica",
+  "nl": "PNG is verliesvrij, dus de doelgrootte is niet van toepassing",
+  "ru": "PNG — формат без потерь, поэтому целевой размер не применяется",
+  "uk": "PNG — формат без втрат, тому цільовий розмір не застосовується",
+  "pl": "PNG jest bezstratny, więc rozmiar docelowy nie ma zastosowania",
+  "cs": "PNG je bezztrátový, takže cílová velikost neplatí",
+  "hu": "A PNG veszteségmentes, ezért a célméret nem érvényes rá",
+  "ro": "PNG este fără pierderi, așa că dimensiunea țintă nu se aplică",
+  "da": "PNG er tabsfrit, så målstørrelsen gælder ikke",
+  "fi": "PNG on häviötön, joten tavoitekoko ei koske sitä",
+  "nb": "PNG er tapsfritt, så målstørrelsen gjelder ikke",
+  "sv": "PNG är förlustfritt, så målstorleken gäller inte",
+  "tr": "PNG kayıpsız olduğundan hedef boyut geçerli değildir",
+  "id": "PNG bersifat lossless, sehingga ukuran target tidak berlaku",
+  "th": "PNG เป็นแบบไม่สูญเสียคุณภาพ ขนาดเป้าหมายจึงใช้ไม่ได้",
+  "vi": "PNG là định dạng không mất dữ liệu nên kích thước đích không áp dụng",
+  "zh-TW": "PNG 是無損格式，目標大小不適用",
+  "ar": "PNG بدون فقدان، لذا لا ينطبق الحجم المستهدف",
+  "fa": "PNG بدون افت کیفیت است، پس حجم هدف اعمال نمی‌شود"
+ },
+ "목표 용량에 맞춰 품질 자동 조절됨": {
+  "en": "Quality auto-adjusted to the target size",
+  "zh": "已按目标大小自动调节质量",
+  "ja": "目標サイズに合わせて品質を自動調整",
+  "es": "Calidad ajustada automáticamente al tamaño objetivo",
+  "hi": "लक्ष्य आकार के अनुसार गुणवत्ता स्वतः समायोजित",
+  "fr": "Qualité ajustée automatiquement à la taille cible",
+  "de": "Qualität automatisch an die Zielgröße angepasst",
+  "pt": "Qualidade ajustada automaticamente ao tamanho alvo",
+  "it": "Qualità regolata automaticamente alla dimensione target",
+  "nl": "Kwaliteit automatisch aangepast aan de doelgrootte",
+  "ru": "Качество автоматически подогнано под целевой размер",
+  "uk": "Якість автоматично підігнано під цільовий розмір",
+  "pl": "Jakość automatycznie dopasowana do rozmiaru docelowego",
+  "cs": "Kvalita automaticky upravena na cílovou velikost",
+  "hu": "A minőség automatikusan a célmérethez igazítva",
+  "ro": "Calitate reglată automat la dimensiunea țintă",
+  "da": "Kvaliteten blev automatisk justeret til målstørrelsen",
+  "fi": "Laatu säädettiin automaattisesti tavoitekokoon",
+  "nb": "Kvaliteten ble automatisk justert til målstørrelsen",
+  "sv": "Kvaliteten justerades automatiskt till målstorleken",
+  "tr": "Kalite hedef boyuta otomatik ayarlandı",
+  "id": "Kualitas disesuaikan otomatis ke ukuran target",
+  "th": "ปรับคุณภาพอัตโนมัติให้ตรงกับขนาดเป้าหมาย",
+  "vi": "Chất lượng đã tự động điều chỉnh theo kích thước đích",
+  "zh-TW": "已按目標大小自動調節品質",
+  "ar": "تم ضبط الجودة تلقائيًا وفق الحجم المستهدف",
+  "fa": "کیفیت به‌صورت خودکار با حجم هدف تنظیم شد"
+ },
+ "최저 품질로도 목표 용량 초과": {
+  "en": "Still over the target size even at the lowest quality",
+  "zh": "即使最低质量也超过目标大小",
+  "ja": "最低品質でも目標サイズを超過",
+  "es": "Aún supera el tamaño objetivo con la calidad mínima",
+  "hi": "न्यूनतम गुणवत्ता पर भी लक्ष्य आकार से अधिक",
+  "fr": "Dépasse encore la taille cible même à la qualité la plus basse",
+  "de": "Zielgröße selbst bei niedrigster Qualität überschritten",
+  "pt": "Ainda acima do tamanho alvo mesmo na qualidade mínima",
+  "it": "Supera la dimensione target anche alla qualità minima",
+  "nl": "Zelfs bij de laagste kwaliteit boven de doelgrootte",
+  "ru": "Даже при минимальном качестве размер превышает целевой",
+  "uk": "Навіть за мінімальної якості розмір перевищує цільовий",
+  "pl": "Nawet przy najniższej jakości przekracza rozmiar docelowy",
+  "cs": "I při nejnižší kvalitě překračuje cílovou velikost",
+  "hu": "Még a legalacsonyabb minőség mellett is meghaladja a célméretet",
+  "ro": "Chiar și la calitatea minimă depășește dimensiunea țintă",
+  "da": "Overstiger målstørrelsen selv ved laveste kvalitet",
+  "fi": "Ylittää tavoitekoon vielä alhaisimmallakin laadulla",
+  "nb": "Overskrider målstørrelsen selv ved laveste kvalitet",
+  "sv": "Överskrider målstorleken även vid lägsta kvalitet",
+  "tr": "En düşük kalitede bile hedef boyutu aşıyor",
+  "id": "Melebihi ukuran target bahkan pada kualitas terendah",
+  "th": "แม้ใช้คุณภาพต่ำสุดก็ยังเกินขนาดเป้าหมาย",
+  "vi": "Ngay cả ở chất lượng thấp nhất vẫn vượt kích thước đích",
+  "zh-TW": "即使最低品質也超過目標大小",
+  "ar": "ما زال يتجاوز الحجم المستهدف حتى عند أدنى جودة",
+  "fa": "حتی با کمترین کیفیت هم از حجم هدف بیشتر است"
+ },
+ "저장": {
+  "en": "Save",
+  "zh": "保存",
+  "ja": "保存",
+  "es": "Guardar",
+  "hi": "सहेजें",
+  "fr": "Enregistrer",
+  "de": "Speichern",
+  "pt": "Salvar",
+  "it": "Salva",
+  "nl": "Opslaan",
+  "ru": "Сохранить",
+  "uk": "Зберегти",
+  "pl": "Zapisz",
+  "cs": "Uložit",
+  "hu": "Mentés",
+  "ro": "Salvează",
+  "da": "Gem",
+  "fi": "Tallenna",
+  "nb": "Lagre",
+  "sv": "Spara",
+  "tr": "Kaydet",
+  "id": "Simpan",
+  "th": "บันทึก",
+  "vi": "Lưu",
+  "zh-TW": "儲存",
+  "ar": "حفظ",
+  "fa": "ذخیره"
+ }
+});
+
+</script>
+<style>.nx-back{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9999;display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:999px;background:rgba(10,16,34,.85);border:1px solid rgba(45,212,191,.55);color:#E2F3FF;font-size:15.5px;font-weight:600;text-decoration:none;backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,.35)}.nx-back:active{filter:brightness(1.6)}</style>
+<a class="nx-back" href="https://nexus-2e23d.web.app/#n02" aria-label="현황판으로 돌아가기">← 돌아가기</a>
+
+<script>
+/* NX-I18N-SUPPLEMENT — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "예: 800": {
+  "en": "e.g. 800",
+  "zh": "例如：800",
+  "zh-TW": "例如：800",
+  "ja": "例：800",
+  "es": "Ej.: 800",
+  "hi": "जैसे: 800",
+  "fr": "Ex. : 800",
+  "de": "z. B. 800",
+  "pt": "Ex.: 800",
+  "it": "Es.: 800",
+  "ru": "Пример: 800",
+  "uk": "Приклад: 800",
+  "ar": "مثال: 800",
+  "fa": "مثال: 800",
+  "th": "เช่น: 800",
+  "vi": "Ví dụ: 800",
+  "id": "Mis.: 800",
+  "tr": "Örn: 800",
+  "nl": "Bijv.: 800",
+  "pl": "Np.: 800",
+  "sv": "T.ex.: 800",
+  "da": "F.eks.: 800",
+  "nb": "F.eks.: 800",
+  "fi": "Esim.: 800",
+  "cs": "Např.: 800",
+  "hu": "Pl.: 800",
+  "ro": "Ex.: 800"
+ },
+ "변환하면 자동 저장": {
+  "en": "Auto-saves when converted",
+  "zh": "转换后自动保存",
+  "zh-TW": "轉換後自動儲存",
+  "ja": "変換すると自動保存",
+  "es": "Se guarda automáticamente al convertir",
+  "hi": "बदलने पर अपने आप सहेजा जाता है",
+  "fr": "Enregistrement automatique après conversion",
+  "de": "Wird nach dem Umwandeln automatisch gespeichert",
+  "pt": "Salva automaticamente ao converter",
+  "it": "Salvataggio automatico dopo la conversione",
+  "ru": "Сохраняется автоматически при преобразовании",
+  "uk": "Зберігається автоматично під час перетворення",
+  "ar": "يُحفظ تلقائيًا عند التحويل",
+  "fa": "هنگام تبدیل به طور خودکار ذخیره می شود",
+  "th": "บันทึกอัตโนมัติเมื่อแปลง",
+  "vi": "Tự động lưu khi chuyển đổi",
+  "id": "Tersimpan otomatis saat dikonversi",
+  "tr": "Dönüştürünce otomatik kaydedilir",
+  "nl": "Wordt automatisch opgeslagen bij converteren",
+  "pl": "Zapisuje automatycznie po konwersji",
+  "sv": "Sparas automatiskt vid konvertering",
+  "da": "Gemmes automatisk ved konvertering",
+  "nb": "Lagres automatisk ved konvertering",
+  "fi": "Tallennetaan automaattisesti muunnettaessa",
+  "cs": "Při převodu se automaticky uloží",
+  "hu": "Átalakításkor automatikusan mentődik",
+  "ro": "Se salvează automat la conversie"
+ },
+ "← 돌아가기": {
+  "en": "← Back",
+  "zh": "← 返回",
+  "zh-TW": "← 返回",
+  "ja": "← 戻る",
+  "es": "← Volver",
+  "hi": "← वापस",
+  "fr": "← Retour",
+  "de": "← Zurück",
+  "pt": "← Voltar",
+  "it": "← Indietro",
+  "ru": "← Назад",
+  "uk": "← Назад",
+  "ar": "← رجوع",
+  "fa": "← بازگشت",
+  "th": "← กลับ",
+  "vi": "← Quay lại",
+  "id": "← Kembali",
+  "tr": "← Geri dön",
+  "nl": "← Terug",
+  "pl": "← Wstecz",
+  "sv": "← Tillbaka",
+  "da": "← Tilbage",
+  "nb": "← Tilbake",
+  "fi": "← Takaisin",
+  "cs": "← Zpět",
+  "hu": "← Vissza",
+  "ro": "← Înapoi"
+ }
+});
+</script>
+
+<script>
+/* NX-I18N-SUPPLEMENT-R3 — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "예: 여권 사진 크기로 바꿔줘": {
+  "en": "e.g. Change it to passport photo size",
+  "zh": "例如：改成护照照片大小",
+  "zh-TW": "例如：改成護照照片大小",
+  "ja": "例：パスポート写真サイズに変えて",
+  "es": "Ej.: Cámbialo al tamaño de foto de pasaporte",
+  "hi": "जैसे: पासपोर्ट फ़ोटो के आकार में बदल दो",
+  "fr": "Ex. : Mets-la au format photo de passeport",
+  "de": "Z. B.: Ändere sie auf Passfotogröße",
+  "pt": "Ex.: Altere para o tamanho de foto de passaporte",
+  "it": "Es.: Cambiala in formato foto tessera",
+  "ru": "Например: измени на размер фото для паспорта",
+  "uk": "Наприклад: зміни на розмір фото для паспорта",
+  "ar": "مثال: غيّرها إلى حجم صورة جواز السفر",
+  "fa": "مثال: به اندازه عکس گذرنامه تغییرش بده",
+  "th": "เช่น: เปลี่ยนเป็นขนาดภาพหนังสือเดินทางให้หน่อย",
+  "vi": "Ví dụ: Đổi thành kích thước ảnh hộ chiếu",
+  "id": "Mis.: Ubah menjadi ukuran foto paspor",
+  "tr": "Örn: Pasaport fotoğrafı boyutuna çevir",
+  "nl": "Bijv.: Zet het om in pasfotogrootte",
+  "pl": "Np.: Zmień na rozmiar zdjęcia paszportowego",
+  "sv": "T.ex.: Ändra till passfotos storlek",
+  "da": "F.eks.: Skift til pasfotostørrelse",
+  "nb": "F.eks.: Endre til passbildestørrelse",
+  "fi": "Esim.: Muuta passikuvan kokoon",
+  "cs": "Např.: Změň na velikost pasové fotografie",
+  "hu": "Pl.: Változtassa útlevélkép méretre",
+  "ro": "De ex.: Schimbă la dimensiunea fotografiei de pașaport"
+ },
+ "· 변환이 끝나면 결과가 자동으로 한 번 저장됩니다. 다시 받으려면 결과 카드의 다시 저장 버튼을 누르세요.": {
+  "en": "· When conversion finishes, the result is saved automatically once. To download it again, press the Save Again button on the result card.",
+  "zh": "· 转换完成后，结果会自动保存一次。如需再次下载，请点击结果卡片上的再次保存按钮。",
+  "zh-TW": "· 轉換完成後，結果會自動儲存一次。如需再次取得，請點選結果卡片上的再次儲存按鈕。",
+  "ja": "· 変換が終わると、結果が自動で一度保存されます。再度受け取るには、結果カードの再保存ボタンを押してください。",
+  "es": "· Cuando finalice la conversión, el resultado se guardará automáticamente una vez. Para obtenerlo de nuevo, pulse el botón de guardar de nuevo en la tarjeta de resultados.",
+  "hi": "· रूपांतरण समाप्त होने पर परिणाम अपने आप एक बार सहेजा जाएगा। इसे फिर से प्राप्त करने के लिए परिणाम कार्ड पर फिर से सहेजें बटन दबाएँ।",
+  "fr": "· Une fois la conversion terminée, le résultat est enregistré automatiquement une fois. Pour le télécharger à nouveau, appuyez sur le bouton Réenregistrer de la carte de résultat.",
+  "de": "· Nach der Umwandlung wird das Ergebnis automatisch einmal gespeichert. Um es erneut herunterzuladen, tippen Sie auf der Ergebniskarte auf „Erneut speichern“.",
+  "pt": "· Quando a conversão termina, o resultado é salvo automaticamente uma vez. Para baixá-lo novamente, toque no botão Salvar novamente no cartão de resultado.",
+  "it": "· Al termine della conversione, il risultato viene salvato automaticamente una volta. Per scaricarlo di nuovo, tocca il pulsante Salva di nuovo nella scheda del risultato.",
+  "ru": "· Когда преобразование завершится, результат один раз сохранится автоматически. Чтобы получить его снова, нажмите кнопку повторного сохранения на карточке результата.",
+  "uk": "· Коли перетворення завершиться, результат один раз збережеться автоматично. Щоб отримати його знову, натисніть кнопку повторного збереження на картці результату.",
+  "ar": "· عند انتهاء التحويل، تُحفظ النتيجة تلقائيًا مرة واحدة. وللحصول عليها مجددًا، اضغط زر الحفظ مجددًا في بطاقة النتيجة.",
+  "fa": "· وقتی تبدیل تمام شود، نتیجه یک بار به‌طور خودکار ذخیره می‌شود. برای دریافت دوباره، دکمه ذخیره مجدد را در کارت نتیجه بزنید.",
+  "th": "· เมื่อแปลงเสร็จ ผลลัพธ์จะถูกบันทึกโดยอัตโนมัติหนึ่งครั้ง หากต้องการรับอีกครั้ง ให้กดปุ่มบันทึกอีกครั้งในการ์ดผลลัพธ์",
+  "vi": "· Khi chuyển đổi xong, kết quả sẽ tự động được lưu một lần. Để nhận lại, hãy nhấn nút lưu lại trên thẻ kết quả.",
+  "id": "· Setelah konversi selesai, hasil akan tersimpan otomatis satu kali. Untuk mengambilnya lagi, tekan tombol simpan lagi pada kartu hasil.",
+  "tr": "· Dönüştürme bitince sonuç otomatik olarak bir kez kaydedilir. Tekrar almak için sonuç kartındaki tekrar kaydet düğmesine basın.",
+  "nl": "· Zodra de conversie klaar is, wordt het resultaat automatisch één keer opgeslagen. Druk op de knop Opnieuw opslaan op de resultaatkaart om het opnieuw te downloaden.",
+  "pl": "· Po zakończeniu konwersji wynik zostanie automatycznie zapisany jeden raz. Aby pobrać go ponownie, naciśnij przycisk Zapisz ponownie na karcie wyniku.",
+  "sv": "· När konverteringen är klar sparas resultatet automatiskt en gång. Tryck på knappen Spara igen på resultatkortet om du vill hämta det igen.",
+  "da": "· Når konverteringen er færdig, gemmes resultatet automatisk én gang. Tryk på knappen Gem igen på resultatkortet for at hente det igen.",
+  "nb": "· Når konverteringen er ferdig, lagres resultatet automatisk én gang. Trykk på Lagre på nytt-knappen på resultatkortet for å laste det ned igjen.",
+  "fi": "· Kun muunnos on valmis, tulos tallennetaan automaattisesti kerran. Jos haluat ladata sen uudelleen, paina tuloskortin Tallenna uudelleen -painiketta.",
+  "cs": "· Po dokončení převodu se výsledek automaticky jednou uloží. Chcete-li jej stáhnout znovu, stiskněte tlačítko Uložit znovu na kartě výsledku.",
+  "hu": "· A konvertálás befejezése után az eredmény automatikusan egyszer mentésre kerül. Újbóli letöltéshez nyomja meg az eredménykártyán az Újra mentés gombot.",
+  "ro": "· După finalizarea conversiei, rezultatul este salvat automat o dată. Pentru a-l descărca din nou, apăsați butonul Salvează din nou de pe cardul cu rezultat."
+ }
+});
+</script>
+</body>
+</html>

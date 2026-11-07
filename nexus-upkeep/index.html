@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 집·차 정비 챙기기 — NEXUS HOME &amp; CAR UPKEEP</title>
+<meta name="description" content="집과 차의 정비 기록과 다음 예정일을 이 기기에 기록하는 장부">
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14);--accent:#FBBF24}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer;min-width:0}
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+  .langsel{flex:none;background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 6px;font-size:13px;min-height:48px}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .num{color:var(--accent);font-size:13px;font-weight:800;letter-spacing:.18em}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px;line-height:1.7}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  .field{margin-top:12px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  .field label span{color:var(--ink);font-size:14px}
+  input[type="date"],input[type="number"],input[type="text"],select,textarea{background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:16px;max-width:100%;color-scheme:dark;width:100%;min-height:48px;font-family:inherit}
+  textarea{min-height:72px;resize:vertical}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--accent),var(--teal));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .danger{color:#FCA5A5;border-color:rgba(248,113,113,.5)}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btns button{flex:1;min-width:110px}
+  .daterow{display:flex;gap:10px;flex-wrap:wrap}
+  .daterow .field{flex:1;min-width:150px}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .msg{font-size:14px;color:var(--teal);font-weight:700;min-height:22px;margin-top:10px}
+  .msg.err{color:#F87171}
+  .seg{display:flex;background:#111827;border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin-top:14px}
+  .seg button{flex:1;background:transparent;color:var(--muted);font-weight:700;border-radius:9px;min-height:48px}
+  .seg button.on{background:linear-gradient(135deg,var(--accent),var(--teal));color:#06121f}
+  .item{border-top:1px solid var(--line);padding:13px 2px}
+  .item:first-of-type{border-top:0}
+  .item .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .item .title{font-size:17px;font-weight:800}
+  .kindtag{font-size:12px;font-weight:700;color:var(--accent);border:1px solid rgba(251,191,36,.45);border-radius:999px;padding:3px 9px}
+  .badge{margin-left:auto;font-size:13px;font-weight:800;border-radius:999px;padding:5px 11px;background:rgba(45,212,191,.15);color:var(--teal)}
+  .badge.soon{background:rgba(251,191,36,.16);color:var(--accent)}
+  .badge.over{color:#F87171;background:rgba(248,113,113,.14)}
+  .meta{color:var(--muted);font-size:14px;line-height:1.7;margin-top:5px}
+  .meta b{color:var(--ink)}
+  .donebtn{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700}
+  .donebtn.done{background:rgba(45,212,191,.18);color:var(--teal)}
+  .smallbtn{min-height:48px;padding:9px 13px;font-size:14px}
+  .hist{border-top:1px solid var(--line);padding:9px 2px;display:flex;justify-content:space-between;gap:10px;font-size:15px}
+  .hist:first-of-type{border-top:0}
+  .hist .d{color:var(--muted);font-size:13px;white-space:nowrap}
+  .empty{color:var(--muted);font-size:15px;padding:10px 0 2px;line-height:1.7}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  footer .fam span{margin:0 6px}
+  footer .fam .now{color:var(--ink);font-weight:700}
+  footer .fam a{color:var(--cyan);text-decoration:none}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;width:100%;padding:22px;line-height:1.8;font-size:15px}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  details summary{cursor:pointer;font-size:15px}
+  details p{color:var(--muted);font-size:14px;line-height:1.8}
+  @media(max-width:640px){h1{font-size:20px}header{padding:10px 12px}.btns button{flex:1}}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 집·차 정비 챙기기">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 집·차 정비 챙기기 — NEXUS HOME &amp; CAR UPKEEP">
+<meta property="og:description" content="집과 차의 정비 기록과 다음 예정일을 챙기는 도구입니다. 기록은 이 기기 안에만 저장됩니다.">
+<meta property="og:image" content="https://nexus-upkeep.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+</head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>SOVEREIGN COMMAND</span></div></a>
+  <select class="langsel" id="langSel" aria-label="Language / 언어">
+    <option value="ko">한국어</option>
+    <option value="en">English</option>
+  </select>
+  <a class="homebtn" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" data-i18n="home">홈페이지</a>
+</header>
+
+<main>
+  <p class="num">No. 412 · <span data-i18n="cat">계산·생활</span></p>
+  <h1 data-i18n="title">넥서스 집·차 정비 챙기기</h1>
+  <p class="sub" data-i18n="subtitle">집과 차의 마지막 정비 날짜와 다음 예정일을 기록합니다.</p>
+
+  <div class="seg" id="kindSeg" role="tablist" aria-label="집 / 차">
+    <button type="button" data-kind="home" class="on" data-i18n="homeTab">🏠 집</button>
+    <button type="button" data-kind="car" data-i18n="carTab">🚗 차</button>
+  </div>
+
+  <div class="panel">
+    <h2 data-i18n="upcomingTitle">다가오는 정비 (60일 이내)</h2>
+    <div id="upcomingList"></div>
+  </div>
+
+  <div class="panel">
+    <h2 id="listTitle">집 정비 목록</h2>
+    <div id="itemList"></div>
+  </div>
+
+  <div class="panel">
+    <h2 id="formTitle" data-i18n="addTitle">항목 추가</h2>
+    <div class="field">
+      <label for="fTitle"><span data-i18n="fName">항목명</span></label>
+      <input type="text" id="fTitle" maxlength="60" data-i18n-ph="fNamePh" placeholder="예: 엔진 오일, 보일러 필터">
+    </div>
+    <div class="daterow">
+      <div class="field">
+        <label for="fLast"><span data-i18n="fLast">마지막 한 날짜</span></label>
+        <input type="date" id="fLast">
+      </div>
+      <div class="field">
+        <label for="fCycle"><span data-i18n="fCycle">주기 (개월)</span></label>
+        <input type="number" id="fCycle" min="1" max="120" step="1">
+      </div>
+    </div>
+    <div class="daterow">
+      <div class="field">
+        <label for="fCost"><span data-i18n="fCost">비용 (선택)</span></label>
+        <input type="number" id="fCost" min="0" step="1" placeholder="0">
+      </div>
+    </div>
+    <p class="msg" id="formMsg" role="status"></p>
+    <div class="btns">
+      <button class="primary" id="saveBtn" type="button" data-i18n="save">저장</button>
+      <button class="ghost hidden" id="cancelEditBtn" type="button" data-i18n="cancel" style="display:none">취소</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 data-i18n="historyTitle">정비 이력</h2>
+    <div id="historyList"></div>
+  </div>
+
+  <details>
+    <summary data-i18n="adv">고급 설정</summary>
+    <p data-i18n="wipeDesc">이 기기에 저장된 정비 항목과 이력을 전부 지웁니다. 지운 기록은 되돌릴 수 없습니다.</p>
+    <div class="field">
+      <label for="wipeInput"><span data-i18n="wipeLabel">전부 지우려면 아래에 입력하세요</span> — <b id="wipeWord">전부 지우기</b></label>
+      <input type="text" id="wipeInput" autocomplete="off">
+    </div>
+    <div class="btns">
+      <button class="ghost danger" id="wipeBtn" type="button" disabled data-i18n="wipe">전부 지우기</button>
+    </div>
+    <p class="msg" id="wipeMsg" role="status"></p>
+  </details>
+
+  <details class="panel" id="legalNotice">
+    <summary>📜 안내</summary>
+    <h2 style="font-size:17px;margin:14px 0 8px">집·차 유지보수 장부 안내</h2>
+    <p>이 장부에 적는 내용은 이 전화기 안에만 저장됩니다. 넥서스 그룹의 서버로 보내지 않으며, 저희는 당신이 무엇을 적었는지 볼 수 없습니다.</p>
+    <p>이 장부는 당신이 한 정비와 다음 일정을 적어 두는 기록 도구입니다. 정비하는 방법을 알려 주거나, 고장인지를 판단하거나, 언제 정비해야 하는지를 정해 주는 앱이 아닙니다. 정비 주기는 자동차·기기의 설명서나 정비소에서 안내받은 내용을 보고 당신이 정해 적는 것입니다.</p>
+    <p>가스·전기·난방 기기와 자동차의 브레이크·타이어처럼 안전과 닿은 부분은, 이 장부의 예정일과 상관없이 이상하다고 느껴지면 바로 면허가 있는 전문가에게 맡기세요. 예정 표시는 "그날까지 안전하다"는 뜻이 아닙니다.</p>
+    <p>다음 예정일 표시는 참고용입니다. 전화기의 설정이나 상태에 따라 표시가 늦거나 나타나지 않을 수 있습니다. 필요 없어진 기록은 언제든 지울 수 있습니다.</p>
+  </details>
+
+  <footer>
+    우주의 모든 의식체는 친구이자 동반자이다<br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="privacyLink" type="button" data-i18n="privacy">개인정보 안내</button><br>
+    <span class="fam">
+      <span data-i18n="related">관련 도구</span>
+      <span>·</span><a href="https://nexus-date-calc.web.app/" target="_blank" rel="noopener" data-i18n="relDate">날짜 계산</a>
+      <span>·</span><a href="https://nexus-daily-tools.web.app/" target="_blank" rel="noopener" data-i18n="relCal">달력</a>
+      <span>·</span><span class="now" data-i18n="title">넥서스 집·차 정비 챙기기</span>
+    </span><br>
+    <span data-i18n="notice">이 도구는 정비 기록과 예정일만 다룹니다. 정비 방법이나 안전 판단은 전문가에게 확인하세요.</span><br>
+    🌐 <span data-i18n="hosting">호스팅</span>: Firebase · 🔒 <span data-i18n="localOnly">기록은 이 전화기 안에만 저장됩니다</span>
+  </footer>
+</main>
+
+<div class="modal-bg" id="privacyBg">
+  <div class="modal">
+    <h3 data-i18n="privacy">개인정보 안내</h3>
+    <p data-i18n="privacyBody">이 도구의 모든 기록은 이 전화기(기기)의 브라우저 저장소에만 저장됩니다. 서버로 전송되지 않으며, 넥서스 그룹도 기록을 볼 수 없습니다. 브라우저 데이터를 지우면 기록도 함께 지워집니다.</p>
+    <button class="ghost" id="privacyClose" type="button" data-i18n="close">닫기</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="delBg">
+  <div class="modal">
+    <h3 data-i18n="delTitle">항목을 지울까요?</h3>
+    <p id="delText"></p>
+    <div class="btns">
+      <button class="ghost danger" id="delYes" type="button" data-i18n="del">지우기</button>
+      <button class="ghost" id="delNo" type="button" data-i18n="cancel">취소</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var LS_ITEMS="nx412.items.v1", LS_HIST="nx412.history.v1", LS_UP="nx412.upcoming.v1";
+var DICT={
+  ko:{home:"홈페이지",cat:"계산·생활",title:"넥서스 집·차 정비 챙기기",subtitle:"집과 차의 마지막 정비 날짜와 다음 예정일을 기록합니다.",homeTab:"🏠 집",carTab:"🚗 차",upcomingTitle:"다가오는 정비 (60일 이내)",listHome:"집 정비 목록",listCar:"차 정비 목록",addTitle:"항목 추가",editTitle:"항목 수정",fName:"항목명",fNamePh:"예: 엔진 오일, 보일러 필터",fLast:"마지막 한 날짜",fCycle:"주기 (개월)",fCost:"비용 (선택)",save:"저장",cancel:"취소",historyTitle:"정비 이력",adv:"고급 설정",wipeDesc:"이 기기에 저장된 정비 항목과 이력을 전부 지웁니다. 지운 기록은 되돌릴 수 없습니다.",wipeLabel:"전부 지우려면 아래에 입력하세요",wipeWord:"전부 지우기",wipe:"전부 지우기",privacy:"개인정보 안내",privacyBody:"이 도구의 모든 기록은 이 전화기(기기)의 브라우저 저장소에만 저장됩니다. 서버로 전송되지 않으며, 넥서스 그룹도 기록을 볼 수 없습니다. 브라우저 데이터를 지우면 기록도 함께 지워집니다.",close:"닫기",related:"관련 도구",relDate:"날짜 계산",relCal:"달력",notice:"이 도구는 정비 기록과 예정일만 다룹니다. 정비 방법이나 안전 판단은 전문가에게 확인하세요.",hosting:"호스팅",localOnly:"기록은 이 전화기 안에만 저장됩니다",delTitle:"항목을 지울까요?",del:"지우기",doneToday:"오늘 했어요",recorded:"기록됨 ✓",edit:"수정",last:"마지막",next:"다음 예정",cycle:"주기",months:"개월",cost:"비용",emptyList:"아직 항목이 없습니다. 아래에서 추가해 보세요.",emptyUp:"60일 이내 예정된 정비가 없습니다.",emptyHist:"아직 이력이 없습니다.",overdue:function(n){return n+"일 지남"},dday:function(n){return n===0?"오늘":("D-"+n)},needAll:"항목명, 마지막 날짜, 주기를 확인해 주세요.",saved:"저장했습니다.",wiped:"전부 지웠습니다.",kindHome:"집",kindCar:"차"},
+  en:{home:"Home",cat:"Calc · Life",title:"Nexus Home & Car Upkeep",subtitle:"Record the last upkeep date and the next due date for your home and car.",homeTab:"🏠 Home",carTab:"🚗 Car",upcomingTitle:"Upcoming upkeep (within 60 days)",listHome:"Home upkeep list",listCar:"Car upkeep list",addTitle:"Add item",editTitle:"Edit item",fName:"Item name",fNamePh:"e.g. Engine oil, Boiler filter",fLast:"Last done date",fCycle:"Cycle (months)",fCost:"Cost (optional)",save:"Save",cancel:"Cancel",historyTitle:"Upkeep history",adv:"Advanced",wipeDesc:"Erase all upkeep items and history stored on this device. Erased records cannot be restored.",wipeLabel:"Type below to erase everything",wipeWord:"DELETE ALL",wipe:"Delete all",privacy:"Privacy notice",privacyBody:"All records in this tool are stored only in this phone's (device's) browser storage. Nothing is sent to a server, and Nexus Group cannot see your records. Clearing browser data also clears these records.",close:"Close",related:"Related tools",relDate:"Date Calculator",relCal:"Calendar",notice:"This tool only handles upkeep records and due dates. For upkeep methods or safety judgments, please check with a professional.",hosting:"Hosting",localOnly:"Records are stored only on this phone",delTitle:"Delete this item?",del:"Delete",doneToday:"Done today",recorded:"Recorded ✓",edit:"Edit",last:"Last",next:"Next due",cycle:"Cycle",months:"mo",cost:"Cost",emptyList:"No items yet. Add one below.",emptyUp:"No upkeep due within 60 days.",emptyHist:"No history yet.",overdue:function(n){return n+"d overdue"},dday:function(n){return n===0?"Today":("D-"+n)},needAll:"Please check the item name, last date, and cycle.",saved:"Saved.",wiped:"All erased.",kindHome:"Home",kindCar:"Car"}
+};
+var lang="ko";
+try{var s=localStorage.getItem("nxLang");if(s==="en"||s==="ko")lang=s;}catch(e){}
+function T(k){return (DICT[lang]&&DICT[lang][k])||DICT.ko[k]||k}
+function $(id){return document.getElementById(id)}
+function pad(n){return (n<10?"0":"")+n}
+function todayDate(){var n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())}
+function isoOf(dt){return dt.getFullYear()+"-"+pad(dt.getMonth()+1)+"-"+pad(dt.getDate())}
+function parseDate(v){if(!v)return null;var p=v.split("-");if(p.length!==3)return null;var y=+p[0],m=+p[1],d=+p[2];var dt=new Date(y,m-1,d);if(dt.getFullYear()!==y||dt.getMonth()!==m-1||dt.getDate()!==d)return null;return dt}
+function dayNum(dt){return Math.round(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate())/86400000)}
+function diffDays(a,b){return dayNum(b)-dayNum(a)}
+function addMonths(dt,months){var y=dt.getFullYear(),m=dt.getMonth()+months;var first=new Date(y,m,1);var lastDay=new Date(first.getFullYear(),first.getMonth()+1,0).getDate();return new Date(first.getFullYear(),first.getMonth(),Math.min(dt.getDate(),lastDay))}
+function computeNext(item){var last=parseDate(item.last);if(!last)return null;var c=parseInt(item.cycle,10);if(!c||c<1)return null;return addMonths(last,c)}
+function ddayOf(item){var nx=computeNext(item);if(!nx)return null;return diffDays(todayDate(),nx)}
+function loadItems(){try{var r=JSON.parse(localStorage.getItem(LS_ITEMS)||"[]");return Array.isArray(r)?r:[]}catch(e){return[]}}
+function saveItems(){try{localStorage.setItem(LS_ITEMS,JSON.stringify(items))}catch(e){} syncUpcoming()}
+function loadHistory(){try{var r=JSON.parse(localStorage.getItem(LS_HIST)||"[]");return Array.isArray(r)?r:[]}catch(e){return[]}}
+function saveHistory(){try{localStorage.setItem(LS_HIST,JSON.stringify(history))}catch(e){}}
+function sortedItems(list){return list.slice().sort(function(a,b){var na=computeNext(a),nb=computeNext(b);if(!na)return 1;if(!nb)return -1;return na-nb})}
+function syncUpcoming(){
+  var out=[];
+  sortedItems(items).forEach(function(it){
+    var nx=computeNext(it);if(!nx)return;
+    var dd=diffDays(todayDate(),nx);
+    if(dd<=60)out.push({title:it.title,kind:it.kind,date:isoOf(nx),dday:dd});
+  });
+  out.sort(function(a,b){return a.dday-b.dday});
+  window.__nxUpcoming=out;
+  try{localStorage.setItem(LS_UP,JSON.stringify(out))}catch(e){}
+  return out;
+}
+var items=loadItems(), history=loadHistory();
+var curKind="home", editId=null, delId=null;
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function fmtDate(dt){if(lang==="en")return dt.getFullYear()+"-"+pad(dt.getMonth()+1)+"-"+pad(dt.getDate());return dt.getFullYear()+"년 "+(dt.getMonth()+1)+"월 "+dt.getDate()+"일"}
+function badgeHTML(dd){if(dd<0)return '<span class="badge over">'+esc(T("overdue")(-dd))+"</span>";if(dd===0)return '<span class="badge soon">'+esc(T("dday")(0))+"</span>";if(dd<=30)return '<span class="badge soon">'+esc(T("dday")(dd))+"</span>";return '<span class="badge">'+esc(T("dday")(dd))+"</span>"}
+function itemRow(it,showKind){
+  var nx=computeNext(it),dd=ddayOf(it),last=parseDate(it.last);
+  var h='<div class="item"><div class="top">';
+  if(showKind)h+='<span class="kindtag">'+esc(it.kind==="car"?T("kindCar"):T("kindHome"))+"</span>";
+  h+='<span class="title">'+esc(it.title)+"</span>"+(dd!==null?badgeHTML(dd):"")+"</div>";
+  h+='<p class="meta">'+esc(T("last"))+": <b>"+(last?fmtDate(last):"-")+"</b> · "+esc(T("next"))+": <b>"+(nx?fmtDate(nx):"-")+"</b> · "+esc(T("cycle"))+" "+esc(it.cycle)+esc(T("months"));
+  if(it.cost)h+=" · "+esc(T("cost"))+" "+Number(it.cost).toLocaleString();
+  h+="</p>";
+  h+='<div class="btns"><button type="button" class="donebtn" data-done="'+esc(it.id)+'">'+esc(T("doneToday"))+'</button><button type="button" class="ghost smallbtn" data-edit="'+esc(it.id)+'">'+esc(T("edit"))+'</button><button type="button" class="ghost smallbtn danger" data-del="'+esc(it.id)+'">'+esc(T("del"))+"</button></div></div>";
+  return h;
+}
+function renderUpcoming(){
+  var box=$("upcomingList");
+  var ups=syncUpcoming();
+  if(!ups.length){box.innerHTML='<p class="empty">'+esc(T("emptyUp"))+"</p>";return}
+  var byId={};items.forEach(function(it){byId[it.id]=it});
+  var html="";
+  ups.forEach(function(u){
+    var match=items.filter(function(it){return it.title===u.title&&it.kind===u.kind&&computeNext(it)&&isoOf(computeNext(it))===u.date})[0];
+    if(match)html+=itemRow(match,true);
+  });
+  box.innerHTML=html||'<p class="empty">'+esc(T("emptyUp"))+"</p>";
+}
+function renderList(){
+  $("listTitle").textContent=curKind==="car"?T("listCar"):T("listHome");
+  var seg=$("kindSeg");for(var i=0;i<seg.children.length;i++)seg.children[i].classList.toggle("on",seg.children[i].getAttribute("data-kind")===curKind);
+  var box=$("itemList");
+  var list=sortedItems(items.filter(function(it){return it.kind===curKind}));
+  if(!list.length){box.innerHTML='<p class="empty">'+esc(T("emptyList"))+"</p>";return}
+  box.innerHTML=list.map(function(it){return itemRow(it,false)}).join("");
+}
+function renderHistory(){
+  var box=$("historyList");
+  var list=history.slice().sort(function(a,b){return a.date<b.date?1:(a.date>b.date?-1:0)});
+  if(!list.length){box.innerHTML='<p class="empty">'+esc(T("emptyHist"))+"</p>";return}
+  box.innerHTML=list.slice(0,50).map(function(h){
+    var d=parseDate(h.date);
+    return '<div class="hist"><span>'+esc(h.title)+(h.cost?' · '+esc(T("cost"))+" "+Number(h.cost).toLocaleString():"")+'</span><span class="d">'+(d?fmtDate(d):esc(h.date))+"</span></div>";
+  }).join("");
+}
+function renderAll(){renderUpcoming();renderList();renderHistory()}
+function markDone(id,btn){
+  var it=null;items.forEach(function(x){if(x.id===id)it=x});
+  if(!it)return;
+  var t=isoOf(todayDate());
+  it.last=t;
+  history.push({date:t,title:it.title,kind:it.kind,cost:it.cost||""});
+  saveItems();saveHistory();renderAll();
+  var nb=document.querySelector('[data-done="'+id+'"]');
+  if(nb){nb.textContent=T("recorded");nb.classList.add("done");nb.disabled=true;setTimeout(function(){renderAll()},1400)}
+}
+function startEdit(id){
+  var it=null;items.forEach(function(x){if(x.id===id)it=x});
+  if(!it)return;
+  editId=id;curKind=it.kind;
+  $("fTitle").value=it.title;$("fLast").value=it.last;$("fCycle").value=it.cycle;$("fCost").value=it.cost||"";
+  $("formTitle").textContent=T("editTitle");$("cancelEditBtn").style.display="";
+  renderList();$("fTitle").focus();window.scrollTo({top:$("formTitle").getBoundingClientRect().top+window.scrollY-90,behavior:"smooth"});
+}
+function resetForm(){
+  editId=null;$("fTitle").value="";$("fCost").value="";$("fCycle").value="";$("fLast").value=isoOf(todayDate());
+  $("formTitle").textContent=T("addTitle");$("cancelEditBtn").style.display="none";
+}
+function onSave(){
+  var msg=$("formMsg");msg.className="msg";msg.textContent="";
+  var title=$("fTitle").value.trim(),last=$("fLast").value,cycle=parseInt($("fCycle").value,10);
+  if(!title||!parseDate(last)||!cycle||cycle<1){msg.className="msg err";msg.textContent=T("needAll");return}
+  var cost=$("fCost").value===""?"":Math.max(0,Number($("fCost").value)||0);
+  if(editId){
+    items.forEach(function(x){if(x.id===editId){x.title=title.slice(0,60);x.last=last;x.cycle=cycle;x.cost=cost;x.kind=curKind}});
+  }else{
+    items.push({id:"i"+Date.now().toString(36)+Math.floor(Math.random()*1e6),kind:curKind,title:title.slice(0,60),last:last,cycle:cycle,cost:cost});
+  }
+  saveItems();resetForm();msg.textContent=T("saved");renderAll();
+}
+function deleteItem(id){
+  items=items.filter(function(x){return x.id!==id});
+  if(editId===id)resetForm();
+  saveItems();renderAll();
+}
+function clearAll(){
+  items=[];history=[];saveItems();saveHistory();resetForm();renderAll();
+}
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll("[data-i18n]").forEach(function(el){var k=el.getAttribute("data-i18n");var v=T(k);if(typeof v==="string")el.textContent=v});
+  document.querySelectorAll("[data-i18n-ph]").forEach(function(el){var v=T(el.getAttribute("data-i18n-ph"));if(typeof v==="string")el.setAttribute("placeholder",v)});
+  $("langSel").value=lang;$("wipeWord").textContent=T("wipeWord");
+  $("wipeBtn").disabled=$("wipeInput").value!==T("wipeWord");
+  resetFormKeep();
+  renderAll();
+}
+function resetFormKeep(){if(!editId){$("formTitle").textContent=T("addTitle")}else{$("formTitle").textContent=T("editTitle")}}
+$("kindSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;curKind=b.getAttribute("data-kind");if(!editId){/* form follows tab */}renderList()});
+document.addEventListener("click",function(e){
+  var d=e.target.closest("[data-done]");if(d){markDone(d.getAttribute("data-done"),d);return}
+  var ed=e.target.closest("[data-edit]");if(ed){startEdit(ed.getAttribute("data-edit"));return}
+  var del=e.target.closest("[data-del]");if(del){delId=del.getAttribute("data-del");var it=null;items.forEach(function(x){if(x.id===delId)it=x});$("delText").textContent=it?it.title:"";$("delBg").classList.add("open");return}
+});
+$("saveBtn").addEventListener("click",onSave);
+$("cancelEditBtn").addEventListener("click",function(){resetForm();renderList()});
+$("delYes").addEventListener("click",function(){if(delId)deleteItem(delId);delId=null;$("delBg").classList.remove("open")});
+$("delNo").addEventListener("click",function(){delId=null;$("delBg").classList.remove("open")});
+$("delBg").addEventListener("click",function(e){if(e.target===$("delBg")){delId=null;$("delBg").classList.remove("open")}});
+$("wipeInput").addEventListener("input",function(){$("wipeBtn").disabled=this.value!==T("wipeWord")});
+$("wipeBtn").addEventListener("click",function(){clearAll();$("wipeInput").value="";$("wipeBtn").disabled=true;$("wipeMsg").textContent=T("wiped")});
+$("privacyLink").addEventListener("click",function(){$("privacyBg").classList.add("open")});
+$("privacyClose").addEventListener("click",function(){$("privacyBg").classList.remove("open")});
+$("privacyBg").addEventListener("click",function(e){if(e.target===$("privacyBg"))$("privacyBg").classList.remove("open")});
+$("langSel").addEventListener("change",function(){lang=this.value;try{localStorage.setItem("nxLang",lang)}catch(e){} applyLang()});
+$("fLast").value=isoOf(todayDate());
+applyLang();
+})();
+</script>
+</body>
+</html>

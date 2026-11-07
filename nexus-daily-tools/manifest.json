@@ -1,0 +1,1 @@
+{"background_color":"#0B0F19","description":"계산기, 날씨, 타이머와 스톱워치, 달력, 손전등, 메모 — 매일 쓰는 기본 도구 여섯 가지","display":"standalone","icons":[{"sizes":"192x192","src":"/icon-192.png","type":"image/png"},{"sizes":"512x512","src":"/icon-512.png","type":"image/png"}],"name":"넥서스 매일 도구","short_name":"매일 도구","start_url":"/","theme_color":"#0B0F19"}

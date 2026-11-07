@@ -1,0 +1,13 @@
+{
+  "name": "넥서스 오늘 운세",
+  "short_name": "오늘 운세",
+  "description": "사주·토정비결·수비학·주역·타로·꿈해몽·어울림·별자리·관상을 기기 안에서 보는 오늘의 운세",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0B0F19",
+  "theme_color": "#0B0F19",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

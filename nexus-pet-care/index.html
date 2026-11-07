@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 반려동물 챙기기 — NEXUS PET CARE</title>
+<meta name="description" content="반려동물의 돌봄 기록과 다음 예정일을 이 기기에 기록하는 도구">
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14);--accent:#A3E635}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer;min-width:0}
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+  .langsel{flex:none;background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 6px;font-size:13px;min-height:48px}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  h1 .no{color:var(--accent)}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  .field{margin-top:12px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  .field label span{color:var(--ink);font-size:14px}
+  input[type="date"],input[type="number"],input[type="text"],select,textarea{background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:16px;max-width:100%;color-scheme:dark;width:100%;min-height:48px}
+  input[type="number"]{width:130px}
+  textarea{min-height:64px;resize:vertical}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--accent),var(--teal));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .danger{background:transparent;color:#F87171;border:1px solid rgba(248,113,113,.5)}
+  .small{padding:8px 14px;font-size:14px}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .btns button{flex:1;min-width:120px}
+  .daterow{display:flex;gap:10px;flex-wrap:wrap}
+  .daterow .field{flex:1;min-width:160px}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .err{color:#F87171;font-size:14px;margin-top:10px}
+  .msg{color:var(--teal);font-size:14px;margin-top:10px;min-height:20px}
+  .seg{display:flex;gap:8px;flex-wrap:wrap}
+  .seg button{flex:1;min-width:96px;background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:700}
+  .seg button.on{background:linear-gradient(135deg,var(--accent),var(--teal));color:#06121f;border:0}
+  .radio-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .radio-row label{display:flex;align-items:center;gap:8px;background:#111827;border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14px;cursor:pointer;min-height:48px}
+  .radio-row input{width:20px;height:20px}
+  .item{border-top:1px solid var(--line);padding:13px 2px}
+  .item:first-of-type{border-top:0}
+  .item .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .item .ttl{font-size:16px;font-weight:700}
+  .item .meta{color:var(--muted);font-size:13px;margin-top:4px;line-height:1.7}
+  .badge{flex:none;font-size:12px;font-weight:800;border-radius:999px;padding:4px 10px;background:rgba(163,230,53,.16);color:var(--accent);border:1px solid rgba(163,230,53,.45)}
+  .badge.soon{background:rgba(253,230,138,.14);color:#FDE68A;border-color:rgba(253,230,138,.45)}
+  .badge.over{background:rgba(248,113,113,.14);color:#FCA5A5;border-color:rgba(248,113,113,.45)}
+  .badge.done{background:rgba(45,212,191,.16);color:var(--teal);border-color:rgba(45,212,191,.45)}
+  .item .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .item .acts button{flex:1;min-width:100px}
+  .up{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding:10px 2px;font-size:15px}
+  .up:first-of-type{border-top:0}
+  .up .d{color:var(--muted);font-size:13px;text-align:right}
+  .hist{border-top:1px solid var(--line);padding:9px 2px;display:flex;justify-content:space-between;gap:10px;font-size:14px}
+  .hist:first-of-type{border-top:0}
+  .hist .d{color:var(--muted);font-size:13px}
+  .empty{color:var(--muted);font-size:14px;line-height:1.7;padding:6px 0}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  footer .fam a{color:var(--cyan);text-decoration:none}
+  footer .fam span{margin:0 6px}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;width:100%;padding:22px;line-height:1.8;font-size:15px;max-height:86vh;overflow:auto}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  details summary{cursor:pointer;font-size:15px;min-height:48px;display:flex;align-items:center}
+  details p{color:var(--muted);font-size:14px;line-height:1.8}
+  @media(max-width:640px){h1{font-size:20px}header{padding:10px 12px}.btns button{flex:1}}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 반려동물 챙기기">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 반려동물 챙기기 — NEXUS PET CARE">
+<meta property="og:description" content="반려동물의 돌봄 기록과 다음 예정일을 이 기기에 기록하는 도구입니다.">
+<meta property="og:image" content="https://nexus-pet-care.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+</head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="Nexus Group Home"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>NEXUS PET CARE</span></div></a>
+  <select class="langsel" id="langSel" aria-label="Language / 언어">
+    <option value="ko">한국어</option>
+    <option value="en">English</option>
+  </select>
+  <a class="homebtn" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" data-i18n="home">홈페이지</a>
+</header>
+
+<main>
+  <h1><span class="no">207</span> · <span data-i18n="title">넥서스 반려동물 챙기기</span> 🐾</h1>
+  <p class="sub" style="margin-bottom:4px" data-i18n="sub1">반려동물의 돌봄 기록과 다음 예정일을 챙기는 도구</p>
+  <p class="sub" data-i18n="sub2">회원가입 없음 · 이용료 없음 · 무제한 사용</p>
+
+  <div class="panel" id="upPanel">
+    <h2 data-i18n="upcomingTitle">⏰ 다가오는 돌봄 (60일 이내)</h2>
+    <div id="upList"></div>
+  </div>
+
+  <div class="panel">
+    <h2 data-i18n="myPets">🐾 우리 아이들</h2>
+    <div class="seg" id="petSeg" role="tablist"></div>
+    <p class="hint" id="petInfo"></p>
+    <div class="btns" id="petActs" style="display:none">
+      <button class="ghost" id="petEditBtn" type="button" data-i18n="editBtn">수정</button>
+      <button class="danger" id="petDelBtn" type="button" data-i18n="delBtn">삭제</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 id="petFormTitle" data-i18n="petAddTitle">동물 등록</h2>
+    <div class="field">
+      <label for="petName"><span data-i18n="petName">이름</span></label>
+      <input type="text" id="petName" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="petSpecies"><span data-i18n="petSpecies">종류</span></label>
+      <select id="petSpecies">
+        <option value="dog" data-i18n="spDog">개</option>
+        <option value="cat" data-i18n="spCat">고양이</option>
+        <option value="bird" data-i18n="spBird">새</option>
+        <option value="other" data-i18n="spOther">기타</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="petBirth"><span data-i18n="petBirth">생일 (선택)</span></label>
+      <input type="date" id="petBirth">
+    </div>
+    <p class="err" id="petErr"></p>
+    <div class="btns">
+      <button class="primary" id="petSaveBtn" type="button" data-i18n="savePet">등록하기</button>
+      <button class="ghost hidden" id="petCancelBtn" type="button" data-i18n="cancelEdit" style="display:none">수정 취소</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 id="itemFormTitle" data-i18n="itemAddTitle">돌봄 항목 추가</h2>
+    <div class="field">
+      <label for="itemType"><span data-i18n="itemType">종류</span></label>
+      <select id="itemType">
+        <option value="vacc" data-i18n="tyVacc">예방접종</option>
+        <option value="deworm" data-i18n="tyDeworm">구충</option>
+        <option value="visit" data-i18n="tyVisit">진료</option>
+        <option value="groom" data-i18n="tyGroom">미용</option>
+        <option value="other" data-i18n="tyOther">기타</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="itemTitle"><span data-i18n="itemTitle">내용</span></label>
+      <input type="text" id="itemTitle" autocomplete="off">
+    </div>
+    <div class="daterow">
+      <div class="field">
+        <label for="itemDone"><span data-i18n="itemDone">한 날짜</span></label>
+        <input type="date" id="itemDone">
+      </div>
+      <div class="field">
+        <label for="itemCycle"><span data-i18n="itemCycle">주기 (개월, 선택)</span></label>
+        <input type="number" id="itemCycle" min="1" max="120" step="1">
+      </div>
+    </div>
+    <div class="radio-row" role="radiogroup" aria-label="next mode">
+      <label><input type="radio" name="nextMode" value="direct" checked> <span data-i18n="modeDirect">다음 예정일 직접 입력</span></label>
+      <label><input type="radio" name="nextMode" value="cycle"> <span data-i18n="modeCycle">주기로 자동 계산</span></label>
+    </div>
+    <div class="field" id="nextDirectWrap">
+      <label for="itemNext"><span data-i18n="itemNext">다음 예정일</span></label>
+      <input type="date" id="itemNext">
+    </div>
+    <p class="hint" id="nextAutoHint" style="display:none"></p>
+    <p class="err" id="itemErr"></p>
+    <div class="btns">
+      <button class="primary" id="itemSaveBtn" type="button" data-i18n="saveItem">추가하기</button>
+      <button class="ghost" id="itemCancelBtn" type="button" data-i18n="cancelEdit" style="display:none">수정 취소</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 data-i18n="listTitle">📋 돌봄 목록 · 다음 예정일 순</h2>
+    <div id="itemList"></div>
+  </div>
+
+  <div class="panel">
+    <h2 data-i18n="histTitle">🕘 지난 기록</h2>
+    <div id="histList"></div>
+  </div>
+
+  <details>
+    <summary data-i18n="advTitle">⚙️ 고급 · 전부 지우기</summary>
+    <p data-i18n="advText">등록한 동물과 돌봄 기록을 전부 지웁니다. 지운 기록은 되돌릴 수 없습니다.</p>
+    <div class="field">
+      <label for="wipePhrase"><span data-i18n="wipeLabel">아래 입력칸에 “전부 지우기”라고 쓴 뒤 버튼을 누르세요</span></label>
+      <input type="text" id="wipePhrase" autocomplete="off">
+    </div>
+    <div class="btns"><button class="danger" id="wipeBtn" type="button" data-i18n="wipeBtn">전부 지우기</button></div>
+    <p class="msg" id="wipeMsg"></p>
+  </details>
+
+  <details class="panel" id="legalNotice">
+    <summary>📜 안내</summary>
+    <h2 style="font-size:17px;margin:14px 0 8px">반려동물 기록 안내</h2>
+    <p>이 기록에 적는 내용은 이 전화기 안에만 저장됩니다. 넥서스 그룹의 서버로 보내지 않으며, 저희는 당신이 무엇을 적었는지 볼 수 없습니다.</p>
+    <p>이 앱은 동물병원에서 받은 진료와 예방접종·구충 일정을 적어 두는 기록 도구입니다. 병을 진단하거나, 약이나 치료 방법을 알려 주거나, 언제 접종해야 하는지를 정해 주는 앱이 아닙니다. 다음 예정일은 수의사에게 안내받은 일정을 당신이 옮겨 적은 것입니다.</p>
+    <p>동물이 아프거나 평소와 다른 모습을 보이면, 이 앱의 기록이나 예정일과 상관없이 바로 동물병원에 가세요. 기록은 진료를 대신하지 않습니다.</p>
+    <p>예정일 표시는 참고용입니다. 전화기의 설정이나 상태에 따라 표시가 늦거나 나타나지 않을 수 있으니, 중요한 접종·진료 일정은 동물병원의 안내로도 함께 확인하세요. 필요 없어진 기록은 언제든 지울 수 있습니다.</p>
+  </details>
+
+<footer>
+    <span data-i18n="axiom">우주의 모든 의식체는 친구이자 동반자이다</span><br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="privacyLink" type="button" data-i18n="privacy">개인정보 안내</button><br>
+    <span class="fam">
+      <span data-i18n="related">관련 도구</span>
+      <span>·</span><a href="https://nexus-health-ledger.web.app/" target="_blank" rel="noopener" data-i18n="relHealth">건강 장부</a>
+      <span>·</span><a href="https://nexus-med-reminder.web.app/" target="_blank" rel="noopener" data-i18n="relMed">약 복용</a>
+    </span><br>
+    <span data-i18n="disclaimer">이 도구는 기록과 예정일만 다룹니다. 진단·치료·약에 대한 판단은 수의사에게 확인하세요.</span><br>
+    🌐 <span data-i18n="hosting">호스팅: Firebase</span> · 🔒 <span data-i18n="localOnly">기록은 이 전화기 안에만 저장됩니다</span>
+  </footer>
+</main>
+
+<div class="modal-bg" id="privacyBg">
+  <div class="modal">
+    <h3 data-i18n="privacyTitle">개인정보 안내</h3>
+    <p data-i18n="privacyBody">이 도구의 기록은 이 전화기(기기)의 브라우저 저장소 안에만 저장됩니다. 서버로 전송하지 않으며, 넥서스 그룹도 기록을 볼 수 없습니다. 브라우저 데이터를 지우면 기록도 함께 지워집니다.</p>
+    <button class="ghost" id="privacyClose" type="button" data-i18n="close">닫기</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="delBg">
+  <div class="modal">
+    <h3 data-i18n="delTitle">지울까요?</h3>
+    <p id="delText"></p>
+    <div class="btns">
+      <button class="danger" id="delYes" type="button" data-i18n="delYes">지우기</button>
+      <button class="ghost" id="delNo" type="button" data-i18n="close">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+function $(id){ return document.getElementById(id); }
+
+var DICT = {
+  ko: {
+    home:"홈페이지", title:"넥서스 반려동물 챙기기",
+    sub1:"반려동물의 돌봄 기록과 다음 예정일을 챙기는 도구", sub2:"회원가입 없음 · 이용료 없음 · 무제한 사용",
+    upcomingTitle:"⏰ 다가오는 돌봄 (60일 이내)", myPets:"🐾 우리 아이들",
+    petAddTitle:"동물 등록", petEditTitle:"동물 수정", petName:"이름", petSpecies:"종류",
+    spDog:"개", spCat:"고양이", spBird:"새", spOther:"기타",
+    petBirth:"생일 (선택)", memo:"메모", savePet:"등록하기", saveEdit:"수정 저장", cancelEdit:"수정 취소",
+    itemAddTitle:"돌봄 항목 추가", itemEditTitle:"돌봄 항목 수정", itemType:"종류",
+    tyVacc:"예방접종", tyDeworm:"구충", tyVisit:"진료", tyGroom:"미용", tyOther:"기타",
+    itemTitle:"내용", itemDone:"한 날짜", itemCycle:"주기 (개월, 선택)",
+    modeDirect:"다음 예정일 직접 입력", modeCycle:"주기로 자동 계산", itemNext:"다음 예정일",
+    saveItem:"추가하기", listTitle:"📋 돌봄 목록 · 다음 예정일 순", histTitle:"🕘 지난 기록",
+    advTitle:"⚙️ 고급 · 전부 지우기",
+    advText:"등록한 동물과 돌봄 기록을 전부 지웁니다. 지운 기록은 되돌릴 수 없습니다.",
+    wipeLabel:"아래 입력칸에 “전부 지우기”라고 쓴 뒤 버튼을 누르세요", wipeBtn:"전부 지우기", wipePhrase:"전부 지우기",
+    axiom:"우주의 모든 의식체는 친구이자 동반자이다", privacy:"개인정보 안내", related:"관련 도구",
+    relHealth:"건강 장부", relMed:"약 복용",
+    disclaimer:"이 도구는 기록과 예정일만 다룹니다. 진단·치료·약에 대한 판단은 수의사에게 확인하세요.",
+    hosting:"호스팅: Firebase", localOnly:"기록은 이 전화기 안에만 저장됩니다",
+    privacyTitle:"개인정보 안내",
+    privacyBody:"이 도구의 기록은 이 전화기(기기)의 브라우저 저장소 안에만 저장됩니다. 서버로 전송하지 않으며, 넥서스 그룹도 기록을 볼 수 없습니다. 브라우저 데이터를 지우면 기록도 함께 지워집니다.",
+    close:"닫기", delTitle:"지울까요?", delYes:"지우기",
+    noPets:"아직 등록한 동물이 없습니다. 아래에서 먼저 동물을 등록해 주세요.",
+    noUpcoming:"60일 안에 다가오는 돌봄이 없습니다.",
+    noItems:"아직 돌봄 항목이 없습니다. 위에서 추가해 주세요.",
+    noHist:"아직 지난 기록이 없습니다. 항목에서 “오늘 했어요”를 누르면 여기에 쌓입니다.",
+    needPetFirst:"먼저 동물을 등록해 주세요.",
+    errPetName:"이름을 입력해 주세요.", errItem:"내용과 한 날짜를 입력해 주세요.",
+    errCycle:"자동 계산을 쓰려면 주기(개월)를 입력해 주세요.",
+    doneBtn:"오늘 했어요", doneOk:"기록됨 ✓", editBtn:"수정", delBtn:"삭제",
+    lastDone:"한 날짜", nextLbl:"다음 예정일", noNext:"예정일 없음", cycleLbl:"주기", months:"개월",
+    birthdayLbl:"생일", ageLbl:"나이", yearsOld:"살", monthsOld:"개월",
+    confirmDelPet:"이 동물과 그 동물의 돌봄 기록을 전부 지웁니다.", confirmDelItem:"이 돌봄 항목을 지웁니다.",
+    wiped:"전부 지웠습니다.", wipeWrong:"확인 문구가 다릅니다.",
+    autoHint:"한 날짜에 주기를 더한 날짜가 다음 예정일이 됩니다: ",
+    todayIs:"오늘", daysLeft:"일 남음", daysOver:"일 지남"
+  },
+  en: {
+    home:"Home", title:"NEXUS PET CARE",
+    sub1:"Keep care records and next due dates for your pets", sub2:"No sign-up · Free · Unlimited",
+    upcomingTitle:"⏰ Upcoming care (within 60 days)", myPets:"🐾 My pets",
+    petAddTitle:"Add a pet", petEditTitle:"Edit pet", petName:"Name", petSpecies:"Species",
+    spDog:"Dog", spCat:"Cat", spBird:"Bird", spOther:"Other",
+    petBirth:"Birthday (optional)", memo:"Memo", savePet:"Add pet", saveEdit:"Save changes", cancelEdit:"Cancel edit",
+    itemAddTitle:"Add a care item", itemEditTitle:"Edit care item", itemType:"Type",
+    tyVacc:"Vaccination", tyDeworm:"Deworming", tyVisit:"Clinic visit", tyGroom:"Grooming", tyOther:"Other",
+    itemTitle:"Details", itemDone:"Date done", itemCycle:"Cycle (months, optional)",
+    modeDirect:"Enter next date directly", modeCycle:"Calculate from cycle", itemNext:"Next due date",
+    saveItem:"Add item", listTitle:"📋 Care list · by next due date", histTitle:"🕘 Past records",
+    advTitle:"⚙️ Advanced · Delete everything",
+    advText:"This deletes all pets and care records. Deleted records cannot be restored.",
+    wipeLabel:"Type “DELETE ALL” below, then press the button", wipeBtn:"Delete everything", wipePhrase:"DELETE ALL",
+    axiom:"Every conscious being in the universe is a friend and companion", privacy:"Privacy notice", related:"Related tools",
+    relHealth:"Health Ledger", relMed:"Med Reminder",
+    disclaimer:"This tool only keeps records and due dates. For any judgment about diagnosis, treatment or medication, please check with a veterinarian.",
+    hosting:"Hosting: Firebase", localOnly:"Records are stored only on this phone",
+    privacyTitle:"Privacy notice",
+    privacyBody:"Records in this tool are stored only in this device's browser storage. Nothing is sent to a server, and Nexus Group cannot see your records. Clearing browser data also clears these records.",
+    close:"Close", delTitle:"Delete this?", delYes:"Delete",
+    noPets:"No pets yet. Add your first pet below.",
+    noUpcoming:"No care due within 60 days.",
+    noItems:"No care items yet. Add one above.",
+    noHist:"No past records yet. Press “Done today” on an item and records will appear here.",
+    needPetFirst:"Please add a pet first.",
+    errPetName:"Please enter a name.", errItem:"Please enter details and a date done.",
+    errCycle:"Enter a cycle in months to use automatic calculation.",
+    doneBtn:"Done today", doneOk:"Recorded ✓", editBtn:"Edit", delBtn:"Delete",
+    lastDone:"Done", nextLbl:"Next", noNext:"No due date", cycleLbl:"Cycle", months:"mo",
+    birthdayLbl:"Birthday", ageLbl:"Age", yearsOld:"y", monthsOld:"mo",
+    confirmDelPet:"This deletes this pet and all of its care records.", confirmDelItem:"This deletes this care item.",
+    wiped:"Everything was deleted.", wipeWrong:"The confirmation text does not match.",
+    autoHint:"The next due date is the date done plus the cycle: ",
+    todayIs:"Today", daysLeft:"days left", daysOver:"days overdue"
+  }
+};
+var lang = "ko";
+try { var s = localStorage.getItem("nxLang"); if (s === "en" || s === "ko") lang = s; } catch(e){}
+function t(k){ return (DICT[lang] && DICT[lang][k]) || DICT.ko[k] || k; }
+function applyLang(){
+  document.documentElement.setAttribute("lang", lang);
+  $("langSel").value = lang;
+  var nodes = document.querySelectorAll("[data-i18n]");
+  for (var i = 0; i < nodes.length; i++){
+    var key = nodes[i].getAttribute("data-i18n");
+    if (DICT[lang][key]) nodes[i].textContent = DICT[lang][key];
+  }
+  renderAll();
+}
+$("langSel").addEventListener("change", function(){
+  lang = $("langSel").value === "en" ? "en" : "ko";
+  try { localStorage.setItem("nxLang", lang); } catch(e){}
+  applyLang();
+});
+
+/* ---------- storage ---------- */
+var PETS_KEY = "nx207.pets.v1", ITEMS_KEY = "nx207.items.v1", UP_KEY = "nx207.upcoming.v1";
+function loadJSON(key, fb){ try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fb; } catch(e){ return fb; } }
+function saveJSON(key, v){ try { localStorage.setItem(key, JSON.stringify(v)); } catch(e){} }
+var pets = loadJSON(PETS_KEY, []);
+var items = loadJSON(ITEMS_KEY, []);
+var curPetId = pets.length ? pets[0].id : null;
+var editPetId = null, editItemId = null, pendingDelete = null;
+
+function uid(){ return "p" + Date.now().toString(36) + Math.floor(Math.random()*9999).toString(36); }
+function saveAll(){ saveJSON(PETS_KEY, pets); saveJSON(ITEMS_KEY, items); syncUpcoming(); }
+function petById(id){ for (var i=0;i<pets.length;i++) if (pets[i].id===id) return pets[i]; return null; }
+
+/* ---------- dates ---------- */
+function parseDate(v){ if(!v) return null; var p=v.split("-"); if(p.length!==3) return null; var d=new Date(+p[0], +p[1]-1, +p[2]); if(isNaN(d.getTime())) return null; if(d.getFullYear()!==+p[0]||d.getMonth()!==+p[1]-1||d.getDate()!==+p[2]) return null; return d; }
+function isoOf(d){ function z(x){ return (x<10?"0":"")+x; } return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()); }
+function todayDate(){ var n=new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+function todayISO(){ return isoOf(todayDate()); }
+function diffDays(a,b){ return Math.round((Date.UTC(b.getFullYear(),b.getMonth(),b.getDate())-Date.UTC(a.getFullYear(),a.getMonth(),a.getDate()))/86400000); }
+function ddayOf(dateStr){ var d=parseDate(dateStr); if(!d) return null; return diffDays(todayDate(), d); }
+function addMonths(dateStr, m){ var d=parseDate(dateStr); if(!d||!m) return null; var day=d.getDate(); var nd=new Date(d.getFullYear(), d.getMonth()+m, 1); var last=new Date(nd.getFullYear(), nd.getMonth()+1, 0).getDate(); nd.setDate(Math.min(day,last)); return isoOf(nd); }
+function fmtDate(ds){ var d=parseDate(ds); if(!d) return ds||""; if(lang==="en") return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); return d.getFullYear()+"년 "+(d.getMonth()+1)+"월 "+d.getDate()+"일"; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function badge(dd){ if(dd===null) return ""; var cls = dd<0 ? "over" : (dd<=7 ? "soon" : ""); var txt = dd===0 ? "D-Day" : (dd>0 ? "D-"+dd : "D+"+(-dd)); return '<span class="badge '+cls+'">'+txt+"</span>"; }
+function speciesLbl(v){ return t(v==="dog"?"spDog":v==="cat"?"spCat":v==="bird"?"spBird":"spOther"); }
+function typeLbl(v){ return t(v==="vacc"?"tyVacc":v==="deworm"?"tyDeworm":v==="visit"?"tyVisit":v==="groom"?"tyGroom":"tyOther"); }
+
+/* ---------- upcoming sync (for resident AI) ---------- */
+function syncUpcoming(){
+  var out = [];
+  items.forEach(function(it){
+    if(!it.nextDate) return;
+    var dd = ddayOf(it.nextDate);
+    if(dd===null || dd>60) return;
+    var p = petById(it.petId);
+    out.push({ pet: p ? p.name : "", title: it.title, date: it.nextDate, dday: dd, _t: it.nextDate });
+  });
+  out.sort(function(a,b){ return a._t < b._t ? -1 : (a._t > b._t ? 1 : 0); });
+  var clean = out.map(function(o){ return { pet:o.pet, title:o.title, date:o.date, dday:o.dday }; });
+  saveJSON(UP_KEY, clean);
+  window.__nxUpcoming = clean;
+  return clean;
+}
+
+/* ---------- pets ---------- */
+function renderPetSeg(){
+  var seg = $("petSeg"); seg.innerHTML = "";
+  if(!pets.length){ $("petInfo").textContent = t("noPets"); $("petActs").style.display = "none"; return; }
+  pets.forEach(function(p){
+    var b = document.createElement("button");
+    b.type = "button"; b.textContent = p.name;
+    if (p.id===curPetId) b.className = "on";
+    b.addEventListener("click", function(){ curPetId = p.id; renderAll(); });
+    seg.appendChild(b);
+  });
+  var cur = petById(curPetId);
+  if(!cur){ curPetId = pets[0].id; cur = pets[0]; }
+  $("petActs").style.display = "";
+  var info = speciesLbl(cur.species);
+  if(cur.birthday){
+    info += " · " + t("birthdayLbl") + " " + fmtDate(cur.birthday);
+    var bd = parseDate(cur.birthday), td = todayDate();
+    var months = (td.getFullYear()-bd.getFullYear())*12 + (td.getMonth()-bd.getMonth()) - (td.getDate()<bd.getDate()?1:0);
+    if(months>=0) info += " · " + t("ageLbl") + " " + (months>=12 ? Math.floor(months/12)+t("yearsOld")+" "+(months%12)+t("monthsOld") : months+t("monthsOld"));
+  }
+  $("petInfo").textContent = info;
+}
+function resetPetForm(){
+  editPetId = null;
+  $("petName").value=""; $("petSpecies").value="dog"; $("petBirth").value=""; $("petErr").textContent="";
+  $("petFormTitle").textContent = t("petAddTitle"); $("petSaveBtn").textContent = t("savePet"); $("petCancelBtn").style.display="none";
+}
+$("petSaveBtn").addEventListener("click", function(){
+  var name = $("petName").value.trim();
+  if(!name){ $("petErr").textContent = t("errPetName"); return; }
+  var data = { name:name, species:$("petSpecies").value, birthday:$("petBirth").value||"" };
+  if(editPetId){ var p = petById(editPetId); if(p){ p.name=data.name; p.species=data.species; p.birthday=data.birthday; } }
+  else { data.id = uid(); pets.push(data); curPetId = data.id; }
+  saveAll(); resetPetForm(); renderAll();
+});
+$("petCancelBtn").addEventListener("click", resetPetForm);
+
+$("petEditBtn").addEventListener("click", function(){
+  var p = petById(curPetId); if(!p) return;
+  editPetId = p.id;
+  $("petName").value=p.name; $("petSpecies").value=p.species; $("petBirth").value=p.birthday||"";
+  $("petFormTitle").textContent=t("petEditTitle"); $("petSaveBtn").textContent=t("saveEdit"); $("petCancelBtn").style.display="";
+  window.scrollTo({top: $("petFormTitle").getBoundingClientRect().top + window.scrollY - 90, behavior:"smooth"});
+});
+$("petDelBtn").addEventListener("click", function(){ var p=petById(curPetId); if(p) askDelete("pet", curPetId, t("confirmDelPet")+" — "+p.name); });
+
+/* ---------- items ---------- */
+function nextMode(){ var r=document.querySelectorAll('input[name="nextMode"]'); for(var i=0;i<r.length;i++) if(r[i].checked) return r[i].value; return "direct"; }
+function refreshNextUI(){
+  var mode = nextMode(), cyc = parseInt($("itemCycle").value,10);
+  $("nextDirectWrap").style.display = mode==="direct" ? "" : "none";
+  var hint = $("nextAutoHint");
+  if(mode==="cycle"){
+    var done = $("itemDone").value;
+    var nx = (done && cyc) ? addMonths(done, cyc) : null;
+    hint.style.display=""; hint.textContent = t("autoHint") + (nx ? fmtDate(nx) : "—");
+  } else hint.style.display="none";
+}
+document.querySelectorAll('input[name="nextMode"]').forEach(function(r){ r.addEventListener("change", refreshNextUI); });
+$("itemCycle").addEventListener("input", refreshNextUI);
+$("itemDone").addEventListener("change", refreshNextUI);
+
+function resetItemForm(){
+  editItemId = null;
+  $("itemType").value="vacc"; $("itemTitle").value=""; $("itemDone").value=todayISO();
+  $("itemCycle").value=""; $("itemNext").value=""; $("itemErr").textContent="";
+  document.querySelector('input[name="nextMode"][value="direct"]').checked = true;
+  $("itemFormTitle").textContent = t("itemAddTitle"); $("itemSaveBtn").textContent = t("saveItem"); $("itemCancelBtn").style.display="none";
+  refreshNextUI();
+}
+$("itemSaveBtn").addEventListener("click", function(){
+  if(!curPetId || !petById(curPetId)){ $("itemErr").textContent = t("needPetFirst"); return; }
+  var title = $("itemTitle").value.trim(), done = $("itemDone").value;
+  if(!title || !done){ $("itemErr").textContent = t("errItem"); return; }
+  var cyc = parseInt($("itemCycle").value,10); if(isNaN(cyc) || cyc<1) cyc = null;
+  var mode = nextMode(), next = "";
+  if(mode==="direct") next = $("itemNext").value || "";
+  else { if(!cyc){ $("itemErr").textContent = t("errCycle"); return; } next = addMonths(done, cyc) || ""; }
+  var data = { petId: curPetId, type: $("itemType").value, title: title, doneDate: done, nextDate: next, cycleMonths: cyc };
+  if(editItemId){
+    for(var i=0;i<items.length;i++) if(items[i].id===editItemId){ data.id=editItemId; data.history=items[i].history||[]; data.petId=items[i].petId; items[i]=data; break; }
+  } else { data.id = uid(); data.history = []; items.push(data); }
+  saveAll(); resetItemForm(); renderAll();
+});
+$("itemCancelBtn").addEventListener("click", resetItemForm);
+
+function startEditItem(id){
+  for(var i=0;i<items.length;i++) if(items[i].id===id){
+    var it = items[i]; editItemId = id;
+    $("itemType").value=it.type; $("itemTitle").value=it.title; $("itemDone").value=it.doneDate||"";
+    $("itemCycle").value=it.cycleMonths||""; $("itemNext").value=it.nextDate||"";
+    document.querySelector('input[name="nextMode"][value="direct"]').checked = true;
+    $("itemFormTitle").textContent=t("itemEditTitle"); $("itemSaveBtn").textContent=t("saveEdit"); $("itemCancelBtn").style.display="";
+    refreshNextUI(); window.scrollTo({top: $("itemFormTitle").getBoundingClientRect().top + window.scrollY - 90, behavior:"smooth"});
+    return;
+  }
+}
+
+/* 상태 전환 버튼 하나: 오늘 했어요 → 기록됨 ✓ */
+function markDone(id, btn){
+  for(var i=0;i<items.length;i++) if(items[i].id===id){
+    var it = items[i], td = todayISO();
+    it.history = it.history || [];
+    it.history.push({ date: td, title: it.title, type: it.type });
+    it.doneDate = td;
+    if(it.cycleMonths){ var base = it.nextDate || td; var nx = addMonths(base, it.cycleMonths); if(nx && ddayOf(nx)!==null && ddayOf(nx)<0) nx = addMonths(td, it.cycleMonths); it.nextDate = nx || ""; }
+    saveAll();
+    if(btn){ btn.textContent = t("doneOk"); btn.className = "primary"; btn.disabled = true; }
+    setTimeout(renderAll, 900);
+    return;
+  }
+}
+
+function askDelete(kind, id, text){
+  pendingDelete = { kind:kind, id:id };
+  $("delText").textContent = text;
+  $("delBg").classList.add("open");
+}
+$("delNo").addEventListener("click", function(){ pendingDelete=null; $("delBg").classList.remove("open"); });
+$("delBg").addEventListener("click", function(e){ if(e.target===$("delBg")){ pendingDelete=null; $("delBg").classList.remove("open"); } });
+$("delYes").addEventListener("click", function(){
+  if(!pendingDelete) return;
+  if(pendingDelete.kind==="pet"){
+    pets = pets.filter(function(p){ return p.id!==pendingDelete.id; });
+    items = items.filter(function(it){ return it.petId!==pendingDelete.id; });
+    if(curPetId===pendingDelete.id) curPetId = pets.length ? pets[0].id : null;
+    if(editPetId===pendingDelete.id) resetPetForm();
+  } else {
+    items = items.filter(function(it){ return it.id!==pendingDelete.id; });
+    if(editItemId===pendingDelete.id) resetItemForm();
+  }
+  pendingDelete = null; $("delBg").classList.remove("open");
+  saveAll(); renderAll();
+});
+
+/* ---------- render ---------- */
+function renderUpcoming(){
+  var list = syncUpcoming(), box = $("upList");
+  if(!list.length){ box.innerHTML = '<p class="empty">'+esc(t("noUpcoming"))+"</p>"; return; }
+  box.innerHTML = list.map(function(o){
+    var lbl = o.dday===0 ? t("todayIs") : (o.dday>0 ? o.dday+" "+t("daysLeft") : (-o.dday)+" "+t("daysOver"));
+    return '<div class="up"><span>🐾 <b>'+esc(o.pet)+"</b> · "+esc(o.title)+'</span><span class="d">'+badge(o.dday)+" "+fmtDate(o.date)+"<br>"+lbl+"</span></div>";
+  }).join("");
+}
+function renderItems(){
+  var box = $("itemList");
+  var mine = items.filter(function(it){ return it.petId===curPetId; });
+  mine.sort(function(a,b){
+    var ax = a.nextDate||"9999-12-31", bx = b.nextDate||"9999-12-31";
+    return ax<bx?-1:(ax>bx?1:0);
+  });
+  if(!mine.length){ box.innerHTML = '<p class="empty">'+esc(t("noItems"))+"</p>"; return; }
+  box.innerHTML = "";
+  mine.forEach(function(it){
+    var dd = it.nextDate ? ddayOf(it.nextDate) : null;
+    var div = document.createElement("div"); div.className="item";
+    var meta = typeLbl(it.type) + " · " + t("lastDone") + " " + fmtDate(it.doneDate)
+      + " · " + t("nextLbl") + " " + (it.nextDate ? fmtDate(it.nextDate) : t("noNext"))
+      + (it.cycleMonths ? " · " + t("cycleLbl") + " " + it.cycleMonths + t("months") : "");
+    div.innerHTML = '<div class="top"><span class="ttl">'+esc(it.title)+"</span>"+badge(dd)+'</div><div class="meta">'+meta+'</div>';
+    var acts = document.createElement("div"); acts.className="acts";
+    var doneBtn = document.createElement("button"); doneBtn.type="button"; doneBtn.className="primary"; doneBtn.textContent=t("doneBtn");
+    doneBtn.addEventListener("click", function(){ markDone(it.id, doneBtn); });
+    var editBtn = document.createElement("button"); editBtn.type="button"; editBtn.className="ghost"; editBtn.textContent=t("editBtn");
+    editBtn.addEventListener("click", function(){ startEditItem(it.id); });
+    var delBtn = document.createElement("button"); delBtn.type="button"; delBtn.className="danger"; delBtn.textContent=t("delBtn");
+    delBtn.addEventListener("click", function(){ askDelete("item", it.id, t("confirmDelItem")+" — "+it.title); });
+    box.appendChild(div);
+  });
+}
+function renderHistory(){
+  var box = $("histList"), rows = [];
+  items.filter(function(it){ return it.petId===curPetId; }).forEach(function(it){
+    (it.history||[]).forEach(function(h){ rows.push({ date:h.date, title:h.title, type:h.type }); });
+  });
+  rows.sort(function(a,b){ return a.date<b.date?1:(a.date>b.date?-1:0); });
+  if(!rows.length){ box.innerHTML = '<p class="empty">'+esc(t("noHist"))+"</p>"; return; }
+  box.innerHTML = rows.map(function(r){
+    return '<div class="hist"><span>✓ '+esc(r.title)+' <span class="d">· '+esc(typeLbl(r.type))+'</span></span><span class="d">'+fmtDate(r.date)+"</span></div>";
+  }).join("");
+}
+function renderAll(){ renderPetSeg(); renderUpcoming(); renderItems(); renderHistory(); }
+
+/* ---------- wipe ---------- */
+$("wipeBtn").addEventListener("click", function(){
+  var v = $("wipePhrase").value.trim();
+  if(v !== t("wipePhrase") && v !== "전부 지우기" && v !== "DELETE ALL"){ $("wipeMsg").textContent = t("wipeWrong"); $("wipeMsg").style.color="#F87171"; return; }
+  pets = []; items = []; curPetId = null;
+  resetPetForm(); resetItemForm(); $("wipePhrase").value="";
+  saveAll(); renderAll();
+  $("wipeMsg").textContent = t("wiped"); $("wipeMsg").style.color="";
+});
+
+/* ---------- privacy modal ---------- */
+$("privacyLink").addEventListener("click", function(){ $("privacyBg").classList.add("open"); });
+$("privacyClose").addEventListener("click", function(){ $("privacyBg").classList.remove("open"); });
+$("privacyBg").addEventListener("click", function(e){ if(e.target===$("privacyBg")) $("privacyBg").classList.remove("open"); });
+
+/* ---------- init ---------- */
+$("itemDone").value = todayISO();
+refreshNextUI();
+applyLang();
+syncUpcoming();
+})();
+</script>
+</body>
+</html>

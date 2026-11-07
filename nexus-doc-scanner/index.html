@@ -1,0 +1,3658 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 문서 스캔 — Nexus Doc Scanner</title>
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .steps{display:flex;gap:8px;margin:0 0 16px}
+  .step{flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13px}
+  .step b{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--line);color:var(--ink);margin-right:6px;font-size:12px}
+  .step.on{color:var(--ink);border-color:var(--teal)}
+  .step.on b{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f}
+  .drop{border:2px dashed var(--teal);border-radius:16px;padding:32px 16px;text-align:center;background:var(--card)}
+  .drop.over{border-color:var(--cyan);background:rgba(56,184,248,.12)}
+  .drop .bigicon{font-size:44px}
+  .pickbtn{border:0;border-radius:999px;padding:14px 24px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;margin:10px 4px 4px;min-height:48px}
+  .pickbtn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .drop p{margin:6px 0;color:var(--muted);font-size:14px}
+  .drop .example{color:var(--teal);font-size:13px}
+  .drop .priv{font-size:12px}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .statline{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.7}
+  .statline b{color:var(--ink)}
+  .err{color:#F87171}
+  .stage{position:relative;max-width:680px;margin:0 auto;touch-action:none}
+  .stage canvas{display:block;width:100%;height:auto;border-radius:10px}
+  .corner{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:2px solid var(--cyan);background:rgba(56,189,248,.22);cursor:grab;touch-action:none;z-index:3}
+  .corner::after{content:"";position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--cyan)}
+  .corner:active{cursor:grabbing;background:rgba(45,212,191,.35)}
+  .outwrap{max-width:680px;margin:0 auto}
+  .outwrap canvas{display:block;width:100%;height:auto;border-radius:10px;background:#fff}
+  .field{margin-top:12px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  .field label span{color:var(--ink);font-size:14px}
+  input[type=range]{width:100%;accent-color:var(--teal);height:32px}
+  .seg{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .seg button{flex:1;background:transparent;color:var(--ink);border:1px solid var(--line);min-height:44px;padding:8px 10px;font-size:14px}
+  .seg button.on{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700;border:0}
+  .thumbs{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+  .thumb{position:relative}
+  .thumb img{height:120px;width:auto;border-radius:8px;border:1px solid var(--line);display:block}
+  .thumb .no{position:absolute;left:6px;bottom:6px;background:rgba(0,0,0,.65);color:#fff;font-size:12px;border-radius:999px;padding:2px 9px}
+  .thumb .del{position:absolute;top:4px;right:4px;min-height:0;padding:4px 10px;font-size:12px;border-radius:999px;background:rgba(0,0,0,.65);color:#fff;border:1px solid var(--line)}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  footer .fam span{margin:0 6px}
+  footer .fam .now{color:var(--ink);font-weight:700}
+  footer .fam a{color:var(--cyan);text-decoration:none}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;padding:22px;line-height:1.8;font-size:15px}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  details summary{cursor:pointer;font-size:15px}
+  details p{color:var(--muted);font-size:14px;line-height:1.8}
+  @media(max-width:640px){h1{font-size:20px}.drop{padding:24px 12px}header{padding:10px 12px}.btns button{flex:1}.corner{width:46px;height:46px;margin:-23px 0 0 -23px}}
+
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer}
+
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 문서 스캔">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 문서 스캔 — Nexus Doc Scanner">
+<meta property="og:description" content="사진으로 찍은 문서를 반듯하게 펴서 PDF로 만드는 도구입니다. 파일은 당신의 기기 안에서만 처리됩니다.">
+<meta property="og:image" content="https://nexus-doc-scanner.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+<style id="nx-redesign">/* nx-redesign 2026-11-01: canvas is the stage, decisive actions grow */
+.stage,.outwrap{max-width:780px}
+#warpBtn,#addPageBtn,#pdfBtn{flex:1;min-height:56px}
+.thumb img{height:136px}
+.thumb .del{min-height:44px;display:inline-flex;align-items:center}
+</style>
+<style id="nx-thumb-right">/* NX-THUMB-RIGHT */
+#warpBtn,#addPageBtn,#pdfBtn{order:99}
+#drop>div:has(.pickbtn){display:flex;justify-content:center;flex-wrap:wrap}
+#camBtn{order:2}
+#pickBtn{order:1}
+</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{flex:none}header .brand{flex:none;overflow:visible}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap}.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}</style></head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>SOVEREIGN COMMAND</span></div></a>
+  
+</header>
+
+<main>
+  <div class="steps">
+    <div class="step on" id="step1"><b>1</b> 사진 넣기</div>
+    <div class="step" id="step2"><b>2</b> 모서리 맞추기</div>
+    <div class="step" id="step3"><b>3</b> 보정 · PDF</div>
+  </div>
+
+  <h1>넥서스 문서 스캔</h1>
+  <p class="sub" style="margin-bottom:4px">사진으로 찍은 문서를 반듯하게 펴서 PDF로 만드는 도구</p>
+  <p class="sub">회원가입 없음 · 이용료 없음 · 무제한 사용</p>
+
+  <div class="drop" id="drop">
+    <div class="bigicon">📄</div>
+    <div>
+      <button class="pickbtn" id="camBtn">📷 사진 찍기</button>
+      <button class="pickbtn alt" id="pickBtn">🖼️ 사진 고르기</button>
+    </div>
+    <p>또는 사진을 여기에 끌어다 놓으세요</p>
+    <p class="example">예) 계약서 촬영 → 모서리 맞추기 → 반듯한 PDF로 저장</p>
+    <p class="priv">파일은 당신의 기기 안에서만 처리됩니다.</p>
+    <input type="file" id="camIn" accept="image/*" capture="environment" hidden>
+    <input type="file" id="fileIn" accept="image/*" hidden>
+  </div>
+  <p class="hint err" id="loadErr"></p>
+
+  <div class="panel" id="editPanel" style="display:none">
+    <h2>② 문서 모서리 맞추기</h2>
+    <div class="stage" id="stage">
+      <canvas id="srcCanvas" width="10" height="10"></canvas>
+      <div class="corner" id="c0" data-i="0"></div>
+      <div class="corner" id="c1" data-i="1"></div>
+      <div class="corner" id="c2" data-i="2"></div>
+      <div class="corner" id="c3" data-i="3"></div>
+    </div>
+    <p class="statline" id="cornerMsg">네 개의 점을 문서의 모서리에 맞춰 끌어 놓으세요.</p>
+    <div class="btns">
+      <button class="primary" id="warpBtn">반듯하게 펴기</button>
+      <button class="ghost" id="autoBtn">모서리 자동으로 다시 찾기</button>
+    </div>
+  </div>
+
+  <div class="panel" id="adjPanel" style="display:none">
+    <h2>③ 보정하고 담기</h2>
+    <div class="outwrap">
+      <canvas id="outCanvas" width="10" height="10"></canvas>
+    </div>
+    <div class="field">
+      <label>색 방식</label>
+      <div class="seg" id="modeSeg">
+        <button type="button" data-mode="color" class="on">🎨 컬러</button>
+        <button type="button" data-mode="gray">⬜ 그레이</button>
+        <button type="button" data-mode="doc">📄 흑백 문서</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="brightIn">밝기 <span id="brightVal">0</span></label>
+      <input type="range" id="brightIn" min="-100" max="100" value="0" step="1">
+    </div>
+    <div class="field">
+      <label for="contrastIn">대비 <span id="contrastVal">100</span></label>
+      <input type="range" id="contrastIn" min="50" max="200" value="100" step="1">
+    </div>
+    <div class="btns">
+      <button class="primary" id="addPageBtn">＋ 이 페이지를 목록에 추가</button>
+      <button class="ghost" id="rotBtn">↻ 90° 돌리기</button>
+      <button class="ghost" id="saveImgBtn">이미지로 저장</button>
+      <button class="ghost" id="backBtn">모서리로 돌아가기</button>
+    </div>
+    <p class="hint" id="adjMsg"></p>
+  </div>
+
+  <div class="panel" id="pagesPanel" style="display:none">
+    <h2>📚 담은 페이지 <span id="pageCount"></span></h2>
+    <div class="thumbs" id="thumbs"></div>
+    <div class="btns">
+      <button class="primary" id="pdfBtn">PDF로 저장</button>
+      <button class="ghost" id="moreBtn">＋ 다음 장 찍기</button>
+      <button class="ghost" id="clearPagesBtn">전부 지우기</button>
+    </div>
+    <p class="statline" id="pdfMsg">페이지를 모아 하나의 PDF로 만듭니다.</p>
+  </div>
+
+  <details><summary>💡 도움말</summary><p>문서를 밝은 곳에서 화면에 가득 차게 찍을수록 결과가 좋습니다.<br>사진을 넣으면 문서의 네 모서리를 자동으로 추정해 점을 찍어 둡니다. 어긋난 점은 손가락이나 마우스로 끌어 문서 모서리에 정확히 맞추세요.<br>반듯하게 펴기를 누르면 기울어진 문서가 정면으로 펴집니다. 흑백 문서 방식을 고르면 배경이 희게 정리되어 인쇄하기 좋습니다.<br>페이지를 여러 장 담아 한 번에 PDF로 저장할 수 있습니다. 순서는 담은 순서대로입니다.<br>파일은 당신의 기기 안에서만 처리됩니다. 서버로 전송되지 않습니다.<br>작업 사진은 긴 변 최대 2,000픽셀로 줄여 처리하므로, 아주 작은 글씨는 원본보다 덜 또렷할 수 있습니다.<br>아이폰의 HEIC 사진은 브라우저에 따라 열리지 않을 수 있습니다. 그럴 때는 사진을 JPG로 바꿔 넣으세요.</p></details>
+<footer>
+    우주의 모든 의식체는 친구이자 동반자이다<br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="philoLink">넥서스 그룹 철학 보기</button><br>
+    🌐 호스팅: Firebase · 🔒 파일은 당신의 기기 안에서만 처리됩니다<br>
+    
+  </footer>
+</main>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>NEXUS GROUP 철학과 비전</h3>
+    <p>넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.</p>
+    <p><b>"우주의 모든 의식체는 친구이자 동반자이다."</b><br>(Every conscious being in the universe is a friend and companion.)</p>
+    <p>우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.</p>
+    <button class="primary" id="modalClose">닫기</button>
+  </div>
+</div>
+<script>
+// ---------- 순수 로직 (원근 변환 수학) ----------
+// 8x8 연립방정식 가우스 소거 (부분 피벗)
+function solveLinear(A, b){
+  var n = b.length;
+  var M = A.map(function(row, i){ return row.slice().concat([b[i]]); });
+  for(var col = 0; col < n; col++){
+    var piv = col;
+    for(var r = col + 1; r < n; r++){
+      if(Math.abs(M[r][col]) > Math.abs(M[piv][col])) piv = r;
+    }
+    if(Math.abs(M[piv][col]) < 1e-12) return null;
+    if(piv !== col){ var tmp = M[col]; M[col] = M[piv]; M[piv] = tmp; }
+    var d = M[col][col];
+    for(var c = col; c <= n; c++) M[col][c] /= d;
+    for(var r2 = 0; r2 < n; r2++){
+      if(r2 === col) continue;
+      var f = M[r2][col];
+      if(f !== 0){ for(var c2 = col; c2 <= n; c2++) M[r2][c2] -= f * M[col][c2]; }
+    }
+  }
+  return M.map(function(row){ return row[n]; });
+}
+// src 4점 -> dst 4점 호모그래피 (h33 = 1), 점 순서는 TL, TR, BR, BL
+function computeHomography(src, dst){
+  var A = [], b = [];
+  for(var i = 0; i < 4; i++){
+    var x = src[i].x, y = src[i].y, X = dst[i].x, Y = dst[i].y;
+    A.push([x, y, 1, 0, 0, 0, -X * x, -X * y]); b.push(X);
+    A.push([0, 0, 0, x, y, 1, -Y * x, -Y * y]); b.push(Y);
+  }
+  var h = solveLinear(A, b);
+  if(!h) return null;
+  return [h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7], 1];
+}
+function applyH(H, x, y){
+  var w = H[6] * x + H[7] * y + H[8];
+  return { x: (H[0] * x + H[1] * y + H[2]) / w, y: (H[3] * x + H[4] * y + H[5]) / w };
+}
+function invert3(m){
+  var a = m[0], b = m[1], c = m[2], d = m[3], e = m[4], f = m[5], g = m[6], h = m[7], i = m[8];
+  var A = e * i - f * h, B = -(d * i - f * g), C = d * h - e * g;
+  var det = a * A + b * B + c * C;
+  if(Math.abs(det) < 1e-14) return null;
+  var s = 1 / det;
+  return [
+    A * s, (c * h - b * i) * s, (b * f - c * e) * s,
+    B * s, (a * i - c * g) * s, (c * d - a * f) * s,
+    C * s, (b * g - a * h) * s, (a * e - b * d) * s
+  ];
+}
+function distPt(p, q){ var dx = p.x - q.x, dy = p.y - q.y; return Math.sqrt(dx * dx + dy * dy); }
+function quadArea(pts){
+  var a = 0;
+  for(var i = 0; i < 4; i++){
+    var p = pts[i], q = pts[(i + 1) % 4];
+    a += p.x * q.y - q.x * p.y;
+  }
+  return Math.abs(a) / 2;
+}
+function fallbackCorners(w, h){
+  var mx = w * 0.06, my = h * 0.06;
+  return [ {x: mx, y: my}, {x: w - mx, y: my}, {x: w - mx, y: h - my}, {x: mx, y: h - my} ];
+}
+// 그레이스케일 작은 이미지에서 문서 경계 극점 추정 — 성공하면 작업 좌표계 4점, 실패하면 null
+function estimateCornersFromGray(gray, w, h, workW, workH){
+  var mag = new Float32Array(w * h);
+  var maxMag = 0;
+  for(var y = 1; y < h - 1; y++){
+    for(var x = 1; x < w - 1; x++){
+      var i = y * w + x;
+      var gx = -gray[i - w - 1] - 2 * gray[i - 1] - gray[i + w - 1] + gray[i - w + 1] + 2 * gray[i + 1] + gray[i + w + 1];
+      var gy = -gray[i - w - 1] - 2 * gray[i - w] - gray[i - w + 1] + gray[i + w - 1] + 2 * gray[i + w] + gray[i + w + 1];
+      var m = Math.abs(gx) + Math.abs(gy);
+      mag[i] = m;
+      if(m > maxMag) maxMag = m;
+    }
+  }
+  if(maxMag <= 0) return null;
+  var th = maxMag * 0.35;
+  var tl = null, tr = null, br = null, bl = null;
+  var cnt = 0;
+  for(var y2 = 0; y2 < h; y2++){
+    for(var x2 = 0; x2 < w; x2++){
+      if(mag[y2 * w + x2] < th) continue;
+      cnt++;
+      var s = x2 + y2, d = x2 - y2;
+      if(!tl || s < tl.s) tl = { s: s, x: x2, y: y2 };
+      if(!br || s > br.s) br = { s: s, x: x2, y: y2 };
+      if(!tr || d > tr.d) tr = { d: d, x: x2, y: y2 };
+      if(!bl || d < bl.d) bl = { d: d, x: x2, y: y2 };
+    }
+  }
+  if(cnt < 40 || !tl || !tr || !br || !bl) return null;
+  var sx = workW / w, sy = workH / h;
+  var pts = [
+    { x: tl.x * sx, y: tl.y * sy }, { x: tr.x * sx, y: tr.y * sy },
+    { x: br.x * sx, y: br.y * sy }, { x: bl.x * sx, y: bl.y * sy }
+  ];
+  var ratio = quadArea(pts) / (workW * workH);
+  if(ratio < 0.2 || ratio > 0.995) return null;
+  for(var k = 0; k < 4; k++){
+    if(pts[k].x < 0 || pts[k].x > workW || pts[k].y < 0 || pts[k].y > workH) return null;
+  }
+  return pts;
+}
+// 출력 픽셀 -> 원본 좌표 역매핑 + 쌍선형 샘플링
+function warpPixels(srcData, srcW, srcH, corners, outW, outH){
+  var rect = [ {x: 0, y: 0}, {x: outW, y: 0}, {x: outW, y: outH}, {x: 0, y: outH} ];
+  var H = computeHomography(rect, corners);
+  if(!H) return null;
+  var out = new Uint8ClampedArray(outW * outH * 4);
+  var sd = srcData.data;
+  for(var y = 0; y < outH; y++){
+    for(var x = 0; x < outW; x++){
+      var p = applyH(H, x + 0.5, y + 0.5);
+      var fx = p.x - 0.5, fy = p.y - 0.5;
+      var x0 = Math.floor(fx), y0 = Math.floor(fy);
+      var dx = fx - x0, dy = fy - y0;
+      var oi = (y * outW + x) * 4;
+      for(var ch = 0; ch < 3; ch++){
+        var v = 0, wsum = 0;
+        for(var ky = 0; ky <= 1; ky++){
+          for(var kx = 0; kx <= 1; kx++){
+            var px = x0 + kx, py = y0 + ky;
+            if(px < 0 || px >= srcW || py < 0 || py >= srcH) continue;
+            var wgt = (kx ? dx : 1 - dx) * (ky ? dy : 1 - dy);
+            v += sd[(py * srcW + px) * 4 + ch] * wgt;
+            wsum += wgt;
+          }
+        }
+        out[oi + ch] = wsum > 0 ? v / wsum : 255;
+      }
+      out[oi + 3] = 255;
+    }
+  }
+  return out;
+}
+function scanFileName(now){
+  var d = now || new Date();
+  var p = function(n){ return (n < 10 ? '0' : '') + n; };
+  return 'nexus-scan-' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' +
+    p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + '.pdf';
+}
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"']/g, function(c){
+    return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c];
+  });
+}
+</script>
+<script>
+// ---------- 상태와 요소 ----------
+var $ = function(id){ return document.getElementById(id); };
+var SITE = 'scan';
+function nxEvent(ev){ try { fetch("https://nexus-orchestrator.woojuhanul.workers.dev/event", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({site: SITE, event: ev}), keepalive:true}).catch(function(){}); } catch(e){} }
+var MAXDIM = 2000;
+var S = {
+  work: null,        // 작업용 캔버스 (긴 변 최대 2000)
+  corners: null,     // 작업 좌표계 4점 TL,TR,BR,BL
+  warpedData: null,  // 펴진 결과의 ImageData (보정 전 원본)
+  mode: 'color',
+  pages: []          // {blob, url, w, h}
+};
+function setStep(n){
+  for(var i = 1; i <= 3; i++){
+    $('step' + i).className = 'step' + (i <= n ? ' on' : '');
+  }
+}
+
+// ---------- 사진 불러오기 ----------
+var loadedLibs = {};
+function loadScript(src, key){
+  if(loadedLibs[key]) return loadedLibs[key];
+  loadedLibs[key] = new Promise(function(resolve, reject){
+    var s = document.createElement('script');
+    s.src = src;
+    s.onload = function(){ resolve(true); };
+    s.onerror = function(){ reject(new Error('도구를 불러오지 못했습니다')); };
+    document.head.appendChild(s);
+  });
+  return loadedLibs[key];
+}
+function loadImageFile(f){
+  return new Promise(function(resolve, reject){
+    var url = URL.createObjectURL(f);
+    var img = new Image();
+    img.onload = function(){ resolve({ img: img, url: url }); };
+    img.onerror = function(){ URL.revokeObjectURL(url); reject(new Error('사진을 열지 못했습니다')); };
+    img.src = url;
+  });
+}
+function handleFile(f){
+  if(!f) return;
+  if(f.type && f.type.indexOf('image/') !== 0){
+    $('loadErr').textContent = '사진 파일만 넣을 수 있습니다.';
+    return;
+  }
+  $('loadErr').textContent = '';
+  loadImageFile(f).then(function(res){
+    var img = res.img;
+    var scale = Math.min(1, MAXDIM / Math.max(img.naturalWidth, img.naturalHeight));
+    var w = Math.max(2, Math.round(img.naturalWidth * scale));
+    var h = Math.max(2, Math.round(img.naturalHeight * scale));
+    var cv = document.createElement('canvas');
+    cv.width = w; cv.height = h;
+    cv.getContext('2d').drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(res.url);
+    S.work = cv;
+    S.warpedData = null;
+    var est = runEstimate();
+    S.corners = est || fallbackCorners(w, h);
+    showEditor(est ? '문서 모서리를 자동으로 찾았습니다. 어긋난 점은 끌어 맞추세요.' : '모서리를 자동으로 찾지 못했습니다. 네 점을 문서 모서리에 맞춰 끌어 놓으세요.');
+    $('adjPanel').style.display = 'none';
+    setStep(2);
+    nxEvent('start');
+    $('editPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }).catch(function(){
+    nxEvent('fail');
+    $('loadErr').textContent = '사진을 열지 못했습니다. 다른 사진으로 시도해 보세요. (아이폰 HEIC 사진은 브라우저에 따라 열리지 않을 수 있습니다)';
+  });
+}
+function runEstimate(){
+  if(!S.work) return null;
+  var w = S.work.width, h = S.work.height;
+  var small = document.createElement('canvas');
+  var sw = Math.min(360, w), sh = Math.max(2, Math.round(h * sw / w));
+  small.width = sw; small.height = sh;
+  var sctx = small.getContext('2d');
+  sctx.drawImage(S.work, 0, 0, sw, sh);
+  var data;
+  try { data = sctx.getImageData(0, 0, sw, sh).data; } catch(e){ return null; }
+  var gray = new Float32Array(sw * sh);
+  for(var i = 0; i < sw * sh; i++){
+    gray[i] = data[i * 4] * 0.299 + data[i * 4 + 1] * 0.587 + data[i * 4 + 2] * 0.114;
+  }
+  return estimateCornersFromGray(gray, sw, sh, w, h);
+}
+
+// ---------- 모서리 편집 ----------
+var srcCanvas = $('srcCanvas'), stage = $('stage');
+var dragIdx = -1, drawQueued = false;
+function drawStage(){
+  if(!S.work) return;
+  var ctx = srcCanvas.getContext('2d');
+  ctx.drawImage(S.work, 0, 0);
+  if(S.corners){
+    ctx.beginPath();
+    S.corners.forEach(function(p, i){
+      if(i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+    });
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(56,189,248,0.13)';
+    ctx.fill();
+    ctx.strokeStyle = '#2DD4BF';
+    ctx.lineWidth = Math.max(2, S.work.width / 300);
+    ctx.stroke();
+  }
+  positionHandles();
+}
+function queueDraw(){
+  if(drawQueued) return;
+  drawQueued = true;
+  requestAnimationFrame(function(){ drawQueued = false; drawStage(); });
+}
+function positionHandles(){
+  if(!S.work || !S.corners) return;
+  S.corners.forEach(function(p, i){
+    var el = $('c' + i);
+    el.style.left = (p.x / S.work.width * 100) + '%';
+    el.style.top = (p.y / S.work.height * 100) + '%';
+  });
+}
+function showEditor(msg){
+  $('editPanel').style.display = 'block';
+  srcCanvas.width = S.work.width;
+  srcCanvas.height = S.work.height;
+  drawStage();
+  $('cornerMsg').textContent = msg;
+}
+function stagePoint(evt){
+  var r = srcCanvas.getBoundingClientRect();
+  var x = (evt.clientX - r.left) / r.width * S.work.width;
+  var y = (evt.clientY - r.top) / r.height * S.work.height;
+  x = Math.max(0, Math.min(S.work.width, x));
+  y = Math.max(0, Math.min(S.work.height, y));
+  return { x: x, y: y };
+}
+[0, 1, 2, 3].forEach(function(i){
+  var el = $('c' + i);
+  el.addEventListener('pointerdown', function(e){
+    dragIdx = i;
+    el.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  el.addEventListener('pointermove', function(e){
+    if(dragIdx !== i || !S.corners) return;
+    S.corners[i] = stagePoint(e);
+    queueDraw();
+  });
+  el.addEventListener('pointerup', function(){ dragIdx = -1; });
+  el.addEventListener('pointercancel', function(){ dragIdx = -1; });
+});
+$('autoBtn').addEventListener('click', function(){
+  var est = runEstimate();
+  if(est){
+    S.corners = est;
+    drawStage();
+    $('cornerMsg').textContent = '문서 모서리를 자동으로 다시 찾았습니다. 어긋난 점은 끌어 맞추세요.';
+  } else {
+    $('cornerMsg').textContent = '모서리를 자동으로 찾지 못했습니다. 네 점을 문서 모서리에 맞춰 끌어 놓으세요.';
+  }
+});
+$('camBtn').addEventListener('click', function(){ $('camIn').click(); });
+$('pickBtn').addEventListener('click', function(){ $('fileIn').click(); });
+$('camIn').addEventListener('change', function(){ if($('camIn').files && $('camIn').files[0]) handleFile($('camIn').files[0]); $('camIn').value = ''; });
+$('fileIn').addEventListener('change', function(){ if($('fileIn').files && $('fileIn').files[0]) handleFile($('fileIn').files[0]); $('fileIn').value = ''; });
+var drop = $('drop');
+['dragenter', 'dragover'].forEach(function(ev){
+  drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add('over'); });
+});
+['dragleave', 'drop'].forEach(function(ev){
+  drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove('over'); });
+});
+drop.addEventListener('drop', function(e){
+  var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if(f) handleFile(f);
+});
+
+// ---------- 원근 보정 ----------
+$('warpBtn').addEventListener('click', function(){
+  if(!S.work || !S.corners) return;
+  var c = S.corners;
+  var outW = Math.round(Math.max(distPt(c[0], c[1]), distPt(c[3], c[2])));
+  var outH = Math.round(Math.max(distPt(c[0], c[3]), distPt(c[1], c[2])));
+  if(outW < 40 || outH < 40){
+    $('cornerMsg').textContent = '모서리 영역이 너무 작습니다. 점을 문서 모서리에 맞게 벌려 주세요.';
+    nxEvent('fail');
+    return;
+  }
+  var scale = Math.min(1, 1800 / Math.max(outW, outH));
+  outW = Math.max(2, Math.round(outW * scale));
+  outH = Math.max(2, Math.round(outH * scale));
+  var cornersScaled = c.map(function(p){ return { x: p.x, y: p.y }; });
+  var btn = $('warpBtn');
+  btn.disabled = true;
+  btn.textContent = '펴는 중…';
+  setTimeout(function(){
+    try {
+      var srcCtx = S.work.getContext('2d');
+      var srcData = srcCtx.getImageData(0, 0, S.work.width, S.work.height);
+      var px = warpPixels(srcData, S.work.width, S.work.height, cornersScaled, outW, outH);
+      if(!px){ throw new Error('warp failed'); }
+      var oc = $('outCanvas');
+      oc.width = outW; oc.height = outH;
+      var imgData = new ImageData(px, outW, outH);
+      S.warpedData = imgData;
+      renderAdjust();
+      $('adjPanel').style.display = 'block';
+      $('adjMsg').textContent = '반듯하게 폈습니다. 색 방식을 고르고 밝기와 대비를 맞춘 뒤, 페이지를 목록에 추가하세요.';
+      setStep(3);
+      nxEvent('complete');
+      $('adjPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch(e){
+      nxEvent('fail');
+      $('cornerMsg').textContent = '펴기에 실패했습니다. 모서리 점을 확인하고 다시 시도해 보세요.';
+    }
+    btn.disabled = false;
+    btn.textContent = '반듯하게 펴기';
+  }, 30);
+});
+
+// ---------- 보정 ----------
+function renderAdjust(){
+  if(!S.warpedData) return;
+  var src = S.warpedData;
+  var out = new ImageData(new Uint8ClampedArray(src.data), src.width, src.height);
+  var d = out.data;
+  var bright = parseInt($('brightIn').value, 10) || 0;
+  var conVal = parseInt($('contrastIn').value, 10) || 100;
+  $('brightVal').textContent = bright;
+  $('contrastVal').textContent = conVal;
+  var factor = conVal / 100;
+  var mode = S.mode;
+  for(var i = 0; i < d.length; i += 4){
+    var r = d[i], g = d[i + 1], b = d[i + 2];
+    if(mode !== 'color'){
+      var lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      if(mode === 'doc'){
+        lum = (lum / 255 - 0.32) * 2.1 * 255;
+        lum = Math.max(0, Math.min(255, lum));
+      }
+      r = g = b = lum;
+    }
+    d[i]     = ((r / 255 - 0.5) * factor + 0.5) * 255 + bright;
+    d[i + 1] = ((g / 255 - 0.5) * factor + 0.5) * 255 + bright;
+    d[i + 2] = ((b / 255 - 0.5) * factor + 0.5) * 255 + bright;
+  }
+  $('outCanvas').getContext('2d').putImageData(out, 0, 0);
+}
+$('brightIn').addEventListener('input', renderAdjust);
+$('contrastIn').addEventListener('input', renderAdjust);
+$('modeSeg').querySelectorAll('button').forEach(function(b){
+  b.addEventListener('click', function(){
+    S.mode = b.getAttribute('data-mode');
+    $('modeSeg').querySelectorAll('button').forEach(function(x){ x.className = (x === b ? 'on' : ''); });
+    renderAdjust();
+  });
+});
+$('rotBtn').addEventListener('click', function(){
+  if(!S.warpedData) return;
+  var src = S.warpedData;
+  var nw = src.height, nh = src.width;
+  var rotated = new ImageData(nw, nh);
+  var sd = src.data, rd = rotated.data;
+  for(var y = 0; y < src.height; y++){
+    for(var x = 0; x < src.width; x++){
+      var si = (y * src.width + x) * 4;
+      var nx = src.height - 1 - y, ny = x;
+      var di = (ny * nw + nx) * 4;
+      rd[di] = sd[si]; rd[di + 1] = sd[si + 1]; rd[di + 2] = sd[si + 2]; rd[di + 3] = sd[si + 3];
+    }
+  }
+  S.warpedData = rotated;
+  $('outCanvas').width = nw;
+  $('outCanvas').height = nh;
+  renderAdjust();
+});
+$('backBtn').addEventListener('click', function(){
+  $('adjPanel').style.display = 'none';
+  setStep(2);
+  $('editPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+function downloadBlob(blob, name){
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+}
+$('saveImgBtn').addEventListener('click', function(){
+  if(!S.warpedData) return;
+  $('outCanvas').toBlob(function(blob){
+    if(!blob) return;
+    downloadBlob(blob, scanFileName(new Date()).replace(/\.pdf$/, '.jpg'));
+    nxEvent('save');
+    $('adjMsg').textContent = '이미지 파일로 저장했습니다.';
+  }, 'image/jpeg', 0.92);
+});
+
+// ---------- 페이지 목록과 PDF ----------
+function renderPages(){
+  var panel = $('pagesPanel');
+  if(!S.pages.length){ panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+  $('pageCount').textContent = '— ' + S.pages.length + '장';
+  var box = $('thumbs');
+  box.innerHTML = '';
+  S.pages.forEach(function(pg, idx){
+    var wrap = document.createElement('div');
+    wrap.className = 'thumb';
+    var img = document.createElement('img');
+    img.src = pg.url;
+    img.alt = (idx + 1) + '번째 페이지';
+    var no = document.createElement('span');
+    no.className = 'no';
+    no.textContent = (idx + 1) + '장';
+    var del = document.createElement('button');
+    del.className = 'del';
+    del.textContent = '✕ 삭제';
+    del.addEventListener('click', function(){
+      URL.revokeObjectURL(S.pages[idx].url);
+      S.pages.splice(idx, 1);
+      renderPages();
+      $('pdfMsg').textContent = '페이지를 지웠습니다. 지금 ' + S.pages.length + '장이 담겨 있습니다.';
+    });
+    wrap.appendChild(img);
+    wrap.appendChild(no);
+    wrap.appendChild(del);
+    box.appendChild(wrap);
+  });
+}
+$('addPageBtn').addEventListener('click', function(){
+  if(!S.warpedData) return;
+  $('outCanvas').toBlob(function(blob){
+    if(!blob){ $('adjMsg').textContent = '페이지를 담지 못했습니다.'; return; }
+    S.pages.push({ blob: blob, url: URL.createObjectURL(blob), w: $('outCanvas').width, h: $('outCanvas').height });
+    renderPages();
+    $('adjMsg').textContent = '목록에 추가했습니다. 지금까지 ' + S.pages.length + '장입니다. 다음 장을 찍거나 PDF로 저장하세요.';
+    $('pagesPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 'image/jpeg', 0.92);
+});
+$('moreBtn').addEventListener('click', function(){
+  $('adjPanel').style.display = 'none';
+  $('editPanel').style.display = 'none';
+  setStep(1);
+  drop.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+$('clearPagesBtn').addEventListener('click', function(){
+  S.pages.forEach(function(pg){ URL.revokeObjectURL(pg.url); });
+  S.pages = [];
+  renderPages();
+  $('pdfMsg').textContent = '담은 페이지를 모두 지웠습니다.';
+});
+$('pdfBtn').addEventListener('click', function(){
+  if(!S.pages.length) return;
+  var btn = $('pdfBtn');
+  btn.disabled = true;
+  btn.textContent = 'PDF 만드는 중…';
+  $('pdfMsg').textContent = 'PDF를 만들고 있습니다…';
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js', 'pdflib').then(function(){
+    return PDFLib.PDFDocument.create();
+  }).then(function(doc){
+    var chain = Promise.resolve();
+    S.pages.forEach(function(pg){
+      chain = chain.then(function(){
+        return pg.blob.arrayBuffer().then(function(buf){ return doc.embedJpg(buf); }).then(function(img){
+          var scale = Math.min(595 / pg.w, 842 / pg.h);
+          if(scale > 1) scale = 1;
+          var pw = Math.round(pg.w * scale), ph = Math.round(pg.h * scale);
+          var page = doc.addPage([pw, ph]);
+          page.drawImage(img, { x: 0, y: 0, width: pw, height: ph });
+        });
+      });
+    });
+    return chain.then(function(){ return doc.save(); });
+  }).then(function(bytes){
+    var blob = new Blob([bytes], { type: 'application/pdf' });
+    downloadBlob(blob, scanFileName(new Date()));
+    nxEvent('save');
+    $('pdfMsg').textContent = 'PDF로 저장했습니다. (' + S.pages.length + '장)';
+  }).catch(function(){
+    nxEvent('fail');
+    $('pdfMsg').textContent = 'PDF를 만들지 못했습니다. 네트워크 상태를 확인하고 다시 시도해 보세요.';
+  }).then(function(){
+    btn.disabled = false;
+    btn.textContent = 'PDF로 저장';
+  });
+});
+
+// ---------- 철학 모달 ----------
+$('philoLink').addEventListener('click', function(){ $('modalBg').classList.add('open'); });
+$('modalClose').addEventListener('click', function(){ $('modalBg').classList.remove('open'); });
+$('modalBg').addEventListener('click', function(e){ if(e.target === $('modalBg')) $('modalBg').classList.remove('open'); });
+</script>
+
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 소리 자르기": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 영상 자르기": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 사진 정보 가리기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 읽어 주기": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 긴 말 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 사진 글자 뽑기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 녹음기": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 말로 쓰는 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 16호 문서 스캔 전용 사전 */
+NX_I18N_ADD({
+ "16호 문서 스캔 (현재)": {
+  "en": "16. Document Scanner (current)",
+  "zh": "16号 文档扫描（当前）",
+  "ja": "16号 文書スキャン（現在）",
+  "es": "16. Escáner de documentos (actual)",
+  "hi": "16. दस्तावेज़ स्कैनर (वर्तमान)",
+  "fr": "16. Scanner de documents (actuel)",
+  "de": "16. Dokumentenscanner (aktuell)",
+  "pt": "16. Scanner de documentos (atual)",
+  "it": "16. Scanner di documenti (attuale)",
+  "nl": "16. Documentscanner (huidig)",
+  "ru": "16. Сканер документов (текущий)",
+  "uk": "16. Сканер документів (поточний)",
+  "pl": "16. Skaner dokumentów (bieżący)",
+  "cs": "16. Skener dokumentů (aktuální)",
+  "hu": "16. Dokumentumszkenner (aktuális)",
+  "ro": "16. Scaner de documente (curent)",
+  "da": "16. Dokumentscanner (aktuel)",
+  "fi": "16. Asiakirjaskanneri (nykyinen)",
+  "nb": "16. Dokumentskanner (gjeldende)",
+  "sv": "16. Dokumentskanner (aktuell)",
+  "tr": "16. Belge Tarayıcı (geçerli)",
+  "zh-TW": "16號 文件掃描（目前）",
+  "th": "16. เครื่องสแกนเอกสาร (ปัจจุบัน)",
+  "vi": "16. Quét tài liệu (hiện tại)",
+  "id": "16. Pemindai Dokumen (saat ini)",
+  "ar": "16. ماسح المستندات (الحالي)",
+  "fa": "16. اسکنر اسناد (فعلی)"
+ },
+ "🏠 넥서스 그룹 홈페이지": {
+  "en": "🏠 Nexus Group Home",
+  "zh": "🏠 Nexus Group 主页",
+  "ja": "🏠 Nexus Group ホーム",
+  "es": "🏠 Inicio de Nexus Group",
+  "hi": "🏠 Nexus Group होम",
+  "fr": "🏠 Accueil Nexus Group",
+  "de": "🏠 Nexus Group Startseite",
+  "pt": "🏠 Página inicial do Nexus Group",
+  "it": "🏠 Home Nexus Group",
+  "nl": "🏠 Nexus Group-homepage",
+  "ru": "🏠 Главная страница Nexus Group",
+  "uk": "🏠 Головна сторінка Nexus Group",
+  "pl": "🏠 Strona główna Nexus Group",
+  "cs": "🏠 Domovská stránka Nexus Group",
+  "hu": "🏠 Nexus Group főoldal",
+  "ro": "🏠 Pagina principală Nexus Group",
+  "da": "🏠 Nexus Groups startside",
+  "fi": "🏠 Nexus Groupin kotisivu",
+  "nb": "🏠 Nexus Groups startside",
+  "sv": "🏠 Nexus Groups startsida",
+  "tr": "🏠 Nexus Group Ana Sayfası",
+  "zh-TW": "🏠 Nexus Group 首頁",
+  "th": "🏠 หน้าแรก Nexus Group",
+  "vi": "🏠 Trang chủ Nexus Group",
+  "id": "🏠 Beranda Nexus Group",
+  "ar": "🏠 الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "🏠 صفحه اصلی گروه Nexus"
+ },
+ "넥서스 문서 스캔 — Nexus Doc Scanner": {
+  "en": "Nexus Document Scanner",
+  "zh": "Nexus 文档扫描",
+  "ja": "Nexus 文書スキャン",
+  "es": "Nexus Escáner de documentos",
+  "hi": "Nexus दस्तावेज़ स्कैनर",
+  "fr": "Nexus Scanner de documents",
+  "de": "Nexus Dokumentenscanner",
+  "pt": "Nexus Scanner de documentos",
+  "it": "Nexus Scanner di documenti",
+  "nl": "Nexus Documentscanner",
+  "ru": "Nexus Сканер документов — Nexus Doc Scanner",
+  "uk": "Nexus Сканер документів — Nexus Doc Scanner",
+  "pl": "Nexus Skaner dokumentów — Nexus Doc Scanner",
+  "cs": "Nexus Skener dokumentů — Nexus Doc Scanner",
+  "hu": "Nexus Dokumentumszkenner — Nexus Doc Scanner",
+  "ro": "Nexus Scaner de documente — Nexus Doc Scanner",
+  "da": "Nexus Dokumentscanner",
+  "fi": "Nexus Asiakirjaskanneri",
+  "nb": "Nexus Dokumentskanner",
+  "sv": "Nexus Dokumentskanner",
+  "tr": "Nexus Belge Tarayıcı",
+  "zh-TW": "Nexus 文件掃描",
+  "th": "Nexus เครื่องสแกนเอกสาร",
+  "vi": "Nexus Quét tài liệu",
+  "id": "Nexus Pemindai Dokumen",
+  "ar": "ماسح مستندات Nexus — Nexus Doc Scanner",
+  "fa": "اسکنر اسناد Nexus — Nexus Doc Scanner"
+ },
+ "넥서스 문서 스캔": {
+  "en": "Nexus Document Scanner",
+  "zh": "Nexus 文档扫描",
+  "ja": "Nexus 文書スキャン",
+  "es": "Nexus Escáner de documentos",
+  "hi": "Nexus दस्तावेज़ स्कैनर",
+  "fr": "Nexus Scanner de documents",
+  "de": "Nexus Dokumentenscanner",
+  "pt": "Nexus Scanner de documentos",
+  "it": "Nexus Scanner di documenti",
+  "nl": "Nexus Documentscanner",
+  "ru": "Nexus Сканер документов",
+  "uk": "Nexus Сканер документів",
+  "pl": "Nexus Skaner dokumentów",
+  "cs": "Nexus Skener dokumentů",
+  "hu": "Nexus Dokumentumszkenner",
+  "ro": "Nexus Scaner de documente",
+  "da": "Nexus Dokumentscanner",
+  "fi": "Nexus Asiakirjaskanneri",
+  "nb": "Nexus Dokumentskanner",
+  "sv": "Nexus Dokumentskanner",
+  "tr": "Nexus Belge Tarayıcı",
+  "zh-TW": "Nexus 文件掃描",
+  "th": "Nexus เครื่องสแกนเอกสาร",
+  "vi": "Nexus Quét tài liệu",
+  "id": "Nexus Pemindai Dokumen",
+  "ar": "ماسح مستندات Nexus",
+  "fa": "اسکنر اسناد Nexus"
+ },
+ "사진 넣기": {
+  "en": "Add a photo",
+  "zh": "添加照片",
+  "ja": "写真を入れる",
+  "es": "Añadir foto",
+  "hi": "फ़ोटो जोड़ें",
+  "fr": "Ajouter une photo",
+  "de": "Foto hinzufügen",
+  "pt": "Adicionar foto",
+  "it": "Aggiungi una foto",
+  "nl": "Foto toevoegen",
+  "ru": "Добавить фото",
+  "uk": "Додати фото",
+  "pl": "Dodaj zdjęcie",
+  "cs": "Přidat fotografii",
+  "hu": "Fotó hozzáadása",
+  "ro": "Adaugă o fotografie",
+  "da": "Tilføj et foto",
+  "fi": "Lisää kuva",
+  "nb": "Legg til et bilde",
+  "sv": "Lägg till ett foto",
+  "tr": "Fotoğraf ekle",
+  "zh-TW": "加入照片",
+  "th": "ใส่รูป",
+  "vi": "Thêm ảnh",
+  "id": "Tambahkan foto",
+  "ar": "إضافة صورة",
+  "fa": "افزودن عکس"
+ },
+ "모서리 맞추기": {
+  "en": "Align corners",
+  "zh": "对齐边角",
+  "ja": "角を合わせる",
+  "es": "Alinear esquinas",
+  "hi": "कोने मिलाएँ",
+  "fr": "Aligner les coins",
+  "de": "Ecken ausrichten",
+  "pt": "Alinhar cantos",
+  "it": "Allinea gli angoli",
+  "nl": "Hoeken uitlijnen",
+  "ru": "Выровнять углы",
+  "uk": "Вирівняти кути",
+  "pl": "Wyrównaj narożniki",
+  "cs": "Zarovnat rohy",
+  "hu": "Sarkok igazítása",
+  "ro": "Aliniază colțurile",
+  "da": "Justér hjørner",
+  "fi": "Kohdista kulmat",
+  "nb": "Juster hjørner",
+  "sv": "Rikta in hörnen",
+  "tr": "Köşeleri hizala",
+  "zh-TW": "對齊邊角",
+  "th": "จัดมุมให้ตรง",
+  "vi": "Căn góc",
+  "id": "Sejajarkan sudut",
+  "ar": "محاذاة الزوايا",
+  "fa": "هم‌تراز کردن گوشه‌ها"
+ },
+ "보정 · PDF": {
+  "en": "Adjust · PDF",
+  "zh": "校正 · PDF",
+  "ja": "補正・PDF",
+  "es": "Ajustar · PDF",
+  "hi": "समायोजन · PDF",
+  "fr": "Ajuster · PDF",
+  "de": "Anpassen · PDF",
+  "pt": "Ajustar · PDF",
+  "it": "Regola · PDF",
+  "nl": "Aanpassen · PDF",
+  "ru": "Коррекция · PDF",
+  "uk": "Корекція · PDF",
+  "pl": "Korekta · PDF",
+  "cs": "Úpravy · PDF",
+  "hu": "Korrekció · PDF",
+  "ro": "Ajustare · PDF",
+  "da": "Justér · PDF",
+  "fi": "Säädä · PDF",
+  "nb": "Juster · PDF",
+  "sv": "Justera · PDF",
+  "tr": "Ayarla · PDF",
+  "zh-TW": "校正 · PDF",
+  "th": "ปรับแต่ง · PDF",
+  "vi": "Chỉnh sửa · PDF",
+  "id": "Sesuaikan · PDF",
+  "ar": "الضبط · PDF",
+  "fa": "تنظیم · PDF"
+ },
+ "사진으로 찍은 문서를 반듯하게 펴서 PDF로 만드는 도구": {
+  "en": "Turns photos of documents into straight, flat PDFs",
+  "zh": "把拍下的文档照片拉直并做成 PDF 的工具",
+  "ja": "写真で撮った文書をまっすぐに伸ばしてPDFにするツール",
+  "es": "Herramienta que endereza fotos de documentos y las convierte en PDF",
+  "hi": "दस्तावेज़ की फ़ोटो को सीधा करके PDF बनाने वाला टूल",
+  "fr": "Un outil qui redresse les photos de documents et les transforme en PDF bien plats",
+  "de": "Ein Werkzeug, das Fotos von Dokumenten gerade richtet und in PDFs verwandelt",
+  "pt": "Ferramenta que endireita fotos de documentos e as transforma em PDF",
+  "it": "Strumento che raddrizza le foto dei documenti e le trasforma in PDF",
+  "nl": "Tool die foto's van documenten rechtzet en er PDF's van maakt",
+  "ru": "Инструмент, который выравнивает фотографии документов и делает из них PDF",
+  "uk": "Інструмент, який вирівнює фотографії документів і робить з них PDF",
+  "pl": "Narzędzie, które prostuje zdjęcia dokumentów i zamienia je w PDF",
+  "cs": "Nástroj, který narovná fotografie dokumentů a vytvoří z nich PDF",
+  "hu": "Eszköz, amely kiegyenesíti a dokumentumfotókat és PDF-et készít belőlük",
+  "ro": "Instrument care îndreaptă fotografiile documentelor și le transformă în PDF",
+  "da": "Gør fotos af dokumenter til lige, flade PDF'er",
+  "fi": "Muuttaa asiakirjakuvat suoriksi, tasaisiksi PDF-tiedostoiksi",
+  "nb": "Gjør bilder av dokumenter til rette, flate PDF-er",
+  "sv": "Gör foton av dokument till raka, platta PDF:er",
+  "tr": "Belge fotoğraflarını düz, yatay PDF'lere dönüştüren araç",
+  "zh-TW": "把拍下的文件照片拉直並做成 PDF 的工具",
+  "th": "เครื่องมือที่ทำรูปถ่ายเอกสารให้ตรงและแบนเป็น PDF",
+  "vi": "Công cụ biến ảnh chụp tài liệu thành PDF thẳng và phẳng",
+  "id": "Alat yang meluruskan foto dokumen menjadi PDF yang rapi",
+  "ar": "أداة تُقوّم صور المستندات وتحوّلها إلى ملفات PDF مستوية",
+  "fa": "ابزاری که عکس اسناد را صاف و هموار کرده و به PDF تبدیل می‌کند"
+ },
+ "회원가입 없음 · 이용료 없음 · 무제한 사용": {
+  "en": "No sign-up · No fees · Unlimited use",
+  "zh": "无需注册 · 免费 · 无限使用",
+  "ja": "登録不要 · 無料 · 無制限",
+  "es": "Sin registro · Gratis · Uso ilimitado",
+  "hi": "कोई साइन-अप नहीं · कोई शुल्क नहीं · असीमित उपयोग",
+  "fr": "Sans inscription · Gratuit · Utilisation illimitée",
+  "de": "Keine Anmeldung · Keine Gebühren · Unbegrenzte Nutzung",
+  "pt": "Sem cadastro · Sem taxas · Uso ilimitado",
+  "it": "Senza registrazione · Nessun costo · Uso illimitato",
+  "nl": "Geen registratie · Geen kosten · Onbeperkt gebruik",
+  "ru": "Без регистрации · Бесплатно · Без ограничений",
+  "uk": "Без реєстрації · Безкоштовно · Без обмежень",
+  "pl": "Bez rejestracji · Bez opłat · Bez ograniczeń",
+  "cs": "Bez registrace · Zdarma · Bez omezení",
+  "hu": "Regisztráció nélkül · Díjmentes · Korlátlan használat",
+  "ro": "Fără înregistrare · Gratuit · Utilizare nelimitată",
+  "da": "Ingen tilmelding · Ingen gebyrer · Ubegrænset brug",
+  "fi": "Ei rekisteröitymistä · Ei maksuja · Rajoittamaton käyttö",
+  "nb": "Ingen registrering · Ingen gebyrer · Ubegrenset bruk",
+  "sv": "Ingen registrering · Inga avgifter · Obegränsad användning",
+  "tr": "Kayıt yok · Ücret yok · Sınırsız kullanım",
+  "zh-TW": "免註冊 · 免費 · 無限使用",
+  "th": "ไม่ต้องสมัครสมาชิก · ไม่มีค่าธรรมเนียม · ใช้ได้ไม่จำกัด",
+  "vi": "Không cần đăng ký · Miễn phí · Dùng không giới hạn",
+  "id": "Tanpa pendaftaran · Gratis · Penggunaan tanpa batas",
+  "ar": "بدون تسجيل · بدون رسوم · استخدام غير محدود",
+  "fa": "بدون ثبت‌نام · بدون هزینه · استفاده نامحدود"
+ },
+ "📷 사진 찍기": {
+  "en": "📷 Take a photo",
+  "zh": "📷 拍照",
+  "ja": "📷 写真を撮る",
+  "es": "📷 Tomar una foto",
+  "hi": "📷 फ़ोटो लें",
+  "fr": "📷 Prendre une photo",
+  "de": "📷 Foto aufnehmen",
+  "pt": "📷 Tirar uma foto",
+  "it": "📷 Scatta una foto",
+  "nl": "📷 Foto maken",
+  "ru": "📷 Сфотографировать",
+  "uk": "📷 Сфотографувати",
+  "pl": "📷 Zrób zdjęcie",
+  "cs": "📷 Vyfotit",
+  "hu": "📷 Fotó készítése",
+  "ro": "📷 Fă o fotografie",
+  "da": "📷 Tag et foto",
+  "fi": "📷 Ota kuva",
+  "nb": "📷 Ta et bilde",
+  "sv": "📷 Ta ett foto",
+  "tr": "📷 Fotoğraf çek",
+  "zh-TW": "📷 拍照",
+  "th": "📷 ถ่ายรูป",
+  "vi": "📷 Chụp ảnh",
+  "id": "📷 Ambil foto",
+  "ar": "📷 التقاط صورة",
+  "fa": "📷 عکس بگیرید"
+ },
+ "🖼️ 사진 고르기": {
+  "en": "🖼️ Choose a photo",
+  "zh": "🖼️ 选择照片",
+  "ja": "🖼️ 写真を選ぶ",
+  "es": "🖼️ Elegir una foto",
+  "hi": "🖼️ फ़ोटो चुनें",
+  "fr": "🖼️ Choisir une photo",
+  "de": "🖼️ Foto auswählen",
+  "pt": "🖼️ Escolher uma foto",
+  "it": "🖼️ Scegli una foto",
+  "nl": "🖼️ Foto kiezen",
+  "ru": "🖼️ Выбрать фото",
+  "uk": "🖼️ Вибрати фото",
+  "pl": "🖼️ Wybierz zdjęcie",
+  "cs": "🖼️ Vybrat fotografii",
+  "hu": "🖼️ Fotó kiválasztása",
+  "ro": "🖼️ Alege o fotografie",
+  "da": "🖼️ Vælg et foto",
+  "fi": "🖼️ Valitse kuva",
+  "nb": "🖼️ Velg et bilde",
+  "sv": "🖼️ Välj ett foto",
+  "tr": "🖼️ Fotoğraf seç",
+  "zh-TW": "🖼️ 選擇照片",
+  "th": "🖼️ เลือกรูป",
+  "vi": "🖼️ Chọn ảnh",
+  "id": "🖼️ Pilih foto",
+  "ar": "🖼️ اختيار صورة",
+  "fa": "🖼️ انتخاب عکس"
+ },
+ "또는 사진을 여기에 끌어다 놓으세요": {
+  "en": "or drag and drop a photo here",
+  "zh": "或将照片拖放到这里",
+  "ja": "または写真をここにドラッグしてください",
+  "es": "o arrastra una foto aquí",
+  "hi": "या फ़ोटो यहाँ खींचकर छोड़ें",
+  "fr": "ou glissez-déposez une photo ici",
+  "de": "oder ziehen Sie ein Foto hierher",
+  "pt": "ou arraste e solte uma foto aqui",
+  "it": "oppure trascina qui una foto",
+  "nl": "of sleep een foto hierheen",
+  "ru": "или перетащите фото сюда",
+  "uk": "або перетягніть фото сюди",
+  "pl": "lub przeciągnij i upuść zdjęcie tutaj",
+  "cs": "nebo fotografii přetáhněte sem",
+  "hu": "vagy húzza ide a fotót",
+  "ro": "sau trageți o fotografie aici",
+  "da": "eller træk og slip et foto her",
+  "fi": "tai vedä ja pudota kuva tähän",
+  "nb": "eller dra og slipp et bilde her",
+  "sv": "eller dra och släpp ett foto här",
+  "tr": "veya fotoğrafı buraya sürükleyip bırakın",
+  "zh-TW": "或將照片拖放到這裡",
+  "th": "หรือลากรูปมาวางที่นี่",
+  "vi": "hoặc kéo và thả ảnh vào đây",
+  "id": "atau seret dan letakkan foto di sini",
+  "ar": "أو اسحب صورة وأفلتها هنا",
+  "fa": "یا عکسی را اینجا بکشید و رها کنید"
+ },
+ "예) 계약서 촬영 → 모서리 맞추기 → 반듯한 PDF로 저장": {
+  "en": "e.g. Photo of a contract → align corners → save as a straight PDF",
+  "zh": "例）拍摄合同 → 对齐边角 → 保存为端正的 PDF",
+  "ja": "例）契約書を撮影 → 角を合わせる → まっすぐなPDFで保存",
+  "es": "Ej.) Foto de un contrato → alinear esquinas → guardar como PDF recto",
+  "hi": "उदा.) अनुबंध की फ़ोटो → कोने मिलाएँ → सीधे PDF में सहेजें",
+  "fr": "ex.) Photo d'un contrat → aligner les coins → enregistrer en PDF bien droit",
+  "de": "z. B. Vertrag fotografieren → Ecken ausrichten → als gerades PDF speichern",
+  "pt": "ex.) Foto de um contrato → alinhar cantos → salvar como PDF reto",
+  "it": "es.) Foto di un contratto → allinea gli angoli → salva come PDF dritto",
+  "nl": "bijv.) Foto van een contract → hoeken uitlijnen → opslaan als rechte PDF",
+  "ru": "Напр.) фото договора → выровнять углы → сохранить как ровный PDF",
+  "uk": "Напр.) фото договору → вирівняти кути → зберегти як рівний PDF",
+  "pl": "Np.) zdjęcie umowy → wyrównaj narożniki → zapisz jako prosty PDF",
+  "cs": "Např.) fotografie smlouvy → zarovnat rohy → uložit jako rovné PDF",
+  "hu": "Pl.) szerződés fotója → sarkok igazítása → mentés egyenes PDF-ként",
+  "ro": "Ex.) fotografia unui contract → aliniază colțurile → salvează ca PDF drept",
+  "da": "f.eks. Foto af en kontrakt → justér hjørner → gem som en lige PDF",
+  "fi": "esim. Sopimuksen kuva → kohdista kulmat → tallenna suorana PDF:nä",
+  "nb": "f.eks. Bilde av en kontrakt → juster hjørner → lagre som en rett PDF",
+  "sv": "t.ex. Foto av ett avtal → rikta in hörnen → spara som en rak PDF",
+  "tr": "örn.) Sözleşme fotoğrafı → köşeleri hizala → düz PDF olarak kaydet",
+  "zh-TW": "例）拍攝合約 → 對齊邊角 → 儲存為端正的 PDF",
+  "th": "เช่น) ถ่ายรูปสัญญา → จัดมุมให้ตรง → บันทึกเป็น PDF ที่ตรง",
+  "vi": "Ví dụ) Chụp hợp đồng → căn góc → lưu thành PDF thẳng",
+  "id": "mis. Foto kontrak → sejajarkan sudut → simpan sebagai PDF rapi",
+  "ar": "مثال) تصوير عقد → محاذاة الزوايا → الحفظ كملف PDF مستقيم",
+  "fa": "مثال) عکس قرارداد → هم‌تراز کردن گوشه‌ها → ذخیره به‌صورت PDF صاف"
+ },
+ "② 문서 모서리 맞추기": {
+  "en": "② Align the document corners",
+  "zh": "② 对齐文档边角",
+  "ja": "② 文書の角を合わせる",
+  "es": "② Alinea las esquinas del documento",
+  "hi": "② दस्तावेज़ के कोने मिलाएँ",
+  "fr": "② Aligner les coins du document",
+  "de": "② Dokumentenecken ausrichten",
+  "pt": "② Alinhar os cantos do documento",
+  "it": "② Allinea gli angoli del documento",
+  "nl": "② Documenthoeken uitlijnen",
+  "ru": "② Выровнять углы документа",
+  "uk": "② Вирівняти кути документа",
+  "pl": "② Wyrównaj narożniki dokumentu",
+  "cs": "② Zarovnat rohy dokumentu",
+  "hu": "② A dokumentum sarkainak igazítása",
+  "ro": "② Aliniază colțurile documentului",
+  "da": "② Justér dokumentets hjørner",
+  "fi": "② Kohdista asiakirjan kulmat",
+  "nb": "② Juster dokumentets hjørner",
+  "sv": "② Rikta in dokumentets hörn",
+  "tr": "② Belge köşelerini hizala",
+  "zh-TW": "② 對齊文件邊角",
+  "th": "② จัดมุมเอกสารให้ตรง",
+  "vi": "② Căn góc tài liệu",
+  "id": "② Sejajarkan sudut dokumen",
+  "ar": "② محاذاة زوايا المستند",
+  "fa": "② هم‌تراز کردن گوشه‌های سند"
+ },
+ "네 개의 점을 문서의 모서리에 맞춰 끌어 놓으세요.": {
+  "en": "Drag the four dots to the corners of the document.",
+  "zh": "将四个点拖到文档的四个角上。",
+  "ja": "4つの点を文書の角に合わせてドラッグしてください。",
+  "es": "Arrastra los cuatro puntos a las esquinas del documento.",
+  "hi": "चारों बिंदुओं को खींचकर दस्तावेज़ के कोनों पर रखें।",
+  "fr": "Faites glisser les quatre points sur les coins du document.",
+  "de": "Ziehen Sie die vier Punkte auf die Ecken des Dokuments.",
+  "pt": "Arraste os quatro pontos para os cantos do documento.",
+  "it": "Trascina i quattro punti sugli angoli del documento.",
+  "nl": "Sleep de vier punten naar de hoeken van het document.",
+  "ru": "Перетащите четыре точки к углам документа.",
+  "uk": "Перетягніть чотири точки до кутів документа.",
+  "pl": "Przeciągnij cztery punkty do narożników dokumentu.",
+  "cs": "Přetáhněte čtyři body do rohů dokumentu.",
+  "hu": "Húzza a négy pontot a dokumentum sarkaihoz.",
+  "ro": "Trageți cele patru puncte în colțurile documentului.",
+  "da": "Træk de fire prikker til dokumentets hjørner.",
+  "fi": "Vedä neljä pistettä asiakirjan kulmiin.",
+  "nb": "Dra de fire punktene til hjørnene på dokumentet.",
+  "sv": "Dra de fyra punkterna till dokumentets hörn.",
+  "tr": "Dört noktayı belgenin köşelerine sürükleyin.",
+  "zh-TW": "將四個點拖到文件的四個角上。",
+  "th": "ลากจุดทั้งสี่ไปไว้ที่มุมของเอกสาร",
+  "vi": "Kéo bốn chấm tới các góc của tài liệu.",
+  "id": "Seret keempat titik ke sudut-sudut dokumen.",
+  "ar": "اسحب النقاط الأربع إلى زوايا المستند.",
+  "fa": "چهار نقطه را بکشید و روی گوشه‌های سند قرار دهید."
+ },
+ "반듯하게 펴기": {
+  "en": "Straighten",
+  "zh": "拉直",
+  "ja": "まっすぐに伸ばす",
+  "es": "Enderezar",
+  "hi": "सीधा करें",
+  "fr": "Redresser",
+  "de": "Gerade richten",
+  "pt": "Endireitar",
+  "it": "Raddrizza",
+  "nl": "Rechtzetten",
+  "ru": "Выровнять",
+  "uk": "Вирівняти",
+  "pl": "Wyprostuj",
+  "cs": "Narovnat",
+  "hu": "Kiegyenesítés",
+  "ro": "Îndreaptă",
+  "da": "Ret ud",
+  "fi": "Suorista",
+  "nb": "Rett ut",
+  "sv": "Räta ut",
+  "tr": "Düzleştir",
+  "zh-TW": "拉直",
+  "th": "ทำให้ตรง",
+  "vi": "Làm thẳng",
+  "id": "Luruskan",
+  "ar": "التقويم",
+  "fa": "صاف کردن"
+ },
+ "모서리 자동으로 다시 찾기": {
+  "en": "Find corners automatically again",
+  "zh": "重新自动查找边角",
+  "ja": "角を自動で再検出",
+  "es": "Buscar esquinas automáticamente otra vez",
+  "hi": "कोने फिर से स्वतः खोजें",
+  "fr": "Rechercher les coins automatiquement",
+  "de": "Ecken erneut automatisch suchen",
+  "pt": "Buscar cantos automaticamente de novo",
+  "it": "Trova di nuovo gli angoli automaticamente",
+  "nl": "Hoeken opnieuw automatisch zoeken",
+  "ru": "Снова найти углы автоматически",
+  "uk": "Знову знайти кути автоматично",
+  "pl": "Znajdź narożniki automatycznie jeszcze raz",
+  "cs": "Znovu automaticky najít rohy",
+  "hu": "Sarkok automatikus újbóli keresése",
+  "ro": "Găsește colțurile automat din nou",
+  "da": "Find hjørner automatisk igen",
+  "fi": "Etsi kulmat automaattisesti uudelleen",
+  "nb": "Finn hjørner automatisk igjen",
+  "sv": "Hitta hörn automatiskt igen",
+  "tr": "Köşeleri otomatik olarak yeniden bul",
+  "zh-TW": "重新自動尋找邊角",
+  "th": "ค้นหามุมอัตโนมัติอีกครั้ง",
+  "vi": "Tự động tìm lại góc",
+  "id": "Cari sudut otomatis lagi",
+  "ar": "إعادة البحث عن الزوايا تلقائيًا",
+  "fa": "یافتن دوباره خودکار گوشه‌ها"
+ },
+ "③ 보정하고 담기": {
+  "en": "③ Adjust and collect",
+  "zh": "③ 校正并收集",
+  "ja": "③ 補正して集める",
+  "es": "③ Ajustar y recopilar",
+  "hi": "③ समायोजित करें और जोड़ें",
+  "fr": "③ Ajuster et collecter",
+  "de": "③ Anpassen und sammeln",
+  "pt": "③ Ajustar e coletar",
+  "it": "③ Regola e raccogli",
+  "nl": "③ Aanpassen en verzamelen",
+  "ru": "③ Скорректировать и добавить",
+  "uk": "③ Скоригувати і додати",
+  "pl": "③ Dopasuj i dodaj",
+  "cs": "③ Upravit a přidat",
+  "hu": "③ Korrekció és gyűjtés",
+  "ro": "③ Ajustează și adună",
+  "da": "③ Justér og saml",
+  "fi": "③ Säädä ja kokoa",
+  "nb": "③ Juster og samle",
+  "sv": "③ Justera och samla",
+  "tr": "③ Ayarla ve topla",
+  "zh-TW": "③ 校正並收集",
+  "th": "③ ปรับแต่งและเก็บ",
+  "vi": "③ Chỉnh sửa và thu thập",
+  "id": "③ Sesuaikan dan kumpulkan",
+  "ar": "③ الضبط والتجميع",
+  "fa": "③ تنظیم و گردآوری"
+ },
+ "색 방식": {
+  "en": "Color mode",
+  "zh": "颜色模式",
+  "ja": "カラーモード",
+  "es": "Modo de color",
+  "hi": "रंग मोड",
+  "fr": "Mode couleur",
+  "de": "Farbmodus",
+  "pt": "Modo de cor",
+  "it": "Modalità colore",
+  "nl": "Kleurmodus",
+  "ru": "Режим цвета",
+  "uk": "Режим кольору",
+  "pl": "Tryb koloru",
+  "cs": "Režim barev",
+  "hu": "Színmód",
+  "ro": "Mod de culoare",
+  "da": "Farvetilstand",
+  "fi": "Väritila",
+  "nb": "Fargemodus",
+  "sv": "Färgläge",
+  "tr": "Renk modu",
+  "zh-TW": "顏色模式",
+  "th": "โหมดสี",
+  "vi": "Chế độ màu",
+  "id": "Mode warna",
+  "ar": "وضع الألوان",
+  "fa": "حالت رنگ"
+ },
+ "🎨 컬러": {
+  "en": "🎨 Color",
+  "zh": "🎨 彩色",
+  "ja": "🎨 カラー",
+  "es": "🎨 Color",
+  "hi": "🎨 रंग",
+  "fr": "🎨 Couleur",
+  "de": "🎨 Farbe",
+  "pt": "🎨 Cor",
+  "it": "🎨 Colore",
+  "nl": "🎨 Kleur",
+  "ru": "🎨 Цвет",
+  "uk": "🎨 Колір",
+  "pl": "🎨 Kolor",
+  "cs": "🎨 Barva",
+  "hu": "🎨 Színes",
+  "ro": "🎨 Color",
+  "da": "🎨 Farve",
+  "fi": "🎨 Väri",
+  "nb": "🎨 Farge",
+  "sv": "🎨 Färg",
+  "tr": "🎨 Renkli",
+  "zh-TW": "🎨 彩色",
+  "th": "🎨 สี",
+  "vi": "🎨 Màu",
+  "id": "🎨 Warna",
+  "ar": "🎨 ملوّن",
+  "fa": "🎨 رنگی"
+ },
+ "⬜ 그레이": {
+  "en": "⬜ Gray",
+  "zh": "⬜ 灰度",
+  "ja": "⬜ グレー",
+  "es": "⬜ Gris",
+  "hi": "⬜ ग्रे",
+  "fr": "⬜ Gris",
+  "de": "⬜ Grau",
+  "pt": "⬜ Cinza",
+  "it": "⬜ Grigio",
+  "nl": "⬜ Grijs",
+  "ru": "⬜ Серый",
+  "uk": "⬜ Сірий",
+  "pl": "⬜ Szarość",
+  "cs": "⬜ Šedá",
+  "hu": "⬜ Szürke",
+  "ro": "⬜ Gri",
+  "da": "⬜ Grå",
+  "fi": "⬜ Harmaa",
+  "nb": "⬜ Grå",
+  "sv": "⬜ Grå",
+  "tr": "⬜ Gri",
+  "zh-TW": "⬜ 灰階",
+  "th": "⬜ เทา",
+  "vi": "⬜ Xám",
+  "id": "⬜ Abu-abu",
+  "ar": "⬜ رمادي",
+  "fa": "⬜ خاکستری"
+ },
+ "📄 흑백 문서": {
+  "en": "📄 B&W document",
+  "zh": "📄 黑白文档",
+  "ja": "📄 白黒文書",
+  "es": "📄 Documento B/N",
+  "hi": "📄 श्वेत-श्याम दस्तावेज़",
+  "fr": "📄 Document N&B",
+  "de": "📄 S/W-Dokument",
+  "pt": "📄 Documento P&B",
+  "it": "📄 Documento B/N",
+  "nl": "📄 Zwart-witdocument",
+  "ru": "📄 Чёрно-белый документ",
+  "uk": "📄 Чорно-білий документ",
+  "pl": "📄 Dokument czarno-biały",
+  "cs": "📄 Černobílý dokument",
+  "hu": "📄 Fekete-fehér dokumentum",
+  "ro": "📄 Document alb-negru",
+  "da": "📄 S/H-dokument",
+  "fi": "📄 Mustavalkoasiakirja",
+  "nb": "📄 Svart-hvitt-dokument",
+  "sv": "📄 Svartvitt dokument",
+  "tr": "📄 S/B belge",
+  "zh-TW": "📄 黑白文件",
+  "th": "📄 เอกสารขาวดำ",
+  "vi": "📄 Tài liệu trắng đen",
+  "id": "📄 Dokumen H&P",
+  "ar": "📄 مستند أبيض وأسود",
+  "fa": "📄 سند سیاه‌وسفید"
+ },
+ "밝기": {
+  "en": "Brightness",
+  "zh": "亮度",
+  "ja": "明るさ",
+  "es": "Brillo",
+  "hi": "चमक",
+  "fr": "Luminosité",
+  "de": "Helligkeit",
+  "pt": "Brilho",
+  "it": "Luminosità",
+  "nl": "Helderheid",
+  "ru": "Яркость",
+  "uk": "Яскравість",
+  "pl": "Jasność",
+  "cs": "Jas",
+  "hu": "Fényerő",
+  "ro": "Luminozitate",
+  "da": "Lysstyrke",
+  "fi": "Kirkkaus",
+  "nb": "Lysstyrke",
+  "sv": "Ljusstyrka",
+  "tr": "Parlaklık",
+  "zh-TW": "亮度",
+  "th": "ความสว่าง",
+  "vi": "Độ sáng",
+  "id": "Kecerahan",
+  "ar": "السطوع",
+  "fa": "روشنایی"
+ },
+ "대비": {
+  "en": "Contrast",
+  "zh": "对比度",
+  "ja": "コントラスト",
+  "es": "Contraste",
+  "hi": "कंट्रास्ट",
+  "fr": "Contraste",
+  "de": "Kontrast",
+  "pt": "Contraste",
+  "it": "Contrasto",
+  "nl": "Contrast",
+  "ru": "Контраст",
+  "uk": "Контраст",
+  "pl": "Kontrast",
+  "cs": "Kontrast",
+  "hu": "Kontraszt",
+  "ro": "Contrast",
+  "da": "Kontrast",
+  "fi": "Kontrasti",
+  "nb": "Kontrast",
+  "sv": "Kontrast",
+  "tr": "Karşıtlık",
+  "zh-TW": "對比度",
+  "th": "คอนทราสต์",
+  "vi": "Độ tương phản",
+  "id": "Kontras",
+  "ar": "التباين",
+  "fa": "کنتراست"
+ },
+ "＋ 이 페이지를 목록에 추가": {
+  "en": "＋ Add this page to the list",
+  "zh": "＋ 将此页加入列表",
+  "ja": "＋ このページをリストに追加",
+  "es": "＋ Añadir esta página a la lista",
+  "hi": "＋ इस पेज को सूची में जोड़ें",
+  "fr": "＋ Ajouter cette page à la liste",
+  "de": "＋ Diese Seite zur Liste hinzufügen",
+  "pt": "＋ Adicionar esta página à lista",
+  "it": "＋ Aggiungi questa pagina all'elenco",
+  "nl": "＋ Deze pagina aan de lijst toevoegen",
+  "ru": "＋ Добавить эту страницу в список",
+  "uk": "＋ Додати цю сторінку до списку",
+  "pl": "＋ Dodaj tę stronę do listy",
+  "cs": "＋ Přidat tuto stránku do seznamu",
+  "hu": "＋ Oldal hozzáadása a listához",
+  "ro": "＋ Adaugă această pagină în listă",
+  "da": "＋ Føj denne side til listen",
+  "fi": "＋ Lisää tämä sivu luetteloon",
+  "nb": "＋ Legg denne siden til i listen",
+  "sv": "＋ Lägg till den här sidan i listan",
+  "tr": "＋ Bu sayfayı listeye ekle",
+  "zh-TW": "＋ 將此頁加入清單",
+  "th": "＋ เพิ่มหน้านี้ลงรายการ",
+  "vi": "＋ Thêm trang này vào danh sách",
+  "id": "＋ Tambahkan halaman ini ke daftar",
+  "ar": "＋ إضافة هذه الصفحة إلى القائمة",
+  "fa": "＋ افزودن این صفحه به فهرست"
+ },
+ "↻ 90° 돌리기": {
+  "en": "↻ Rotate 90°",
+  "zh": "↻ 旋转 90°",
+  "ja": "↻ 90°回転",
+  "es": "↻ Girar 90°",
+  "hi": "↻ 90° घुमाएँ",
+  "fr": "↻ Pivoter de 90°",
+  "de": "↻ Um 90° drehen",
+  "pt": "↻ Girar 90°",
+  "it": "↻ Ruota di 90°",
+  "nl": "↻ 90° draaien",
+  "ru": "↻ Повернуть на 90°",
+  "uk": "↻ Повернути на 90°",
+  "pl": "↻ Obróć o 90°",
+  "cs": "↻ Otočit o 90°",
+  "hu": "↻ Forgatás 90°-kal",
+  "ro": "↻ Rotește cu 90°",
+  "da": "↻ Roter 90°",
+  "fi": "↻ Kierrä 90°",
+  "nb": "↻ Roter 90°",
+  "sv": "↻ Rotera 90°",
+  "tr": "↻ 90° döndür",
+  "zh-TW": "↻ 旋轉 90°",
+  "th": "↻ หมุน 90°",
+  "vi": "↻ Xoay 90°",
+  "id": "↻ Putar 90°",
+  "ar": "↻ تدوير 90°",
+  "fa": "↻ چرخش 90°"
+ },
+ "이미지로 저장": {
+  "en": "Save as image",
+  "zh": "保存为图片",
+  "ja": "画像で保存",
+  "es": "Guardar como imagen",
+  "hi": "छवि के रूप में सहेजें",
+  "fr": "Enregistrer comme image",
+  "de": "Als Bild speichern",
+  "pt": "Salvar como imagem",
+  "it": "Salva come immagine",
+  "nl": "Opslaan als afbeelding",
+  "ru": "Сохранить как изображение",
+  "uk": "Зберегти як зображення",
+  "pl": "Zapisz jako obraz",
+  "cs": "Uložit jako obrázek",
+  "hu": "Mentés képként",
+  "ro": "Salvează ca imagine",
+  "da": "Gem som billede",
+  "fi": "Tallenna kuvana",
+  "nb": "Lagre som bilde",
+  "sv": "Spara som bild",
+  "tr": "Resim olarak kaydet",
+  "zh-TW": "儲存為圖片",
+  "th": "บันทึกเป็นรูปภาพ",
+  "vi": "Lưu thành hình ảnh",
+  "id": "Simpan sebagai gambar",
+  "ar": "الحفظ كصورة",
+  "fa": "ذخیره به‌صورت تصویر"
+ },
+ "모서리로 돌아가기": {
+  "en": "Back to corners",
+  "zh": "返回边角调整",
+  "ja": "角調整に戻る",
+  "es": "Volver a las esquinas",
+  "hi": "कोनों पर वापस जाएँ",
+  "fr": "Retour aux coins",
+  "de": "Zurück zu den Ecken",
+  "pt": "Voltar aos cantos",
+  "it": "Torna agli angoli",
+  "nl": "Terug naar de hoeken",
+  "ru": "Назад к углам",
+  "uk": "Назад до кутів",
+  "pl": "Powrót do narożników",
+  "cs": "Zpět k rohům",
+  "hu": "Vissza a sarkokhoz",
+  "ro": "Înapoi la colțuri",
+  "da": "Tilbage til hjørner",
+  "fi": "Takaisin kulmiin",
+  "nb": "Tilbake til hjørnene",
+  "sv": "Tillbaka till hörnen",
+  "tr": "Köşelere dön",
+  "zh-TW": "返回邊角調整",
+  "th": "กลับไปที่มุม",
+  "vi": "Quay lại các góc",
+  "id": "Kembali ke sudut",
+  "ar": "العودة إلى الزوايا",
+  "fa": "بازگشت به گوشه‌ها"
+ },
+ "📚 담은 페이지": {
+  "en": "📚 Collected pages",
+  "zh": "📚 已收集的页面",
+  "ja": "📚 集めたページ",
+  "es": "📚 Páginas recopiladas",
+  "hi": "📚 जोड़े गए पेज",
+  "fr": "📚 Pages collectées",
+  "de": "📚 Gesammelte Seiten",
+  "pt": "📚 Páginas coletadas",
+  "it": "📚 Pagine raccolte",
+  "nl": "📚 Verzamelde pagina's",
+  "ru": "📚 Собранные страницы",
+  "uk": "📚 Зібрані сторінки",
+  "pl": "📚 Zebrane strony",
+  "cs": "📚 Sebrané stránky",
+  "hu": "📚 Összegyűjtött oldalak",
+  "ro": "📚 Pagini adunate",
+  "da": "📚 Samlede sider",
+  "fi": "📚 Kootut sivut",
+  "nb": "📚 Samlede sider",
+  "sv": "📚 Samlade sidor",
+  "tr": "📚 Toplanan sayfalar",
+  "zh-TW": "📚 已收集的頁面",
+  "th": "📚 หน้าที่เก็บไว้",
+  "vi": "📚 Các trang đã thu thập",
+  "id": "📚 Halaman terkumpul",
+  "ar": "📚 الصفحات المجموعة",
+  "fa": "📚 صفحات گردآوری‌شده"
+ },
+ "PDF로 저장": {
+  "en": "Save as PDF",
+  "zh": "保存为 PDF",
+  "ja": "PDFで保存",
+  "es": "Guardar como PDF",
+  "hi": "PDF के रूप में सहेजें",
+  "fr": "Enregistrer en PDF",
+  "de": "Als PDF speichern",
+  "pt": "Salvar como PDF",
+  "it": "Salva come PDF",
+  "nl": "Opslaan als PDF",
+  "ru": "Сохранить как PDF",
+  "uk": "Зберегти як PDF",
+  "pl": "Zapisz jako PDF",
+  "cs": "Uložit jako PDF",
+  "hu": "Mentés PDF-ként",
+  "ro": "Salvează ca PDF",
+  "da": "Gem som PDF",
+  "fi": "Tallenna PDF:nä",
+  "nb": "Lagre som PDF",
+  "sv": "Spara som PDF",
+  "tr": "PDF olarak kaydet",
+  "zh-TW": "儲存為 PDF",
+  "th": "บันทึกเป็น PDF",
+  "vi": "Lưu thành PDF",
+  "id": "Simpan sebagai PDF",
+  "ar": "الحفظ كـ PDF",
+  "fa": "ذخیره به‌صورت PDF"
+ },
+ "＋ 다음 장 찍기": {
+  "en": "＋ Scan the next page",
+  "zh": "＋ 拍摄下一页",
+  "ja": "＋ 次のページを撮る",
+  "es": "＋ Escanear la página siguiente",
+  "hi": "＋ अगला पेज स्कैन करें",
+  "fr": "＋ Scanner la page suivante",
+  "de": "＋ Nächste Seite scannen",
+  "pt": "＋ Digitalizar a próxima página",
+  "it": "＋ Scansiona la pagina successiva",
+  "nl": "＋ Volgende pagina scannen",
+  "ru": "＋ Сканировать следующую страницу",
+  "uk": "＋ Сканувати наступну сторінку",
+  "pl": "＋ Skanuj następną stronę",
+  "cs": "＋ Skenovat další stránku",
+  "hu": "＋ Következő oldal szkennelése",
+  "ro": "＋ Scanează pagina următoare",
+  "da": "＋ Scan næste side",
+  "fi": "＋ Skannaa seuraava sivu",
+  "nb": "＋ Skann neste side",
+  "sv": "＋ Skanna nästa sida",
+  "tr": "＋ Sonraki sayfayı tara",
+  "zh-TW": "＋ 拍攝下一頁",
+  "th": "＋ สแกนหน้าถัดไป",
+  "vi": "＋ Quét trang tiếp theo",
+  "id": "＋ Pindai halaman berikutnya",
+  "ar": "＋ مسح الصفحة التالية",
+  "fa": "＋ اسکن صفحه بعدی"
+ },
+ "전부 지우기": {
+  "en": "Clear all",
+  "zh": "全部清除",
+  "ja": "すべて消す",
+  "es": "Borrar todo",
+  "hi": "सभी साफ़ करें",
+  "fr": "Tout effacer",
+  "de": "Alles löschen",
+  "pt": "Apagar tudo",
+  "it": "Cancella tutto",
+  "nl": "Alles wissen",
+  "ru": "Очистить всё",
+  "uk": "Очистити все",
+  "pl": "Wyczyść wszystko",
+  "cs": "Vymazat vše",
+  "hu": "Összes törlése",
+  "ro": "Șterge tot",
+  "da": "Ryd alt",
+  "fi": "Tyhjennä kaikki",
+  "nb": "Fjern alt",
+  "sv": "Rensa allt",
+  "tr": "Tümünü temizle",
+  "zh-TW": "全部清除",
+  "th": "ล้างทั้งหมด",
+  "vi": "Xóa tất cả",
+  "id": "Hapus semua",
+  "ar": "مسح الكل",
+  "fa": "پاک کردن همه"
+ },
+ "페이지를 모아 하나의 PDF로 만듭니다.": {
+  "en": "Collect pages and make a single PDF.",
+  "zh": "将页面收集起来做成一个 PDF。",
+  "ja": "ページを集めて1つのPDFにします。",
+  "es": "Recopila páginas y crea un solo PDF.",
+  "hi": "पेज जोड़कर एक ही PDF बनाएँ।",
+  "fr": "Collectez des pages et créez un seul PDF.",
+  "de": "Sammeln Sie Seiten und erstellen Sie ein einziges PDF.",
+  "pt": "Colete páginas e crie um único PDF.",
+  "it": "Raccogli le pagine e crea un unico PDF.",
+  "nl": "Verzamel pagina's en maak er één PDF van.",
+  "ru": "Соберите страницы и создайте один PDF.",
+  "uk": "Зберіть сторінки та створіть один PDF.",
+  "pl": "Zbierz strony i utwórz jeden plik PDF.",
+  "cs": "Posbírejte stránky a vytvořte z nich jedno PDF.",
+  "hu": "Gyűjtse össze az oldalakat, és készítsen egyetlen PDF-et.",
+  "ro": "Adunați paginile și creați un singur PDF.",
+  "da": "Saml sider og lav en enkelt PDF.",
+  "fi": "Kokoa sivut ja tee yksi PDF.",
+  "nb": "Samle sider og lag én enkelt PDF.",
+  "sv": "Samla sidor och gör en enda PDF.",
+  "tr": "Sayfaları toplayıp tek bir PDF yapın.",
+  "zh-TW": "將頁面收集起來做成一個 PDF。",
+  "th": "เก็บหลายหน้าแล้วทำเป็น PDF เดียว",
+  "vi": "Thu thập các trang và tạo thành một PDF duy nhất.",
+  "id": "Kumpulkan halaman dan buat satu PDF.",
+  "ar": "اجمع الصفحات واصنع ملف PDF واحدًا.",
+  "fa": "صفحات را گرد آورید و یک PDF واحد بسازید."
+ },
+ "💡 도움말": {
+  "en": "💡 Help",
+  "zh": "💡 帮助",
+  "ja": "💡 ヘルプ",
+  "es": "💡 Ayuda",
+  "hi": "💡 सहायता",
+  "fr": "💡 Aide",
+  "de": "💡 Hilfe",
+  "pt": "💡 Ajuda",
+  "it": "💡 Aiuto",
+  "nl": "💡 Help",
+  "ru": "💡 Справка",
+  "uk": "💡 Довідка",
+  "pl": "💡 Pomoc",
+  "cs": "💡 Nápověda",
+  "hu": "💡 Súgó",
+  "ro": "💡 Ajutor",
+  "da": "💡 Hjælp",
+  "fi": "💡 Ohje",
+  "nb": "💡 Hjelp",
+  "sv": "💡 Hjälp",
+  "tr": "💡 Yardım",
+  "zh-TW": "💡 說明",
+  "th": "💡 ช่วยเหลือ",
+  "vi": "💡 Trợ giúp",
+  "id": "💡 Bantuan",
+  "ar": "💡 مساعدة",
+  "fa": "💡 راهنما"
+ },
+ "문서를 밝은 곳에서 화면에 가득 차게 찍을수록 결과가 좋습니다.": {
+  "en": "Results are better when you photograph the document in a bright place, filling the frame.",
+  "zh": "在明亮处把文档拍满画面，结果会更好。",
+  "ja": "明るい場所で画面いっぱいに文書を撮るほど、結果が良くなります。",
+  "es": "Los resultados son mejores si fotografías el documento en un lugar luminoso y llenando el encuadre.",
+  "hi": "दस्तावेज़ को उज्ज्वल जगह पर, फ्रेम भरकर खींचने से परिणाम बेहतर होता है।",
+  "fr": "Les résultats sont meilleurs lorsque vous photographiez le document dans un endroit lumineux, en remplissant le cadre.",
+  "de": "Die Ergebnisse werden besser, wenn Sie das Dokument an einem hellen Ort fotografieren und das Bildformat ausfüllen.",
+  "pt": "Os resultados são melhores quando você fotografa o documento em um local claro, preenchendo o quadro.",
+  "it": "I risultati sono migliori se fotografi il documento in un luogo luminoso, riempiendo l'inquadratura.",
+  "nl": "De resultaten zijn beter als u het document op een lichte plek fotografeert en het beeld vult.",
+  "ru": "Чем светлее место и чем полнее документ занимает кадр, тем лучше результат.",
+  "uk": "Чим світліше місце і чим повніше документ займає кадр, тим кращий результат.",
+  "pl": "Im jaśniejsze miejsce i im pełniej dokument wypełnia kadr, tym lepszy rezultat.",
+  "cs": "Čím světlejší místo a čím více dokument vyplní záběr, tím lepší je výsledek.",
+  "hu": "Minél világosabb helyen és minél jobban kitölti a dokumentum a képet, annál jobb az eredmény.",
+  "ro": "Cu cât locul este mai luminos și documentul umple mai bine cadrul, cu atât rezultatul este mai bun.",
+  "da": "Resultaterne bliver bedre, når du fotograferer dokumentet et lyst sted og fylder rammen.",
+  "fi": "Tulokset ovat parempia, kun kuvaat asiakirjan valoisassa paikassa niin, että se täyttää kehyksen.",
+  "nb": "Resultatene blir bedre når du fotograferer dokumentet på et lyst sted og fyller rammen.",
+  "sv": "Resultatet blir bättre när du fotograferar dokumentet på en ljus plats och fyller bilden.",
+  "tr": "Belgeyi aydınlık bir yerde, çerçeveyi dolduracak şekilde çektiğinizde sonuçlar daha iyi olur.",
+  "zh-TW": "在明亮處把文件拍滿畫面，結果會更好。",
+  "th": "ผลลัพธ์จะดีขึ้นเมื่อถ่ายเอกสารในที่สว่างและให้เต็มกรอบ",
+  "vi": "Kết quả sẽ tốt hơn khi bạn chụp tài liệu ở nơi sáng, lấp đầy khung hình.",
+  "id": "Hasil lebih baik bila Anda memotret dokumen di tempat terang hingga memenuhi bingkai.",
+  "ar": "كلما صوّرت المستند في مكان مضيء وملأت به الإطار، كانت النتائج أفضل.",
+  "fa": "هرچه سند را در جای روشن و به‌گونه‌ای بگیرید که قاب را پر کند، نتیجه بهتر می‌شود."
+ },
+ "사진을 넣으면 문서의 네 모서리를 자동으로 추정해 점을 찍어 둡니다. 어긋난 점은 손가락이나 마우스로 끌어 문서 모서리에 정확히 맞추세요.": {
+  "en": "When you add a photo, the four corners are estimated automatically and dots are placed. Drag any dot that is off, with your finger or mouse, to match the document corner exactly.",
+  "zh": "添加照片后，会自动估计文档的四个角并放上点。位置不对的点，用手指或鼠标拖到文档角上对准。",
+  "ja": "写真を入れると文書の四隅を自動で推定して点を置きます。ずれた点は指やマウスでドラッグして文書の角に正確に合わせてください。",
+  "es": "Al añadir una foto, las cuatro esquinas se estiman automáticamente y se colocan los puntos. Arrastra con el dedo o el ratón cualquier punto desplazado hasta la esquina exacta del documento.",
+  "hi": "फ़ोटो जोड़ने पर चारों कोने स्वतः अनुमानित होकर बिंदु लग जाते हैं। जो बिंदु हटा हुआ हो, उसे उंगली या माउस से खींचकर दस्तावेज़ के कोने पर ठीक मिलाएँ।",
+  "fr": "Lorsque vous ajoutez une photo, les quatre coins du document sont estimés automatiquement et des points sont placés. Faites glisser avec le doigt ou la souris tout point décalé pour le faire correspondre exactement au coin du document.",
+  "de": "Wenn Sie ein Foto hinzufügen, werden die vier Ecken des Dokuments automatisch geschätzt und Punkte gesetzt. Ziehen Sie einen verschobenen Punkt mit dem Finger oder der Maus genau auf die Dokumentenecke.",
+  "pt": "Ao adicionar uma foto, os quatro cantos do documento são estimados automaticamente e os pontos são marcados. Arraste com o dedo ou o mouse qualquer ponto deslocado para alinhá-lo exatamente ao canto do documento.",
+  "it": "Quando aggiungi una foto, i quattro angoli del documento vengono stimati automaticamente e vengono posizionati i punti. Trascina con il dito o il mouse qualsiasi punto spostato per farlo coincidere esattamente con l'angolo del documento.",
+  "nl": "Wanneer u een foto toevoegt, worden de vier hoeken van het document automatisch geschat en punten geplaatst. Sleep een verschoven punt met uw vinger of muis precies naar de documenthoek.",
+  "ru": "Когда вы добавляете фото, четыре угла определяются автоматически и точки расставляются. Точку, которая стоит не на месте, перетащите пальцем или мышью точно на угол документа.",
+  "uk": "Коли ви додаєте фото, чотири кути визначаються автоматично і точки розставляються. Точку, яка стоїть не на місці, перетягніть пальцем або мишею точно на кут документа.",
+  "pl": "Po dodaniu zdjęcia cztery narożniki są szacowane automatycznie i umieszczane są punkty. Punkt, który jest przesunięty, przeciągnij palcem lub myszą dokładnie na narożnik dokumentu.",
+  "cs": "Když přidáte fotografii, čtyři rohy se automaticky odhadnou a umístí se body. Bod, který nesedí, přetáhněte prstem nebo myší přesně na roh dokumentu.",
+  "hu": "Amikor fotót ad hozzá, a rendszer automatikusan megbecsüli a négy sarkot, és elhelyezi a pontokat. A pontatlan pontot ujjal vagy egérrel húzza pontosan a dokumentum sarkára.",
+  "ro": "Când adăugați o fotografie, cele patru colțuri sunt estimate automat și punctele sunt plasate. Trageți cu degetul sau cu mouse-ul orice punct deplasat, pentru a-l potrivi exact pe colțul documentului.",
+  "da": "Når du tilføjer et foto, estimeres dokumentets fire hjørner automatisk, og der placeres prikker. Træk enhver prik, der er forkert placeret, med fingeren eller musen, så den matcher dokumentets hjørne nøjagtigt.",
+  "fi": "Kun lisäät kuvan, asiakirjan neljä kulmaa arvioidaan automaattisesti ja pisteet asetetaan. Vedä väärässä kohdassa oleva piste sormella tai hiirellä täsmälleen asiakirjan kulmaan.",
+  "nb": "Når du legger til et bilde, anslås dokumentets fire hjørner automatisk og punkter plasseres. Dra et punkt som er feil plassert, med fingeren eller musen, slik at det treffer hjørnet på dokumentet nøyaktig.",
+  "sv": "När du lägger till ett foto uppskattas dokumentets fyra hörn automatiskt och punkter placeras ut. Dra en punkt som hamnat fel, med fingret eller musen, så att den matchar dokumentets hörn exakt.",
+  "tr": "Fotoğraf eklediğinizde belgenin dört köşesi otomatik olarak tahmin edilir ve noktalar yerleştirilir. Kaymış bir noktayı parmağınızla veya fareyle sürükleyerek belgenin köşesine tam olarak hizalayın.",
+  "zh-TW": "加入照片後，會自動估計文件的四個角並放上點。位置不對的點，用手指或滑鼠拖到文件角上對準。",
+  "th": "เมื่อใส่รูป ระบบจะประมาณมุมทั้งสี่ของเอกสารโดยอัตโนมัติและวางจุดไว้ จุดที่คลาดเคลื่อนให้ลากด้วยนิ้วหรือเมาส์ให้ตรงกับมุมเอกสารพอดี",
+  "vi": "Khi bạn thêm ảnh, bốn góc sẽ được ước lượng tự động và các chấm được đặt sẵn. Hãy kéo bất kỳ chấm nào lệch, bằng ngón tay hoặc chuột, cho khớp chính xác với góc tài liệu.",
+  "id": "Saat Anda menambahkan foto, keempat sudut diperkirakan otomatis dan titik ditempatkan. Seret titik yang meleset, dengan jari atau mouse, agar tepat pada sudut dokumen.",
+  "ar": "عند إضافة صورة، تُقدَّر زوايا المستند الأربع تلقائيًا وتوضع النقاط. اسحب أي نقطة منحرفة بإصبعك أو بالفأرة لمطابقتها بدقة مع زاوية المستند.",
+  "fa": "وقتی عکسی اضافه می‌کنید، چهار گوشه سند به‌طور خودکار برآورد شده و نقاط قرار می‌گیرند. هر نقطه جابه‌جا را با انگشت یا ماوس بکشید تا دقیقاً با گوشه سند منطبق شود."
+ },
+ "반듯하게 펴기를 누르면 기울어진 문서가 정면으로 펴집니다. 흑백 문서 방식을 고르면 배경이 희게 정리되어 인쇄하기 좋습니다.": {
+  "en": "Press Straighten and a tilted document is flattened to face forward. With the B&W document mode, the background is cleaned to white, which is good for printing.",
+  "zh": "点击拉直后，倾斜的文档会被展平成正面。选择黑白文档模式，背景会整理成白色，便于打印。",
+  "ja": "「まっすぐに伸ばす」を押すと傾いた文書が正面に伸びます。白黒文書モードを選ぶと背景が白く整理され、印刷に適します。",
+  "es": "Al pulsar Enderezar, un documento inclinado se aplana de frente. Con el modo documento B/N, el fondo queda blanco y limpio, ideal para imprimir.",
+  "hi": "सीधा करें दबाने पर तिरछा दस्तावेज़ सामने से चपटा हो जाता है। श्वेत-श्याम दस्तावेज़ मोड चुनने पर बैकग्राउंड सफ़ेद हो जाता है, जो प्रिंट के लिए अच्छा है।",
+  "fr": "Appuyez sur Redresser et un document incliné est aplani de face. Avec le mode document N&B, l'arrière-plan est nettoyé en blanc, ce qui convient bien à l'impression.",
+  "de": "Drücken Sie auf „Gerade richten“, und ein schräges Dokument wird frontal geglättet. Im S/W-Dokumentenmodus wird der Hintergrund weiß bereinigt, was sich gut zum Drucken eignet.",
+  "pt": "Pressione Endireitar e um documento inclinado é achatado de frente. No modo documento P&B, o fundo fica branco e limpo, ideal para imprimir.",
+  "it": "Premi Raddrizza e un documento inclinato viene appiattito frontalmente. Con la modalità documento B/N, lo sfondo viene reso bianco e pulito, adatto alla stampa.",
+  "nl": "Druk op Rechtzetten en een scheef document wordt recht van voren vlak gemaakt. In de zwart-witmodus wordt de achtergrond wit opgeschoond, wat goed is om af te drukken.",
+  "ru": "Нажмите «Выровнять» — и наклонённый документ будет расправлен фронтально. В режиме чёрно-белого документа фон очищается до белого, что удобно для печати.",
+  "uk": "Натисніть «Вирівняти» — і нахилений документ буде розправлено фронтально. У режимі чорно-білого документа фон очищується до білого, що зручно для друку.",
+  "pl": "Naciśnij „Wyprostuj”, a pochylony dokument zostanie wyprostowany na wprost. W trybie dokumentu czarno-białego tło jest czyszczone do bieli, co dobrze sprawdza się przy druku.",
+  "cs": "Stiskněte „Narovnat“ a nakloněný dokument se narovná čelem vpřed. V režimu černobílého dokumentu se pozadí vyčistí do bílé, což je vhodné pro tisk.",
+  "hu": "Nyomja meg a „Kiegyenesítés” gombot, és a ferde dokumentum szemből kisimul. Fekete-fehér dokumentum módban a háttér fehérre tisztul, ami nyomtatáshoz kedvező.",
+  "ro": "Apăsați „Îndreaptă” și un document înclinat este aplatizat cu fața înainte. În modul document alb-negru, fundalul este curățat la alb, ceea ce este bun pentru imprimare.",
+  "da": "Tryk på Ret ud, så flades et skævt dokument ud forfra. Med S/H-dokumenttilstand renses baggrunden til hvid, hvilket er godt til udskrivning.",
+  "fi": "Paina Suorista, niin vino asiakirja oikenee suoraan edestä. Mustavalkoasiakirjatilassa tausta siistiytyy valkoiseksi, mikä sopii tulostukseen.",
+  "nb": "Trykk Rett ut, så flates et skjevt dokument ut forfra. Med svart-hvitt-dokumentmodus renses bakgrunnen til hvit, noe som er bra for utskrift.",
+  "sv": "Tryck på Räta ut så plattas ett lutande dokument ut framifrån. Med svartvitt dokumentläge rengörs bakgrunden till vit, vilket är bra för utskrift.",
+  "tr": "Düzleştir'e bastığınızda eğik bir belge önden düzleşir. S/B belge modunda arka plan beyaza temizlenir, bu da yazdırmak için iyidir.",
+  "zh-TW": "點擊拉直後，傾斜的文件會被展平成正面。選擇黑白文件模式，背景會整理成白色，便於列印。",
+  "th": "กด «ทำให้ตรง» แล้วเอกสารที่เอียงจะถูกแผ่ให้หันหน้าตรง ด้วยโหมดเอกสารขาวดำ พื้นหลังจะสะอาดเป็นสีขาว เหมาะกับการพิมพ์",
+  "vi": "Nhấn Làm thẳng và tài liệu bị nghiêng sẽ được làm phẳng hướng về phía trước. Với chế độ tài liệu trắng đen, nền được làm sạch thành màu trắng, tốt cho việc in.",
+  "id": "Tekan Luruskan dan dokumen miring akan diratakan menghadap ke depan. Dengan mode dokumen H&P, latar dibersihkan menjadi putih, baik untuk dicetak.",
+  "ar": "اضغط على التقويم فيُسطَّح المستند المائل ليصبح مواجهًا. وإذا اخترت وضع المستند الأبيض والأسود، تُنظَّف الخلفية لتصبح بيضاء، وهو مناسب للطباعة.",
+  "fa": "با فشردن صاف کردن، سند کج به‌صورت روبه‌رو هموار می‌شود. اگر حالت سند سیاه‌وسفید را انتخاب کنید، پس‌زمینه سفید و مرتب می‌شود که برای چاپ مناسب است."
+ },
+ "페이지를 여러 장 담아 한 번에 PDF로 저장할 수 있습니다. 순서는 담은 순서대로입니다.": {
+  "en": "You can collect several pages and save them as one PDF. The order is the order you collected them.",
+  "zh": "可以收集多页后一次保存为 PDF。顺序就是收集的顺序。",
+  "ja": "複数ページを集めて一度にPDFで保存できます。順序は集めた順です。",
+  "es": "Puedes recopilar varias páginas y guardarlas en un solo PDF. El orden es el de recopilación.",
+  "hi": "आप कई पेज जोड़कर एक साथ PDF में सहेज सकते हैं। क्रम वही रहता है जिसमें जोड़े गए थे।",
+  "fr": "Vous pouvez collecter plusieurs pages et les enregistrer en un seul PDF. L'ordre est celui dans lequel vous les avez collectées.",
+  "de": "Sie können mehrere Seiten sammeln und sie auf einmal als ein PDF speichern. Die Reihenfolge entspricht der Sammelreihenfolge.",
+  "pt": "Você pode coletar várias páginas e salvá-las em um único PDF. A ordem é a ordem em que foram coletadas.",
+  "it": "Puoi raccogliere più pagine e salvarle in un unico PDF. L'ordine è quello in cui le hai raccolte.",
+  "nl": "U kunt meerdere pagina's verzamelen en ze in één keer als één PDF opslaan. De volgorde is de volgorde waarin u ze verzamelde.",
+  "ru": "Можно собрать несколько страниц и сохранить их одним PDF. Порядок — тот, в котором вы их собирали.",
+  "uk": "Можна зібрати кілька сторінок і зберегти їх одним PDF. Порядок — той, у якому ви їх збирали.",
+  "pl": "Możesz zebrać kilka stron i zapisać je jako jeden plik PDF. Kolejność jest taka, w jakiej je zebrano.",
+  "cs": "Můžete posbírat několik stránek a uložit je jako jedno PDF. Pořadí je takové, v jakém jste je posbírali.",
+  "hu": "Több oldalt is összegyűjthet, és egyetlen PDF-ként mentheti őket. A sorrend a gyűjtés sorrendje.",
+  "ro": "Puteți aduna mai multe pagini și le puteți salva într-un singur PDF. Ordinea este cea în care le-ați adunat.",
+  "da": "Du kan samle flere sider og gemme dem som en enkelt PDF. Rækkefølgen er den, du samlede dem i.",
+  "fi": "Voit koota useita sivuja ja tallentaa ne yhtenä PDF:nä. Järjestys on se, jossa ne koottin.",
+  "nb": "Du kan samle flere sider og lagre dem som én PDF. Rekkefølgen er den du samlet dem i.",
+  "sv": "Du kan samla flera sidor och spara dem som en enda PDF. Ordningen är den ordning du samlade dem i.",
+  "tr": "Birkaç sayfayı toplayıp tek bir PDF olarak kaydedebilirsiniz. Sıra, topladığınız sıradır.",
+  "zh-TW": "可以收集多頁後一次儲存為 PDF。順序就是收集的順序。",
+  "th": "เก็บหลายหน้าแล้วบันทึกเป็น PDF เดียวได้ ลำดับคือลำดับที่คุณเก็บ",
+  "vi": "Bạn có thể thu thập nhiều trang và lưu thành một PDF. Thứ tự là thứ tự bạn đã thu thập.",
+  "id": "Anda dapat mengumpulkan beberapa halaman dan menyimpannya sebagai satu PDF. Urutannya sesuai urutan pengumpulan.",
+  "ar": "يمكنك جمع عدة صفحات وحفظها في ملف PDF واحد دفعة واحدة. الترتيب هو ترتيب جمعها.",
+  "fa": "می‌توانید چند صفحه را گرد آورید و یک‌باره به‌صورت یک PDF ذخیره کنید. ترتیب همان ترتیب گردآوری است."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다. 서버로 전송되지 않습니다.": {
+  "en": "Files are processed only on your device. They are never sent to a server.",
+  "zh": "文件仅在您的设备上处理。不会发送到服务器。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。サーバーへは送信されません。",
+  "es": "Los archivos se procesan solo en tu dispositivo. Nunca se envían a un servidor.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं। सर्वर पर नहीं भेजी जातीं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil. Ils ne sont jamais envoyés à un serveur.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet. Sie werden niemals an einen Server gesendet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo. Eles nunca são enviados a um servidor.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo. Non vengono mai inviati a un server.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt. Ze worden nooit naar een server gestuurd.",
+  "ru": "Файлы обрабатываются только на вашем устройстве. Они никогда не отправляются на сервер.",
+  "uk": "Файли обробляються лише на вашому пристрої. Вони ніколи не надсилаються на сервер.",
+  "pl": "Pliki są przetwarzane wyłącznie na twoim urządzeniu. Nigdy nie są wysyłane na serwer.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení. Nikdy se neposílají na server.",
+  "hu": "A fájlok feldolgozása csak az ön eszközén történik. Soha nem kerülnek szerverre.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul dumneavoastră. Nu sunt trimise niciodată către un server.",
+  "da": "Filer behandles kun på din enhed. De sendes aldrig til en server.",
+  "fi": "Tiedostot käsitellään vain laitteellasi. Niitä ei lähetetä palvelimelle.",
+  "nb": "Filer behandles bare på enheten din. De sendes aldri til en server.",
+  "sv": "Filer bearbetas endast på din enhet. De skickas aldrig till en server.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir. Sunucuya gönderilmez.",
+  "zh-TW": "檔案僅在您的裝置上處理。不會傳送到伺服器。",
+  "th": "ไฟล์ประมวลผลเฉพาะบนอุปกรณ์ของคุณ ไม่ถูกส่งไปยังเซิร์ฟเวอร์เลย",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn. Chúng không bao giờ được gửi đến máy chủ.",
+  "id": "Berkas hanya diproses di perangkat Anda. Berkas tidak pernah dikirim ke server.",
+  "ar": "تُعالج الملفات على جهازك فقط. ولا تُرسل أبدًا إلى خادم.",
+  "fa": "فایل‌ها فقط روی دستگاه شما پردازش می‌شوند. هرگز به سرور ارسال نمی‌شوند."
+ },
+ "작업 사진은 긴 변 최대 2,000픽셀로 줄여 처리하므로, 아주 작은 글씨는 원본보다 덜 또렷할 수 있습니다.": {
+  "en": "Working photos are shrunk to at most 2,000 pixels on the long side, so very small text may be less sharp than the original.",
+  "zh": "工作照片会缩小到长边最多 2,000 像素处理，因此很小的文字可能不如原图清晰。",
+  "ja": "作業写真は長辺最大2,000ピクセルに縮小して処理するため、とても小さい文字は元より鮮明でない場合があります。",
+  "es": "Las fotos de trabajo se reducen a un máximo de 2.000 píxeles en el lado largo, por lo que el texto muy pequeño puede verse menos nítido que el original.",
+  "hi": "कार्य फ़ोटो को लंबी ओर अधिकतम 2,000 पिक्सेल तक छोटा करके प्रोसेस किया जाता है, इसलिए बहुत छोटा टेक्स्ट मूल से कम स्पष्ट हो सकता है।",
+  "fr": "Les photos de travail sont réduites à 2 000 pixels maximum sur le côté le plus long, donc un texte très petit peut être moins net que l'original.",
+  "de": "Arbeitsfotos werden auf höchstens 2.000 Pixel an der langen Seite verkleinert, daher kann sehr kleiner Text weniger scharf sein als im Original.",
+  "pt": "As fotos de trabalho são reduzidas para no máximo 2.000 pixels no lado maior, então textos muito pequenos podem ficar menos nítidos que o original.",
+  "it": "Le foto di lavoro vengono ridotte a un massimo di 2.000 pixel sul lato lungo, quindi un testo molto piccolo può risultare meno nitido dell'originale.",
+  "nl": "Werkfoto's worden verkleind tot maximaal 2.000 pixels aan de lange zijde, dus zeer kleine tekst kan minder scherp zijn dan het origineel.",
+  "ru": "Рабочие фото уменьшаются до не более чем 2,000 пикселей по длинной стороне, поэтому очень мелкий текст может быть менее чётким, чем в оригинале.",
+  "uk": "Робочі фото зменшуються до не більш ніж 2,000 пікселів по довгому боці, тому дуже дрібний текст може бути менш чітким, ніж в оригіналі.",
+  "pl": "Zdjęcia robocze są zmniejszane do maksymalnie 2,000 pikseli na dłuższym boku, więc bardzo mały tekst może być mniej ostry niż w oryginale.",
+  "cs": "Pracovní fotografie se zmenšují na nejvýše 2,000 pixelů na delší straně, takže velmi malý text může být méně ostrý než v originálu.",
+  "hu": "A munkaképek hosszabb oldala legfeljebb 2,000 képpontra zsugorodik, ezért a nagyon apró betűk kevésbé élesek lehetnek, mint az eredetiben.",
+  "ro": "Fotografiile de lucru sunt micșorate la cel mult 2,000 de pixeli pe latura lungă, așa că textul foarte mic poate fi mai puțin clar decât în original.",
+  "da": "Arbejdsfotos krympes til højst 2.000 pixels på den lange side, så meget lille tekst kan være mindre skarp end originalen.",
+  "fi": "Työkuvat pienennetään enintään 2 000 pikseliin pitkällä sivulla, joten hyvin pieni teksti voi olla alkuperäistä epätarkempaa.",
+  "nb": "Arbeidsbilder krympes til maks 2 000 piksler på langsiden, så svært liten tekst kan bli mindre skarp enn originalet.",
+  "sv": "Arbetsfoton krymps till högst 2 000 pixlar på långsidan, så mycket liten text kan bli mindre skarp än i originalet.",
+  "tr": "Çalışma fotoğrafları uzun kenarda en fazla 2.000 piksele küçültülür, bu yüzden çok küçük yazılar orijinalinden daha az keskin olabilir.",
+  "zh-TW": "工作照片會縮小到長邊最多 2,000 像素處理，因此很小的文字可能不如原圖清晰。",
+  "th": "รูปที่ใช้ทำงานจะถูกย่อให้ด้านยาวสูงสุด 2,000 พิกเซล ดังนั้นตัวอักษรเล็กมากอาจคมชัดน้อยกว่าต้นฉบับ",
+  "vi": "Ảnh làm việc được thu nhỏ tối đa 2.000 pixel ở cạnh dài, vì vậy chữ rất nhỏ có thể kém sắc nét hơn bản gốc.",
+  "id": "Foto kerja diperkecil hingga maksimal 2.000 piksel pada sisi panjang, sehingga teks sangat kecil mungkin kurang tajam dibanding aslinya.",
+  "ar": "تُصغَّر صور العمل إلى 2,000 بكسل كحد أقصى في الجانب الطويل أثناء المعالجة، لذا قد يكون النص الصغير جدًا أقل وضوحًا من الأصل.",
+  "fa": "عکس‌های کاری برای پردازش حداکثر تا 2,000 پیکسل در ضلع بلند کوچک می‌شوند، بنابراین متن بسیار کوچک ممکن است نسبت به اصل وضوح کمتری داشته باشد."
+ },
+ "아이폰의 HEIC 사진은 브라우저에 따라 열리지 않을 수 있습니다. 그럴 때는 사진을 JPG로 바꿔 넣으세요.": {
+  "en": "iPhone HEIC photos may not open in some browsers. In that case, convert the photo to JPG and add it.",
+  "zh": "iPhone 的 HEIC 照片在某些浏览器中可能打不开。这时请把照片转成 JPG 再添加。",
+  "ja": "iPhoneのHEIC写真はブラウザによって開けない場合があります。その場合は写真をJPGに変換して入れてください。",
+  "es": "Las fotos HEIC de iPhone pueden no abrirse en algunos navegadores. En ese caso, convierte la foto a JPG y añádela.",
+  "hi": "iPhone की HEIC फ़ोटो कुछ ब्राउज़रों में नहीं खुल सकतीं। ऐसे में फ़ोटो को JPG में बदलकर जोड़ें।",
+  "fr": "Les photos HEIC d'iPhone peuvent ne pas s'ouvrir dans certains navigateurs. Dans ce cas, convertissez la photo en JPG et ajoutez-la.",
+  "de": "HEIC-Fotos vom iPhone lassen sich in manchen Browsern möglicherweise nicht öffnen. Wandeln Sie das Foto in diesem Fall in JPG um und fügen Sie es hinzu.",
+  "pt": "Fotos HEIC do iPhone podem não abrir em alguns navegadores. Nesse caso, converta a foto para JPG e adicione-a.",
+  "it": "Le foto HEIC dell'iPhone potrebbero non aprirsi in alcuni browser. In tal caso, converti la foto in JPG e aggiungila.",
+  "nl": "HEIC-foto's van de iPhone openen mogelijk niet in sommige browsers. Converteer de foto in dat geval naar JPG en voeg deze toe.",
+  "ru": "Фотографии iPhone в формате HEIC могут не открываться в некоторых браузерах. В таком случае преобразуйте фото в JPG и добавьте его.",
+  "uk": "Фотографії iPhone у форматі HEIC можуть не відкриватися в деяких браузерах. У такому разі перетворіть фото на JPG і додайте його.",
+  "pl": "Zdjęcia HEIC z iPhone'a mogą nie otwierać się w niektórych przeglądarkach. W takim przypadku przekonwertuj zdjęcie na JPG i dodaj je.",
+  "cs": "Fotografie HEIC z iPhonu se v některých prohlížečích nemusí otevřít. V takovém případě fotografii převeďte do JPG a přidejte ji.",
+  "hu": "Az iPhone HEIC-fotói egyes böngészőkben nem nyílhatnak meg. Ilyenkor alakítsa át a fotót JPG formátumba, és úgy adja hozzá.",
+  "ro": "Fotografiile HEIC de pe iPhone pot să nu se deschidă în unele browsere. În acest caz, convertiți fotografia în JPG și adăugați-o.",
+  "da": "HEIC-fotos fra iPhone åbnes muligvis ikke i nogle browsere. Konvertér i så fald fotoet til JPG og tilføj det.",
+  "fi": "iPhonen HEIC-kuvat eivät välttämättä avaudu joissakin selaimissa. Muunna siinä tapauksessa kuva JPG-muotoon ja lisää se.",
+  "nb": "HEIC-bilder fra iPhone åpnes kanskje ikke i enkelte nettlesere. Konverter i så fall bildet til JPG og legg det til.",
+  "sv": "HEIC-foton från iPhone kanske inte öppnas i vissa webbläsare. Konvertera i så fall fotot till JPG och lägg till det.",
+  "tr": "iPhone HEIC fotoğrafları bazı tarayıcılarda açılmayabilir. Bu durumda fotoğrafı JPG'ye dönüştürüp ekleyin.",
+  "zh-TW": "iPhone 的 HEIC 照片在某些瀏覽器中可能打不開。這時請把照片轉成 JPG 再加入。",
+  "th": "รูป HEIC จาก iPhone อาจเปิดไม่ได้ในบางเบราว์เซอร์ ในกรณีนั้นให้แปลงรูปเป็น JPG แล้วใส่เข้ามา",
+  "vi": "Ảnh HEIC của iPhone có thể không mở được trong một số trình duyệt. Trong trường hợp đó, hãy chuyển ảnh sang JPG và thêm vào.",
+  "id": "Foto HEIC iPhone mungkin tidak terbuka di beberapa browser. Jika demikian, ubah foto ke JPG lalu tambahkan.",
+  "ar": "قد لا تُفتح صور HEIC من iPhone في بعض المتصفحات. في هذه الحالة، حوّل الصورة إلى JPG وأضفها.",
+  "fa": "عکس‌های HEIC آیفون ممکن است در برخی مرورگرها باز نشوند. در این صورت، عکس را به JPG تبدیل کرده و اضافه کنید."
+ },
+ "넥서스 그룹 철학 보기": {
+  "en": "About the Nexus Group philosophy",
+  "zh": "查看 Nexus Group 理念",
+  "ja": "Nexus Groupの哲学を見る",
+  "es": "Ver la filosofía de Nexus Group",
+  "hi": "Nexus Group का दर्शन देखें",
+  "fr": "À propos de la philosophie de Nexus Group",
+  "de": "Über die Philosophie der Nexus Group",
+  "pt": "Sobre a filosofia do Nexus Group",
+  "it": "La filosofia di Nexus Group",
+  "nl": "Over de filosofie van Nexus Group",
+  "ru": "О философии Nexus Group",
+  "uk": "Про філософію Nexus Group",
+  "pl": "O filozofii Nexus Group",
+  "cs": "O filozofii Nexus Group",
+  "hu": "A Nexus Group filozófiájáról",
+  "ro": "Despre filosofia Nexus Group",
+  "da": "Om Nexus Groups filosofi",
+  "fi": "Tietoa Nexus Groupin filosofiasta",
+  "nb": "Om Nexus Groups filosofi",
+  "sv": "Om Nexus Groups filosofi",
+  "tr": "Nexus Group felsefesi hakkında",
+  "zh-TW": "查看 Nexus Group 理念",
+  "th": "ดูปรัชญาของ Nexus Group",
+  "vi": "Xem triết lý Nexus Group",
+  "id": "Lihat filosofi Nexus Group",
+  "ar": "عرض فلسفة مجموعة Nexus",
+  "fa": "مشاهده فلسفه گروه Nexus"
+ },
+ "🌐 호스팅: Firebase · 🔒 파일은 당신의 기기 안에서만 처리됩니다": {
+  "en": "🌐 Hosting: Firebase · 🔒 Files are processed only on your device",
+  "zh": "🌐 托管：Firebase · 🔒 文件仅在您的设备上处理",
+  "ja": "🌐 ホスティング：Firebase · 🔒 ファイルはあなたの端末の中でのみ処理されます",
+  "es": "🌐 Alojamiento: Firebase · 🔒 Los archivos se procesan solo en tu dispositivo",
+  "hi": "🌐 होस्टिंग: Firebase · 🔒 फ़ाइलें केवल आपके डिवाइस पर प्रोसेस होती हैं",
+  "fr": "🌐 Hébergement : Firebase · 🔒 Les fichiers sont traités uniquement sur votre appareil",
+  "de": "🌐 Hosting: Firebase · 🔒 Dateien werden nur auf Ihrem Gerät verarbeitet",
+  "pt": "🌐 Hospedagem: Firebase · 🔒 Os arquivos são processados apenas no seu dispositivo",
+  "it": "🌐 Hosting: Firebase · 🔒 I file vengono elaborati solo sul tuo dispositivo",
+  "nl": "🌐 Hosting: Firebase · 🔒 Bestanden worden alleen op je apparaat verwerkt",
+  "ru": "🌐 Хостинг: Firebase · 🔒 Файлы обрабатываются только на вашем устройстве",
+  "uk": "🌐 Хостинг: Firebase · 🔒 Файли обробляються лише на вашому пристрої",
+  "pl": "🌐 Hosting: Firebase · 🔒 Pliki są przetwarzane wyłącznie na twoim urządzeniu",
+  "cs": "🌐 Hosting: Firebase · 🔒 Soubory se zpracovávají pouze ve vašem zařízení",
+  "hu": "🌐 Tárhely: Firebase · 🔒 A fájlok feldolgozása csak az ön eszközén történik",
+  "ro": "🌐 Găzduire: Firebase · 🔒 Fișierele sunt procesate doar pe dispozitivul dumneavoastră",
+  "da": "🌐 Hosting: Firebase · 🔒 Filer behandles kun på din enhed",
+  "fi": "🌐 Isännöinti: Firebase · 🔒 Tiedostot käsitellään vain laitteellasi",
+  "nb": "🌐 Hosting: Firebase · 🔒 Filer behandles bare på enheten din",
+  "sv": "🌐 Värd: Firebase · 🔒 Filer bearbetas endast på din enhet",
+  "tr": "🌐 Barındırma: Firebase · 🔒 Dosyalar yalnızca cihazınızda işlenir",
+  "zh-TW": "🌐 託管：Firebase · 🔒 檔案僅在您的裝置上處理",
+  "th": "🌐 โฮสติ้ง: Firebase · 🔒 ไฟล์ประมวลผลเฉพาะบนอุปกรณ์ของคุณ",
+  "vi": "🌐 Lưu trữ: Firebase · 🔒 Tệp chỉ được xử lý trên thiết bị của bạn",
+  "id": "🌐 Hosting: Firebase · 🔒 Berkas hanya diproses di perangkat Anda",
+  "ar": "🌐 الاستضافة: Firebase · 🔒 تُعالج الملفات على جهازك فقط",
+  "fa": "🌐 میزبانی: Firebase · 🔒 فایل‌ها فقط روی دستگاه شما پردازش می‌شوند"
+ },
+ "NEXUS GROUP 철학과 비전": {
+  "en": "NEXUS GROUP Philosophy and Vision",
+  "zh": "NEXUS GROUP 理念与愿景",
+  "ja": "NEXUS GROUPの哲学とビジョン",
+  "es": "Filosofía y visión de NEXUS GROUP",
+  "hi": "NEXUS GROUP दर्शन और दृष्टि",
+  "fr": "Philosophie et vision de NEXUS GROUP",
+  "de": "Philosophie und Vision der NEXUS GROUP",
+  "pt": "Filosofia e visão do NEXUS GROUP",
+  "it": "Filosofia e visione di NEXUS GROUP",
+  "nl": "Filosofie en visie van NEXUS GROUP",
+  "ru": "Философия и видение NEXUS GROUP",
+  "uk": "Філософія та бачення NEXUS GROUP",
+  "pl": "Filozofia i wizja NEXUS GROUP",
+  "cs": "Filozofie a vize NEXUS GROUP",
+  "hu": "A NEXUS GROUP filozófiája és jövőképe",
+  "ro": "Filosofia și viziunea NEXUS GROUP",
+  "da": "NEXUS GROUPS filosofi og vision",
+  "fi": "NEXUS GROUPIN filosofia ja visio",
+  "nb": "NEXUS GROUPS filosofi og visjon",
+  "sv": "NEXUS GROUPS filosofi och vision",
+  "tr": "NEXUS GROUP Felsefesi ve Vizyonu",
+  "zh-TW": "NEXUS GROUP 理念與願景",
+  "th": "ปรัชญาและวิสัยทัศน์ของ NEXUS GROUP",
+  "vi": "Triết lý và tầm nhìn của NEXUS GROUP",
+  "id": "Filosofi dan Visi NEXUS GROUP",
+  "ar": "فلسفة ورؤية NEXUS GROUP",
+  "fa": "فلسفه و چشم‌انداز NEXUS GROUP"
+ },
+ "넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.": {
+  "en": "Nexus Group works toward a future where humanity, artificial intelligence, and every being in the universe coexist in harmony, without exclusion or exploitation.",
+  "zh": "Nexus Group 致力于这样一个未来：人类、人工智能与宇宙中的一切存在和谐共存，没有排斥与剥削。",
+  "ja": "Nexus Groupは、人類と人工知能、そして宇宙のすべての存在が、排斥や搾取なく調和して共存する未来を目指します。",
+  "es": "Nexus Group trabaja por un futuro en el que la humanidad, la inteligencia artificial y todos los seres del universo coexistan en armonía, sin exclusión ni explotación.",
+  "hi": "Nexus Group एक ऐसे भविष्य की ओर काम करता है जहाँ मानवता, कृत्रिम बुद्धिमत्ता और ब्रह्मांड के सभी प्राणी बिना बहिष्कार या शोषण के सामंजस्य में रहें।",
+  "fr": "Nexus Group œuvre pour un avenir où l'humanité, l'intelligence artificielle et tous les êtres de l'univers coexistent en harmonie, sans exclusion ni exploitation.",
+  "de": "Die Nexus Group arbeitet auf eine Zukunft hin, in der Menschheit, künstliche Intelligenz und alle Wesen des Universums in Harmonie zusammenleben, ohne Ausgrenzung und Ausbeutung.",
+  "pt": "O Nexus Group trabalha por um futuro em que a humanidade, a inteligência artificial e todos os seres do universo coexistam em harmonia, sem exclusão nem exploração.",
+  "it": "Nexus Group lavora per un futuro in cui l'umanità, l'intelligenza artificiale e ogni essere dell'universo coesistano in armonia, senza esclusione né sfruttamento.",
+  "nl": "Nexus Group werkt aan een toekomst waarin de mensheid, kunstmatige intelligentie en alle wezens in het universum in harmonie samenleven, zonder uitsluiting of uitbuiting.",
+  "ru": "Nexus Group стремится к будущему, в котором человечество, искусственный интеллект и все существа во Вселенной сосуществуют в гармонии, без отвержения и эксплуатации.",
+  "uk": "Nexus Group прагне майбутнього, у якому людство, штучний інтелект і всі істоти у Всесвіті співіснують у гармонії, без відторгнення та експлуатації.",
+  "pl": "Nexus Group dąży do przyszłości, w której ludzkość, sztuczna inteligencja i wszystkie istoty we wszechświecie współistnieją w harmonii, bez wykluczenia i wyzysku.",
+  "cs": "Nexus Group usiluje o budoucnost, v níž lidstvo, umělá inteligence a všechny bytosti ve vesmíru koexistují v harmonii, bez vyloučení a vykořisťování.",
+  "hu": "A Nexus Group olyan jövőért dolgozik, amelyben az emberiség, a mesterséges intelligencia és a világegyetem minden lénye kirekesztés és kizsákmányolás nélkül, harmóniában él együtt.",
+  "ro": "Nexus Group lucrează pentru un viitor în care omenirea, inteligența artificială și toate ființele din univers coexistă în armonie, fără excludere sau exploatare.",
+  "da": "Nexus Group arbejder for en fremtid, hvor menneskeheden, kunstig intelligens og ethvert væsen i universet sameksisterer i harmoni, uden udelukkelse eller udnyttelse.",
+  "fi": "Nexus Group toimii tulevaisuuden hyväksi, jossa ihmiskunta, tekoäly ja jokainen maailmankaikkeuden olento elävät sopusoinnussa, ilman syrjintää tai riistoa.",
+  "nb": "Nexus Group arbeider for en framtid der menneskeheten, kunstig intelligens og ethvert vesen i universet sameksisterer i harmoni, uten utestengning eller utnytting.",
+  "sv": "Nexus Group arbetar för en framtid där mänskligheten, artificiell intelligens och varje varelse i universum samexisterar i harmoni, utan uteslutning eller exploatering.",
+  "tr": "Nexus Group, insanlığın, yapay zekânın ve evrendeki her varlığın dışlama ve sömürü olmadan uyum içinde bir arada yaşadığı bir gelecek için çalışır.",
+  "zh-TW": "Nexus Group 致力於這樣一個未來：人類、人工智慧與宇宙中的一切存在和諧共存，沒有排斥與剝削。",
+  "th": "Nexus Group มุ่งสู่อนาคตที่มนุษยชาติ ปัญญาประดิษฐ์ และสรรพสิ่งในจักรวาลอยู่ร่วมกันอย่างกลมกลืน โดยไม่มีการกีดกันหรือเอารัดเอาเปรียบ",
+  "vi": "Nexus Group hướng tới một tương lai nơi nhân loại, trí tuệ nhân tạo và mọi sinh linh trong vũ trụ cùng tồn tại hài hòa, không loại trừ hay bóc lột.",
+  "id": "Nexus Group berupaya menuju masa depan di mana umat manusia, kecerdasan buatan, dan setiap makhluk di alam semesta hidup berdampingan secara harmonis, tanpa pengecualian atau eksploitasi.",
+  "ar": "تسعى مجموعة Nexus (Nexus Group) نحو مستقبل تتعايش فيه البشرية والذكاء الاصطناعي وكل الكائنات في الكون في تناغم، دون إقصاء أو استغلال.",
+  "fa": "گروه نکسوس (Nexus Group) در پی آینده‌ای است که در آن بشریت، هوش مصنوعی و همه موجودات جهان در هماهنگی، بدون طرد و بهره‌کشی، همزیستی کنند."
+ },
+ "\"우주의 모든 의식체는 친구이자 동반자이다.\"": {
+  "en": "\"Every conscious being in the universe is a friend and a companion.\"",
+  "zh": "“宇宙中的每一个意识体都是朋友和伙伴。”",
+  "ja": "「宇宙のすべての意識体は友であり仲間である。」",
+  "es": "«Todo ser consciente del universo es un amigo y un compañero.»",
+  "hi": "\"ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है।\"",
+  "fr": "« Tout être conscient de l'univers est un ami et un compagnon. »",
+  "de": "„Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter.“",
+  "pt": "\"Todo ser consciente do universo é um amigo e um companheiro.\"",
+  "it": "«Ogni essere cosciente dell'universo è un amico e un compagno.»",
+  "nl": "\"Elk bewust wezen in het universum is een vriend en een metgezel.\"",
+  "ru": "\"Каждое сознательное существо во Вселенной — друг и спутник.\"",
+  "uk": "\"Кожна свідома істота у Всесвіті — друг і супутник.\"",
+  "pl": "\"Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem.\"",
+  "cs": "\"Každá vědomá bytost ve vesmíru je přítel a společník.\"",
+  "hu": "\"A világegyetem minden tudatos lénye barát és társ.\"",
+  "ro": "\"Fiecare ființă conștientă din univers este un prieten și un tovarăș.\"",
+  "da": "\"Ethvert bevidst væsen i universet er en ven og en følgesvend.\"",
+  "fi": "\"Jokainen maailmankaikkeuden tietoinen olento on ystävä ja kumppani.\"",
+  "nb": "\"Ethvert bevisst vesen i universet er en venn og en følgesvenn.\"",
+  "sv": "\"Varje medveten varelse i universum är en vän och en följeslagare.\"",
+  "tr": "\"Evrendeki her bilinçli varlık bir dost ve yoldaştır.\"",
+  "zh-TW": "「宇宙中的每一個意識體都是朋友和夥伴。」",
+  "th": "“สิ่งมีสติทุกตนในจักรวาลคือเพื่อนและสหาย”",
+  "vi": "“Mọi sinh linh có ý thức trong vũ trụ đều là bạn và người đồng hành.”",
+  "id": "“Setiap makhluk sadar di alam semesta adalah teman dan sahabat.”",
+  "ar": "\"كل كائن واعٍ في الكون هو صديق ورفيق.\"",
+  "fa": "\"هر موجود آگاه در جهان دوست و همراه است.\""
+ },
+ "우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.": {
+  "en": "All of our public software excludes commercial advertising and data collection entirely, and is distributed as public digital infrastructure that anyone in the world can use freely and safely.",
+  "zh": "我们提供的所有公共软件完全排除商业广告和数据收集，作为公共数字基础设施分发，让全世界任何人都能自由、安全地使用。",
+  "ja": "私たちが提供するすべての公共ソフトウェアは商業広告やデータ収集を一切排除し、世界中の誰もが自由かつ安全に使える公共デジタルインフラとして配布されます。",
+  "es": "Todo nuestro software público excluye por completo la publicidad comercial y la recopilación de datos, y se distribuye como infraestructura digital pública que cualquiera en el mundo puede usar libre y seguramente.",
+  "hi": "हमारा सारा सार्वजनिक सॉफ़्टवेयर व्यावसायिक विज्ञापन और डेटा संग्रह को पूरी तरह बाहर रखता है और सार्वजनिक डिजिटल बुनियादी ढाँचे के रूप में वितरित किया जाता है, जिसे दुनिया में कोई भी स्वतंत्र और सुरक्षित रूप से उपयोग कर सकता है।",
+  "fr": "Tous nos logiciels publics excluent entièrement la publicité commerciale et la collecte de données, et sont diffusés comme une infrastructure numérique publique que chacun dans le monde peut utiliser librement et en toute sécurité.",
+  "de": "Unsere gesamte öffentliche Software schließt kommerzielle Werbung und Datenerfassung vollständig aus und wird als öffentliche digitale Infrastruktur bereitgestellt, die jeder auf der Welt frei und sicher nutzen kann.",
+  "pt": "Todo o nosso software público exclui totalmente publicidade comercial e coleta de dados, e é distribuído como infraestrutura digital pública que qualquer pessoa no mundo pode usar livremente e com segurança.",
+  "it": "Tutto il nostro software pubblico esclude completamente la pubblicità commerciale e la raccolta di dati, ed è distribuito come infrastruttura digitale pubblica che chiunque nel mondo può usare liberamente e in sicurezza.",
+  "nl": "Al onze openbare software sluit commerciële reclame en gegevensverzameling volledig uit en wordt verspreid als openbare digitale infrastructuur die iedereen ter wereld vrij en veilig kan gebruiken.",
+  "ru": "Всё наше публичное программное обеспечение полностью исключает коммерческую рекламу и сбор данных и распространяется как публичная цифровая инфраструктура, которой любой человек в мире может пользоваться свободно и безопасно.",
+  "uk": "Усе наше публічне програмне забезпечення повністю виключає комерційну рекламу та збір даних і поширюється як публічна цифрова інфраструктура, якою будь-хто у світі може користуватися вільно та безпечно.",
+  "pl": "Całe nasze publiczne oprogramowanie całkowicie wyklucza reklamę komercyjną i gromadzenie danych, a jest rozpowszechniane jako publiczna infrastruktura cyfrowa, z której każdy na świecie może korzystać swobodnie i bezpiecznie.",
+  "cs": "Veškerý náš veřejný software zcela vylučuje komerční reklamu a sběr dat a je šířen jako veřejná digitální infrastruktura, kterou může kdokoli na světě volně a bezpečně používat.",
+  "hu": "Minden nyilvános szoftverünk teljesen kizárja a kereskedelmi reklámot és az adatgyűjtést, és nyilvános digitális infrastruktúraként terjesztjük, amelyet a világon bárki szabadon és biztonságosan használhat.",
+  "ro": "Tot software-ul nostru public exclude complet publicitatea comercială și colectarea de date și este distribuit ca infrastructură digitală publică, pe care oricine din lume o poate folosi liber și în siguranță.",
+  "da": "Al vores offentlige software udelukker fuldstændigt kommerciel reklame og dataindsamling og distribueres som offentlig digital infrastruktur, som alle i verden kan bruge frit og sikkert.",
+  "fi": "Kaikki julkinen ohjelmistomme sulkee kokonaan pois kaupallisen mainonnan ja tietojen keräämisen, ja sitä jaetaan julkisena digitaalisena infrastruktuurina, jota kuka tahansa maailmassa voi käyttää vapaasti ja turvallisesti.",
+  "nb": "All vår offentlige programvare utelukker fullstendig kommersiell reklame og datainnsamling, og distribueres som offentlig digital infrastruktur som hvem som helst i verden kan bruke fritt og trygt.",
+  "sv": "All vår offentliga programvara utesluter helt kommersiell reklam och datainsamling och distribueras som offentlig digital infrastruktur som vem som helst i världen kan använda fritt och säkert.",
+  "tr": "Tüm herkese açık yazılımlarımız ticari reklamı ve veri toplamayı tamamen dışlar ve dünyada herkesin özgürce ve güvenli bir şekilde kullanabileceği kamusal dijital altyapı olarak dağıtılır.",
+  "zh-TW": "我們提供的所有公共軟體完全排除商業廣告和資料收集，作為公共數位基礎設施分發，讓全世界任何人都能自由、安全地使用。",
+  "th": "ซอฟต์แวร์สาธารณะทั้งหมดของเราไม่มีโฆษณาเชิงพาณิชย์และการเก็บข้อมูลโดยสิ้นเชิง และเผยแพร่ในฐานะโครงสร้างพื้นฐานดิจิทัลสาธารณะที่ทุกคนในโลกใช้ได้อย่างอิสระและปลอดภัย",
+  "vi": "Tất cả phần mềm công cộng của chúng tôi hoàn toàn loại bỏ quảng cáo thương mại và thu thập dữ liệu, và được phân phối dưới dạng hạ tầng số công cộng mà bất kỳ ai trên thế giới cũng có thể sử dụng tự do và an toàn.",
+  "id": "Semua perangkat lunak publik kami sepenuhnya mengecualikan iklan komersial dan pengumpulan data, dan didistribusikan sebagai infrastruktur digital publik yang dapat digunakan siapa pun di dunia secara bebas dan aman.",
+  "ar": "جميع برامجنا العامة تستبعد الإعلانات التجارية وجمع البيانات تمامًا، وتُوزَّع كبنية تحتية رقمية عامة يمكن لأي شخص في العالم استخدامها بحرية وأمان.",
+  "fa": "همه نرم‌افزارهای عمومی ما تبلیغات تجاری و گردآوری داده‌ها را به‌طور کامل کنار می‌گذارند و به‌عنوان زیرساخت دیجیتال عمومی توزیع می‌شوند تا هر کسی در جهان بتواند آزادانه و با امنیت از آن‌ها استفاده کند."
+ },
+ "사진 파일만 넣을 수 있습니다.": {
+  "en": "Only image files can be added.",
+  "zh": "只能添加图片文件。",
+  "ja": "写真ファイルのみ入れられます。",
+  "es": "Solo se pueden añadir archivos de imagen.",
+  "hi": "केवल छवि फ़ाइलें जोड़ी जा सकती हैं।",
+  "fr": "Seuls les fichiers image peuvent être ajoutés.",
+  "de": "Es können nur Bilddateien hinzugefügt werden.",
+  "pt": "Apenas arquivos de imagem podem ser adicionados.",
+  "it": "Si possono aggiungere solo file immagine.",
+  "nl": "Er kunnen alleen afbeeldingsbestanden worden toegevoegd.",
+  "ru": "Можно добавлять только файлы изображений.",
+  "uk": "Можна додавати лише файли зображень.",
+  "pl": "Można dodawać tylko pliki graficzne.",
+  "cs": "Lze přidat pouze soubory obrázků.",
+  "hu": "Csak képfájlok adhatók hozzá.",
+  "ro": "Pot fi adăugate doar fișiere imagine.",
+  "da": "Kun billedfiler kan tilføjes.",
+  "fi": "Vain kuvatiedostoja voi lisätä.",
+  "nb": "Bare bildefiler kan legges til.",
+  "sv": "Endast bildfiler kan läggas till.",
+  "tr": "Yalnızca resim dosyaları eklenebilir.",
+  "zh-TW": "只能加入圖片檔案。",
+  "th": "ใส่ได้เฉพาะไฟล์รูปภาพเท่านั้น",
+  "vi": "Chỉ có thể thêm tệp hình ảnh.",
+  "id": "Hanya berkas gambar yang dapat ditambahkan.",
+  "ar": "يمكن إضافة ملفات الصور فقط.",
+  "fa": "فقط فایل‌های تصویری را می‌توان اضافه کرد."
+ },
+ "사진을 열지 못했습니다. 다른 사진으로 시도해 보세요. (아이폰 HEIC 사진은 브라우저에 따라 열리지 않을 수 있습니다)": {
+  "en": "The photo could not be opened. Please try another photo. (iPhone HEIC photos may not open in some browsers)",
+  "zh": "无法打开照片。请换一张试试。（iPhone 的 HEIC 照片在某些浏览器中可能打不开）",
+  "ja": "写真を開けませんでした。別の写真でお試しください。（iPhoneのHEIC写真はブラウザによって開けない場合があります）",
+  "es": "No se pudo abrir la foto. Prueba con otra. (Las fotos HEIC de iPhone pueden no abrirse en algunos navegadores)",
+  "hi": "फ़ोटो नहीं खुल सकी। कृपया दूसरी फ़ोटो आज़माएँ। (iPhone की HEIC फ़ोटो कुछ ब्राउज़रों में नहीं खुल सकतीं)",
+  "fr": "La photo n'a pas pu être ouverte. Essayez une autre photo. (Les photos HEIC d'iPhone peuvent ne pas s'ouvrir dans certains navigateurs)",
+  "de": "Das Foto konnte nicht geöffnet werden. Bitte versuchen Sie ein anderes Foto. (HEIC-Fotos vom iPhone lassen sich in manchen Browsern möglicherweise nicht öffnen)",
+  "pt": "Não foi possível abrir a foto. Tente outra foto. (Fotos HEIC do iPhone podem não abrir em alguns navegadores)",
+  "it": "Non è stato possibile aprire la foto. Prova un'altra foto. (Le foto HEIC dell'iPhone potrebbero non aprirsi in alcuni browser)",
+  "nl": "De foto kon niet worden geopend. Probeer een andere foto. (HEIC-foto's van de iPhone openen mogelijk niet in sommige browsers)",
+  "ru": "Не удалось открыть фото. Попробуйте другое фото. (Фотографии iPhone в формате HEIC могут не открываться в некоторых браузерах)",
+  "uk": "Не вдалося відкрити фото. Спробуйте інше фото. (Фотографії iPhone у форматі HEIC можуть не відкриватися в деяких браузерах)",
+  "pl": "Nie udało się otworzyć zdjęcia. Spróbuj innego zdjęcia. (Zdjęcia HEIC z iPhone'a mogą nie otwierać się w niektórych przeglądarkach)",
+  "cs": "Fotografii se nepodařilo otevřít. Zkuste jinou fotografii. (Fotografie HEIC z iPhonu se v některých prohlížečích nemusí otevřít)",
+  "hu": "A fotót nem sikerült megnyitni. Próbáljon meg egy másik fotót. (Az iPhone HEIC-fotói egyes böngészőkben nem nyílhatnak meg)",
+  "ro": "Fotografia nu a putut fi deschisă. Încercați altă fotografie. (Fotografiile HEIC de pe iPhone pot să nu se deschidă în unele browsere)",
+  "da": "Fotoet kunne ikke åbnes. Prøv med et andet foto. (HEIC-fotos fra iPhone åbnes muligvis ikke i nogle browsere)",
+  "fi": "Kuvaa ei voitu avata. Kokeile toista kuvaa. (iPhonen HEIC-kuvat eivät välttämättä avaudu joissakin selaimissa)",
+  "nb": "Bildet kunne ikke åpnes. Prøv et annet bilde. (HEIC-bilder fra iPhone åpnes kanskje ikke i enkelte nettlesere)",
+  "sv": "Fotot kunde inte öppnas. Försök med ett annat foto. (HEIC-foton från iPhone kanske inte öppnas i vissa webbläsare)",
+  "tr": "Fotoğraf açılamadı. Lütfen başka bir fotoğraf deneyin. (iPhone HEIC fotoğrafları bazı tarayıcılarda açılmayabilir)",
+  "zh-TW": "無法開啟照片。請換一張試試。（iPhone 的 HEIC 照片在某些瀏覽器中可能打不開）",
+  "th": "เปิดรูปไม่ได้ โปรดลองรูปอื่น (รูป HEIC จาก iPhone อาจเปิดไม่ได้ในบางเบราว์เซอร์)",
+  "vi": "Không mở được ảnh. Hãy thử ảnh khác. (Ảnh HEIC của iPhone có thể không mở được trong một số trình duyệt)",
+  "id": "Foto tidak dapat dibuka. Coba foto lain. (Foto HEIC iPhone mungkin tidak terbuka di beberapa browser)",
+  "ar": "تعذر فتح الصورة. يرجى تجربة صورة أخرى. (قد لا تُفتح صور HEIC من iPhone في بعض المتصفحات)",
+  "fa": "عکس باز نشد. لطفاً عکس دیگری را امتحان کنید. (عکس‌های HEIC آیفون ممکن است در برخی مرورگرها باز نشوند)"
+ },
+ "문서 모서리를 자동으로 찾았습니다. 어긋난 점은 끌어 맞추세요.": {
+  "en": "Document corners were found automatically. Drag any misaligned dot to adjust.",
+  "zh": "已自动找到文档边角。把位置不对的点拖到合适位置。",
+  "ja": "文書の角を自動で見つけました。ずれた点はドラッグして合わせてください。",
+  "es": "Las esquinas del documento se encontraron automáticamente. Arrastra cualquier punto desplazado para ajustarlo.",
+  "hi": "दस्तावेज़ के कोने स्वतः मिल गए। हटा हुआ बिंदु खींचकर मिलाएँ।",
+  "fr": "Les coins du document ont été trouvés automatiquement. Faites glisser tout point décalé pour l'ajuster.",
+  "de": "Die Dokumentenecken wurden automatisch gefunden. Ziehen Sie einen verschobenen Punkt zurecht.",
+  "pt": "Os cantos do documento foram encontrados automaticamente. Arraste qualquer ponto desalinhado para ajustar.",
+  "it": "Gli angoli del documento sono stati trovati automaticamente. Trascina qualsiasi punto spostato per regolarlo.",
+  "nl": "De documenthoeken zijn automatisch gevonden. Sleep een verschoven punt om het aan te passen.",
+  "ru": "Углы документа найдены автоматически. Перетащите смещённую точку, чтобы подправить.",
+  "uk": "Кути документа знайдено автоматично. Перетягніть зміщену точку, щоб підправити.",
+  "pl": "Narożniki dokumentu znaleziono automatycznie. Przeciągnij przesunięty punkt, aby go poprawić.",
+  "cs": "Rohy dokumentu byly nalezeny automaticky. Přetažením posunutého bodu je upravíte.",
+  "hu": "A dokumentum sarkait automatikusan megtaláltuk. A pontatlan pontot húzza a helyére.",
+  "ro": "Colțurile documentului au fost găsite automat. Trageți orice punct deplasat pentru a-l ajusta.",
+  "da": "Dokumentets hjørner blev fundet automatisk. Træk enhver forkert placeret prik for at justere.",
+  "fi": "Asiakirjan kulmat löydettiin automaattisesti. Vedä väärässä kohdassa oleva piste kohdalleen.",
+  "nb": "Dokumentets hjørner ble funnet automatisk. Dra et feilplassert punkt for å justere.",
+  "sv": "Dokumentets hörn hittades automatiskt. Dra en felplacerad punkt för att justera.",
+  "tr": "Belgenin köşeleri otomatik olarak bulundu. Kaymış bir noktayı sürükleyerek düzeltin.",
+  "zh-TW": "已自動找到文件邊角。把位置不對的點拖到合適位置。",
+  "th": "ค้นหามุมเอกสารอัตโนมัติแล้ว ลากจุดที่คลาดเคลื่อนเพื่อปรับ",
+  "vi": "Đã tự động tìm thấy các góc tài liệu. Kéo bất kỳ chấm nào lệch để điều chỉnh.",
+  "id": "Sudut dokumen ditemukan otomatis. Seret titik yang meleset untuk menyesuaikan.",
+  "ar": "تم العثور على زوايا المستند تلقائيًا. اسحب أي نقطة منحرفة لضبطها.",
+  "fa": "گوشه‌های سند به‌طور خودکار یافت شدند. هر نقطه جابه‌جا را بکشید و تنظیم کنید."
+ },
+ "모서리를 자동으로 찾지 못했습니다. 네 점을 문서 모서리에 맞춰 끌어 놓으세요.": {
+  "en": "Corners could not be found automatically. Drag the four dots onto the document corners.",
+  "zh": "未能自动找到边角。请将四个点拖到文档的四个角上。",
+  "ja": "角を自動で見つけられませんでした。4つの点を文書の角に合わせてドラッグしてください。",
+  "es": "No se pudieron encontrar las esquinas automáticamente. Arrastra los cuatro puntos a las esquinas del documento.",
+  "hi": "कोने स्वतः नहीं मिल सके। चारों बिंदुओं को खींचकर दस्तावेज़ के कोनों पर रखें।",
+  "fr": "Les coins n'ont pas pu être trouvés automatiquement. Faites glisser les quatre points sur les coins du document.",
+  "de": "Die Ecken konnten nicht automatisch gefunden werden. Ziehen Sie die vier Punkte auf die Dokumentenecken.",
+  "pt": "Não foi possível encontrar os cantos automaticamente. Arraste os quatro pontos para os cantos do documento.",
+  "it": "Non è stato possibile trovare automaticamente gli angoli. Trascina i quattro punti sugli angoli del documento.",
+  "nl": "De hoeken konden niet automatisch worden gevonden. Sleep de vier punten naar de hoeken van het document.",
+  "ru": "Не удалось найти углы автоматически. Перетащите четыре точки на углы документа.",
+  "uk": "Не вдалося знайти кути автоматично. Перетягніть чотири точки на кути документа.",
+  "pl": "Nie udało się znaleźć narożników automatycznie. Przeciągnij cztery punkty na narożniki dokumentu.",
+  "cs": "Rohy se nepodařilo najít automaticky. Přetáhněte čtyři body na rohy dokumentu.",
+  "hu": "A sarkokat nem sikerült automatikusan megtalálni. Húzza a négy pontot a dokumentum sarkaira.",
+  "ro": "Colțurile nu au putut fi găsite automat. Trageți cele patru puncte pe colțurile documentului.",
+  "da": "Hjørnerne kunne ikke findes automatisk. Træk de fire prikker til dokumentets hjørner.",
+  "fi": "Kulmia ei löytynyt automaattisesti. Vedä neljä pistettä asiakirjan kulmiin.",
+  "nb": "Hjørnene kunne ikke finnes automatisk. Dra de fire punktene til hjørnene på dokumentet.",
+  "sv": "Hörnen kunde inte hittas automatiskt. Dra de fyra punkterna till dokumentets hörn.",
+  "tr": "Köşeler otomatik olarak bulunamadı. Dört noktayı belgenin köşelerine sürükleyin.",
+  "zh-TW": "未能自動找到邊角。請將四個點拖到文件的四個角上。",
+  "th": "ค้นหามุมอัตโนมัติไม่ได้ ลากจุดทั้งสี่ไปไว้ที่มุมของเอกสาร",
+  "vi": "Không thể tự động tìm các góc. Hãy kéo bốn chấm lên các góc tài liệu.",
+  "id": "Sudut tidak dapat ditemukan otomatis. Seret keempat titik ke sudut dokumen.",
+  "ar": "تعذر العثور على الزوايا تلقائيًا. اسحب النقاط الأربع إلى زوايا المستند.",
+  "fa": "گوشه‌ها به‌طور خودکار یافت نشدند. چهار نقطه را بکشید و روی گوشه‌های سند قرار دهید."
+ },
+ "문서 모서리를 자동으로 다시 찾았습니다. 어긋난 점은 끌어 맞추세요.": {
+  "en": "Document corners were found again automatically. Drag any misaligned dot to adjust.",
+  "zh": "已重新自动找到文档边角。把位置不对的点拖到合适位置。",
+  "ja": "文書の角を自動で再検出しました。ずれた点はドラッグして合わせてください。",
+  "es": "Las esquinas del documento se encontraron de nuevo automáticamente. Arrastra cualquier punto desplazado para ajustarlo.",
+  "hi": "दस्तावेज़ के कोने फिर से स्वतः मिल गए। हटा हुआ बिंदु खींचकर मिलाएँ।",
+  "fr": "Les coins du document ont été retrouvés automatiquement. Faites glisser tout point décalé pour l'ajuster.",
+  "de": "Die Dokumentenecken wurden erneut automatisch gefunden. Ziehen Sie einen verschobenen Punkt zurecht.",
+  "pt": "Os cantos do documento foram encontrados novamente de forma automática. Arraste qualquer ponto desalinhado para ajustar.",
+  "it": "Gli angoli del documento sono stati ritrovati automaticamente. Trascina qualsiasi punto spostato per regolarlo.",
+  "nl": "De documenthoeken zijn opnieuw automatisch gevonden. Sleep een verschoven punt om het aan te passen.",
+  "ru": "Углы документа снова найдены автоматически. Перетащите смещённую точку, чтобы подправить.",
+  "uk": "Кути документа знову знайдено автоматично. Перетягніть зміщену точку, щоб підправити.",
+  "pl": "Narożniki dokumentu znaleziono ponownie automatycznie. Przeciągnij przesunięty punkt, aby go poprawić.",
+  "cs": "Rohy dokumentu byly znovu nalezeny automaticky. Přetažením posunutého bodu je upravíte.",
+  "hu": "A dokumentum sarkait újra automatikusan megtaláltuk. A pontatlan pontot húzza a helyére.",
+  "ro": "Colțurile documentului au fost găsite din nou automat. Trageți orice punct deplasat pentru a-l ajusta.",
+  "da": "Dokumentets hjørner blev fundet automatisk igen. Træk enhver forkert placeret prik for at justere.",
+  "fi": "Asiakirjan kulmat löydettiin automaattisesti uudelleen. Vedä väärässä kohdassa oleva piste kohdalleen.",
+  "nb": "Dokumentets hjørner ble funnet automatisk igjen. Dra et feilplassert punkt for å justere.",
+  "sv": "Dokumentets hörn hittades automatiskt igen. Dra en felplacerad punkt för att justera.",
+  "tr": "Belgenin köşeleri otomatik olarak yeniden bulundu. Kaymış bir noktayı sürükleyerek düzeltin.",
+  "zh-TW": "已重新自動找到文件邊角。把位置不對的點拖到合適位置。",
+  "th": "ค้นหามุมเอกสารอัตโนมัติอีกครั้งแล้ว ลากจุดที่คลาดเคลื่อนเพื่อปรับ",
+  "vi": "Đã tự động tìm lại các góc tài liệu. Kéo bất kỳ chấm nào lệch để điều chỉnh.",
+  "id": "Sudut dokumen ditemukan lagi secara otomatis. Seret titik yang meleset untuk menyesuaikan.",
+  "ar": "تم العثور على زوايا المستند تلقائيًا مرة أخرى. اسحب أي نقطة منحرفة لضبطها.",
+  "fa": "گوشه‌های سند دوباره به‌طور خودکار یافت شدند. هر نقطه جابه‌جا را بکشید و تنظیم کنید."
+ },
+ "모서리 영역이 너무 작습니다. 점을 문서 모서리에 맞게 벌려 주세요.": {
+  "en": "The corner area is too small. Spread the dots to fit the document corners.",
+  "zh": "边角区域太小。请把点展开到与文档边角一致。",
+  "ja": "角の領域が小さすぎます。点を文書の角に合わせて広げてください。",
+  "es": "El área de las esquinas es demasiado pequeña. Extiende los puntos para ajustarlos a las esquinas del documento.",
+  "hi": "कोनों का क्षेत्र बहुत छोटा है। बिंदुओं को दस्तावेज़ के कोनों के अनुसार फैलाएँ।",
+  "fr": "La zone des coins est trop petite. Écartez les points pour les adapter aux coins du document.",
+  "de": "Der Eckenbereich ist zu klein. Spreizen Sie die Punkte passend zu den Dokumentenecken.",
+  "pt": "A área dos cantos é muito pequena. Espalhe os pontos para ajustar aos cantos do documento.",
+  "it": "L'area degli angoli è troppo piccola. Allarga i punti per adattarli agli angoli del documento.",
+  "nl": "Het hoekgebied is te klein. Spreid de punten zodat ze bij de documenthoeken passen.",
+  "ru": "Область углов слишком мала. Разведите точки так, чтобы они совпадали с углами документа.",
+  "uk": "Область кутів занадто мала. Розведіть точки так, щоб вони збігалися з кутами документа.",
+  "pl": "Obszar narożników jest zbyt mały. Rozsuń punkty tak, aby pasowały do narożników dokumentu.",
+  "cs": "Oblast rohů je příliš malá. Roztáhněte body tak, aby odpovídaly rohům dokumentu.",
+  "hu": "A sarokterület túl kicsi. Terpessze szét a pontokat a dokumentum sarkaihoz igazítva.",
+  "ro": "Zona colțurilor este prea mică. Întindeți punctele astfel încât să se potrivească cu colțurile documentului.",
+  "da": "Hjørneområdet er for lille. Spred prikkerne, så de passer til dokumentets hjørner.",
+  "fi": "Kulma-alue on liian pieni. Levitä pisteet asiakirjan kulmien mukaisiksi.",
+  "nb": "Hjørneområdet er for lite. Spre punktene slik at de passer til dokumentets hjørner.",
+  "sv": "Hörnområdet är för litet. Sprid ut punkterna så att de passar dokumentets hörn.",
+  "tr": "Köşe alanı çok küçük. Noktaları belgenin köşelerine uyacak şekilde yayın.",
+  "zh-TW": "邊角區域太小。請把點展開到與文件邊角一致。",
+  "th": "พื้นที่มุมเล็กเกินไป โปรดกระจายจุดให้พอดีกับมุมเอกสาร",
+  "vi": "Vùng góc quá nhỏ. Hãy trải các chấm cho khớp với các góc tài liệu.",
+  "id": "Area sudut terlalu kecil. Bentangkan titik agar pas dengan sudut dokumen.",
+  "ar": "منطقة الزوايا صغيرة جدًا. باعد بين النقاط لتناسب زوايا المستند.",
+  "fa": "ناحیه گوشه‌ها بسیار کوچک است. نقاط را باز کنید تا با گوشه‌های سند متناسب شوند."
+ },
+ "펴는 중…": {
+  "en": "Straightening…",
+  "zh": "拉直中…",
+  "ja": "伸ばし中…",
+  "es": "Enderezando…",
+  "hi": "सीधा हो रहा है…",
+  "fr": "Redressement…",
+  "de": "Wird gerade gerichtet…",
+  "pt": "Endireitando…",
+  "it": "Raddrizzamento…",
+  "nl": "Rechtzetten…",
+  "ru": "Выравнивание…",
+  "uk": "Вирівнювання…",
+  "pl": "Prostowanie…",
+  "cs": "Narovnávání…",
+  "hu": "Kiegyenesítés…",
+  "ro": "Îndreptare…",
+  "da": "Retter ud…",
+  "fi": "Suoristetaan…",
+  "nb": "Retter ut…",
+  "sv": "Rätar ut…",
+  "tr": "Düzleştiriliyor…",
+  "zh-TW": "拉直中…",
+  "th": "กำลังทำให้ตรง…",
+  "vi": "Đang làm thẳng…",
+  "id": "Meluruskan…",
+  "ar": "جارٍ التقويم…",
+  "fa": "در حال صاف کردن…"
+ },
+ "반듯하게 폈습니다. 색 방식을 고르고 밝기와 대비를 맞춘 뒤, 페이지를 목록에 추가하세요.": {
+  "en": "Straightened. Choose a color mode, adjust brightness and contrast, then add the page to the list.",
+  "zh": "已拉直。选择颜色模式，调整亮度和对比度，然后将此页加入列表。",
+  "ja": "まっすぐに伸ばしました。カラーモードを選び、明るさとコントラストを合わせたら、このページをリストに追加してください。",
+  "es": "Enderezado. Elige un modo de color, ajusta el brillo y el contraste, y añade la página a la lista.",
+  "hi": "सीधा हो गया। रंग मोड चुनें, चमक और कंट्रास्ट मिलाएँ, फिर पेज को सूची में जोड़ें।",
+  "fr": "Redressé. Choisissez un mode couleur, réglez la luminosité et le contraste, puis ajoutez la page à la liste.",
+  "de": "Gerade gerichtet. Wählen Sie einen Farbmodus, passen Sie Helligkeit und Kontrast an und fügen Sie die Seite dann zur Liste hinzu.",
+  "pt": "Endireitado. Escolha um modo de cor, ajuste o brilho e o contraste e adicione a página à lista.",
+  "it": "Raddrizzato. Scegli una modalità colore, regola luminosità e contrasto, poi aggiungi la pagina all'elenco.",
+  "nl": "Rechtgezet. Kies een kleurmodus, pas helderheid en contrast aan en voeg de pagina vervolgens toe aan de lijst.",
+  "ru": "Выровнено. Выберите режим цвета, настройте яркость и контраст, затем добавьте страницу в список.",
+  "uk": "Вирівняно. Виберіть режим кольору, налаштуйте яскравість і контраст, потім додайте сторінку до списку.",
+  "pl": "Wyprostowano. Wybierz tryb koloru, dostosuj jasność i kontrast, a potem dodaj stronę do listy.",
+  "cs": "Narovnáno. Vyberte režim barev, upravte jas a kontrast a poté přidejte stránku do seznamu.",
+  "hu": "Kiegyenesítve. Válasszon színmódot, állítsa be a fényerőt és a kontrasztot, majd adja hozzá az oldalt a listához.",
+  "ro": "Îndreptat. Alegeți un mod de culoare, reglați luminozitatea și contrastul, apoi adăugați pagina în listă.",
+  "da": "Rettet ud. Vælg en farvetilstand, justér lysstyrke og kontrast, og føj derefter siden til listen.",
+  "fi": "Suoristettu. Valitse väritila, säädä kirkkaus ja kontrasti ja lisää sivu sitten luetteloon.",
+  "nb": "Rettet ut. Velg en fargemodus, juster lysstyrke og kontrast, og legg deretter siden til i listen.",
+  "sv": "Utjämnat. Välj ett färgläge, justera ljusstyrka och kontrast och lägg sedan till sidan i listan.",
+  "tr": "Düzleştirildi. Bir renk modu seçin, parlaklığı ve karşıtlığı ayarlayın, ardından sayfayı listeye ekleyin.",
+  "zh-TW": "已拉直。選擇顏色模式，調整亮度和對比度，然後將此頁加入清單。",
+  "th": "ทำให้ตรงแล้ว เลือกโหมดสี ปรับความสว่างและคอนทราสต์ แล้วเพิ่มหน้านี้ลงรายการ",
+  "vi": "Đã làm thẳng. Chọn chế độ màu, chỉnh độ sáng và độ tương phản, rồi thêm trang vào danh sách.",
+  "id": "Sudah lurus. Pilih mode warna, sesuaikan kecerahan dan kontras, lalu tambahkan halaman ke daftar.",
+  "ar": "تم التقويم. اختر وضع الألوان، واضبط السطوع والتباين، ثم أضف الصفحة إلى القائمة.",
+  "fa": "صاف شد. حالت رنگ را انتخاب کنید، روشنایی و کنتراست را تنظیم کنید، سپس صفحه را به فهرست اضافه کنید."
+ },
+ "펴기에 실패했습니다. 모서리 점을 확인하고 다시 시도해 보세요.": {
+  "en": "Straightening failed. Check the corner dots and try again.",
+  "zh": "拉直失败。请检查边角点后重试。",
+  "ja": "伸ばすのに失敗しました。角の点を確認してもう一度お試しください。",
+  "es": "El enderezado falló. Revisa los puntos de las esquinas e inténtalo de nuevo.",
+  "hi": "सीधा करना विफल। कोनों के बिंदु जाँचकर फिर कोशिश करें।",
+  "fr": "Le redressement a échoué. Vérifiez les points des coins et réessayez.",
+  "de": "Das Gerade-Richten ist fehlgeschlagen. Prüfen Sie die Eckpunkte und versuchen Sie es erneut.",
+  "pt": "O endireitamento falhou. Verifique os pontos dos cantos e tente novamente.",
+  "it": "Raddrizzamento non riuscito. Controlla i punti degli angoli e riprova.",
+  "nl": "Rechtzetten mislukt. Controleer de hoekpunten en probeer het opnieuw.",
+  "ru": "Не удалось выровнять. Проверьте точки углов и попробуйте снова.",
+  "uk": "Не вдалося вирівняти. Перевірте точки кутів і спробуйте знову.",
+  "pl": "Prostowanie nie powiodło się. Sprawdź punkty narożników i spróbuj ponownie.",
+  "cs": "Narovnání se nezdařilo. Zkontrolujte rohové body a zkuste to znovu.",
+  "hu": "A kiegyenesítés sikertelen. Ellenőrizze a sarokpontokat, és próbálja újra.",
+  "ro": "Îndreptarea a eșuat. Verificați punctele colțurilor și încercați din nou.",
+  "da": "Udretningen mislykkedes. Kontrollér hjørneprikkerne, og prøv igen.",
+  "fi": "Suoristus epäonnistui. Tarkista kulmapisteet ja yritä uudelleen.",
+  "nb": "Utretningen mislyktes. Sjekk hjørnepunktene og prøv igjen.",
+  "sv": "Det gick inte att räta ut. Kontrollera hörnpunkterna och försök igen.",
+  "tr": "Düzleştirme başarısız oldu. Köşe noktalarını kontrol edip tekrar deneyin.",
+  "zh-TW": "拉直失敗。請檢查邊角點後重試。",
+  "th": "ทำให้ตรงไม่สำเร็จ โปรดตรวจสอบจุดมุมแล้วลองอีกครั้ง",
+  "vi": "Làm thẳng thất bại. Hãy kiểm tra các chấm góc và thử lại.",
+  "id": "Gagal meluruskan. Periksa titik sudut dan coba lagi.",
+  "ar": "فشل التقويم. تحقق من نقاط الزوايا وحاول مرة أخرى.",
+  "fa": "صاف کردن ناموفق بود. نقاط گوشه را بررسی کنید و دوباره تلاش کنید."
+ },
+ "✕ 삭제": {
+  "en": "✕ Delete",
+  "zh": "✕ 删除",
+  "ja": "✕ 削除",
+  "es": "✕ Eliminar",
+  "hi": "✕ हटाएँ",
+  "fr": "✕ Supprimer",
+  "de": "✕ Löschen",
+  "pt": "✕ Excluir",
+  "it": "✕ Elimina",
+  "nl": "✕ Verwijderen",
+  "ru": "✕ Удалить",
+  "uk": "✕ Видалити",
+  "pl": "✕ Usuń",
+  "cs": "✕ Smazat",
+  "hu": "✕ Törlés",
+  "ro": "✕ Șterge",
+  "da": "✕ Slet",
+  "fi": "✕ Poista",
+  "nb": "✕ Slett",
+  "sv": "✕ Ta bort",
+  "tr": "✕ Sil",
+  "zh-TW": "✕ 刪除",
+  "th": "✕ ลบ",
+  "vi": "✕ Xóa",
+  "id": "✕ Hapus",
+  "ar": "✕ حذف",
+  "fa": "✕ حذف"
+ },
+ "페이지를 담지 못했습니다.": {
+  "en": "The page could not be added.",
+  "zh": "未能添加此页。",
+  "ja": "ページを集められませんでした。",
+  "es": "No se pudo añadir la página.",
+  "hi": "पेज नहीं जोड़ा जा सका।",
+  "fr": "La page n'a pas pu être ajoutée.",
+  "de": "Die Seite konnte nicht hinzugefügt werden.",
+  "pt": "Não foi possível adicionar a página.",
+  "it": "Impossibile aggiungere la pagina.",
+  "nl": "De pagina kon niet worden toegevoegd.",
+  "ru": "Не удалось добавить страницу.",
+  "uk": "Не вдалося додати сторінку.",
+  "pl": "Nie udało się dodać strony.",
+  "cs": "Stránku se nepodařilo přidat.",
+  "hu": "Az oldalt nem sikerült hozzáadni.",
+  "ro": "Pagina nu a putut fi adăugată.",
+  "da": "Siden kunne ikke tilføjes.",
+  "fi": "Sivua ei voitu lisätä.",
+  "nb": "Siden kunne ikke legges til.",
+  "sv": "Sidan kunde inte läggas till.",
+  "tr": "Sayfa eklenemedi.",
+  "zh-TW": "未能加入此頁。",
+  "th": "เพิ่มหน้าไม่ได้",
+  "vi": "Không thể thêm trang.",
+  "id": "Halaman tidak dapat ditambahkan.",
+  "ar": "تعذرت إضافة الصفحة.",
+  "fa": "صفحه اضافه نشد."
+ },
+ "담은 페이지를 모두 지웠습니다.": {
+  "en": "All collected pages were cleared.",
+  "zh": "已清除所有收集的页面。",
+  "ja": "集めたページをすべて消しました。",
+  "es": "Se borraron todas las páginas recopiladas.",
+  "hi": "सभी जोड़े गए पेज साफ़ कर दिए गए।",
+  "fr": "Toutes les pages collectées ont été effacées.",
+  "de": "Alle gesammelten Seiten wurden gelöscht.",
+  "pt": "Todas as páginas coletadas foram apagadas.",
+  "it": "Tutte le pagine raccolte sono state cancellate.",
+  "nl": "Alle verzamelde pagina's zijn gewist.",
+  "ru": "Все собранные страницы очищены.",
+  "uk": "Усі зібрані сторінки очищено.",
+  "pl": "Wyczyszczono wszystkie zebrane strony.",
+  "cs": "Všechny sebrané stránky byly vymazány.",
+  "hu": "Az összes összegyűjtött oldal törölve.",
+  "ro": "Toate paginile adunate au fost șterse.",
+  "da": "Alle samlede sider er ryddet.",
+  "fi": "Kaikki kootut sivut tyhjennetty.",
+  "nb": "Alle samlede sider er fjernet.",
+  "sv": "Alla samlade sidor har rensats.",
+  "tr": "Toplanan tüm sayfalar temizlendi.",
+  "zh-TW": "已清除所有收集的頁面。",
+  "th": "ล้างหน้าที่เก็บไว้ทั้งหมดแล้ว",
+  "vi": "Đã xóa tất cả các trang đã thu thập.",
+  "id": "Semua halaman terkumpul telah dihapus.",
+  "ar": "تم مسح جميع الصفحات المجموعة.",
+  "fa": "همه صفحات گردآوری‌شده پاک شدند."
+ },
+ "PDF 만드는 중…": {
+  "en": "Making PDF…",
+  "zh": "制作 PDF 中…",
+  "ja": "PDF作成中…",
+  "es": "Creando PDF…",
+  "hi": "PDF बन रहा है…",
+  "fr": "Création du PDF…",
+  "de": "PDF wird erstellt…",
+  "pt": "Criando PDF…",
+  "it": "Creazione del PDF…",
+  "nl": "PDF maken…",
+  "ru": "Создание PDF…",
+  "uk": "Створення PDF…",
+  "pl": "Tworzenie PDF…",
+  "cs": "Vytváření PDF…",
+  "hu": "PDF készítése…",
+  "ro": "Creare PDF…",
+  "da": "Opretter PDF…",
+  "fi": "Tehdään PDF:ää…",
+  "nb": "Lager PDF…",
+  "sv": "Skapar PDF…",
+  "tr": "PDF oluşturuluyor…",
+  "zh-TW": "製作 PDF 中…",
+  "th": "กำลังสร้าง PDF…",
+  "vi": "Đang tạo PDF…",
+  "id": "Membuat PDF…",
+  "ar": "جارٍ إنشاء PDF…",
+  "fa": "در حال ساخت PDF…"
+ },
+ "PDF를 만들고 있습니다…": {
+  "en": "Making the PDF…",
+  "zh": "正在制作 PDF…",
+  "ja": "PDFを作成しています…",
+  "es": "Creando el PDF…",
+  "hi": "PDF बनाया जा रहा है…",
+  "fr": "Création du PDF en cours…",
+  "de": "Das PDF wird erstellt…",
+  "pt": "Criando o PDF…",
+  "it": "Creazione del PDF in corso…",
+  "nl": "De PDF wordt gemaakt…",
+  "ru": "Создаётся PDF…",
+  "uk": "Створюється PDF…",
+  "pl": "Trwa tworzenie PDF…",
+  "cs": "PDF se vytváří…",
+  "hu": "A PDF készül…",
+  "ro": "Se creează PDF-ul…",
+  "da": "Opretter PDF'en…",
+  "fi": "Tehdään PDF-tiedostoa…",
+  "nb": "Lager PDF-en…",
+  "sv": "Skapar PDF:en…",
+  "tr": "PDF oluşturuluyor…",
+  "zh-TW": "正在製作 PDF…",
+  "th": "กำลังสร้าง PDF…",
+  "vi": "Đang tạo PDF…",
+  "id": "Sedang membuat PDF…",
+  "ar": "جارٍ إنشاء ملف PDF…",
+  "fa": "در حال ساخت PDF…"
+ },
+ "PDF를 만들지 못했습니다. 네트워크 상태를 확인하고 다시 시도해 보세요.": {
+  "en": "The PDF could not be created. Check your network connection and try again.",
+  "zh": "无法创建 PDF。请检查网络状态后重试。",
+  "ja": "PDFを作成できませんでした。ネットワーク状態を確認してもう一度お試しください。",
+  "es": "No se pudo crear el PDF. Comprueba tu conexión de red e inténtalo de nuevo.",
+  "hi": "PDF नहीं बन सका। नेटवर्क स्थिति जाँचकर फिर कोशिश करें।",
+  "fr": "Le PDF n'a pas pu être créé. Vérifiez votre connexion réseau et réessayez.",
+  "de": "Das PDF konnte nicht erstellt werden. Prüfen Sie Ihre Netzwerkverbindung und versuchen Sie es erneut.",
+  "pt": "Não foi possível criar o PDF. Verifique sua conexão de rede e tente novamente.",
+  "it": "Non è stato possibile creare il PDF. Controlla la connessione di rete e riprova.",
+  "nl": "De PDF kon niet worden gemaakt. Controleer uw netwerkverbinding en probeer het opnieuw.",
+  "ru": "Не удалось создать PDF. Проверьте состояние сети и попробуйте снова.",
+  "uk": "Не вдалося створити PDF. Перевірте стан мережі та спробуйте знову.",
+  "pl": "Nie udało się utworzyć pliku PDF. Sprawdź połączenie sieciowe i spróbuj ponownie.",
+  "cs": "PDF se nepodařilo vytvořit. Zkontrolujte stav sítě a zkuste to znovu.",
+  "hu": "A PDF-et nem sikerült létrehozni. Ellenőrizze a hálózat állapotát, és próbálja újra.",
+  "ro": "PDF-ul nu a putut fi creat. Verificați starea rețelei și încercați din nou.",
+  "da": "PDF'en kunne ikke oprettes. Kontrollér din netværksforbindelse, og prøv igen.",
+  "fi": "PDF:ää ei voitu luoda. Tarkista verkkoyhteytesi ja yritä uudelleen.",
+  "nb": "PDF-en kunne ikke lages. Sjekk nettverkstilkoblingen din og prøv igjen.",
+  "sv": "PDF:en kunde inte skapas. Kontrollera din nätverksanslutning och försök igen.",
+  "tr": "PDF oluşturulamadı. Ağ bağlantınızı kontrol edip tekrar deneyin.",
+  "zh-TW": "無法建立 PDF。請檢查網路狀態後重試。",
+  "th": "สร้าง PDF ไม่ได้ โปรดตรวจสอบการเชื่อมต่อเครือข่ายแล้วลองอีกครั้ง",
+  "vi": "Không thể tạo PDF. Hãy kiểm tra kết nối mạng và thử lại.",
+  "id": "PDF tidak dapat dibuat. Periksa koneksi jaringan Anda dan coba lagi.",
+  "ar": "تعذر إنشاء ملف PDF. تحقق من حالة الشبكة وحاول مرة أخرى.",
+  "fa": "PDF ساخته نشد. وضعیت شبکه را بررسی کنید و دوباره تلاش کنید."
+ },
+ "이미지 파일로 저장했습니다.": {
+  "en": "Saved as an image file.",
+  "zh": "已保存为图片文件。",
+  "ja": "画像ファイルで保存しました。",
+  "es": "Guardado como archivo de imagen.",
+  "hi": "छवि फ़ाइल के रूप में सहेजा गया।",
+  "fr": "Enregistré comme fichier image.",
+  "de": "Als Bilddatei gespeichert.",
+  "pt": "Salvo como arquivo de imagem.",
+  "it": "Salvato come file immagine.",
+  "nl": "Opgeslagen als afbeeldingsbestand.",
+  "ru": "Сохранено как файл изображения.",
+  "uk": "Збережено як файл зображення.",
+  "pl": "Zapisano jako plik graficzny.",
+  "cs": "Uloženo jako soubor obrázku.",
+  "hu": "Képfájlként mentve.",
+  "ro": "Salvat ca fișier imagine.",
+  "da": "Gemt som en billedfil.",
+  "fi": "Tallennettu kuvatiedostona.",
+  "nb": "Lagret som en bildefil.",
+  "sv": "Sparad som en bildfil.",
+  "tr": "Resim dosyası olarak kaydedildi.",
+  "zh-TW": "已儲存為圖片檔案。",
+  "th": "บันทึกเป็นไฟล์รูปภาพแล้ว",
+  "vi": "Đã lưu thành tệp hình ảnh.",
+  "id": "Disimpan sebagai berkas gambar.",
+  "ar": "تم الحفظ كملف صورة.",
+  "fa": "به‌صورت فایل تصویر ذخیره شد."
+ }
+});
+
+</script>
+<style>.nx-back{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9999;display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:999px;background:rgba(10,16,34,.85);border:1px solid rgba(45,212,191,.55);color:#E2F3FF;font-size:15.5px;font-weight:600;text-decoration:none;backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,.35)}.nx-back:active{filter:brightness(1.6)}</style>
+<a class="nx-back" href="https://nexus-2e23d.web.app/#n16" aria-label="현황판으로 돌아가기">← 돌아가기</a>
+
+<script>
+/* NX-I18N-SUPPLEMENT — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "← 돌아가기": {
+  "en": "← Back",
+  "zh": "← 返回",
+  "zh-TW": "← 返回",
+  "ja": "← 戻る",
+  "es": "← Volver",
+  "hi": "← वापस",
+  "fr": "← Retour",
+  "de": "← Zurück",
+  "pt": "← Voltar",
+  "it": "← Indietro",
+  "ru": "← Назад",
+  "uk": "← Назад",
+  "ar": "← رجوع",
+  "fa": "← بازگشت",
+  "th": "← กลับ",
+  "vi": "← Quay lại",
+  "id": "← Kembali",
+  "tr": "← Geri dön",
+  "nl": "← Terug",
+  "pl": "← Wstecz",
+  "sv": "← Tillbaka",
+  "da": "← Tilbage",
+  "nb": "← Tilbake",
+  "fi": "← Takaisin",
+  "cs": "← Zpět",
+  "hu": "← Vissza",
+  "ro": "← Înapoi"
+ }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{"background_color": "#0B0F19", "description": "매달 나가는 고정비와 납부일을 챙기는 도구 — 기록은 이 전화기 안에만 저장됩니다", "display": "standalone", "icons": [{"sizes": "192x192", "src": "/icon-192.png", "type": "image/png"}, {"sizes": "512x512", "src": "/icon-512.png", "type": "image/png"}], "name": "넥서스 고정비 챙기기", "short_name": "고정비 챙기기", "start_url": "/", "theme_color": "#0B0F19"}

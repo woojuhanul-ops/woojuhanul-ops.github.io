@@ -1,0 +1,1 @@
+{"background_color": "#0B0F19", "description": "집과 차의 정비 기록과 다음 예정일을 챙기는 도구", "display": "standalone", "icons": [{"sizes": "192x192", "src": "/icon-192.png", "type": "image/png"}, {"sizes": "512x512", "src": "/icon-512.png", "type": "image/png"}], "name": "넥서스 집·차 정비 챙기기", "short_name": "정비 챙기기", "start_url": "/", "theme_color": "#0B0F19"}

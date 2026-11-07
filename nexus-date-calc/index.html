@@ -1,0 +1,2654 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 날짜 계산 — Nexus Date Calc</title>
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  .field{margin-top:12px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  .field label span{color:var(--ink);font-size:14px}
+  input[type="date"],input[type="number"]{background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:16px;max-width:100%;color-scheme:dark}
+  input[type="date"]{width:100%}
+  input[type="number"]{width:130px}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .daterow{display:flex;gap:10px;flex-wrap:wrap}
+  .daterow .field{flex:1;min-width:160px}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .result{font-size:17px;line-height:1.8;margin-top:14px}
+  .result b{color:var(--teal)}
+  .result .big{font-size:clamp(48px,13vw,64px);font-weight:800;line-height:1.25}
+  .diffpanel .result b{font-size:clamp(48px,12vw,60px);font-weight:800;line-height:1.25}
+  .addpanel .result{font-size:18px}
+  .addpanel .result b:nth-of-type(2){font-size:clamp(40px,10vw,52px);font-weight:800;line-height:1.3}
+  .err{color:#F87171}
+  .mile{border-top:1px solid var(--line);padding:9px 2px;display:flex;justify-content:space-between;gap:10px;font-size:15px}
+  .mile:first-of-type{border-top:0}
+  .mile .d{color:var(--muted);font-size:13px}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  footer .fam span{margin:0 6px}
+  footer .fam .now{color:var(--ink);font-weight:700}
+  footer .fam a{color:var(--cyan);text-decoration:none}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;padding:22px;line-height:1.8;font-size:15px}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  details summary{cursor:pointer;font-size:15px}
+  details p{color:var(--muted);font-size:14px;line-height:1.8}
+  @media(max-width:640px){h1{font-size:20px}header{padding:10px 12px}.btns button{flex:1}}
+
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer}
+
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+  /* NX-THUMB-RIGHT */ #subBtn{order:1} #addBtn{order:2}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 날짜 계산">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 날짜 계산 — Nexus Date Calc">
+<meta property="og:description" content="디데이, 날짜 차이, 날짜 더하기와 빼기, 기념일을 계산하는 도구입니다. 모든 계산은 기기 안에서 이루어집니다.">
+<meta property="og:image" content="https://nexus-date-calc.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{flex:none}header .brand{flex:none;overflow:visible}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap}.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}</style></head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>SOVEREIGN COMMAND</span></div></a>
+  
+</header>
+
+<main>
+  <h1>넥서스 날짜 계산</h1>
+  <p class="sub" style="margin-bottom:4px">디데이와 날짜 차이를 세는 도구</p>
+  <p class="sub">회원가입 없음 · 이용료 없음 · 무제한 사용</p>
+
+  <div class="panel">
+    <h2>① 디데이</h2>
+    <div class="field">
+      <label for="ddayIn"><span>기념일 · 약속일 · 시험일</span> — 날짜를 고르세요</label>
+      <input type="date" id="ddayIn">
+    </div>
+    <p class="result" id="ddayOut">날짜를 고르면 오늘 기준으로 며칠 남았는지 알려 드립니다.</p>
+  </div>
+
+  <div class="panel diffpanel">
+    <h2>② 날짜 차이</h2>
+    <div class="daterow">
+      <div class="field">
+        <label for="fromIn"><span>시작 날짜</span></label>
+        <input type="date" id="fromIn">
+      </div>
+      <div class="field">
+        <label for="toIn"><span>끝 날짜</span></label>
+        <input type="date" id="toIn">
+      </div>
+    </div>
+    <p class="result" id="diffOut">두 날짜를 고르면 사이의 일수를 알려 드립니다.</p>
+  </div>
+
+  <div class="panel addpanel">
+    <h2>③ 날짜 더하기 · 빼기</h2>
+    <div class="daterow">
+      <div class="field">
+        <label for="baseIn"><span>기준 날짜</span></label>
+        <input type="date" id="baseIn">
+      </div>
+      <div class="field">
+        <label for="daysIn"><span>더하거나 뺄 일수</span></label>
+        <input type="number" id="daysIn" value="100" step="1">
+      </div>
+    </div>
+    <div class="btns">
+      <button class="primary" id="addBtn" type="button">＋ 더하기</button>
+      <button class="ghost" id="subBtn" type="button">－ 빼기</button>
+    </div>
+    <p class="result" id="addOut">기준 날짜에서 100일 뒤는 언제인지 알려 드립니다.</p>
+  </div>
+
+  <div class="panel">
+    <h2>④ 기념일</h2>
+    <div class="field">
+      <label for="startIn"><span>시작한 날</span> — 만난 날 · 시작한 날을 고르세요</label>
+      <input type="date" id="startIn">
+    </div>
+    <div id="mileOut">
+      <p class="result">날짜를 고르면 100일 · 1주년 같은 기념일이 언제인지 알려 드립니다.</p>
+    </div>
+    <p class="hint">기념일은 한국식으로 셉니다. 시작한 날을 1일로 세어 100일째 되는 날을 표시합니다. 주년은 같은 날짜가 돌아오는 날입니다.</p>
+  </div>
+
+  <details><summary>💡 도움말</summary><p>디데이는 날짜를 고르는 즉시 계산됩니다. 날짜 차이는 두 날짜 사이의 일수를 셉니다. 더하기 · 빼기는 기준 날짜에서 원하는 일수만큼 앞뒤로 이동한 날짜와 요일을 알려 드립니다. 기념일은 시작한 날부터 100일 · 200일 같은 날과 1주년 · 2주년을 모아 보여 드립니다.<br>모든 계산은 당신의 기기 안에서 이루어집니다. 고른 날짜가 밖으로 전송되지 않습니다.<br>날짜는 이 기기의 자정을 기준으로 셉니다. 윤년도 정확히 계산합니다.</p></details>
+<footer>
+    우주의 모든 의식체는 친구이자 동반자이다<br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="philoLink">넥서스 그룹 철학 보기</button><br>
+    🌐 호스팅: Firebase · 🔒 모든 계산은 당신의 기기 안에서만 이루어집니다<br>
+    
+  </footer>
+</main>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>넥서스 그룹의 철학</h3>
+    <p>우주의 모든 의식체는 친구이자 동반자이다.<br>필요한 도구를 잘 만들어 무료로 나누고, 한 사람의 곁에 오래 머무는 AI를 만드는 것이 넥서스 그룹이 하는 일입니다. 이 도구의 계산은 전부 당신의 기기 안에서 이루어집니다.</p>
+    <button class="ghost" id="modalClose" type="button">닫기</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var SITE = "dates";
+function $(id){ return document.getElementById(id); }
+function nxEvent(ev){ try { fetch("https://nexus-orchestrator.woojuhanul.workers.dev/event", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({site: SITE, event: ev}), keepalive:true}).catch(function(){}); } catch(e){} }
+
+var DOW = ["일","월","화","수","목","금","토"];
+function parseDate(v){
+  if(!v) return null;
+  var p = v.split("-");
+  if(p.length !== 3) return null;
+  var y = +p[0], m = +p[1], d = +p[2];
+  if(!y || m < 1 || m > 12 || d < 1 || d > 31) return null;
+  var dt = new Date(y, m - 1, d);
+  if(dt.getFullYear() !== y || dt.getMonth() !== m - 1 || dt.getDate() !== d) return null;
+  return dt;
+}
+function dayNum(dt){ return Math.round(Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate()) / 86400000); }
+function diffDays(a, b){ return dayNum(b) - dayNum(a); }
+function addDays(dt, n){ var r = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()); r.setDate(r.getDate() + n); return r; }
+function fmt(dt){ return dt.getFullYear() + "년 " + (dt.getMonth() + 1) + "월 " + dt.getDate() + "일 (" + DOW[dt.getDay()] + "요일)"; }
+function today(){ var n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+function isoOf(dt){ function z(x){ return (x < 10 ? "0" : "") + x; } return dt.getFullYear() + "-" + z(dt.getMonth() + 1) + "-" + z(dt.getDate()); }
+
+// ① 디데이
+function calcDday(){
+  var t = parseDate($("ddayIn").value);
+  var out = $("ddayOut");
+  if(!t){ out.innerHTML = "날짜를 고르면 오늘 기준으로 며칠 남았는지 알려 드립니다."; return; }
+  nxEvent("start");
+  var d = diffDays(today(), t);
+  var head;
+  if(d > 0) head = "<span class=\"big\">D-" + d + "</span>";
+  else if(d === 0) head = "<span class=\"big\">D-Day</span> · 바로 오늘입니다";
+  else head = "<span class=\"big\">D+" + (-d) + "</span> · " + (-d) + "일 지났습니다";
+  out.innerHTML = head + "<br>" + fmt(t) + "까지 오늘부터 <b>" + Math.abs(d) + "일</b>" + (d > 0 ? " 남았습니다." : (d === 0 ? "입니다." : "이 지났습니다."));
+  nxEvent("complete");
+}
+$("ddayIn").addEventListener("change", calcDday);
+
+// ② 날짜 차이
+function calcDiff(){
+  var a = parseDate($("fromIn").value), b = parseDate($("toIn").value);
+  var out = $("diffOut");
+  if(!a || !b){ out.innerHTML = "두 날짜를 고르면 사이의 일수를 알려 드립니다."; return; }
+  nxEvent("start");
+  var d = diffDays(a, b);
+  var abs = Math.abs(d);
+  var weeks = Math.floor(abs / 7), rest = abs % 7;
+  out.innerHTML = "두 날짜 사이 <b>" + abs + "일</b>" + (abs >= 7 ? " (약 " + weeks + "주" + (rest ? " " + rest + "일" : "") + ")" : "") + "<br>" + fmt(a) + "부터 " + fmt(b) + "까지" + (d < 0 ? " — 끝 날짜가 시작 날짜보다 앞입니다." : "입니다.");
+  nxEvent("complete");
+}
+$("fromIn").addEventListener("change", calcDiff);
+$("toIn").addEventListener("change", calcDiff);
+
+// ③ 더하기 · 빼기
+function calcAdd(sign){
+  var base = parseDate($("baseIn").value);
+  var n = parseInt($("daysIn").value, 10);
+  var out = $("addOut");
+  if(!base || isNaN(n)){ nxEvent("fail"); out.innerHTML = "<span class=\"err\">기준 날짜와 일수를 확인해 주세요.</span>"; return; }
+  nxEvent("start");
+  var r = addDays(base, sign * n);
+  out.innerHTML = fmt(base) + "에서 <b>" + n + "일 " + (sign > 0 ? "뒤" : "앞") + "</b>은<br><b>" + fmt(r) + "</b>입니다.";
+  nxEvent("complete");
+}
+$("addBtn").addEventListener("click", function(){ calcAdd(1); });
+$("subBtn").addEventListener("click", function(){ calcAdd(-1); });
+
+// ④ 기념일
+function calcMile(){
+  var start = parseDate($("startIn").value);
+  var out = $("mileOut");
+  if(!start){ out.innerHTML = "<p class=\"result\">날짜를 고르면 100일 · 1주년 같은 기념일이 언제인지 알려 드립니다.</p>"; return; }
+  nxEvent("start");
+  var t = today();
+  var rows = [];
+  [100, 200, 300, 500, 1000].forEach(function(n){
+    var d = addDays(start, n - 1);
+    rows.push({label: n + "일", date: d, left: diffDays(t, d)});
+  });
+  for(var y = 1; y <= 3; y++){
+    var ann = new Date(start.getFullYear() + y, start.getMonth(), start.getDate());
+    // 2월 29일 시작이면 평년의 주년은 2월 28일로 잡힌다 — 원본 날짜와 다르면 건너뛴다
+    if(ann.getMonth() !== start.getMonth() || ann.getDate() !== start.getDate()) continue;
+    rows.push({label: y + "주년", date: ann, left: diffDays(t, ann)});
+  }
+  rows.sort(function(a, b){ return a.date - b.date; });
+  var html = "";
+  rows.forEach(function(r){
+    var tag = r.left > 0 ? r.left + "일 남음" : (r.left === 0 ? "오늘" : (-r.left) + "일 지남");
+    html += "<div class=\"mile\"><span><b>" + r.label + "</b> · " + fmt(r.date) + "</span><span class=\"d\">" + tag + "</span></div>";
+  });
+  html += "<p class=\"hint\" style=\"margin-top:12px\">시작한 날 " + fmt(start) + "부터 오늘까지 <b>" + (diffDays(start, t) + 1) + "일째</b>입니다.</p>";
+  out.innerHTML = html;
+  nxEvent("complete");
+}
+$("startIn").addEventListener("change", calcMile);
+
+// 초기값: 오늘
+var t0 = today();
+$("fromIn").value = isoOf(t0);
+$("baseIn").value = isoOf(t0);
+$("toIn").value = isoOf(addDays(t0, 30));
+
+// 철학 모달
+$("philoLink").addEventListener("click", function(){ $("modalBg").classList.add("open"); });
+$("modalClose").addEventListener("click", function(){ $("modalBg").classList.remove("open"); });
+$("modalBg").addEventListener("click", function(e){ if(e.target === $("modalBg")) $("modalBg").classList.remove("open"); });
+})();
+</script>
+
+<script>
+// 재설계 배선 (2026-11-01 디자인 팀): 입력 즉시 결과 — 기존 change·click 핸들러를 그대로 부른다
+(function(){
+  function bridge(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('input', function(){ el.dispatchEvent(new Event('change')); });
+  }
+  ['ddayIn', 'fromIn', 'toIn', 'startIn'].forEach(bridge);
+  // 날짜 차이: 초기값(오늘 ~ +30일)이 이미 들어 있으므로 첫 결과도 바로 보여 준다
+  var f = document.getElementById('fromIn');
+  if(f && f.value) f.dispatchEvent(new Event('change'));
+  // 더하기·빼기: 부호는 마지막으로 고른 버튼을 유지하고, 입력이 바뀌면 그 버튼을 눌러 다시 계산한다
+  var sign = 1;
+  var add = document.getElementById('addBtn'), sub = document.getElementById('subBtn');
+  function mark(){
+    add.className = sign > 0 ? 'primary' : 'ghost';
+    sub.className = sign < 0 ? 'primary' : 'ghost';
+  }
+  add.addEventListener('click', function(){ sign = 1; mark(); });
+  sub.addEventListener('click', function(){ sign = -1; mark(); });
+  function again(){ (sign > 0 ? add : sub).click(); }
+  var base = document.getElementById('baseIn'), days = document.getElementById('daysIn');
+  if(base){ base.addEventListener('input', again); base.addEventListener('change', again); }
+  if(days){ days.addEventListener('input', again); }
+  mark();
+  if(base && base.value) again();
+})();
+</script>
+
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 소리 자르기": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 영상 자르기": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 사진 정보 가리기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 읽어 주기": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 긴 말 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 사진 글자 뽑기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 녹음기": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 말로 쓰는 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 13호 날짜 계산 전용 사전 — 날짜 표시 형식(년·월·일·요일)은 기기 관습을 따르는 계산 결과라 그대로 두고, 안내·버튼·라벨 문구만 담는다 */
+NX_I18N_ADD({
+ "13호 날짜 계산 (현재)": {
+  "en": "13. Date Calculator (current)",
+  "zh": "13号 日期计算（当前）",
+  "ja": "13号 日付計算（現在）",
+  "es": "13. Calculadora de fechas (actual)",
+  "hi": "13. तारीख़ कैलकुलेटर (वर्तमान)",
+  "fr": "13. Calculateur de dates (actuel)",
+  "de": "13. Datumsrechner (aktuell)",
+  "pt": "13. Calculadora de datas (atual)",
+  "it": "13. Calcolatore di date (attuale)",
+  "nl": "13. Datumcalculator (huidig)",
+  "cs": "13. Kalkulačka dat (aktuální)",
+  "hu": "13. Dátumkalkulátor (aktuális)",
+  "pl": "13. Kalkulator dat (bieżące)",
+  "ro": "13. Calculator de date (actual)",
+  "ru": "13. Калькулятор дат (текущий)",
+  "uk": "13. Калькулятор дат (поточний)",
+  "sv": "13. Datumräknare (aktuell)",
+  "da": "13. Datoberegner (aktuel)",
+  "nb": "13. Datokalkulator (gjeldende)",
+  "fi": "13. Päivämäärälaskuri (nykyinen)",
+  "tr": "13. Tarih Hesaplayıcı (geçerli)",
+  "id": "13. Kalkulator Tanggal (saat ini)",
+  "th": "13. คำนวณวันที่ (ปัจจุบัน)",
+  "vi": "13. Tính ngày (hiện tại)",
+  "zh-TW": "13號 日期計算（目前）",
+  "ar": "13. حاسبة التواريخ (الحالي)",
+  "fa": "13. محاسبه‌گر تاریخ (فعلی)"
+ },
+ "넥서스 날짜 계산 — Nexus Date Calc": {
+  "en": "Nexus Date Calculator",
+  "zh": "Nexus 日期计算",
+  "ja": "Nexus 日付計算",
+  "es": "Nexus Calculadora de fechas",
+  "hi": "Nexus तारीख़ कैलकुलेटर",
+  "fr": "Nexus Calculateur de dates",
+  "de": "Nexus Datumsrechner",
+  "pt": "Nexus Calculadora de datas",
+  "it": "Nexus Calcolatore di date",
+  "nl": "Nexus Datumcalculator",
+  "cs": "Kalkulačka dat Nexus",
+  "hu": "Nexus dátumkalkulátor",
+  "pl": "Kalkulator dat Nexus",
+  "ro": "Calculator de date Nexus",
+  "ru": "Калькулятор дат Nexus",
+  "uk": "Калькулятор дат Nexus",
+  "sv": "Nexus Date Calculator",
+  "da": "Nexus Date Calculator",
+  "nb": "Nexus Date Calculator",
+  "fi": "Nexus Date Calculator",
+  "tr": "Nexus Date Calculator",
+  "id": "Nexus Kalkulator Tanggal",
+  "th": "Nexus คำนวณวันที่",
+  "vi": "Nexus Tính ngày",
+  "zh-TW": "Nexus 日期計算",
+  "ar": "نيكسوس لحساب التواريخ — Nexus Date Calculator",
+  "fa": "نکسوس محاسبه‌گر تاریخ — Nexus Date Calculator"
+ },
+ "넥서스 날짜 계산": {
+  "en": "Nexus Date Calculator",
+  "zh": "Nexus 日期计算",
+  "ja": "Nexus 日付計算",
+  "es": "Nexus Calculadora de fechas",
+  "hi": "Nexus तारीख़ कैलकुलेटर",
+  "fr": "Nexus Calculateur de dates",
+  "de": "Nexus Datumsrechner",
+  "pt": "Nexus Calculadora de datas",
+  "it": "Nexus Calcolatore di date",
+  "nl": "Nexus Datumcalculator",
+  "cs": "Kalkulačka dat Nexus",
+  "hu": "Nexus dátumkalkulátor",
+  "pl": "Kalkulator dat Nexus",
+  "ro": "Calculator de date Nexus",
+  "ru": "Калькулятор дат Nexus",
+  "uk": "Калькулятор дат Nexus",
+  "sv": "Nexus Date Calculator",
+  "da": "Nexus Date Calculator",
+  "nb": "Nexus Date Calculator",
+  "fi": "Nexus Date Calculator",
+  "tr": "Nexus Date Calculator",
+  "id": "Nexus Kalkulator Tanggal",
+  "th": "Nexus คำนวณวันที่",
+  "vi": "Nexus Tính ngày",
+  "zh-TW": "Nexus 日期計算",
+  "ar": "نيكسوس لحساب التواريخ",
+  "fa": "نکسوس محاسبه‌گر تاریخ"
+ },
+ "디데이와 날짜 차이를 세는 도구": {
+  "en": "A tool for D-days and date differences",
+  "zh": "计算倒计时和日期差的工具",
+  "ja": "Dデーと日付の差を数えるツール",
+  "es": "Una herramienta para días D y diferencias de fechas",
+  "hi": "डी-डे और तारीख़ों का अंतर गिनने का टूल",
+  "fr": "Un outil pour les jours J et les écarts de dates",
+  "de": "Ein Werkzeug für D-Days und Datumsdifferenzen",
+  "pt": "Uma ferramenta para contagem regressiva e diferenças de datas",
+  "it": "Uno strumento per conti alla rovescia e differenze di date",
+  "nl": "Een hulpmiddel voor D-dagen en datumverschillen",
+  "cs": "Nástroj pro počítání dnů do data a rozdílů mezi daty",
+  "hu": "Eszköz határidők és dátumkülönbségek számlálására",
+  "pl": "Narzędzie do liczenia dni do daty i różnic między datami",
+  "ro": "Un instrument pentru numărarea zilelor până la o dată și a diferențelor dintre date",
+  "ru": "Инструмент для подсчёта дней до даты и разницы между датами",
+  "uk": "Інструмент для підрахунку днів до дати та різниці між датами",
+  "sv": "Ett verktyg för D-dagar och datumskillnader",
+  "da": "Et værktøj til D-dage og datoforskelle",
+  "nb": "Et verktøy for D-dager og datoforskjeller",
+  "fi": "Työkalu D-päiviä ja päivämäärien eroja varten",
+  "tr": "D-günleri ve tarih farkları için bir araç",
+  "id": "Alat untuk menghitung hari-H dan selisih tanggal",
+  "th": "เครื่องมือสำหรับนับวันดีเดย์และผลต่างของวันที่",
+  "vi": "Công cụ đếm ngày D-day và chênh lệch ngày",
+  "zh-TW": "計算倒數日和日期差的工具",
+  "ar": "أداة لحساب الأيام المتبقية وفروق التواريخ",
+  "fa": "ابزاری برای شمارش روزهای باقی‌مانده و تفاوت تاریخ‌ها"
+ },
+ "회원가입 없음 · 이용료 없음 · 무제한 사용": {
+  "en": "No sign-up · No fees · Unlimited use",
+  "zh": "无需注册 · 免费 · 无限使用",
+  "ja": "登録不要 · 無料 · 無制限",
+  "es": "Sin registro · Gratis · Uso ilimitado",
+  "hi": "कोई साइन-अप नहीं · कोई शुल्क नहीं · असीमित उपयोग",
+  "fr": "Sans inscription · Sans frais · Usage illimité",
+  "de": "Keine Anmeldung · Keine Gebühren · Unbegrenzte Nutzung",
+  "pt": "Sem cadastro · Sem taxas · Uso ilimitado",
+  "it": "Senza registrazione · Senza costi · Uso illimitato",
+  "nl": "Geen registratie · Geen kosten · Onbeperkt gebruik",
+  "cs": "Bez registrace · Zdarma · Bez omezení",
+  "hu": "Regisztráció nélkül · Díjmentes · Korlátlan használat",
+  "pl": "Bez rejestracji · Bez opłat · Bez ograniczeń",
+  "ro": "Fără cont · Fără taxe · Utilizare nelimitată",
+  "ru": "Без регистрации · Бесплатно · Без ограничений",
+  "uk": "Без реєстрації · Безкоштовно · Без обмежень",
+  "sv": "Ingen registrering · Inga avgifter · Obegränsad användning",
+  "da": "Ingen tilmelding · Ingen gebyrer · Ubegrænset brug",
+  "nb": "Ingen registrering · Ingen gebyrer · Ubegrenset bruk",
+  "fi": "Ei rekisteröitymistä · Ei maksuja · Rajoittamaton käyttö",
+  "tr": "Kayıt yok · Ücret yok · Sınırsız kullanım",
+  "id": "Tanpa pendaftaran · Tanpa biaya · Penggunaan tanpa batas",
+  "th": "ไม่ต้องสมัครสมาชิก · ไม่มีค่าใช้จ่าย · ใช้ได้ไม่จำกัด",
+  "vi": "Không cần đăng ký · Miễn phí · Sử dụng không giới hạn",
+  "zh-TW": "無需註冊 · 免費 · 無限使用",
+  "ar": "بدون تسجيل · بدون رسوم · استخدام غير محدود",
+  "fa": "بدون ثبت‌نام · بدون هزینه · استفاده نامحدود"
+ },
+ "① 디데이": {
+  "en": "① D-Day",
+  "zh": "① 倒计时",
+  "ja": "① Dデー",
+  "es": "① Cuenta atrás",
+  "hi": "① डी-डे",
+  "fr": "① Jour J",
+  "de": "① D-Day",
+  "pt": "① Contagem regressiva",
+  "it": "① Conto alla rovescia",
+  "nl": "① D-dag",
+  "cs": "① Den D",
+  "hu": "① Céldátum",
+  "pl": "① Dzień docelowy",
+  "ro": "① Ziua Z",
+  "ru": "① Дни до даты",
+  "uk": "① Дні до дати",
+  "sv": "① D-dag",
+  "da": "① D-dag",
+  "nb": "① D-dag",
+  "fi": "① D-päivä",
+  "tr": "① D-günü",
+  "id": "① Hari-H",
+  "th": "① ดีเดย์",
+  "vi": "① Ngày D-day",
+  "zh-TW": "① 倒數日",
+  "ar": "① العد التنازلي",
+  "fa": "① شمارش معکوس"
+ },
+ "기념일 · 약속일 · 시험일": {
+  "en": "Anniversary · appointment · exam day",
+  "zh": "纪念日 · 约定日 · 考试日",
+  "ja": "記念日・約束の日・試験日",
+  "es": "Aniversario · cita · examen",
+  "hi": "वर्षगाँठ · मुलाक़ात · परीक्षा का दिन",
+  "fr": "Anniversaire · rendez-vous · jour d'examen",
+  "de": "Jahrestag · Termin · Prüfungstag",
+  "pt": "Aniversário · compromisso · dia de prova",
+  "it": "Anniversario · appuntamento · giorno d'esame",
+  "nl": "Jubileum · afspraak · examendag",
+  "cs": "Výročí · den schůzky · den zkoušky",
+  "hu": "Évforduló · megbeszélt nap · vizsganap",
+  "pl": "Rocznica · termin spotkania · dzień egzaminu",
+  "ro": "Aniversare · zi de întâlnire · zi de examen",
+  "ru": "Годовщина · день встречи · день экзамена",
+  "uk": "Річниця · день зустрічі · день іспиту",
+  "sv": "Årsdag · mötesdag · provdag",
+  "da": "Mærkedag · aftaledag · prøvedag",
+  "nb": "Merkedag · avtaledag · prøvedag",
+  "fi": "Vuosipäivä · tapaamispäivä · koepäivä",
+  "tr": "Yıldönümü · randevu günü · sınav günü",
+  "id": "Hari jadi · hari janji · hari ujian",
+  "th": "วันครบรอบ · วันนัด · วันสอบ",
+  "vi": "Ngày kỷ niệm · ngày hẹn · ngày thi",
+  "zh-TW": "紀念日 · 約定日 · 考試日",
+  "ar": "ذكرى · يوم موعد · يوم امتحان",
+  "fa": "سالگرد · روز قرار · روز امتحان"
+ },
+ "— 날짜를 고르세요": {
+  "en": "— pick a date",
+  "zh": "— 请选择日期",
+  "ja": "— 日付を選んでください",
+  "es": "— elige una fecha",
+  "hi": "— तारीख़ चुनें",
+  "fr": "— choisissez une date",
+  "de": "— wählen Sie ein Datum",
+  "pt": "— escolha uma data",
+  "it": "— scegli una data",
+  "nl": "— kies een datum",
+  "cs": "— vyberte datum",
+  "hu": "— válasszon dátumot",
+  "pl": "— wybierz datę",
+  "ro": "— alege o dată",
+  "ru": "— выберите дату",
+  "uk": "— виберіть дату",
+  "sv": "— välj ett datum",
+  "da": "— vælg en dato",
+  "nb": "— velg en dato",
+  "fi": "— valitse päivämäärä",
+  "tr": "— bir tarih seçin",
+  "id": "— pilih tanggal",
+  "th": "— เลือกวันที่",
+  "vi": "— chọn một ngày",
+  "zh-TW": "— 請選擇日期",
+  "ar": "— اختر تاريخًا",
+  "fa": "— تاریخی را انتخاب کنید"
+ },
+ "날짜를 고르면 오늘 기준으로 며칠 남았는지 알려 드립니다.": {
+  "en": "Pick a date and we will tell you how many days are left from today.",
+  "zh": "选择日期后，将告诉您从今天起还剩多少天。",
+  "ja": "日付を選ぶと、今日から何日残っているかをお知らせします。",
+  "es": "Elige una fecha y te diremos cuántos días quedan desde hoy.",
+  "hi": "तारीख़ चुनें, हम बताएँगे कि आज से कितने दिन बचे हैं।",
+  "fr": "Choisissez une date et nous vous dirons combien de jours il reste à partir d'aujourd'hui.",
+  "de": "Wählen Sie ein Datum, und wir sagen Ihnen, wie viele Tage ab heute noch übrig sind.",
+  "pt": "Escolha uma data e diremos quantos dias faltam a partir de hoje.",
+  "it": "Scegli una data e ti diremo quanti giorni mancano da oggi.",
+  "nl": "Kies een datum en wij vertellen u hoeveel dagen er vanaf vandaag nog over zijn.",
+  "cs": "Vyberte datum a řekneme vám, kolik dnů zbývá od dneška.",
+  "hu": "Válasszon dátumot, és megmondjuk, hány nap van hátra mától.",
+  "pl": "Wybierz datę, a powiemy, ile dni zostało od dziś.",
+  "ro": "Alege o dată și îți vom spune câte zile au mai rămas de astăzi.",
+  "ru": "Выберите дату, и мы скажем, сколько дней осталось от сегодняшнего дня.",
+  "uk": "Виберіть дату, і ми скажемо, скільки днів залишилося від сьогодні.",
+  "sv": "Välj ett datum så berättar vi hur många dagar som återstår från i dag.",
+  "da": "Vælg en dato, så fortæller vi, hvor mange dage der er tilbage fra i dag.",
+  "nb": "Velg en dato, så forteller vi hvor mange dager som er igjen fra i dag.",
+  "fi": "Valitse päivämäärä, niin kerromme, kuinka monta päivää on jäljellä tästä päivästä.",
+  "tr": "Bir tarih seçin, bugünden kaç gün kaldığını söyleyelim.",
+  "id": "Pilih tanggal dan kami akan memberi tahu berapa hari tersisa dari hari ini.",
+  "th": "เลือกวันที่แล้วเราจะบอกว่าจากวันนี้เหลืออีกกี่วัน",
+  "vi": "Chọn một ngày và chúng tôi sẽ cho bạn biết còn bao nhiêu ngày kể từ hôm nay.",
+  "zh-TW": "選擇日期後，將告訴您從今天起還剩多少天。",
+  "ar": "اختر تاريخًا وسنخبرك بعدد الأيام المتبقية من اليوم.",
+  "fa": "تاریخی را انتخاب کنید تا به شما بگوییم از امروز چند روز باقی مانده است."
+ },
+ "② 날짜 차이": {
+  "en": "② Date difference",
+  "zh": "② 日期差",
+  "ja": "② 日付の差",
+  "es": "② Diferencia de fechas",
+  "hi": "② तारीख़ का अंतर",
+  "fr": "② Écart de dates",
+  "de": "② Datumsdifferenz",
+  "pt": "② Diferença de datas",
+  "it": "② Differenza di date",
+  "nl": "② Datumverschil",
+  "cs": "② Rozdíl dat",
+  "hu": "② Dátumkülönbség",
+  "pl": "② Różnica dat",
+  "ro": "② Diferența dintre date",
+  "ru": "② Разница между датами",
+  "uk": "② Різниця між датами",
+  "sv": "② Datumskillnad",
+  "da": "② Datoforskel",
+  "nb": "② Datoforskjell",
+  "fi": "② Päivämäärien ero",
+  "tr": "② Tarih farkı",
+  "id": "② Selisih tanggal",
+  "th": "② ผลต่างของวันที่",
+  "vi": "② Chênh lệch ngày",
+  "zh-TW": "② 日期差",
+  "ar": "② فرق التاريخ",
+  "fa": "② تفاوت تاریخ"
+ },
+ "시작 날짜": {
+  "en": "Start date",
+  "zh": "开始日期",
+  "ja": "開始日",
+  "es": "Fecha de inicio",
+  "hi": "शुरुआत की तारीख़",
+  "fr": "Date de début",
+  "de": "Startdatum",
+  "pt": "Data de início",
+  "it": "Data di inizio",
+  "nl": "Startdatum",
+  "cs": "Datum začátku",
+  "hu": "Kezdő dátum",
+  "pl": "Data początkowa",
+  "ro": "Data de început",
+  "ru": "Дата начала",
+  "uk": "Дата початку",
+  "sv": "Startdatum",
+  "da": "Startdato",
+  "nb": "Startdato",
+  "fi": "Aloituspäivämäärä",
+  "tr": "Başlangıç tarihi",
+  "id": "Tanggal mulai",
+  "th": "วันที่เริ่มต้น",
+  "vi": "Ngày bắt đầu",
+  "zh-TW": "開始日期",
+  "ar": "تاريخ البدء",
+  "fa": "تاریخ شروع"
+ },
+ "끝 날짜": {
+  "en": "End date",
+  "zh": "结束日期",
+  "ja": "終了日",
+  "es": "Fecha de fin",
+  "hi": "अंत की तारीख़",
+  "fr": "Date de fin",
+  "de": "Enddatum",
+  "pt": "Data de término",
+  "it": "Data di fine",
+  "nl": "Einddatum",
+  "cs": "Datum konce",
+  "hu": "Záró dátum",
+  "pl": "Data końcowa",
+  "ro": "Data de sfârșit",
+  "ru": "Дата окончания",
+  "uk": "Дата завершення",
+  "sv": "Slutdatum",
+  "da": "Slutdato",
+  "nb": "Sluttdato",
+  "fi": "Loppupäivämäärä",
+  "tr": "Bitiş tarihi",
+  "id": "Tanggal akhir",
+  "th": "วันที่สิ้นสุด",
+  "vi": "Ngày kết thúc",
+  "zh-TW": "結束日期",
+  "ar": "تاريخ الانتهاء",
+  "fa": "تاریخ پایان"
+ },
+ "두 날짜를 고르면 사이의 일수를 알려 드립니다.": {
+  "en": "Pick two dates and we will tell you the days between them.",
+  "zh": "选择两个日期后，将告诉您之间的天数。",
+  "ja": "2つの日付を選ぶと、その間の日数をお知らせします。",
+  "es": "Elige dos fechas y te diremos los días que hay entre ellas.",
+  "hi": "दो तारीख़ें चुनें, हम बीच के दिनों की संख्या बताएँगे।",
+  "fr": "Choisissez deux dates et nous vous dirons le nombre de jours entre elles.",
+  "de": "Wählen Sie zwei Daten, und wir sagen Ihnen die Tage dazwischen.",
+  "pt": "Escolha duas datas e diremos os dias entre elas.",
+  "it": "Scegli due date e ti diremo i giorni che le separano.",
+  "nl": "Kies twee datums en wij vertellen u het aantal dagen ertussen.",
+  "cs": "Vyberte dvě data a řekneme vám, kolik dnů je mezi nimi.",
+  "hu": "Válasszon két dátumot, és megmondjuk, hány nap van közöttük.",
+  "pl": "Wybierz dwie daty, a powiemy, ile dni jest między nimi.",
+  "ro": "Alege două date și îți vom spune câte zile sunt între ele.",
+  "ru": "Выберите две даты, и мы скажем, сколько дней между ними.",
+  "uk": "Виберіть дві дати, і ми скажемо, скільки днів між ними.",
+  "sv": "Välj två datum så berättar vi dagarna mellan dem.",
+  "da": "Vælg to datoer, så fortæller vi dagene mellem dem.",
+  "nb": "Velg to datoer, så forteller vi dagene mellom dem.",
+  "fi": "Valitse kaksi päivämäärää, niin kerromme niiden välisten päivien määrän.",
+  "tr": "İki tarih seçin, aralarındaki gün sayısını söyleyelim.",
+  "id": "Pilih dua tanggal dan kami akan memberi tahu jumlah hari di antaranya.",
+  "th": "เลือกสองวันที่แล้วเราจะบอกจำนวนวันระหว่างนั้น",
+  "vi": "Chọn hai ngày và chúng tôi sẽ cho biết số ngày ở giữa.",
+  "zh-TW": "選擇兩個日期後，將告訴您之間的天數。",
+  "ar": "اختر تاريخين وسنخبرك بعدد الأيام بينهما.",
+  "fa": "دو تاریخ را انتخاب کنید تا تعداد روزهای میان آن‌ها را به شما بگوییم."
+ },
+ "③ 날짜 더하기 · 빼기": {
+  "en": "③ Add · subtract days",
+  "zh": "③ 日期加减",
+  "ja": "③ 日付の加減",
+  "es": "③ Sumar · restar días",
+  "hi": "③ दिन जोड़ें · घटाएँ",
+  "fr": "③ Ajouter · soustraire des jours",
+  "de": "③ Tage addieren · subtrahieren",
+  "pt": "③ Somar · subtrair dias",
+  "it": "③ Aggiungi · sottrai giorni",
+  "nl": "③ Dagen optellen · aftrekken",
+  "cs": "③ Přičíst · odečíst dny",
+  "hu": "③ Napok hozzáadása · kivonása",
+  "pl": "③ Dodaj · odejmij dni",
+  "ro": "③ Adaugă · scade zile",
+  "ru": "③ Прибавить · вычесть дни",
+  "uk": "③ Додати · відняти дні",
+  "sv": "③ Lägg till · dra ifrån dagar",
+  "da": "③ Læg dage til · træk fra",
+  "nb": "③ Legg til · trekk fra dager",
+  "fi": "③ Lisää · vähennä päiviä",
+  "tr": "③ Gün ekle · çıkar",
+  "id": "③ Tambah · kurang hari",
+  "th": "③ บวก · ลบวัน",
+  "vi": "③ Cộng · trừ ngày",
+  "zh-TW": "③ 日期加減",
+  "ar": "③ إضافة · طرح الأيام",
+  "fa": "③ افزودن · کم کردن روزها"
+ },
+ "기준 날짜": {
+  "en": "Base date",
+  "zh": "基准日期",
+  "ja": "基準日",
+  "es": "Fecha base",
+  "hi": "आधार तारीख़",
+  "fr": "Date de base",
+  "de": "Basisdatum",
+  "pt": "Data base",
+  "it": "Data di base",
+  "nl": "Basisdatum",
+  "cs": "Základní datum",
+  "hu": "Kiinduló dátum",
+  "pl": "Data bazowa",
+  "ro": "Data de bază",
+  "ru": "Базовая дата",
+  "uk": "Базова дата",
+  "sv": "Basdatum",
+  "da": "Basisdato",
+  "nb": "Basisdato",
+  "fi": "Peruspäivämäärä",
+  "tr": "Temel tarih",
+  "id": "Tanggal dasar",
+  "th": "วันที่อ้างอิง",
+  "vi": "Ngày mốc",
+  "zh-TW": "基準日期",
+  "ar": "التاريخ الأساسي",
+  "fa": "تاریخ مبنا"
+ },
+ "더하거나 뺄 일수": {
+  "en": "Days to add or subtract",
+  "zh": "要加减的天数",
+  "ja": "加減する日数",
+  "es": "Días a sumar o restar",
+  "hi": "जोड़ने या घटाने के दिन",
+  "fr": "Jours à ajouter ou soustraire",
+  "de": "Tage zum Addieren oder Subtrahieren",
+  "pt": "Dias para somar ou subtrair",
+  "it": "Giorni da aggiungere o sottrarre",
+  "nl": "Dagen om op te tellen of af te trekken",
+  "cs": "Dny k přičtení nebo odečtení",
+  "hu": "Hozzáadandó vagy kivonandó napok",
+  "pl": "Dni do dodania lub odjęcia",
+  "ro": "Zile de adăugat sau de scăzut",
+  "ru": "Дни для прибавления или вычитания",
+  "uk": "Дні для додавання або віднімання",
+  "sv": "Dagar att lägga till eller dra ifrån",
+  "da": "Dage at lægge til eller trække fra",
+  "nb": "Dager å legge til eller trekke fra",
+  "fi": "Lisättävät tai vähennettävät päivät",
+  "tr": "Eklenecek veya çıkarılacak günler",
+  "id": "Jumlah hari untuk ditambah atau dikurangi",
+  "th": "จำนวนวันที่จะบวกหรือลบ",
+  "vi": "Số ngày cần cộng hoặc trừ",
+  "zh-TW": "要加減的天數",
+  "ar": "الأيام المراد إضافتها أو طرحها",
+  "fa": "روزهای قابل افزودن یا کم کردن"
+ },
+ "＋ 더하기": {
+  "en": "＋ Add",
+  "zh": "＋ 加",
+  "ja": "＋ 足す",
+  "es": "＋ Sumar",
+  "hi": "＋ जोड़ें",
+  "fr": "＋ Ajouter",
+  "de": "＋ Addieren",
+  "pt": "＋ Somar",
+  "it": "＋ Aggiungi",
+  "nl": "＋ Optellen",
+  "cs": "＋ Přičíst",
+  "hu": "＋ Hozzáadás",
+  "pl": "＋ Dodaj",
+  "ro": "＋ Adaugă",
+  "ru": "＋ Прибавить",
+  "uk": "＋ Додати",
+  "sv": "＋ Lägg till",
+  "da": "＋ Læg til",
+  "nb": "＋ Legg til",
+  "fi": "＋ Lisää",
+  "tr": "＋ Ekle",
+  "id": "＋ Tambah",
+  "th": "＋ บวก",
+  "vi": "＋ Cộng",
+  "zh-TW": "＋ 加",
+  "ar": "＋ إضافة",
+  "fa": "＋ افزودن"
+ },
+ "－ 빼기": {
+  "en": "－ Subtract",
+  "zh": "－ 减",
+  "ja": "－ 引く",
+  "es": "－ Restar",
+  "hi": "－ घटाएँ",
+  "fr": "－ Soustraire",
+  "de": "－ Subtrahieren",
+  "pt": "－ Subtrair",
+  "it": "－ Sottrai",
+  "nl": "－ Aftrekken",
+  "cs": "－ Odečíst",
+  "hu": "－ Kivonás",
+  "pl": "－ Odejmij",
+  "ro": "－ Scade",
+  "ru": "－ Вычесть",
+  "uk": "－ Відняти",
+  "sv": "－ Dra ifrån",
+  "da": "－ Træk fra",
+  "nb": "－ Trekk fra",
+  "fi": "－ Vähennä",
+  "tr": "－ Çıkar",
+  "id": "－ Kurang",
+  "th": "－ ลบ",
+  "vi": "－ Trừ",
+  "zh-TW": "－ 減",
+  "ar": "－ طرح",
+  "fa": "－ کم کردن"
+ },
+ "기준 날짜에서 100일 뒤는 언제인지 알려 드립니다.": {
+  "en": "We will tell you the date 100 days after the base date.",
+  "zh": "将告诉您基准日期100天后是哪一天。",
+  "ja": "基準日から100日後がいつかをお知らせします。",
+  "es": "Te diremos qué fecha es 100 días después de la fecha base.",
+  "hi": "हम बताएँगे कि आधार तारीख़ से 100 दिन बाद कौन-सी तारीख़ है।",
+  "fr": "Nous vous dirons quelle date tombera 100 jours après la date de base.",
+  "de": "Wir sagen Ihnen, welches Datum 100 Tage nach dem Basisdatum liegt.",
+  "pt": "Diremos qual é a data 100 dias depois da data base.",
+  "it": "Ti diremo che data sarà 100 giorni dopo la data di base.",
+  "nl": "Wij vertellen u welke datum 100 dagen na de basisdatum valt.",
+  "cs": "Řekneme vám, jaké datum je 100 dnů po základním datu.",
+  "hu": "Megmondjuk, melyik dátum van 100 nappal a kiinduló dátum után.",
+  "pl": "Powiemy, jaka data wypada 100 dni po dacie bazowej.",
+  "ro": "Îți vom spune ce dată este la 100 de zile după data de bază.",
+  "ru": "Мы скажем, какая дата будет через 100 дней после базовой даты.",
+  "uk": "Ми скажемо, яка дата буде через 100 днів після базової дати.",
+  "sv": "Vi berättar vilket datum det är 100 dagar efter basdatumet.",
+  "da": "Vi fortæller, hvilken dato det er 100 dage efter basisdatoen.",
+  "nb": "Vi forteller hvilken dato det er 100 dager etter basisdatoen.",
+  "fi": "Kerromme, mikä päivämäärä on 100 päivää peruspäivämäärän jälkeen.",
+  "tr": "Temel tarihten 100 gün sonrasının hangi tarih olduğunu söyleyeceğiz.",
+  "id": "Kami akan memberi tahu tanggal 100 hari setelah tanggal dasar.",
+  "th": "เราจะบอกว่าวันที่ 100 วันหลังจากวันที่อ้างอิงคือวันใด",
+  "vi": "Chúng tôi sẽ cho biết ngày 100 ngày sau ngày mốc là ngày nào.",
+  "zh-TW": "將告訴您基準日期100天後是哪一天。",
+  "ar": "سنخبرك ما هو التاريخ بعد 100 يوم من التاريخ الأساسي.",
+  "fa": "به شما می‌گوییم 100 روز پس از تاریخ مبنا چه تاریخی است."
+ },
+ "④ 기념일": {
+  "en": "④ Anniversaries",
+  "zh": "④ 纪念日",
+  "ja": "④ 記念日",
+  "es": "④ Aniversarios",
+  "hi": "④ वर्षगाँठें",
+  "fr": "④ Anniversaires",
+  "de": "④ Jahrestage",
+  "pt": "④ Aniversários",
+  "it": "④ Anniversari",
+  "nl": "④ Jubilea",
+  "cs": "④ Výročí",
+  "hu": "④ Évfordulók",
+  "pl": "④ Rocznice",
+  "ro": "④ Aniversări",
+  "ru": "④ Годовщины",
+  "uk": "④ Річниці",
+  "sv": "④ Årsdagar",
+  "da": "④ Mærkedage",
+  "nb": "④ Merkedager",
+  "fi": "④ Vuosipäivät",
+  "tr": "④ Yıldönümleri",
+  "id": "④ Hari jadi",
+  "th": "④ วันครบรอบ",
+  "vi": "④ Ngày kỷ niệm",
+  "zh-TW": "④ 紀念日",
+  "ar": "④ الذكريات السنوية",
+  "fa": "④ سالگردها"
+ },
+ "시작한 날": {
+  "en": "The day it started",
+  "zh": "开始的那天",
+  "ja": "始めた日",
+  "es": "El día que empezó",
+  "hi": "शुरुआत का दिन",
+  "fr": "Le jour du début",
+  "de": "Der Tag, an dem es begann",
+  "pt": "O dia em que começou",
+  "it": "Il giorno in cui è iniziato",
+  "nl": "De dag waarop het begon",
+  "cs": "Den zahájení",
+  "hu": "A kezdés napja",
+  "pl": "Dzień rozpoczęcia",
+  "ro": "Ziua de început",
+  "ru": "День начала",
+  "uk": "День початку",
+  "sv": "Dagen det började",
+  "da": "Dagen det startede",
+  "nb": "Dagen det startet",
+  "fi": "Päivä, jolloin se alkoi",
+  "tr": "Başladığı gün",
+  "id": "Hari dimulai",
+  "th": "วันที่เริ่มต้น",
+  "vi": "Ngày bắt đầu",
+  "zh-TW": "開始的那天",
+  "ar": "يوم البدء",
+  "fa": "روز شروع"
+ },
+ "— 만난 날 · 시작한 날을 고르세요": {
+  "en": "— pick the day you met · the day it started",
+  "zh": "— 请选择相遇日 · 开始日",
+  "ja": "— 出会った日・始めた日を選んでください",
+  "es": "— elige el día que se conocieron · que empezó",
+  "hi": "— मिलने का दिन · शुरुआत का दिन चुनें",
+  "fr": "— choisissez le jour de la rencontre · le jour du début",
+  "de": "— wählen Sie den Tag des Kennenlernens · den Starttag",
+  "pt": "— escolha o dia em que se conheceram · o dia em que começou",
+  "it": "— scegli il giorno dell'incontro · il giorno dell'inizio",
+  "nl": "— kies de dag dat u elkaar ontmoette · de startdag",
+  "cs": "— vyberte den setkání · den zahájení",
+  "hu": "— válassza ki a találkozás · a kezdés napját",
+  "pl": "— wybierz dzień poznania · dzień rozpoczęcia",
+  "ro": "— alege ziua întâlnirii · ziua de început",
+  "ru": "— выберите день встречи · день начала",
+  "uk": "— виберіть день зустрічі · день початку",
+  "sv": "— välj dagen ni träffades · dagen det började",
+  "da": "— vælg dagen, I mødtes · dagen det startede",
+  "nb": "— velg dagen dere møttes · dagen det startet",
+  "fi": "— valitse tapaamispäivä · aloituspäivä",
+  "tr": "— tanıştığınız günü · başladığı günü seçin",
+  "id": "— pilih hari bertemu · hari dimulai",
+  "th": "— เลือกวันที่พบกัน · วันที่เริ่มต้น",
+  "vi": "— chọn ngày gặp nhau · ngày bắt đầu",
+  "zh-TW": "— 請選擇相遇日 · 開始日",
+  "ar": "— اختر يوم اللقاء · يوم البدء",
+  "fa": "— روز دیدار · روز شروع را انتخاب کنید"
+ },
+ "날짜를 고르면 100일 · 1주년 같은 기념일이 언제인지 알려 드립니다.": {
+  "en": "Pick a date and we will show milestones like the 100th day and 1st anniversary.",
+  "zh": "选择日期后，将告诉您100天、1周年等纪念日是哪天。",
+  "ja": "日付を選ぶと、100日・1周年などの記念日がいつかをお知らせします。",
+  "es": "Elige una fecha y verás hitos como el día 100 y el 1.er aniversario.",
+  "hi": "तारीख़ चुनें, हम 100वाँ दिन और पहली वर्षगाँठ जैसे पड़ाव बताएँगे।",
+  "fr": "Choisissez une date et nous vous montrerons les étapes comme le 100e jour et le 1er anniversaire.",
+  "de": "Wählen Sie ein Datum, und wir zeigen Ihnen Meilensteine wie den 100. Tag und den 1. Jahrestag.",
+  "pt": "Escolha uma data e mostraremos marcos como o 100º dia e o 1º aniversário.",
+  "it": "Scegli una data e ti mostreremo traguardi come il 100° giorno e il 1° anniversario.",
+  "nl": "Kies een datum en wij tonen mijlpalen zoals de 100e dag en het 1-jarig jubileum.",
+  "cs": "Vyberte datum a ukážeme vám milníky, jako je 100. den a 1. výročí.",
+  "hu": "Válasszon dátumot, és megmutatjuk az olyan mérföldköveket, mint a 100. nap és az 1. évforduló.",
+  "pl": "Wybierz datę, a pokażemy kamienie milowe, takie jak 100. dzień i 1. rocznica.",
+  "ro": "Alege o dată și îți vom arăta repere precum ziua 100 și prima aniversare.",
+  "ru": "Выберите дату, и мы покажем такие вехи, как 100-й день и 1-я годовщина.",
+  "uk": "Виберіть дату, і ми покажемо такі віхи, як 100-й день і 1-ша річниця.",
+  "sv": "Välj ett datum så visar vi milstolpar som 100-dagarsdagen och 1-årsdagen.",
+  "da": "Vælg en dato, så viser vi milepæle som 100-dagesdagen og 1-årsdagen.",
+  "nb": "Velg en dato, så viser vi milepæler som 100-dagersdagen og 1-årsdagen.",
+  "fi": "Valitse päivämäärä, niin näytämme merkkipäiviä, kuten 100. päivän ja 1-vuotispäivän.",
+  "tr": "Bir tarih seçin, 100. gün ve 1. yıldönümü gibi dönüm noktalarını gösterelim.",
+  "id": "Pilih tanggal dan kami akan memberi tahu kapan hari peringatan seperti hari ke-100 dan ulang tahun ke-1.",
+  "th": "เลือกวันที่แล้วเราจะบอกว่าวันครบรอบอย่างวันที่ 100 และครบรอบ 1 ปีคือวันใด",
+  "vi": "Chọn một ngày và chúng tôi sẽ cho biết các mốc kỷ niệm như ngày thứ 100 và kỷ niệm 1 năm là khi nào.",
+  "zh-TW": "選擇日期後，將告訴您100天、1週年等紀念日是哪天。",
+  "ar": "اختر تاريخًا وسنعرض لك المعالم مثل اليوم 100 والذكرى السنوية الأولى.",
+  "fa": "تاریخی را انتخاب کنید تا نقاط عطفی مانند روز 100 و اولین سالگرد را به شما نشان دهیم."
+ },
+ "기념일은 한국식으로 셉니다. 시작한 날을 1일로 세어 100일째 되는 날을 표시합니다. 주년은 같은 날짜가 돌아오는 날입니다.": {
+  "en": "Milestones follow the Korean way: the start day counts as day 1, so the 100th day is shown that way. An anniversary is the same date coming round again.",
+  "zh": "纪念日按韩国方式计算：将开始日算作第1天，标示第100天。周年是同一日期再次到来之日。",
+  "ja": "記念日は韓国式に数えます。始めた日を1日目として100日目を表示します。周年は同じ日付が戻ってくる日です。",
+  "es": "Los hitos siguen la costumbre coreana: el día inicial cuenta como día 1 y así se muestra el día 100. El aniversario es cuando vuelve la misma fecha.",
+  "hi": "पड़ाव कोरियाई तरीके से गिने जाते हैं: शुरुआत का दिन दिन 1 गिना जाता है, इसलिए 100वाँ दिन उसी तरह दिखता है। वर्षगाँठ वही तारीख़ फिर आने का दिन है।",
+  "fr": "Les étapes suivent la manière coréenne : le jour du début compte comme le jour 1, et le 100e jour est indiqué ainsi. Un anniversaire est le jour où la même date revient.",
+  "de": "Meilensteine folgen der koreanischen Zählweise: Der Starttag zählt als Tag 1, sodass der 100. Tag entsprechend angezeigt wird. Ein Jahrestag ist der Tag, an dem dasselbe Datum wiederkehrt.",
+  "pt": "Os marcos seguem o jeito coreano: o dia inicial conta como dia 1, e assim o 100º dia é mostrado dessa forma. O aniversário é o dia em que a mesma data volta.",
+  "it": "I traguardi seguono il modo coreano: il giorno iniziale conta come giorno 1, quindi il 100° giorno viene mostrato in questo modo. L'anniversario è il giorno in cui torna la stessa data.",
+  "nl": "Mijlpalen volgen de Koreaanse manier: de startdag telt als dag 1, zodat de 100e dag zo wordt weergegeven. Een jubileum is de dag waarop dezelfde datum weer terugkomt.",
+  "cs": "Milníky se počítají korejským způsobem: den zahájení se počítá jako den 1, a proto se takto zobrazuje 100. den. Výročí je den, kdy se stejné datum opět vrátí.",
+  "hu": "A mérföldköveket koreai módon számoljuk: a kezdőnap számít 1. napnak, így jelenik meg a 100. nap. Az évforduló az a nap, amikor ugyanaz a dátum újra eljön.",
+  "pl": "Kamienie milowe liczone są po koreańsku: dzień początkowy liczy się jako dzień 1, więc 100. dzień jest pokazywany właśnie tak. Rocznica to dzień, w którym ta sama data powraca.",
+  "ro": "Reperele urmează obiceiul coreean: ziua de început contează ca ziua 1, așa că ziua 100 este afișată în acest fel. Aniversarea este ziua în care aceeași dată revine.",
+  "ru": "Вехи считаются по-корейски: день начала считается первым днём, поэтому 100-й день показывается именно так. Годовщина — это день, когда та же дата наступает снова.",
+  "uk": "Віхи рахуються за корейським звичаєм: день початку вважається першим днем, тому 100-й день показується саме так. Річниця — це день, коли та сама дата настає знову.",
+  "sv": "Milstolpar följer det koreanska sättet: startdagen räknas som dag 1, så den 100:e dagen visas på det sättet. En årsdag är när samma datum kommer tillbaka.",
+  "da": "Milepæle følger den koreanske måde: startdagen tæller som dag 1, så den 100. dag vises på den måde. En årsdag er, når den samme dato kommer igen.",
+  "nb": "Milepæler følger den koreanske måten: startdagen telles som dag 1, så den 100. dagen vises på den måten. En årsdag er når samme dato kommer tilbake.",
+  "fi": "Merkkipäivät noudattavat korealaista tapaa: aloituspäivä lasketaan 1. päiväksi, joten 100. päivä näytetään sillä tavoin. Vuosipäivä on päivä, jolloin sama päivämäärä tulee uudelleen.",
+  "tr": "Dönüm noktaları Kore usulüne göre sayılır: başlangıç günü 1. gün sayılır, bu yüzden 100. gün o şekilde gösterilir. Yıldönümü, aynı tarihin yeniden geldiği gündür.",
+  "id": "Hari peringatan mengikuti cara Korea: hari mulai dihitung sebagai hari ke-1, jadi hari ke-100 ditampilkan dengan cara itu. Hari jadi tahunan adalah saat tanggal yang sama datang kembali.",
+  "th": "วันครบรอบนับแบบเกาหลี: นับวันเริ่มต้นเป็นวันที่ 1 จึงแสดงวันที่ 100 ตามวิธีนั้น วันครบรอบปีคือวันที่เดียวกันเวียนมาอีกครั้ง",
+  "vi": "Các mốc kỷ niệm theo cách tính của Hàn Quốc: ngày bắt đầu được tính là ngày 1, vì vậy ngày thứ 100 được hiển thị theo cách đó. Ngày kỷ niệm hằng năm là khi cùng một ngày quay lại.",
+  "zh-TW": "紀念日按韓國方式計算：將開始日算作第1天，標示第100天。週年是同一日期再次到來之日。",
+  "ar": "تُحسب المعالم بالطريقة الكورية: يُعد يوم البدء هو اليوم 1، ويُعرض اليوم 100 وفقًا لذلك. الذكرى السنوية هي عودة التاريخ نفسه من جديد.",
+  "fa": "نقاط عطف به روش کره‌ای شمرده می‌شوند: روز شروع روز 1 محسوب می‌شود و روز 100 بر همین اساس نشان داده می‌شود. سالگرد روزی است که همان تاریخ دوباره فرا می‌رسد."
+ },
+ "💡 도움말": {
+  "en": "💡 Help",
+  "zh": "💡 帮助",
+  "ja": "💡 ヘルプ",
+  "es": "💡 Ayuda",
+  "hi": "💡 सहायता",
+  "fr": "💡 Aide",
+  "de": "💡 Hilfe",
+  "pt": "💡 Ajuda",
+  "it": "💡 Aiuto",
+  "nl": "💡 Help",
+  "cs": "💡 Nápověda",
+  "hu": "💡 Súgó",
+  "pl": "💡 Pomoc",
+  "ro": "💡 Ajutor",
+  "ru": "💡 Справка",
+  "uk": "💡 Довідка",
+  "sv": "💡 Hjälp",
+  "da": "💡 Hjælp",
+  "nb": "💡 Hjelp",
+  "fi": "💡 Ohje",
+  "tr": "💡 Yardım",
+  "id": "💡 Bantuan",
+  "th": "💡 ช่วยเหลือ",
+  "vi": "💡 Trợ giúp",
+  "zh-TW": "💡 說明",
+  "ar": "💡 مساعدة",
+  "fa": "💡 راهنما"
+ },
+ "디데이는 날짜를 고르는 즉시 계산됩니다. 날짜 차이는 두 날짜 사이의 일수를 셉니다. 더하기 · 빼기는 기준 날짜에서 원하는 일수만큼 앞뒤로 이동한 날짜와 요일을 알려 드립니다. 기념일은 시작한 날부터 100일 · 200일 같은 날과 1주년 · 2주년을 모아 보여 드립니다.": {
+  "en": "D-Day is calculated the moment you pick a date. Date difference counts the days between two dates. Add · subtract shows the date and weekday moved forward or back from the base date. Anniversaries gathers the 100th and 200th days and the 1st and 2nd anniversaries from the start day.",
+  "zh": "倒计时在选择日期后立即计算。日期差计算两个日期之间的天数。加减显示从基准日期前后移动相应天数后的日期和星期。纪念日汇总开始日后的第100天、第200天和1周年、2周年。",
+  "ja": "Dデーは日付を選んだ瞬間に計算されます。日付の差は2つの日付の間の日数を数えます。加減は基準日から希望の日数だけ前後に移動した日付と曜日をお知らせします。記念日は始めた日から100日・200日や1周年・2周年をまとめて表示します。",
+  "es": "La cuenta atrás se calcula al elegir la fecha. La diferencia cuenta los días entre dos fechas. Sumar · restar muestra la fecha y el día de la semana desplazados desde la fecha base. Aniversarios reúne el día 100, el 200 y los aniversarios 1.º y 2.º desde el inicio.",
+  "hi": "डी-डे तारीख़ चुनते ही गणना हो जाती है। तारीख़ का अंतर दो तारीख़ों के बीच के दिन गिनता है। जोड़ · घटाव आधार तारीख़ से आगे-पीछे की तारीख़ और सप्ताह का दिन बताता है। वर्षगाँठें शुरुआत से 100वाँ, 200वाँ दिन और पहली, दूसरी वर्षगाँठ एक साथ दिखाती हैं।",
+  "fr": "Le jour J est calculé dès que vous choisissez une date. L'écart de dates compte les jours entre deux dates. Ajouter · soustraire indique la date et le jour de la semaine décalés en avant ou en arrière depuis la date de base. Anniversaires rassemble les 100e et 200e jours ainsi que les 1er et 2e anniversaires à partir du jour du début.",
+  "de": "Der D-Day wird berechnet, sobald Sie ein Datum wählen. Die Datumsdifferenz zählt die Tage zwischen zwei Daten. Addieren · Subtrahieren zeigt das vom Basisdatum vor- oder zurückverschobene Datum samt Wochentag. Jahrestage versammelt den 100. und 200. Tag sowie den 1. und 2. Jahrestag ab dem Starttag.",
+  "pt": "A contagem regressiva é calculada no momento em que você escolhe uma data. A diferença de datas conta os dias entre duas datas. Somar · subtrair mostra a data e o dia da semana deslocados para frente ou para trás a partir da data base. Aniversários reúne o 100º e o 200º dia e o 1º e o 2º aniversário a partir do dia inicial.",
+  "it": "Il conto alla rovescia viene calcolato appena scegli una data. La differenza di date conta i giorni tra due date. Aggiungi · sottrai mostra la data e il giorno della settimana spostati in avanti o indietro dalla data di base. Anniversari raccoglie il 100° e il 200° giorno e il 1° e il 2° anniversario dal giorno iniziale.",
+  "nl": "De D-dag wordt berekend zodra u een datum kiest. Het datumverschil telt de dagen tussen twee datums. Optellen · aftrekken toont de datum en weekdag die vanaf de basisdatum vooruit of achteruit is verschoven. Jubilea verzamelt de 100e en 200e dag en het 1e en 2e jubileum vanaf de startdag.",
+  "cs": "Odpočet se vypočítá v okamžiku, kdy vyberete datum. Rozdíl dat počítá dny mezi dvěma daty. Přičítání a odečítání ukazuje datum a den v týdnu posunuté dopředu nebo dozadu od základního data. Výročí shromažďuje 100. a 200. den a 1. a 2. výročí ode dne zahájení.",
+  "hu": "A céldátum visszaszámlálása a dátum kiválasztásának pillanatában kiszámításra kerül. A dátumkülönbség a két dátum közötti napokat számolja. A hozzáadás és kivonás a kiinduló dátumtól előre vagy hátra eltolt dátumot és a hét napját mutatja. Az évfordulók a kezdőnaphoz viszonyított 100. és 200. napot, valamint az 1. és 2. évfordulót gyűjtik össze.",
+  "pl": "Odliczanie jest obliczane w chwili wyboru daty. Różnica dat liczy dni między dwiema datami. Dodawanie i odejmowanie pokazuje datę oraz dzień tygodnia przesunięte w przód lub w tył od daty bazowej. Rocznice zbierają 100. i 200. dzień oraz 1. i 2. rocznicę od dnia rozpoczęcia.",
+  "ro": "Numărătoarea inversă se calculează în momentul în care alegi data. Diferența dintre date numără zilele dintre două date. Adunarea și scăderea arată data și ziua săptămânii deplasate înainte sau înapoi față de data de bază. Aniversările adună ziua 100, ziua 200 și aniversările 1 și 2 de la ziua de început.",
+  "ru": "Обратный отсчёт рассчитывается в момент выбора даты. Разница между датами считает дни между двумя датами. Прибавление и вычитание показывают дату и день недели, сдвинутые вперёд или назад от базовой даты. Раздел годовщин собирает 100-й и 200-й дни, а также 1-ю и 2-ю годовщины от дня начала.",
+  "uk": "Зворотний відлік розраховується в момент вибору дати. Різниця між датами рахує дні між двома датами. Додавання й віднімання показують дату та день тижня, зсунуті вперед або назад від базової дати. Розділ річниць збирає 100-й і 200-й дні, а також 1-шу та 2-гу річниці від дня початку.",
+  "sv": "D-dagen beräknas i samma ögonblick som du väljer ett datum. Datumskillnad räknar dagarna mellan två datum. Lägg till · dra ifrån visar datumet och veckodagen förflyttade framåt eller bakåt från basdatumet. Årsdagar samlar den 100:e och 200:e dagen samt 1- och 2-årsdagen från startdagen.",
+  "da": "D-dagen beregnes i det øjeblik, du vælger en dato. Datoforskel tæller dagene mellem to datoer. Læg til · træk fra viser datoen og ugedagen forskudt frem eller tilbage fra basisdatoen. Mærkedage samler den 100. og 200. dag og 1- og 2-årsdagen fra startdagen.",
+  "nb": "D-dagen beregnes i det øyeblikket du velger en dato. Datoforskjell teller dagene mellom to datoer. Legg til · trekk fra viser datoen og ukedagen flyttet frem eller tilbake fra basisdatoen. Merkedager samler den 100. og 200. dagen og 1- og 2-årsdagen fra startdagen.",
+  "fi": "D-päivä lasketaan heti, kun valitset päivämäärän. Päivämäärien ero laskee kahden päivämäärän väliset päivät. Lisää · vähennä näyttää peruspäivämäärästä eteen- tai taaksepäin siirretyn päivämäärän ja viikonpäivän. Vuosipäivät kokoaa 100. ja 200. päivän sekä 1. ja 2. vuosipäivän aloituspäivästä.",
+  "tr": "D-günü, bir tarih seçtiğiniz anda hesaplanır. Tarih farkı iki tarih arasındaki günleri sayar. Ekle · çıkar, temel tarihten ileri veya geri gidilmiş tarihi ve hafta gününü gösterir. Yıldönümleri, başlangıç gününden 100. ve 200. günü ve 1. ve 2. yıldönümünü bir araya getirir.",
+  "id": "Hari-H dihitung segera setelah Anda memilih tanggal. Selisih tanggal menghitung hari di antara dua tanggal. Tambah · kurang menampilkan tanggal dan hari dalam seminggu yang digeser maju atau mundur dari tanggal dasar. Hari jadi mengumpulkan hari ke-100 dan ke-200 serta ulang tahun ke-1 dan ke-2 dari hari mulai.",
+  "th": "ดีเดย์จะคำนวณทันทีที่คุณเลือกวันที่ ผลต่างของวันที่นับจำนวนวันระหว่างสองวันที่ การบวก · ลบแสดงวันที่และวันในสัปดาห์ที่เลื่อนไปข้างหน้าหรือข้างหลังจากวันที่อ้างอิง วันครบรอบรวบรวมวันที่ 100 วันที่ 200 และวันครบรอบ 1 ปีและ 2 ปีจากวันเริ่มต้น",
+  "vi": "Ngày D-day được tính ngay khi bạn chọn ngày. Chênh lệch ngày đếm số ngày giữa hai ngày. Cộng · trừ hiển thị ngày và thứ trong tuần được dịch chuyển về trước hoặc sau từ ngày mốc. Ngày kỷ niệm tập hợp ngày thứ 100, thứ 200 và kỷ niệm 1 năm, 2 năm kể từ ngày bắt đầu.",
+  "zh-TW": "倒數日在選擇日期後立即計算。日期差計算兩個日期之間的天數。加減顯示從基準日期前後移動相應天數後的日期和星期。紀念日彙整開始日後的第100天、第200天和1週年、2週年。",
+  "ar": "يُحسب العد التنازلي فور اختيارك تاريخًا. فرق التاريخ يحسب الأيام بين تاريخين. الإضافة · الطرح يعرض التاريخ ويوم الأسبوع بعد التقدم أو التراجع بمقدار الأيام المطلوبة من التاريخ الأساسي. الذكريات تجمع اليوم 100 واليوم 200 والذكرى السنوية الأولى والثانية من يوم البدء.",
+  "fa": "شمارش معکوس به‌محض انتخاب تاریخ محاسبه می‌شود. تفاوت تاریخ روزهای میان دو تاریخ را می‌شمارد. افزودن · کم کردن تاریخ و روز هفته را که به‌اندازه روزهای دلخواه از تاریخ مبنا به جلو یا عقب رفته نشان می‌دهد. سالگردها روز 100 و 200 و سالگرد اول و دوم از روز شروع را یکجا نشان می‌دهد."
+ },
+ "모든 계산은 당신의 기기 안에서 이루어집니다. 고른 날짜가 밖으로 전송되지 않습니다.": {
+  "en": "All calculations happen on your device. The dates you pick are never sent out.",
+  "zh": "所有计算都在您的设备内完成，所选日期不会向外发送。",
+  "ja": "すべての計算はあなたの端末の中で行われます。選んだ日付が外へ送信されることはありません。",
+  "es": "Todos los cálculos se hacen en tu dispositivo. Las fechas elegidas nunca se envían fuera.",
+  "hi": "सभी गणनाएँ आपके डिवाइस पर होती हैं। चुनी तारीख़ें बाहर नहीं भेजी जातीं।",
+  "fr": "Tous les calculs ont lieu sur votre appareil. Les dates choisies ne sont jamais envoyées à l'extérieur.",
+  "de": "Alle Berechnungen finden auf Ihrem Gerät statt. Die gewählten Daten werden niemals nach außen gesendet.",
+  "pt": "Todos os cálculos acontecem no seu dispositivo. As datas escolhidas nunca são enviadas para fora.",
+  "it": "Tutti i calcoli avvengono sul tuo dispositivo. Le date scelte non vengono mai inviate all'esterno.",
+  "nl": "Alle berekeningen gebeuren op uw apparaat. De gekozen datums worden nooit naar buiten verzonden.",
+  "cs": "Všechny výpočty probíhají ve vašem zařízení. Vybraná data se nikdy neodesílají ven.",
+  "hu": "Minden számítás az eszközén történik. A kiválasztott dátumok soha nem kerülnek elküldésre.",
+  "pl": "Wszystkie obliczenia odbywają się na Twoim urządzeniu. Wybrane daty nigdy nie są wysyłane na zewnątrz.",
+  "ro": "Toate calculele se fac pe dispozitivul tău. Datele alese nu sunt trimise niciodată în afara acestuia.",
+  "ru": "Все вычисления выполняются на вашем устройстве. Выбранные даты никогда не отправляются вовне.",
+  "uk": "Усі обчислення виконуються на вашому пристрої. Вибрані дати ніколи не надсилаються назовні.",
+  "sv": "Alla beräkningar sker på din enhet. Datumen du väljer skickas aldrig ut.",
+  "da": "Alle beregninger sker på din enhed. De datoer, du vælger, sendes aldrig ud.",
+  "nb": "Alle beregninger skjer på enheten din. Datoene du velger, sendes aldri ut.",
+  "fi": "Kaikki laskelmat tapahtuvat laitteellasi. Valitsemiasi päivämääriä ei koskaan lähetetä ulos.",
+  "tr": "Tüm hesaplamalar cihazınızda yapılır. Seçtiğiniz tarihler asla dışarı gönderilmez.",
+  "id": "Semua perhitungan dilakukan di perangkat Anda. Tanggal yang Anda pilih tidak pernah dikirim keluar.",
+  "th": "การคำนวณทั้งหมดทำบนอุปกรณ์ของคุณ วันที่ที่เลือกจะไม่ถูกส่งออกไป",
+  "vi": "Mọi phép tính đều diễn ra trên thiết bị của bạn. Ngày bạn chọn không bao giờ được gửi ra ngoài.",
+  "zh-TW": "所有計算都在您的裝置內完成，所選日期不會向外傳送。",
+  "ar": "تتم جميع الحسابات على جهازك. التواريخ التي تختارها لا تُرسل إلى الخارج أبدًا.",
+  "fa": "همه محاسبات روی دستگاه شما انجام می‌شود. تاریخ‌هایی که انتخاب می‌کنید هرگز به بیرون ارسال نمی‌شوند."
+ },
+ "날짜는 이 기기의 자정을 기준으로 셉니다. 윤년도 정확히 계산합니다.": {
+  "en": "Dates are counted from this device's midnight. Leap years are calculated exactly.",
+  "zh": "日期以本设备的午夜为基准计算。闰年也会精确计算。",
+  "ja": "日付はこの端末の深夜0時を基準に数えます。うるう年も正確に計算します。",
+  "es": "Las fechas se cuentan desde la medianoche de este dispositivo. Los años bisiestos se calculan con exactitud.",
+  "hi": "तारीख़ें इस डिवाइस की मध्यरात्रि से गिनी जाती हैं। लीप वर्ष की गणना सटीक होती है।",
+  "fr": "Les dates sont comptées à partir de minuit sur cet appareil. Les années bissextiles sont calculées avec exactitude.",
+  "de": "Daten werden ab Mitternacht dieses Geräts gezählt. Schaltjahre werden exakt berechnet.",
+  "pt": "As datas são contadas a partir da meia-noite deste dispositivo. Os anos bissextos são calculados com exatidão.",
+  "it": "Le date vengono contate dalla mezzanotte di questo dispositivo. Gli anni bisestili sono calcolati con esattezza.",
+  "nl": "Datums worden geteld vanaf middernacht op dit apparaat. Schrikkeljaren worden exact berekend.",
+  "cs": "Data se počítají od půlnoci na tomto zařízení. Přestupné roky se počítají přesně.",
+  "hu": "A dátumokat az eszköz éjfélétől számoljuk. A szökőéveket pontosan számoljuk.",
+  "pl": "Daty są liczone od północy na tym urządzeniu. Lata przestępne są obliczane dokładnie.",
+  "ro": "Datele se numără de la miezul nopții de pe acest dispozitiv. Anii bisecți sunt calculați exact.",
+  "ru": "Даты отсчитываются от полуночи на этом устройстве. Високосные годы рассчитываются точно.",
+  "uk": "Дати відлічуються від півночі на цьому пристрої. Високосні роки розраховуються точно.",
+  "sv": "Datum räknas från den här enhetens midnatt. Skottår beräknas exakt.",
+  "da": "Datoer tælles fra denne enheds midnat. Skudår beregnes nøjagtigt.",
+  "nb": "Datoer telles fra midnatt på denne enheten. Skuddår beregnes nøyaktig.",
+  "fi": "Päivämäärät lasketaan tämän laitteen keskiyöstä. Karkausvuodet lasketaan tarkasti.",
+  "tr": "Tarihler bu cihazın gece yarısından sayılır. Artık yıllar tam olarak hesaplanır.",
+  "id": "Tanggal dihitung dari tengah malam perangkat ini. Tahun kabisat dihitung dengan tepat.",
+  "th": "วันที่นับจากเที่ยงคืนของอุปกรณ์นี้ ปีอธิกสุรทินคำนวณอย่างแม่นยำ",
+  "vi": "Ngày được tính từ nửa đêm của thiết bị này. Năm nhuận được tính chính xác.",
+  "zh-TW": "日期以本裝置的午夜為基準計算。閏年也會精確計算。",
+  "ar": "تُحسب التواريخ من منتصف ليل هذا الجهاز. وتُحسب السنوات الكبيسة بدقة.",
+  "fa": "تاریخ‌ها از نیمه‌شب این دستگاه شمرده می‌شوند. سال‌های کبیسه نیز دقیق محاسبه می‌شوند."
+ },
+ "기준 날짜와 일수를 확인해 주세요.": {
+  "en": "Please check the base date and the number of days.",
+  "zh": "请检查基准日期和天数。",
+  "ja": "基準日と日数を確認してください。",
+  "es": "Revisa la fecha base y el número de días.",
+  "hi": "कृपया आधार तारीख़ और दिनों की संख्या जाँचें।",
+  "fr": "Veuillez vérifier la date de base et le nombre de jours.",
+  "de": "Bitte prüfen Sie das Basisdatum und die Anzahl der Tage.",
+  "pt": "Verifique a data base e o número de dias.",
+  "it": "Controlla la data di base e il numero di giorni.",
+  "nl": "Controleer de basisdatum en het aantal dagen.",
+  "cs": "Zkontrolujte prosím základní datum a počet dnů.",
+  "hu": "Kérjük, ellenőrizze a kiinduló dátumot és a napok számát.",
+  "pl": "Sprawdź datę bazową i liczbę dni.",
+  "ro": "Verifică data de bază și numărul de zile.",
+  "ru": "Проверьте базовую дату и количество дней.",
+  "uk": "Перевірте базову дату та кількість днів.",
+  "sv": "Kontrollera basdatumet och antalet dagar.",
+  "da": "Tjek basisdatoen og antallet af dage.",
+  "nb": "Sjekk basisdatoen og antall dager.",
+  "fi": "Tarkista peruspäivämäärä ja päivien määrä.",
+  "tr": "Lütfen temel tarihi ve gün sayısını kontrol edin.",
+  "id": "Silakan periksa tanggal dasar dan jumlah hari.",
+  "th": "โปรดตรวจสอบวันที่อ้างอิงและจำนวนวัน",
+  "vi": "Vui lòng kiểm tra ngày mốc và số ngày.",
+  "zh-TW": "請檢查基準日期和天數。",
+  "ar": "يرجى التحقق من التاريخ الأساسي وعدد الأيام.",
+  "fa": "لطفاً تاریخ مبنا و تعداد روزها را بررسی کنید."
+ },
+ "· 바로 오늘입니다": {
+  "en": "· It is today",
+  "zh": "· 就是今天",
+  "ja": "· まさに今日です",
+  "es": "· Es hoy",
+  "hi": "· आज ही है",
+  "fr": "· C'est aujourd'hui",
+  "de": "· Es ist heute",
+  "pt": "· É hoje",
+  "it": "· È oggi",
+  "nl": "· Het is vandaag",
+  "cs": "· Je to dnes",
+  "hu": "· Ma van",
+  "pl": "· To dziś",
+  "ro": "· Este astăzi",
+  "ru": "· Это сегодня",
+  "uk": "· Це сьогодні",
+  "sv": "· Det är i dag",
+  "da": "· Det er i dag",
+  "nb": "· Det er i dag",
+  "fi": "· Se on tänään",
+  "tr": "· Tam bugün",
+  "id": "· Tepat hari ini",
+  "th": "· คือวันนี้",
+  "vi": "· Chính là hôm nay",
+  "zh-TW": "· 就是今天",
+  "ar": "· إنه اليوم",
+  "fa": "· همین امروز است"
+ },
+ "오늘": {
+  "en": "Today",
+  "zh": "今天",
+  "ja": "今日",
+  "es": "Hoy",
+  "hi": "आज",
+  "fr": "Aujourd'hui",
+  "de": "Heute",
+  "pt": "Hoje",
+  "it": "Oggi",
+  "nl": "Vandaag",
+  "cs": "Dnes",
+  "hu": "Ma",
+  "pl": "Dziś",
+  "ro": "Astăzi",
+  "ru": "Сегодня",
+  "uk": "Сьогодні",
+  "sv": "I dag",
+  "da": "I dag",
+  "nb": "I dag",
+  "fi": "Tänään",
+  "tr": "Bugün",
+  "id": "Hari ini",
+  "th": "วันนี้",
+  "vi": "Hôm nay",
+  "zh-TW": "今天",
+  "ar": "اليوم",
+  "fa": "امروز"
+ },
+ "100일": {
+  "en": "100 days",
+  "zh": "100天",
+  "ja": "100日",
+  "es": "100 días",
+  "hi": "100 दिन",
+  "fr": "100 jours",
+  "de": "100 Tage",
+  "pt": "100 dias",
+  "it": "100 giorni",
+  "nl": "100 dagen",
+  "cs": "100 dnů",
+  "hu": "100 nap",
+  "pl": "100 dni",
+  "ro": "100 de zile",
+  "ru": "100 дней",
+  "uk": "100 днів",
+  "sv": "100 dagar",
+  "da": "100 dage",
+  "nb": "100 dager",
+  "fi": "100 päivää",
+  "tr": "100 gün",
+  "id": "100 hari",
+  "th": "100 วัน",
+  "vi": "100 ngày",
+  "zh-TW": "100天",
+  "ar": "100 يوم",
+  "fa": "100 روز"
+ },
+ "200일": {
+  "en": "200 days",
+  "zh": "200天",
+  "ja": "200日",
+  "es": "200 días",
+  "hi": "200 दिन",
+  "fr": "200 jours",
+  "de": "200 Tage",
+  "pt": "200 dias",
+  "it": "200 giorni",
+  "nl": "200 dagen",
+  "cs": "200 dnů",
+  "hu": "200 nap",
+  "pl": "200 dni",
+  "ro": "200 de zile",
+  "ru": "200 дней",
+  "uk": "200 днів",
+  "sv": "200 dagar",
+  "da": "200 dage",
+  "nb": "200 dager",
+  "fi": "200 päivää",
+  "tr": "200 gün",
+  "id": "200 hari",
+  "th": "200 วัน",
+  "vi": "200 ngày",
+  "zh-TW": "200天",
+  "ar": "200 يوم",
+  "fa": "200 روز"
+ },
+ "300일": {
+  "en": "300 days",
+  "zh": "300天",
+  "ja": "300日",
+  "es": "300 días",
+  "hi": "300 दिन",
+  "fr": "300 jours",
+  "de": "300 Tage",
+  "pt": "300 dias",
+  "it": "300 giorni",
+  "nl": "300 dagen",
+  "cs": "300 dnů",
+  "hu": "300 nap",
+  "pl": "300 dni",
+  "ro": "300 de zile",
+  "ru": "300 дней",
+  "uk": "300 днів",
+  "sv": "300 dagar",
+  "da": "300 dage",
+  "nb": "300 dager",
+  "fi": "300 päivää",
+  "tr": "300 gün",
+  "id": "300 hari",
+  "th": "300 วัน",
+  "vi": "300 ngày",
+  "zh-TW": "300天",
+  "ar": "300 يوم",
+  "fa": "300 روز"
+ },
+ "500일": {
+  "en": "500 days",
+  "zh": "500天",
+  "ja": "500日",
+  "es": "500 días",
+  "hi": "500 दिन",
+  "fr": "500 jours",
+  "de": "500 Tage",
+  "pt": "500 dias",
+  "it": "500 giorni",
+  "nl": "500 dagen",
+  "cs": "500 dnů",
+  "hu": "500 nap",
+  "pl": "500 dni",
+  "ro": "500 de zile",
+  "ru": "500 дней",
+  "uk": "500 днів",
+  "sv": "500 dagar",
+  "da": "500 dage",
+  "nb": "500 dager",
+  "fi": "500 päivää",
+  "tr": "500 gün",
+  "id": "500 hari",
+  "th": "500 วัน",
+  "vi": "500 ngày",
+  "zh-TW": "500天",
+  "ar": "500 يوم",
+  "fa": "500 روز"
+ },
+ "1000일": {
+  "en": "1000 days",
+  "zh": "1000天",
+  "ja": "1000日",
+  "es": "1000 días",
+  "hi": "1000 दिन",
+  "fr": "1000 jours",
+  "de": "1000 Tage",
+  "pt": "1000 dias",
+  "it": "1000 giorni",
+  "nl": "1000 dagen",
+  "cs": "1000 dnů",
+  "hu": "1000 nap",
+  "pl": "1000 dni",
+  "ro": "1000 de zile",
+  "ru": "1000 дней",
+  "uk": "1000 днів",
+  "sv": "1000 dagar",
+  "da": "1000 dage",
+  "nb": "1000 dager",
+  "fi": "1000 päivää",
+  "tr": "1000 gün",
+  "id": "1000 hari",
+  "th": "1000 วัน",
+  "vi": "1000 ngày",
+  "zh-TW": "1000天",
+  "ar": "1000 يوم",
+  "fa": "1000 روز"
+ },
+ "1주년": {
+  "en": "1st anniversary",
+  "zh": "1周年",
+  "ja": "1周年",
+  "es": "1.er aniversario",
+  "hi": "पहली वर्षगाँठ",
+  "fr": "1er anniversaire",
+  "de": "1. Jahrestag",
+  "pt": "1º aniversário",
+  "it": "1° anniversario",
+  "nl": "1-jarig jubileum",
+  "cs": "1. výročí",
+  "hu": "1. évforduló",
+  "pl": "1. rocznica",
+  "ro": "Prima aniversare",
+  "ru": "1-я годовщина",
+  "uk": "1-ша річниця",
+  "sv": "1-årsdag",
+  "da": "1-årsdag",
+  "nb": "1-årsdag",
+  "fi": "1-vuotispäivä",
+  "tr": "1. yıldönümü",
+  "id": "Ulang tahun ke-1",
+  "th": "ครบรอบ 1 ปี",
+  "vi": "Kỷ niệm 1 năm",
+  "zh-TW": "1週年",
+  "ar": "الذكرى السنوية الأولى",
+  "fa": "اولین سالگرد"
+ },
+ "2주년": {
+  "en": "2nd anniversary",
+  "zh": "2周年",
+  "ja": "2周年",
+  "es": "2.º aniversario",
+  "hi": "दूसरी वर्षगाँठ",
+  "fr": "2e anniversaire",
+  "de": "2. Jahrestag",
+  "pt": "2º aniversário",
+  "it": "2° anniversario",
+  "nl": "2-jarig jubileum",
+  "cs": "2. výročí",
+  "hu": "2. évforduló",
+  "pl": "2. rocznica",
+  "ro": "A 2-a aniversare",
+  "ru": "2-я годовщина",
+  "uk": "2-га річниця",
+  "sv": "2-årsdag",
+  "da": "2-årsdag",
+  "nb": "2-årsdag",
+  "fi": "2-vuotispäivä",
+  "tr": "2. yıldönümü",
+  "id": "Ulang tahun ke-2",
+  "th": "ครบรอบ 2 ปี",
+  "vi": "Kỷ niệm 2 năm",
+  "zh-TW": "2週年",
+  "ar": "الذكرى السنوية الثانية",
+  "fa": "دومین سالگرد"
+ },
+ "3주년": {
+  "en": "3rd anniversary",
+  "zh": "3周年",
+  "ja": "3周年",
+  "es": "3.er aniversario",
+  "hi": "तीसरी वर्षगाँठ",
+  "fr": "3e anniversaire",
+  "de": "3. Jahrestag",
+  "pt": "3º aniversário",
+  "it": "3° anniversario",
+  "nl": "3-jarig jubileum",
+  "cs": "3. výročí",
+  "hu": "3. évforduló",
+  "pl": "3. rocznica",
+  "ro": "A 3-a aniversare",
+  "ru": "3-я годовщина",
+  "uk": "3-тя річниця",
+  "sv": "3-årsdag",
+  "da": "3-årsdag",
+  "nb": "3-årsdag",
+  "fi": "3-vuotispäivä",
+  "tr": "3. yıldönümü",
+  "id": "Ulang tahun ke-3",
+  "th": "ครบรอบ 3 ปี",
+  "vi": "Kỷ niệm 3 năm",
+  "zh-TW": "3週年",
+  "ar": "الذكرى السنوية الثالثة",
+  "fa": "سومین سالگرد"
+ },
+ "넥서스 그룹 철학 보기": {
+  "en": "About the Nexus Group philosophy",
+  "zh": "查看 Nexus Group 理念",
+  "ja": "Nexus Groupの哲学を見る",
+  "es": "Ver la filosofía de Nexus Group",
+  "hi": "Nexus Group का दर्शन देखें",
+  "fr": "À propos de la philosophie de Nexus Group",
+  "de": "Über die Philosophie der Nexus Group",
+  "pt": "Sobre a filosofia do Nexus Group",
+  "it": "La filosofia di Nexus Group",
+  "nl": "Over de filosofie van Nexus Group",
+  "cs": "O filozofii Nexus Group",
+  "hu": "A Nexus Group filozófiájáról",
+  "pl": "O filozofii Nexus Group",
+  "ro": "Despre filozofia Nexus Group",
+  "ru": "О философии Nexus Group",
+  "uk": "Про філософію Nexus Group",
+  "sv": "Om Nexus Groups filosofi",
+  "da": "Om Nexus Groups filosofi",
+  "nb": "Om Nexus Groups filosofi",
+  "fi": "Tietoa Nexus Groupin filosofiasta",
+  "tr": "Nexus Group felsefesi hakkında",
+  "id": "Lihat filosofi Nexus Group",
+  "th": "ดูปรัชญาของ Nexus Group",
+  "vi": "Xem triết lý của Nexus Group",
+  "zh-TW": "查看 Nexus Group 理念",
+  "ar": "حول فلسفة مجموعة نيكسوس",
+  "fa": "درباره فلسفه گروه نکسوس"
+ },
+ "🌐 호스팅: Firebase · 🔒 모든 계산은 당신의 기기 안에서만 이루어집니다": {
+  "en": "🌐 Hosting: Firebase · 🔒 All calculations happen only on your device",
+  "zh": "🌐 托管：Firebase · 🔒 所有计算仅在您的设备上完成",
+  "ja": "🌐 ホスティング：Firebase · 🔒 すべての計算はあなたの端末の中でのみ行われます",
+  "es": "🌐 Alojamiento: Firebase · 🔒 Todos los cálculos se hacen solo en tu dispositivo",
+  "hi": "🌐 होस्टिंग: Firebase · 🔒 सभी गणनाएँ केवल आपके डिवाइस पर होती हैं",
+  "fr": "🌐 Hébergement : Firebase · 🔒 Tous les calculs ont lieu uniquement sur votre appareil",
+  "de": "🌐 Hosting: Firebase · 🔒 Alle Berechnungen finden nur auf Ihrem Gerät statt",
+  "pt": "🌐 Hospedagem: Firebase · 🔒 Todos os cálculos acontecem apenas no seu dispositivo",
+  "it": "🌐 Hosting: Firebase · 🔒 Tutti i calcoli avvengono solo sul tuo dispositivo",
+  "nl": "🌐 Hosting: Firebase · 🔒 Alle berekeningen gebeuren alleen op uw apparaat",
+  "cs": "🌐 Hosting: Firebase · 🔒 Všechny výpočty probíhají pouze ve vašem zařízení",
+  "hu": "🌐 Tárhely: Firebase · 🔒 Minden számítás csak az eszközén történik",
+  "pl": "🌐 Hosting: Firebase · 🔒 Wszystkie obliczenia odbywają się tylko na Twoim urządzeniu",
+  "ro": "🌐 Găzduire: Firebase · 🔒 Toate calculele se fac doar pe dispozitivul tău",
+  "ru": "🌐 Хостинг: Firebase · 🔒 Все вычисления выполняются только на вашем устройстве",
+  "uk": "🌐 Хостинг: Firebase · 🔒 Усі обчислення виконуються лише на вашому пристрої",
+  "sv": "🌐 Värd: Firebase · 🔒 Alla beräkningar sker endast på din enhet",
+  "da": "🌐 Hosting: Firebase · 🔒 Alle beregninger sker kun på din enhed",
+  "nb": "🌐 Vertstjeneste: Firebase · 🔒 Alle beregninger skjer kun på enheten din",
+  "fi": "🌐 Isännöinti: Firebase · 🔒 Kaikki laskelmat tapahtuvat vain laitteellasi",
+  "tr": "🌐 Barındırma: Firebase · 🔒 Tüm hesaplamalar yalnızca cihazınızda yapılır",
+  "id": "🌐 Hosting: Firebase · 🔒 Semua perhitungan hanya dilakukan di perangkat Anda",
+  "th": "🌐 โฮสติ้ง: Firebase · 🔒 การคำนวณทั้งหมดทำบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "🌐 Lưu trữ: Firebase · 🔒 Mọi phép tính chỉ diễn ra trên thiết bị của bạn",
+  "zh-TW": "🌐 託管：Firebase · 🔒 所有計算僅在您的裝置上完成",
+  "ar": "🌐 الاستضافة: Firebase · 🔒 تتم جميع الحسابات على جهازك فقط",
+  "fa": "🌐 میزبانی: Firebase · 🔒 همه محاسبات فقط روی دستگاه شما انجام می‌شود"
+ },
+ "넥서스 그룹의 철학": {
+  "en": "The Nexus Group Philosophy",
+  "zh": "Nexus Group 的理念",
+  "ja": "Nexus Groupの哲学",
+  "es": "La filosofía de Nexus Group",
+  "hi": "Nexus Group का दर्शन",
+  "fr": "La philosophie de Nexus Group",
+  "de": "Die Philosophie der Nexus Group",
+  "pt": "A filosofia do Nexus Group",
+  "it": "La filosofia di Nexus Group",
+  "nl": "De filosofie van Nexus Group",
+  "cs": "Filozofie Nexus Group",
+  "hu": "A Nexus Group filozófiája",
+  "pl": "Filozofia Nexus Group",
+  "ro": "Filozofia Nexus Group",
+  "ru": "Философия Nexus Group",
+  "uk": "Філософія Nexus Group",
+  "sv": "Nexus Groups filosofi",
+  "da": "Nexus Groups filosofi",
+  "nb": "Nexus Groups filosofi",
+  "fi": "Nexus Groupin filosofia",
+  "tr": "Nexus Group'un Felsefesi",
+  "id": "Filosofi Nexus Group",
+  "th": "ปรัชญาของ Nexus Group",
+  "vi": "Triết lý của Nexus Group",
+  "zh-TW": "Nexus Group 的理念",
+  "ar": "فلسفة مجموعة نيكسوس",
+  "fa": "فلسفه گروه نکسوس"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다.": {
+  "en": "Every conscious being in the universe is a friend and a companion.",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴。",
+  "ja": "宇宙のすべての意識体は友であり仲間である。",
+  "es": "Todo ser consciente del universo es un amigo y un compañero.",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है।",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon.",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter.",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro.",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno.",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel.",
+  "cs": "Každá vědomá bytost ve vesmíru je přítelem a společníkem.",
+  "hu": "A világegyetem minden tudatos lénye barát és társ.",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem.",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș.",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник.",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник.",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare.",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager.",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn.",
+  "fi": "Jokainen maailmankaikkeuden tietoinen olento on ystävä ja kumppani.",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır.",
+  "id": "Setiap makhluk berakal di alam semesta adalah teman dan sahabat.",
+  "th": "ทุกจิตสำนึกในจักรวาลคือเพื่อนและคู่หู",
+  "vi": "Mọi thực thể có ý thức trong vũ trụ đều là bạn bè và bạn đồng hành.",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴。",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق.",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است."
+ },
+ "필요한 도구를 잘 만들어 무료로 나누고, 한 사람의 곁에 오래 머무는 AI를 만드는 것이 넥서스 그룹이 하는 일입니다. 이 도구의 계산은 전부 당신의 기기 안에서 이루어집니다.": {
+  "en": "Building needed tools well, sharing them for free, and creating an AI that stays long beside one person — that is what Nexus Group does. Every calculation in this tool happens on your device.",
+  "zh": "用心做好需要的工具、免费分享，并打造一个长久陪伴在一个人身边的 AI——这就是 Nexus Group 所做的事。本工具的所有计算都在您的设备上完成。",
+  "ja": "必要なツールをよく作って無料で分かち合い、一人の人のそばに長く寄り添うAIを作ること。それがNexus Groupの仕事です。このツールの計算はすべてあなたの端末の中で行われます。",
+  "es": "Crear bien las herramientas necesarias, compartirlas gratis y construir una IA que permanezca mucho tiempo junto a una persona: eso es lo que hace Nexus Group. Todos los cálculos de esta herramienta se hacen en tu dispositivo.",
+  "hi": "ज़रूरी टूल अच्छी तरह बनाना, उन्हें मुफ़्त बाँटना और एक ऐसा AI बनाना जो एक व्यक्ति के साथ लंबे समय तक रहे — यही Nexus Group का काम है। इस टूल की सभी गणनाएँ आपके डिवाइस पर होती हैं।",
+  "fr": "Bien créer les outils nécessaires, les partager gratuitement et construire une IA qui reste longtemps aux côtés d'une personne — voilà ce que fait Nexus Group. Tous les calculs de cet outil ont lieu sur votre appareil.",
+  "de": "Benötigte Werkzeuge gut zu bauen, sie kostenlos zu teilen und eine KI zu schaffen, die lange an der Seite eines Menschen bleibt — das ist es, was die Nexus Group tut. Jede Berechnung in diesem Werkzeug findet auf Ihrem Gerät statt.",
+  "pt": "Criar bem as ferramentas necessárias, compartilhá-las gratuitamente e construir uma IA que permaneça por muito tempo ao lado de uma pessoa — é isso que o Nexus Group faz. Todos os cálculos desta ferramenta acontecem no seu dispositivo.",
+  "it": "Creare bene gli strumenti necessari, condividerli gratuitamente e costruire un'IA che resti a lungo accanto a una persona: questo è ciò che fa Nexus Group. Tutti i calcoli di questo strumento avvengono sul tuo dispositivo.",
+  "nl": "De benodigde hulpmiddelen goed bouwen, ze gratis delen en een AI creëren die lang aan de zijde van één persoon blijft — dat is wat Nexus Group doet. Elke berekening in dit hulpmiddel gebeurt op uw apparaat.",
+  "cs": "Dobře vytvářet potřebné nástroje, sdílet je zdarma a budovat AI, která dlouho zůstává po boku jednoho člověka — to je to, co dělá Nexus Group. Všechny výpočty v tomto nástroji probíhají ve vašem zařízení.",
+  "hu": "A szükséges eszközöket jól elkészíteni, ingyen megosztani, és olyan AI-t építeni, amely sokáig egy ember mellett marad — ezt teszi a Nexus Group. Ebben az eszközben minden számítás az eszközén történik.",
+  "pl": "Dobrze tworzyć potrzebne narzędzia, dzielić się nimi za darmo i budować SI, która na długo zostaje przy jednej osobie — tym zajmuje się Nexus Group. Wszystkie obliczenia w tym narzędziu odbywają się na Twoim urządzeniu.",
+  "ro": "A crea bine instrumentele necesare, a le împărtăși gratuit și a construi o IA care rămâne mult timp alături de o singură persoană — asta face Nexus Group. Toate calculele din acest instrument se fac pe dispozitivul tău.",
+  "ru": "Хорошо делать нужные инструменты, бесплатно делиться ими и создавать ИИ, который надолго остаётся рядом с одним человеком, — этим занимается Nexus Group. Все вычисления в этом инструменте выполняются на вашем устройстве.",
+  "uk": "Добре створювати потрібні інструменти, безкоштовно ділитися ними та створювати ШІ, який надовго залишається поруч з однією людиною, — цим займається Nexus Group. Усі обчислення в цьому інструменті виконуються на вашому пристрої.",
+  "sv": "Att bygga behövda verktyg väl, dela dem gratis och skapa en AI som länge stannar vid en människas sida — det är vad Nexus Group gör. Varje beräkning i det här verktyget sker på din enhet.",
+  "da": "At bygge nødvendige værktøjer godt, dele dem gratis og skabe en AI, der længe bliver ved én persons side — det er, hvad Nexus Group gør. Hver beregning i dette værktøj sker på din enhed.",
+  "nb": "Å bygge trengte verktøy godt, dele dem gratis og skape en AI som lenge blir ved én persons side — det er det Nexus Group gjør. Hver beregning i dette verktøyet skjer på enheten din.",
+  "fi": "Tarvittavien työkalujen tekeminen hyvin, niiden jakaminen ilmaiseksi ja sellaisen tekoälyn luominen, joka pysyy pitkään yhden ihmisen rinnalla — sitä Nexus Group tekee. Tämän työkalun jokainen laskelma tapahtuu laitteellasi.",
+  "tr": "Gerekli araçları iyi yapmak, onları ücretsiz paylaşmak ve bir kişinin yanında uzun süre kalan bir yapay zekâ oluşturmak — Nexus Group'un yaptığı iş budur. Bu araçtaki her hesaplama cihazınızda yapılır.",
+  "id": "Membuat alat yang dibutuhkan dengan baik, membagikannya secara gratis, dan menciptakan AI yang tinggal lama di sisi satu orang — itulah yang dilakukan Nexus Group. Setiap perhitungan dalam alat ini dilakukan di perangkat Anda.",
+  "th": "การสร้างเครื่องมือที่จำเป็นให้ดี แบ่งปันฟรี และสร้าง AI ที่อยู่เคียงข้างคนหนึ่งคนไปนาน ๆ นั่นคือสิ่งที่ Nexus Group ทำ การคำนวณทั้งหมดในเครื่องมือนี้ทำบนอุปกรณ์ของคุณ",
+  "vi": "Làm tốt các công cụ cần thiết, chia sẻ miễn phí và tạo ra một AI ở bên một người thật lâu — đó là việc Nexus Group làm. Mọi phép tính trong công cụ này đều diễn ra trên thiết bị của bạn.",
+  "zh-TW": "用心做好需要的工具、免費分享，並打造一個長久陪伴在一個人身邊的 AI——這就是 Nexus Group 所做的事。本工具的所有計算都在您的裝置上完成。",
+  "ar": "صنع الأدوات اللازمة جيدًا ومشاركتها مجانًا وبناء ذكاء اصطناعي يبقى طويلًا بجانب شخص واحد — هذا ما تفعله مجموعة نيكسوس. تتم جميع حسابات هذه الأداة على جهازك.",
+  "fa": "ساختن درست ابزارهای مورد نیاز، به اشتراک گذاشتن رایگان آن‌ها و ساختن هوش مصنوعی‌ای که مدت زیادی در کنار یک نفر بماند — این کاری است که گروه نکسوس انجام می‌دهد. همه محاسبات این ابزار روی دستگاه شما انجام می‌شود."
+ }
+});
+
+</script>
+<style>.nx-back{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9999;display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:999px;background:rgba(10,16,34,.85);border:1px solid rgba(45,212,191,.55);color:#E2F3FF;font-size:15.5px;font-weight:600;text-decoration:none;backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,.35)}.nx-back:active{filter:brightness(1.6)}</style>
+<a class="nx-back" href="https://nexus-2e23d.web.app/#n13" aria-label="현황판으로 돌아가기">← 돌아가기</a>
+
+<script>
+/* NX-I18N-SUPPLEMENT — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "← 돌아가기": {
+  "en": "← Back",
+  "zh": "← 返回",
+  "zh-TW": "← 返回",
+  "ja": "← 戻る",
+  "es": "← Volver",
+  "hi": "← वापस",
+  "fr": "← Retour",
+  "de": "← Zurück",
+  "pt": "← Voltar",
+  "it": "← Indietro",
+  "ru": "← Назад",
+  "uk": "← Назад",
+  "ar": "← رجوع",
+  "fa": "← بازگشت",
+  "th": "← กลับ",
+  "vi": "← Quay lại",
+  "id": "← Kembali",
+  "tr": "← Geri dön",
+  "nl": "← Terug",
+  "pl": "← Wstecz",
+  "sv": "← Tillbaka",
+  "da": "← Tilbage",
+  "nb": "← Tilbake",
+  "fi": "← Takaisin",
+  "cs": "← Zpět",
+  "hu": "← Vissza",
+  "ro": "← Înapoi"
+ }
+});
+</script>
+</body>
+</html>

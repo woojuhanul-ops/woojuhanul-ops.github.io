@@ -1,0 +1,1 @@
+{"background_color":"#0B0F19","description":"사진 속 글자를 인식해 글자로 바꿔 주는 도구. 인식은 기기 안에서 실행되고 사진은 밖으로 나가지 않습니다","display":"standalone","icons":[{"sizes":"192x192","src":"/icon-192.png","type":"image/png"},{"sizes":"512x512","src":"/icon-512.png","type":"image/png"}],"name":"넥서스 글자 읽기","short_name":"글자 읽기","start_url":"/","theme_color":"#0B0F19"}

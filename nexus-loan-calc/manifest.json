@@ -1,0 +1,1 @@
+{"background_color":"#0B0F19","description":"대출과 모기지의 월 상환액, 총 이자, 상환 표를 계산하는 도구","display":"standalone","icons":[{"sizes":"192x192","src":"/icon-192.png","type":"image/png"},{"sizes":"512x512","src":"/icon-512.png","type":"image/png"}],"name":"넥서스 대출 계산","short_name":"대출 계산","start_url":"/","theme_color":"#0B0F19"}

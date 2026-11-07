@@ -1,0 +1,3277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 녹음기 — Nexus Voice Recorder</title>
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .steps{display:flex;gap:8px;margin:0 0 16px}
+  .step{flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13px}
+  .step b{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--line);color:var(--ink);margin-right:6px;font-size:12px}
+  .step.on{color:var(--ink);border-color:var(--teal)}
+  .step.on b{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .statline{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.7}
+  .statline b{color:var(--ink)}
+  .err{color:#F87171}
+  .recwrap{text-align:center;padding:10px 0 4px}
+  .timer{font-size:44px;font-weight:800;letter-spacing:.06em;font-variant-numeric:tabular-nums;margin:6px 0 2px}
+  .recstate{font-size:14px;color:var(--muted);min-height:20px}
+  .recstate.rec{color:#F87171;font-weight:700}
+  .recdot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#F87171;margin-right:6px;vertical-align:middle;animation:blink 1.1s ease-in-out infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+  .recbtn{width:92px;height:92px;border-radius:50%;border:0;cursor:pointer;background:radial-gradient(circle at 50% 38%,#F87171,#DC2626 70%);color:#fff;font-size:15px;font-weight:800;margin:14px 0 6px;box-shadow:0 0 0 6px rgba(248,113,113,.18)}
+  .recbtn:disabled{opacity:.45;cursor:default}
+  .reccontrols{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+  .recitem{border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px;background:rgba(255,255,255,.03)}
+  .recitem .nm{font-size:16px;font-weight:700;word-break:break-all}
+  .recitem .meta{font-size:12px;color:var(--muted);margin-top:3px}
+  .recitem audio{width:100%;margin-top:10px}
+  .recitem .btns{margin-top:10px}
+  .recitem .btns button{min-height:42px;padding:8px 14px;font-size:14px}
+  .danger{color:#F87171;border-color:rgba(248,113,113,.5)}
+  .danger.armed{background:#DC2626;color:#fff;border-color:#DC2626;font-weight:700}
+  .nameedit{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .nameedit input{flex:1;min-width:180px;background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;font-size:15px}
+  .emptylist{color:var(--muted);font-size:14px;line-height:1.7;padding:8px 0}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  footer .fam span{margin:0 6px}
+  footer .fam .now{color:var(--ink);font-weight:700}
+  footer .fam a{color:var(--cyan);text-decoration:none}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;padding:22px;line-height:1.8;font-size:15px}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  details summary{cursor:pointer;font-size:15px}
+  details p{color:var(--muted);font-size:14px;line-height:1.8}
+  @media(max-width:640px){h1{font-size:20px}header{padding:10px 12px}.timer{font-size:36px}}
+
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer}
+
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 녹음기">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 녹음기 — Nexus Voice Recorder">
+<meta property="og:description" content="말소리를 녹음하고 이 기기 안에 저장하는 도구입니다. 녹음은 서버로 전송되지 않습니다.">
+<meta property="og:image" content="https://nexus-voice-recorder.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+<style id="nx-redesign">
+/* sound redesign: one big circle stays the center of the stage, timer above it grows, list actions meet the 44px floor */
+.step{padding:7px 4px;font-size:12px}
+.recwrap{padding:22px 0 10px}
+.timer{font-size:58px}
+.recbtn{width:116px;height:116px;font-size:17px;margin:18px 0 8px}
+.reccontrols button{min-height:52px;padding:12px 22px;font-size:16px}
+.recitem .btns button{min-height:44px}
+@media(max-width:640px){.timer{font-size:46px}.recbtn{width:104px;height:104px}}
+
+/* 녹음색 결정(2026-11-01): 빨강은 녹음 중 점 하나로만 */
+.recbtn{background:radial-gradient(circle at 50% 38%,#2DD4BF,#0D9488 70%);box-shadow:0 0 0 6px rgba(45,212,191,.16)}
+.recstate.rec{color:var(--ink)}
+.armed{background:var(--card);color:var(--teal,#2DD4BF);border-color:var(--teal,#2DD4BF)}
+</style>
+<style id="nx-thumb-right">
+/* NX-THUMB-RIGHT */
+.recwrap .recbtn{display:block;margin-left:auto}
+</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{flex:none}header .brand{flex:none;overflow:visible}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap}.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}</style></head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>SOVEREIGN COMMAND</span></div></a>
+  
+</header>
+
+<main>
+  <div class="steps">
+    <div class="step on" id="step1"><b>1</b> 녹음하기</div>
+    <div class="step" id="step2"><b>2</b> 목록에서 듣기</div>
+  </div>
+
+  <h1>넥서스 녹음기</h1>
+  <p class="sub" style="margin-bottom:4px">말소리를 녹음하고 이 기기 안에 저장하는 도구</p>
+  <!-- NX-BOUNDARY-2026-11-04 --><p class="sub nx-boundary" style="border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 10px">역할 안내: 녹음기는 소리를 <b>녹음 파일</b>로 남기는 도구입니다. 말을 글자로 바꾸지는 않습니다 — 글자 메모는 <a href="https://nexus-voice-memo.web.app">말로 쓰는 메모(103)</a>, 긴 받아쓰기는 <a href="https://nexus-speech-note.web.app">받아쓰기(603)</a>에 있습니다.</p>
+  <p class="sub">회원가입 없음 · 이용료 없음 · 무제한 사용</p>
+
+  <div class="panel">
+    <h2>🎙️ 녹음</h2>
+    <div class="recwrap">
+      <div class="timer" id="timer">00:00</div>
+      <div class="recstate" id="recState">녹음 버튼을 누르면 시작합니다</div>
+      <button class="recbtn" id="recBtn">● 녹음</button>
+      <div class="reccontrols">
+        <button class="ghost" id="pauseBtn" disabled>일시정지</button>
+        <button class="ghost" id="stopBtn" disabled>정지</button>
+      </div>
+    </div>
+    <p class="hint err" id="recErr"></p>
+    <p class="hint">녹음은 당신의 기기 안에만 저장됩니다. 서버로 전송되지 않습니다.<br>녹음 중에는 이 화면을 닫지 마세요. 목록은 이 브라우저 안에 남아 새로고침해도 유지됩니다.</p>
+  </div>
+
+  <div class="panel">
+    <h2>🎧 녹음 목록</h2>
+    <p class="statline" id="listStat">저장된 녹음이 없습니다.</p>
+    <div id="listWrap"></div>
+  </div>
+
+  <details><summary>💡 도움말</summary><p>녹음 버튼을 누르면 마이크 사용을 묻습니다. 허용하면 바로 녹음이 시작되고, 경과 시간이 표시됩니다.<br>일시정지로 잠시 멈췄다가 다시 이어서 녹음할 수 있습니다. 정지를 누르면 녹음이 목록에 저장됩니다.<br>목록에서 바로 재생할 수 있고, 파일로 저장을 누르면 녹음 파일(webm 등)이 기기에 내려받아집니다.<br>이름 바꾸기로 녹음마다 알아보기 쉬운 이름을 붙일 수 있습니다. 지우기는 두 번 눌러야 지워집니다.<br>녹음은 이 브라우저의 저장소(IndexedDB)에 보관됩니다. 브라우저 데이터를 지우면 녹음도 함께 지워지니, 중요한 녹음은 파일로 저장해 두세요.<br>마이크가 없거나 허용을 거절하면 녹음할 수 없습니다. 그럴 때는 브라우저 설정에서 마이크 허용을 확인해 주세요.<br>녹음 길이와 개수에 제한을 두지 않았습니다. 다만 기기의 저장 공간이 부족하면 저장이 실패할 수 있습니다.</p></details>
+<footer>
+    우주의 모든 의식체는 친구이자 동반자이다<br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="philoLink">넥서스 그룹 철학 보기</button><br>
+    🌐 호스팅: Firebase · 🔒 녹음은 당신의 기기 안에만 저장됩니다<br>
+    
+  </footer>
+</main>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>NEXUS GROUP 철학과 비전</h3>
+    <p>넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.</p>
+    <p><b>"우주의 모든 의식체는 친구이자 동반자이다."</b><br>(Every conscious being in the universe is a friend and companion.)</p>
+    <p>우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.</p>
+    <button class="primary" id="modalClose">닫기</button>
+  </div>
+</div>
+<script>
+// ---------- 순수 로직 ----------
+function fmtTime(sec){
+  sec = Math.max(0, Math.floor(Number(sec) || 0));
+  var h = Math.floor(sec / 3600);
+  var m = Math.floor((sec % 3600) / 60);
+  var s = sec % 60;
+  var p = function(n){ return (n < 10 ? '0' : '') + n; };
+  if(h > 0) return h + ':' + p(m) + ':' + p(s);
+  return p(m) + ':' + p(s);
+}
+function fmtDate(ts){
+  var d = new Date(ts);
+  if(isNaN(d.getTime())) return '';
+  var p = function(n){ return (n < 10 ? '0' : '') + n; };
+  var h = d.getHours();
+  var ap = h < 12 ? '오전' : '오후';
+  var h12 = h % 12; if(h12 === 0) h12 = 12;
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + ap + ' ' + h12 + ':' + p(d.getMinutes());
+}
+function defaultName(ts){
+  var d = new Date(ts);
+  var p = function(n){ return (n < 10 ? '0' : '') + n; };
+  return '녹음 ' + d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function elapsedSeconds(accMs, segStart, now, running){
+  var ms = accMs + (running && segStart ? (now - segStart) : 0);
+  return Math.floor(ms / 1000);
+}
+function pickMimeType(candidates, isSupported){
+  for(var i = 0; i < candidates.length; i++){
+    if(candidates[i] === '') return '';
+    if(isSupported(candidates[i])) return candidates[i];
+  }
+  return '';
+}
+function fileExt(mime){
+  mime = String(mime || '');
+  if(mime.indexOf('mp4') >= 0) return '.m4a';
+  if(mime.indexOf('ogg') >= 0) return '.ogg';
+  return '.webm';
+}
+function safeFileName(name){
+  var s = String(name || '녹음').replace(/[\\/:*?"<>|]/g, '_').trim();
+  return s || '녹음';
+}
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"']/g, function(c){
+    return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c];
+  });
+}
+
+// ---------- 텔레메트리 ----------
+var SITE = 'recorder';
+function nxEvent(ev){ try { fetch("https://nexus-orchestrator.woojuhanul.workers.dev/event", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({site: SITE, event: ev}), keepalive:true}).catch(function(){}); } catch(e){} }
+
+// ---------- 상태와 요소 ----------
+var $ = function(id){ return document.getElementById(id); };
+var R = {
+  state: 'idle',            // idle | recording | paused
+  stream: null, recorder: null, chunks: [],
+  accMs: 0, segStart: 0, timerId: null, mime: ''
+};
+var items = [];             // IndexedDB에서 읽은 녹음 목록 (최신순)
+
+// ---------- IndexedDB ----------
+var DB_NAME = 'nexus-voice-recorder', STORE = 'recordings';
+function dbOpen(){
+  return new Promise(function(resolve, reject){
+    if(!window.indexedDB){ reject(new Error('no-idb')); return; }
+    var req = window.indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = function(){
+      var db = req.result;
+      if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: 'id' });
+    };
+    req.onsuccess = function(){ resolve(req.result); };
+    req.onerror = function(){ reject(req.error || new Error('idb-open')); };
+  });
+}
+function dbTx(mode, fn){
+  return dbOpen().then(function(db){
+    return new Promise(function(resolve, reject){
+      var tx = db.transaction(STORE, mode);
+      var store = tx.objectStore(STORE);
+      var out = fn(store);
+      tx.oncomplete = function(){ db.close(); resolve(out && out.__result); };
+      tx.onerror = function(){ db.close(); reject(tx.error || new Error('idb-tx')); };
+      if(out && out.__req){
+        out.__req.onsuccess = function(){ out.__result = out.__req.result; };
+      }
+    });
+  });
+}
+function dbAdd(rec){
+  return dbTx('readwrite', function(store){ store.put(rec); return {}; });
+}
+function dbAll(){
+  return dbTx('readonly', function(store){
+    var req = store.getAll();
+    return { __req: req };
+  }).then(function(rows){
+    rows = rows || [];
+    rows.sort(function(a, b){ return (b.createdAt || 0) - (a.createdAt || 0); });
+    return rows;
+  });
+}
+function dbUpdate(rec){
+  return dbTx('readwrite', function(store){ store.put(rec); return {}; });
+}
+function dbDelete(id){
+  return dbTx('readwrite', function(store){ store.delete(id); return {}; });
+}
+
+// ---------- 목록 렌더 ----------
+var liveUrls = [];
+function revokeUrls(){
+  liveUrls.forEach(function(u){ try{ URL.revokeObjectURL(u); }catch(e){} });
+  liveUrls = [];
+}
+function renderList(rows){
+  items = rows || items;
+  revokeUrls();
+  var wrap = $('listWrap');
+  wrap.innerHTML = '';
+  $('listStat').innerHTML = items.length
+    ? '저장된 녹음 <b>' + items.length + '</b>개'
+    : '저장된 녹음이 없습니다.';
+  $('step2').className = 'step' + (items.length ? ' on' : '');
+  if(!items.length){
+    var em = document.createElement('p');
+    em.className = 'emptylist';
+    em.textContent = '아직 녹음이 없습니다. 위에서 녹음하면 여기에 쌓입니다.';
+    wrap.appendChild(em);
+    return;
+  }
+  items.forEach(function(rec){
+    var box = document.createElement('div');
+    box.className = 'recitem';
+    var nm = document.createElement('div');
+    nm.className = 'nm';
+    nm.textContent = rec.name || '녹음';
+    box.appendChild(nm);
+    var meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.textContent = fmtDate(rec.createdAt) + ' · 길이 ' + fmtTime(rec.duration || 0);
+    box.appendChild(meta);
+    if(rec.blob){
+      var url = null;
+      try{ url = URL.createObjectURL(rec.blob); }catch(e){}
+      if(url){
+        liveUrls.push(url);
+        var au = document.createElement('audio');
+        au.controls = true;
+        au.src = url;
+        au.preload = 'metadata';
+        box.appendChild(au);
+      }
+    }
+    var btns = document.createElement('div');
+    btns.className = 'btns';
+    var saveB = document.createElement('button');
+    saveB.className = 'ghost'; saveB.textContent = '파일로 저장';
+    saveB.addEventListener('click', function(){ downloadRec(rec); });
+    var renB = document.createElement('button');
+    renB.className = 'ghost'; renB.textContent = '이름 바꾸기';
+    renB.addEventListener('click', function(){ startRename(box, rec); });
+    var delB = document.createElement('button');
+    delB.className = 'ghost danger'; delB.textContent = '지우기';
+    delB.addEventListener('click', function(){
+      if(delB.dataset.armed === '1'){
+        dbDelete(rec.id).then(function(){
+          return dbAll();
+        }).then(function(rows){ renderList(rows); }).catch(function(){
+          $('recErr').textContent = '지우지 못했습니다. 다시 시도해 주세요.';
+        });
+      }else{
+        delB.dataset.armed = '1';
+        delB.classList.add('armed');
+        delB.textContent = '정말 지울까요?';
+        setTimeout(function(){
+          delB.dataset.armed = '';
+          delB.classList.remove('armed');
+          delB.textContent = '지우기';
+        }, 3000);
+      }
+    });
+    btns.appendChild(saveB); btns.appendChild(renB); btns.appendChild(delB);
+    box.appendChild(btns);
+    wrap.appendChild(box);
+  });
+}
+function startRename(box, rec){
+  if(box.querySelector('.nameedit')) return;
+  var row = document.createElement('div');
+  row.className = 'nameedit';
+  var input = document.createElement('input');
+  input.type = 'text';
+  input.value = rec.name || '';
+  input.maxLength = 80;
+  var ok = document.createElement('button');
+  ok.className = 'primary'; ok.textContent = '저장';
+  var cancel = document.createElement('button');
+  cancel.className = 'ghost'; cancel.textContent = '취소';
+  cancel.addEventListener('click', function(){ row.remove(); });
+  ok.addEventListener('click', function(){
+    var v = input.value.trim();
+    if(!v){ input.focus(); return; }
+    var updated = { id: rec.id, name: v, createdAt: rec.createdAt, duration: rec.duration, type: rec.type, blob: rec.blob };
+    dbUpdate(updated).then(function(){
+      return dbAll();
+    }).then(function(rows){ renderList(rows); }).catch(function(){
+      $('recErr').textContent = '이름을 바꾸지 못했습니다. 다시 시도해 주세요.';
+    });
+  });
+  row.appendChild(input); row.appendChild(ok); row.appendChild(cancel);
+  box.appendChild(row);
+  input.focus(); input.select();
+}
+function downloadRec(rec){
+  if(!rec.blob) return;
+  var url = null;
+  try{ url = URL.createObjectURL(rec.blob); }catch(e){}
+  if(!url) return;
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = safeFileName(rec.name) + fileExt(rec.type || rec.blob.type);
+  document.body.appendChild(a); a.click(); a.remove();
+  nxEvent('save');
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+}
+function refreshList(){
+  return dbAll().then(function(rows){ renderList(rows); }).catch(function(){
+    renderList([]);
+    $('recErr').textContent = '저장된 녹음을 불러오지 못했습니다. 이 브라우저에서 저장소 사용이 막혀 있을 수 있습니다.';
+  });
+}
+
+// ---------- 녹음 ----------
+function setRecUI(){
+  var recording = R.state === 'recording';
+  var paused = R.state === 'paused';
+  $('recBtn').disabled = recording || paused;
+  $('pauseBtn').disabled = !(recording || paused);
+  $('pauseBtn').textContent = paused ? '이어서 녹음' : '일시정지';
+  $('stopBtn').disabled = !(recording || paused);
+  var st = $('recState');
+  if(recording){
+    st.innerHTML = '<span class="recdot"></span>녹음 중입니다';
+    st.className = 'recstate rec';
+  }else if(paused){
+    st.textContent = '일시정지 중입니다';
+    st.className = 'recstate';
+  }else{
+    st.textContent = '녹음 버튼을 누르면 시작합니다';
+    st.className = 'recstate';
+  }
+  $('step1').className = 'step on';
+}
+function tick(){
+  $('timer').textContent = fmtTime(elapsedSeconds(R.accMs, R.segStart, Date.now(), R.state === 'recording'));
+}
+function startTimer(){
+  stopTimer();
+  R.timerId = setInterval(tick, 250);
+  tick();
+}
+function stopTimer(){
+  if(R.timerId){ clearInterval(R.timerId); R.timerId = null; }
+}
+function stopStream(){
+  if(R.stream){
+    R.stream.getTracks().forEach(function(t){ try{ t.stop(); }catch(e){} });
+    R.stream = null;
+  }
+}
+function startRecording(){
+  $('recErr').textContent = '';
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || typeof MediaRecorder === 'undefined'){
+    $('recErr').textContent = '이 브라우저에서는 녹음을 지원하지 않습니다. 최신 브라우저에서 열어 주세요.';
+    nxEvent('fail');
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream){
+    R.stream = stream;
+    R.mime = pickMimeType(['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg', ''],
+      function(m){ try{ return MediaRecorder.isTypeSupported(m); }catch(e){ return false; } });
+    R.chunks = [];
+    try{
+      R.recorder = R.mime ? new MediaRecorder(stream, { mimeType: R.mime }) : new MediaRecorder(stream);
+    }catch(e){
+      R.recorder = new MediaRecorder(stream);
+    }
+    if(!R.mime) R.mime = R.recorder.mimeType || 'audio/webm';
+    R.recorder.addEventListener('dataavailable', function(ev){
+      if(ev.data && ev.data.size > 0) R.chunks.push(ev.data);
+    });
+    R.recorder.addEventListener('stop', finishRecording);
+    R.accMs = 0;
+    R.segStart = Date.now();
+    R.state = 'recording';
+    R.recorder.start(1000);
+    nxEvent('start');
+    startTimer();
+    setRecUI();
+  }).catch(function(){
+    $('recErr').textContent = '마이크를 사용할 수 없습니다. 마이크가 있는지, 브라우저 설정에서 마이크 허용이 되어 있는지 확인해 주세요. 허용을 거절하면 녹음할 수 없습니다.';
+    nxEvent('fail');
+  });
+}
+function togglePause(){
+  if(!R.recorder) return;
+  if(R.state === 'recording' && typeof R.recorder.pause === 'function'){
+    R.recorder.pause();
+    R.accMs += Date.now() - R.segStart;
+    R.state = 'paused';
+  }else if(R.state === 'paused' && typeof R.recorder.resume === 'function'){
+    R.recorder.resume();
+    R.segStart = Date.now();
+    R.state = 'recording';
+  }else{
+    $('recErr').textContent = '이 브라우저에서는 일시정지를 지원하지 않습니다.';
+    return;
+  }
+  tick();
+  setRecUI();
+}
+function stopRecording(){
+  if(R.recorder && R.state !== 'idle'){
+    if(R.state === 'recording') R.accMs += Date.now() - R.segStart;
+    try{ R.recorder.stop(); }catch(e){ finishRecording(); }
+  }
+}
+function finishRecording(){
+  stopTimer();
+  var dur = Math.round(R.accMs / 1000);
+  var blob = new Blob(R.chunks, { type: R.mime || 'audio/webm' });
+  var rec = {
+    id: 'rec-' + Date.now() + '-' + Math.floor(Math.random() * 1e6),
+    name: defaultName(Date.now()),
+    createdAt: Date.now(),
+    duration: dur,
+    type: blob.type || R.mime || 'audio/webm',
+    blob: blob
+  };
+  R.state = 'idle';
+  R.recorder = null;
+  R.chunks = [];
+  stopStream();
+  $('timer').textContent = '00:00';
+  setRecUI();
+  if(blob.size === 0){
+    $('recErr').textContent = '녹음된 소리가 없습니다. 다시 시도해 주세요.';
+    nxEvent('fail');
+    return;
+  }
+  dbAdd(rec).then(function(){
+    nxEvent('complete');
+    return refreshList();
+  }).catch(function(){
+    $('recErr').textContent = '녹음을 저장하지 못했습니다. 기기의 저장 공간이 부족하거나 브라우저가 저장을 막고 있을 수 있습니다.';
+    nxEvent('fail');
+  });
+}
+$('recBtn').addEventListener('click', startRecording);
+$('pauseBtn').addEventListener('click', togglePause);
+$('stopBtn').addEventListener('click', stopRecording);
+
+// ---------- 철학 모달 ----------
+$('philoLink').addEventListener('click', function(){ $('modalBg').classList.add('open'); });
+$('modalClose').addEventListener('click', function(){ $('modalBg').classList.remove('open'); });
+$('modalBg').addEventListener('click', function(e){ if(e.target === $('modalBg')) $('modalBg').classList.remove('open'); });
+
+// ---------- 시작 ----------
+setRecUI();
+refreshList();
+
+// 시험용 노출 (순수 로직·렌더 검증용)
+window.NXREC = { fmtTime: fmtTime, fmtDate: fmtDate, defaultName: defaultName,
+  elapsedSeconds: elapsedSeconds, pickMimeType: pickMimeType, fileExt: fileExt,
+  safeFileName: safeFileName, renderList: renderList };
+</script>
+
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 소리 자르기": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 영상 자르기": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 사진 정보 가리기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 읽어 주기": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 긴 말 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 사진 글자 뽑기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 녹음기": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 말로 쓰는 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 20호 녹음기 전용 사전 */
+NX_I18N_ADD({
+ "20호 녹음기 (현재)": {
+  "en": "20. Voice Recorder (current)",
+  "zh": "20号 语音录音机（当前）",
+  "ja": "20号 ボイスレコーダー（現在）",
+  "es": "20. Grabadora de voz (actual)",
+  "hi": "20. वॉयस रिकॉर्डर (वर्तमान)",
+  "fr": "20. Enregistreur vocal (actuel)",
+  "de": "20. Sprachrekorder (aktuell)",
+  "pt": "20. Gravador de voz (atual)",
+  "it": "20. Registratore vocale (attuale)",
+  "nl": "20. Voicerecorder (huidig)",
+  "cs": "20. Diktafon (aktuální)",
+  "hu": "20. Hangrögzítő (aktuális)",
+  "pl": "20. Dyktafon (bieżące)",
+  "ro": "20. Reportofon (curent)",
+  "ru": "20. Диктофон (текущий)",
+  "uk": "20. Диктофон (поточний)",
+  "sv": "20. Röstinspelare (aktuell)",
+  "da": "20. Stemmeoptager (aktuel)",
+  "nb": "20. Stemmeopptaker (gjeldende)",
+  "fi": "20. Ääninauhuri (nykyinen)",
+  "tr": "20. Ses Kaydedici (geçerli)",
+  "id": "20. Perekam Suara (saat ini)",
+  "th": "20. เครื่องบันทึกเสียง (ปัจจุบัน)",
+  "vi": "20. Máy ghi âm (hiện tại)",
+  "zh-TW": "20號 語音錄音機（目前）",
+  "ar": "20. مسجل الصوت (الحالي)",
+  "fa": "20. ضبط‌کننده صدا (فعلی)"
+ },
+ "넥서스 녹음기 — Nexus Voice Recorder": {
+  "en": "Nexus Voice Recorder",
+  "zh": "Nexus 语音录音机",
+  "ja": "Nexus ボイスレコーダー",
+  "es": "Nexus Grabadora de voz",
+  "hi": "Nexus वॉयस रिकॉर्डर",
+  "fr": "Enregistreur vocal Nexus",
+  "de": "Nexus Sprachrekorder",
+  "pt": "Gravador de voz Nexus",
+  "it": "Registratore vocale Nexus",
+  "nl": "Nexus voicerecorder",
+  "cs": "Diktafon Nexus",
+  "hu": "Nexus Hangrögzítő",
+  "pl": "Dyktafon Nexus",
+  "ro": "Reportofon Nexus",
+  "ru": "Диктофон Nexus",
+  "uk": "Диктофон Nexus",
+  "sv": "Nexus röstinspelare — Nexus Voice Recorder",
+  "da": "Nexus stemmeoptager — Nexus Voice Recorder",
+  "nb": "Nexus stemmeopptaker — Nexus Voice Recorder",
+  "fi": "Nexus-ääninauhuri — Nexus Voice Recorder",
+  "tr": "Nexus Ses Kaydedici — Nexus Voice Recorder",
+  "id": "Nexus Perekam Suara",
+  "th": "Nexus เครื่องบันทึกเสียง",
+  "vi": "Nexus Máy ghi âm",
+  "zh-TW": "Nexus 語音錄音機",
+  "ar": "مسجل صوت Nexus",
+  "fa": "ضبط‌کننده صدای Nexus"
+ },
+ "넥서스 녹음기": {
+  "en": "Nexus Voice Recorder",
+  "zh": "Nexus 语音录音机",
+  "ja": "Nexus ボイスレコーダー",
+  "es": "Nexus Grabadora de voz",
+  "hi": "Nexus वॉयस रिकॉर्डर",
+  "fr": "Enregistreur vocal Nexus",
+  "de": "Nexus Sprachrekorder",
+  "pt": "Gravador de voz Nexus",
+  "it": "Registratore vocale Nexus",
+  "nl": "Nexus voicerecorder",
+  "cs": "Diktafon Nexus",
+  "hu": "Nexus Hangrögzítő",
+  "pl": "Dyktafon Nexus",
+  "ro": "Reportofon Nexus",
+  "ru": "Диктофон Nexus",
+  "uk": "Диктофон Nexus",
+  "sv": "Nexus röstinspelare",
+  "da": "Nexus stemmeoptager",
+  "nb": "Nexus stemmeopptaker",
+  "fi": "Nexus-ääninauhuri",
+  "tr": "Nexus Ses Kaydedici",
+  "id": "Nexus Perekam Suara",
+  "th": "Nexus เครื่องบันทึกเสียง",
+  "vi": "Nexus Máy ghi âm",
+  "zh-TW": "Nexus 語音錄音機",
+  "ar": "مسجل صوت Nexus",
+  "fa": "ضبط‌کننده صدای Nexus"
+ },
+ "말소리를 녹음하고 이 기기 안에 저장하는 도구": {
+  "en": "Record your voice and keep it on this device",
+  "zh": "录下声音并保存在这台设备中",
+  "ja": "声を録音してこの端末の中に保存するツール",
+  "es": "Graba tu voz y guárdala en este dispositivo",
+  "hi": "अपनी आवाज़ रिकॉर्ड करें और इसी डिवाइस में रखें",
+  "fr": "Enregistrez votre voix et conservez-la sur cet appareil",
+  "de": "Nehmen Sie Ihre Stimme auf und speichern Sie sie auf diesem Gerät",
+  "pt": "Grave sua voz e mantenha-a neste dispositivo",
+  "it": "Registra la tua voce e conservala su questo dispositivo",
+  "nl": "Neem uw stem op en bewaar deze op dit apparaat",
+  "cs": "Nahrávejte hlas a ukládejte nahrávky v tomto zařízení",
+  "hu": "Rögzítse a hangját, és tárolja a felvételeket ezen az eszközön",
+  "pl": "Nagrywaj głos i przechowuj nagrania na tym urządzeniu",
+  "ro": "Înregistrează-ți vocea și păstreaz-o pe acest dispozitiv",
+  "ru": "Записывайте голос и храните записи на этом устройстве",
+  "uk": "Записуйте голос і зберігайте записи на цьому пристрої",
+  "sv": "Ett verktyg som spelar in din röst och sparar den på den här enheten",
+  "da": "Et værktøj, der optager din stemme og gemmer den på denne enhed",
+  "nb": "Et verktøy som tar opp stemmen din og lagrer den på denne enheten",
+  "fi": "Työkalu, joka nauhoittaa äänesi ja tallentaa sen tähän laitteeseen",
+  "tr": "Sesinizi kaydedip bu cihazda saklayan bir araç",
+  "id": "Rekam suara Anda dan simpan di perangkat ini",
+  "th": "บันทึกเสียงของคุณและเก็บไว้ในอุปกรณ์นี้",
+  "vi": "Ghi lại giọng nói của bạn và lưu trên thiết bị này",
+  "zh-TW": "錄下您的聲音並保存在這台裝置中的工具",
+  "ar": "أداة لتسجيل صوتك وحفظه داخل هذا الجهاز",
+  "fa": "ابزاری برای ضبط صدا و ذخیره آن در همین دستگاه"
+ },
+ "회원가입 없음 · 이용료 없음 · 무제한 사용": {
+  "en": "No sign-up · No fees · Unlimited use",
+  "zh": "无需注册 · 免费 · 无限使用",
+  "ja": "登録不要 · 無料 · 無制限",
+  "es": "Sin registro · Gratis · Uso ilimitado",
+  "hi": "कोई साइन-अप नहीं · कोई शुल्क नहीं · असीमित उपयोग",
+  "fr": "Sans inscription · Sans frais · Utilisation illimitée",
+  "de": "Keine Anmeldung · Keine Gebühren · Unbegrenzte Nutzung",
+  "pt": "Sem cadastro · Sem taxas · Uso ilimitado",
+  "it": "Nessuna registrazione · Nessun costo · Uso illimitato",
+  "nl": "Geen registratie · Geen kosten · Onbeperkt gebruik",
+  "cs": "Bez registrace · Zdarma · Bez omezení",
+  "hu": "Regisztráció nélkül · Ingyenes · Korlátlan használat",
+  "pl": "Bez rejestracji · Za darmo · Bez ograniczeń",
+  "ro": "Fără cont · Gratuit · Utilizare nelimitată",
+  "ru": "Без регистрации · Бесплатно · Без ограничений",
+  "uk": "Без реєстрації · Безкоштовно · Без обмежень",
+  "sv": "Ingen registrering · Inga avgifter · Obegränsad användning",
+  "da": "Ingen tilmelding · Ingen gebyrer · Ubegrænset brug",
+  "nb": "Ingen registrering · Ingen gebyrer · Ubegrenset bruk",
+  "fi": "Ei rekisteröitymistä · Ei maksuja · Rajaton käyttö",
+  "tr": "Kayıt yok · Ücret yok · Sınırsız kullanım",
+  "id": "Tanpa pendaftaran · Tanpa biaya · Penggunaan tanpa batas",
+  "th": "ไม่ต้องสมัครสมาชิก · ไม่มีค่าธรรมเนียม · ใช้ได้ไม่จำกัด",
+  "vi": "Không cần đăng ký · Không tính phí · Sử dụng không giới hạn",
+  "zh-TW": "無需註冊 · 免費 · 無限使用",
+  "ar": "بدون تسجيل · بدون رسوم · استخدام غير محدود",
+  "fa": "بدون ثبت‌نام · بدون هزینه · استفاده نامحدود"
+ },
+ "녹음하기": {
+  "en": "Record",
+  "zh": "录音",
+  "ja": "録音する",
+  "es": "Grabar",
+  "hi": "रिकॉर्ड करें",
+  "fr": "Enregistrer",
+  "de": "Aufnehmen",
+  "pt": "Gravar",
+  "it": "Registra",
+  "nl": "Opnemen",
+  "cs": "Nahrávání",
+  "hu": "Felvétel",
+  "pl": "Nagrywanie",
+  "ro": "Înregistrare",
+  "ru": "Запись",
+  "uk": "Запис",
+  "sv": "Spela in",
+  "da": "Optag",
+  "nb": "Ta opp",
+  "fi": "Nauhoita",
+  "tr": "Kaydet",
+  "id": "Merekam",
+  "th": "บันทึก",
+  "vi": "Ghi âm",
+  "zh-TW": "錄音",
+  "ar": "التسجيل",
+  "fa": "ضبط کردن"
+ },
+ "목록에서 듣기": {
+  "en": "Listen from the list",
+  "zh": "在列表中收听",
+  "ja": "リストから聞く",
+  "es": "Escuchar de la lista",
+  "hi": "सूची से सुनें",
+  "fr": "Écouter depuis la liste",
+  "de": "Aus der Liste anhören",
+  "pt": "Ouvir da lista",
+  "it": "Ascolta dall'elenco",
+  "nl": "Beluister uit de lijst",
+  "cs": "Poslech ze seznamu",
+  "hu": "Hallgatás a listából",
+  "pl": "Odsłuchaj z listy",
+  "ro": "Ascultă din listă",
+  "ru": "Слушать из списка",
+  "uk": "Слухати зі списку",
+  "sv": "Lyssna från listan",
+  "da": "Lyt fra listen",
+  "nb": "Lytt fra listen",
+  "fi": "Kuuntele listalta",
+  "tr": "Listeden dinle",
+  "id": "Dengarkan dari daftar",
+  "th": "ฟังจากรายการ",
+  "vi": "Nghe từ danh sách",
+  "zh-TW": "在清單中收聽",
+  "ar": "الاستماع من القائمة",
+  "fa": "گوش دادن از فهرست"
+ },
+ "🎙️ 녹음": {
+  "en": "🎙️ Record",
+  "zh": "🎙️ 录音",
+  "ja": "🎙️ 録音",
+  "es": "🎙️ Grabar",
+  "hi": "🎙️ रिकॉर्ड",
+  "fr": "🎙️ Enregistrer",
+  "de": "🎙️ Aufnehmen",
+  "pt": "🎙️ Gravar",
+  "it": "🎙️ Registra",
+  "nl": "🎙️ Opnemen",
+  "cs": "🎙️ Nahrát",
+  "hu": "🎙️ Felvétel",
+  "pl": "🎙️ Nagraj",
+  "ro": "🎙️ Înregistrează",
+  "ru": "🎙️ Запись",
+  "uk": "🎙️ Запис",
+  "sv": "🎙️ Spela in",
+  "da": "🎙️ Optag",
+  "nb": "🎙️ Ta opp",
+  "fi": "🎙️ Nauhoita",
+  "tr": "🎙️ Kaydet",
+  "id": "🎙️ Rekam",
+  "th": "🎙️ บันทึก",
+  "vi": "🎙️ Ghi âm",
+  "zh-TW": "🎙️ 錄音",
+  "ar": "🎙️ تسجيل",
+  "fa": "🎙️ ضبط"
+ },
+ "● 녹음": {
+  "en": "● Record",
+  "zh": "● 录音",
+  "ja": "● 録音",
+  "es": "● Grabar",
+  "hi": "● रिकॉर्ड",
+  "fr": "● Enregistrer",
+  "de": "● Aufnehmen",
+  "pt": "● Gravar",
+  "it": "● Registra",
+  "nl": "● Opnemen",
+  "cs": "● Nahrát",
+  "hu": "● Felvétel",
+  "pl": "● Nagraj",
+  "ro": "● Înregistrează",
+  "ru": "● Запись",
+  "uk": "● Запис",
+  "sv": "● Spela in",
+  "da": "● Optag",
+  "nb": "● Ta opp",
+  "fi": "● Nauhoita",
+  "tr": "● Kaydet",
+  "id": "● Rekam",
+  "th": "● บันทึก",
+  "vi": "● Ghi âm",
+  "zh-TW": "● 錄音",
+  "ar": "● تسجيل",
+  "fa": "● ضبط"
+ },
+ "일시정지": {
+  "en": "Pause",
+  "zh": "暂停",
+  "ja": "一時停止",
+  "es": "Pausar",
+  "hi": "रोकें",
+  "fr": "Pause",
+  "de": "Pause",
+  "pt": "Pausar",
+  "it": "Pausa",
+  "nl": "Pauze",
+  "cs": "Pozastavit",
+  "hu": "Szünet",
+  "pl": "Pauza",
+  "ro": "Pauză",
+  "ru": "Пауза",
+  "uk": "Пауза",
+  "sv": "Pausa",
+  "da": "Pause",
+  "nb": "Pause",
+  "fi": "Tauko",
+  "tr": "Duraklat",
+  "id": "Jeda",
+  "th": "หยุดชั่วคราว",
+  "vi": "Tạm dừng",
+  "zh-TW": "暫停",
+  "ar": "إيقاف مؤقت",
+  "fa": "توقف موقت"
+ },
+ "이어서 녹음": {
+  "en": "Resume",
+  "zh": "继续录音",
+  "ja": "録音を続ける",
+  "es": "Continuar",
+  "hi": "रिकॉर्डिंग जारी रखें",
+  "fr": "Reprendre",
+  "de": "Weiter aufnehmen",
+  "pt": "Continuar",
+  "it": "Riprendi",
+  "nl": "Doorgaan",
+  "cs": "Pokračovat",
+  "hu": "Folytatás",
+  "pl": "Wznów",
+  "ro": "Continuă",
+  "ru": "Продолжить",
+  "uk": "Продовжити",
+  "sv": "Fortsätt spela in",
+  "da": "Fortsæt optagelse",
+  "nb": "Fortsett opptak",
+  "fi": "Jatka nauhoitusta",
+  "tr": "Kayda devam et",
+  "id": "Lanjutkan",
+  "th": "บันทึกต่อ",
+  "vi": "Tiếp tục ghi",
+  "zh-TW": "繼續錄音",
+  "ar": "متابعة التسجيل",
+  "fa": "ادامه ضبط"
+ },
+ "정지": {
+  "en": "Stop",
+  "zh": "停止",
+  "ja": "停止",
+  "es": "Detener",
+  "hi": "बंद करें",
+  "fr": "Arrêter",
+  "de": "Stopp",
+  "pt": "Parar",
+  "it": "Stop",
+  "nl": "Stoppen",
+  "cs": "Zastavit",
+  "hu": "Leállítás",
+  "pl": "Stop",
+  "ro": "Stop",
+  "ru": "Стоп",
+  "uk": "Стоп",
+  "sv": "Stopp",
+  "da": "Stop",
+  "nb": "Stopp",
+  "fi": "Pysäytä",
+  "tr": "Durdur",
+  "id": "Berhenti",
+  "th": "หยุด",
+  "vi": "Dừng",
+  "zh-TW": "停止",
+  "ar": "إيقاف",
+  "fa": "توقف"
+ },
+ "녹음 버튼을 누르면 시작합니다": {
+  "en": "Press the record button to start",
+  "zh": "按下录音按钮即可开始",
+  "ja": "録音ボタンを押すと始まります",
+  "es": "Pulsa el botón de grabar para empezar",
+  "hi": "रिकॉर्ड बटन दबाने से शुरू होता है",
+  "fr": "Appuyez sur le bouton d'enregistrement pour commencer",
+  "de": "Drücken Sie die Aufnahmetaste, um zu beginnen",
+  "pt": "Pressione o botão de gravar para começar",
+  "it": "Premi il pulsante di registrazione per iniziare",
+  "nl": "Druk op de opnameknop om te starten",
+  "cs": "Stisknutím tlačítka nahrávání začnete",
+  "hu": "A felvétel gomb megnyomásával indul",
+  "pl": "Naciśnij przycisk nagrywania, aby zacząć",
+  "ro": "Apasă butonul de înregistrare pentru a începe",
+  "ru": "Нажмите кнопку записи, чтобы начать",
+  "uk": "Натисніть кнопку запису, щоб почати",
+  "sv": "Tryck på inspelningsknappen för att börja",
+  "da": "Tryk på optageknappen for at starte",
+  "nb": "Trykk på opptaksknappen for å starte",
+  "fi": "Aloita painamalla nauhoituspainiketta",
+  "tr": "Başlamak için kayıt düğmesine basın",
+  "id": "Tekan tombol rekam untuk memulai",
+  "th": "กดปุ่มบันทึกเพื่อเริ่ม",
+  "vi": "Nhấn nút ghi âm để bắt đầu",
+  "zh-TW": "按下錄音按鈕即可開始",
+  "ar": "اضغط زر التسجيل للبدء",
+  "fa": "برای شروع، دکمه ضبط را فشار دهید"
+ },
+ "녹음 중입니다": {
+  "en": "Recording",
+  "zh": "正在录音",
+  "ja": "録音中です",
+  "es": "Grabando",
+  "hi": "रिकॉर्ड हो रहा है",
+  "fr": "Enregistrement en cours",
+  "de": "Aufnahme läuft",
+  "pt": "Gravando",
+  "it": "Registrazione in corso",
+  "nl": "Opname bezig",
+  "cs": "Probíhá nahrávání",
+  "hu": "Felvétel folyamatban",
+  "pl": "Nagrywanie",
+  "ro": "Se înregistrează",
+  "ru": "Идёт запись",
+  "uk": "Триває запис",
+  "sv": "Spelar in",
+  "da": "Optager",
+  "nb": "Tar opp",
+  "fi": "Nauhoitetaan",
+  "tr": "Kaydediliyor",
+  "id": "Sedang merekam",
+  "th": "กำลังบันทึก",
+  "vi": "Đang ghi âm",
+  "zh-TW": "正在錄音",
+  "ar": "جارٍ التسجيل",
+  "fa": "در حال ضبط است"
+ },
+ "일시정지 중입니다": {
+  "en": "Paused",
+  "zh": "已暂停",
+  "ja": "一時停止中です",
+  "es": "En pausa",
+  "hi": "रुका हुआ है",
+  "fr": "En pause",
+  "de": "Pausiert",
+  "pt": "Pausado",
+  "it": "In pausa",
+  "nl": "Gepauzeerd",
+  "cs": "Pozastaveno",
+  "hu": "Szüneteltetve",
+  "pl": "Wstrzymano",
+  "ro": "În pauză",
+  "ru": "Пауза",
+  "uk": "Пауза",
+  "sv": "Pausad",
+  "da": "Sat på pause",
+  "nb": "Satt på pause",
+  "fi": "Tauolla",
+  "tr": "Duraklatıldı",
+  "id": "Dijeda",
+  "th": "หยุดชั่วคราวแล้ว",
+  "vi": "Đã tạm dừng",
+  "zh-TW": "已暫停",
+  "ar": "متوقف مؤقتًا",
+  "fa": "به‌طور موقت متوقف است"
+ },
+ "녹음은 당신의 기기 안에만 저장됩니다. 서버로 전송되지 않습니다.": {
+  "en": "Recordings are stored only on your device. They are never sent to a server.",
+  "zh": "录音仅保存在您的设备中，不会发送到服务器。",
+  "ja": "録音はあなたの端末の中にのみ保存されます。サーバーには送信されません。",
+  "es": "Las grabaciones se guardan solo en tu dispositivo. No se envían a ningún servidor.",
+  "hi": "रिकॉर्डिंग केवल आपके डिवाइस में रहती है। सर्वर पर नहीं भेजी जाती।",
+  "fr": "Les enregistrements sont conservés uniquement sur votre appareil. Ils ne sont jamais envoyés à un serveur.",
+  "de": "Aufnahmen werden nur auf Ihrem Gerät gespeichert. Sie werden nie an einen Server gesendet.",
+  "pt": "As gravações são salvas apenas no seu dispositivo. Nunca são enviadas a um servidor.",
+  "it": "Le registrazioni sono conservate solo sul tuo dispositivo. Non vengono mai inviate a un server.",
+  "nl": "Opnamen worden alleen op uw apparaat bewaard. Ze worden nooit naar een server verzonden.",
+  "cs": "Nahrávky se ukládají pouze ve vašem zařízení. Nikdy se neodesílají na server.",
+  "hu": "A felvételek csak az Ön eszközén tárolódnak. Soha nem kerülnek szerverre.",
+  "pl": "Nagrania są przechowywane tylko na Twoim urządzeniu. Nigdy nie są wysyłane na serwer.",
+  "ro": "Înregistrările sunt stocate doar pe dispozitivul tău. Nu sunt trimise niciodată către un server.",
+  "ru": "Записи хранятся только на вашем устройстве. Они никогда не отправляются на сервер.",
+  "uk": "Записи зберігаються лише на вашому пристрої. Вони ніколи не надсилаються на сервер.",
+  "sv": "Inspelningar sparas endast på din enhet. De skickas aldrig till en server.",
+  "da": "Optagelser gemmes kun på din enhed. De sendes aldrig til en server.",
+  "nb": "Opptak lagres kun på enheten din. De sendes aldri til en server.",
+  "fi": "Nauhoitukset tallennetaan vain laitteeseesi. Niitä ei lähetetä palvelimelle.",
+  "tr": "Kayıtlar yalnızca cihazınızda saklanır. Bir sunucuya asla gönderilmez.",
+  "id": "Rekaman hanya disimpan di perangkat Anda. Tidak pernah dikirim ke server.",
+  "th": "การบันทึกจะเก็บไว้ในอุปกรณ์ของคุณเท่านั้น จะไม่ถูกส่งไปยังเซิร์ฟเวอร์",
+  "vi": "Bản ghi chỉ được lưu trên thiết bị của bạn. Không bao giờ được gửi đến máy chủ.",
+  "zh-TW": "錄音僅保存在您的裝置中，不會傳送到任何伺服器。",
+  "ar": "تُحفظ التسجيلات داخل جهازك فقط، ولا تُرسل إلى أي خادم.",
+  "fa": "ضبط‌ها فقط در دستگاه شما ذخیره می‌شوند و به هیچ سروری ارسال نمی‌شوند."
+ },
+ "녹음 중에는 이 화면을 닫지 마세요. 목록은 이 브라우저 안에 남아 새로고침해도 유지됩니다.": {
+  "en": "Do not close this screen while recording. The list stays in this browser and survives a refresh.",
+  "zh": "录音时请不要关闭此页面。列表保存在此浏览器中，刷新后仍保留。",
+  "ja": "録音中はこの画面を閉じないでください。リストはこのブラウザ内に残り、更新しても維持されます。",
+  "es": "No cierres esta pantalla mientras grabas. La lista permanece en este navegador incluso tras recargar.",
+  "hi": "रिकॉर्डिंग के दौरान यह स्क्रीन बंद न करें। सूची इसी ब्राउज़र में रहती है और रीफ़्रेश पर भी बनी रहती है।",
+  "fr": "Ne fermez pas cet écran pendant l'enregistrement. La liste reste dans ce navigateur et survit à un rafraîchissement.",
+  "de": "Schließen Sie diesen Bildschirm während der Aufnahme nicht. Die Liste bleibt in diesem Browser und bleibt auch nach dem Aktualisieren erhalten.",
+  "pt": "Não feche esta tela enquanto grava. A lista permanece neste navegador e continua após atualizar a página.",
+  "it": "Non chiudere questa schermata durante la registrazione. L'elenco resta in questo browser e si conserva anche dopo un aggiornamento.",
+  "nl": "Sluit dit scherm niet tijdens het opnemen. De lijst blijft in deze browser en blijft behouden na verversen.",
+  "cs": "Během nahrávání tuto obrazovku nezavírejte. Seznam zůstává v tomto prohlížeči a zachová se i po obnovení stránky.",
+  "hu": "Felvétel közben ne zárja be ezt a képernyőt. A lista ebben a böngészőben marad, és frissítés után is megmarad.",
+  "pl": "Nie zamykaj tego ekranu podczas nagrywania. Lista pozostaje w tej przeglądarce i przetrwa odświeżenie.",
+  "ro": "Nu închide acest ecran în timpul înregistrării. Lista rămâne în acest browser și se păstrează după reîncărcare.",
+  "ru": "Не закрывайте этот экран во время записи. Список остаётся в этом браузере и сохраняется после обновления страницы.",
+  "uk": "Не закривайте цей екран під час запису. Список залишається в цьому браузері та зберігається після оновлення сторінки.",
+  "sv": "Stäng inte den här skärmen medan du spelar in. Listan stannar i den här webbläsaren och finns kvar även efter en uppdatering.",
+  "da": "Luk ikke denne skærm under optagelse. Listen bliver i denne browser og bevares, selv efter en genindlæsning.",
+  "nb": "Ikke lukk denne skjermen mens du tar opp. Listen blir værende i denne nettleseren og beholdes selv etter en oppdatering.",
+  "fi": "Älä sulje tätä näyttöä nauhoituksen aikana. Lista pysyy tässä selaimessa ja säilyy myös päivityksen jälkeen.",
+  "tr": "Kayıt sırasında bu ekranı kapatmayın. Liste bu tarayıcıda kalır ve yenileseniz bile korunur.",
+  "id": "Jangan tutup layar ini saat merekam. Daftar tetap berada di browser ini dan bertahan setelah dimuat ulang.",
+  "th": "อย่าปิดหน้าจอนี้ขณะบันทึก รายการจะอยู่ในเบราว์เซอร์นี้และยังคงอยู่แม้รีเฟรช",
+  "vi": "Không đóng màn hình này khi đang ghi âm. Danh sách vẫn nằm trong trình duyệt này và vẫn còn sau khi tải lại trang.",
+  "zh-TW": "錄音時請不要關閉此畫面。清單會保留在此瀏覽器中，重新整理後仍會保留。",
+  "ar": "لا تغلق هذه الشاشة أثناء التسجيل. تبقى القائمة داخل هذا المتصفح وتستمر حتى بعد التحديث.",
+  "fa": "هنگام ضبط این صفحه را نبندید. فهرست در همین مرورگر باقی می‌ماند و با تازه‌سازی هم حفظ می‌شود."
+ },
+ "🎧 녹음 목록": {
+  "en": "🎧 Recordings",
+  "zh": "🎧 录音列表",
+  "ja": "🎧 録音リスト",
+  "es": "🎧 Grabaciones",
+  "hi": "🎧 रिकॉर्डिंग सूची",
+  "fr": "🎧 Enregistrements",
+  "de": "🎧 Aufnahmen",
+  "pt": "🎧 Gravações",
+  "it": "🎧 Registrazioni",
+  "nl": "🎧 Opnamen",
+  "cs": "🎧 Nahrávky",
+  "hu": "🎧 Felvételek",
+  "pl": "🎧 Nagrania",
+  "ro": "🎧 Înregistrări",
+  "ru": "🎧 Записи",
+  "uk": "🎧 Записи",
+  "sv": "🎧 Inspelningar",
+  "da": "🎧 Optagelser",
+  "nb": "🎧 Opptak",
+  "fi": "🎧 Nauhoitukset",
+  "tr": "🎧 Kayıtlar",
+  "id": "🎧 Daftar Rekaman",
+  "th": "🎧 รายการบันทึก",
+  "vi": "🎧 Danh sách bản ghi",
+  "zh-TW": "🎧 錄音清單",
+  "ar": "🎧 قائمة التسجيلات",
+  "fa": "🎧 فهرست ضبط‌ها"
+ },
+ "저장된 녹음이 없습니다.": {
+  "en": "No recordings saved.",
+  "zh": "没有已保存的录音。",
+  "ja": "保存された録音はありません。",
+  "es": "No hay grabaciones guardadas.",
+  "hi": "कोई रिकॉर्डिंग सहेजी नहीं गई।",
+  "fr": "Aucun enregistrement sauvegardé.",
+  "de": "Keine gespeicherten Aufnahmen.",
+  "pt": "Nenhuma gravação salva.",
+  "it": "Nessuna registrazione salvata.",
+  "nl": "Geen opgeslagen opnamen.",
+  "cs": "Žádné uložené nahrávky.",
+  "hu": "Nincsenek mentett felvételek.",
+  "pl": "Brak zapisanych nagrań.",
+  "ro": "Nu există înregistrări salvate.",
+  "ru": "Нет сохранённых записей.",
+  "uk": "Немає збережених записів.",
+  "sv": "Inga sparade inspelningar.",
+  "da": "Ingen gemte optagelser.",
+  "nb": "Ingen lagrede opptak.",
+  "fi": "Ei tallennettuja nauhoituksia.",
+  "tr": "Kaydedilmiş kayıt yok.",
+  "id": "Tidak ada rekaman tersimpan.",
+  "th": "ไม่มีการบันทึกที่บันทึกไว้",
+  "vi": "Chưa có bản ghi nào được lưu.",
+  "zh-TW": "沒有已儲存的錄音。",
+  "ar": "لا توجد تسجيلات محفوظة.",
+  "fa": "هیچ ضبط ذخیره‌شده‌ای وجود ندارد."
+ },
+ "저장된 녹음": {
+  "en": "Saved recordings",
+  "zh": "已保存的录音",
+  "ja": "保存された録音",
+  "es": "Grabaciones guardadas",
+  "hi": "सहेजी गई रिकॉर्डिंग",
+  "fr": "Enregistrements sauvegardés",
+  "de": "Gespeicherte Aufnahmen",
+  "pt": "Gravações salvas",
+  "it": "Registrazioni salvate",
+  "nl": "Opgeslagen opnamen",
+  "cs": "Uložené nahrávky",
+  "hu": "Mentett felvételek",
+  "pl": "Zapisane nagrania",
+  "ro": "Înregistrări salvate",
+  "ru": "Сохранённые записи",
+  "uk": "Збережені записи",
+  "sv": "Sparade inspelningar",
+  "da": "Gemte optagelser",
+  "nb": "Lagrede opptak",
+  "fi": "Tallennetut nauhoitukset",
+  "tr": "Kaydedilen kayıtlar",
+  "id": "Rekaman tersimpan",
+  "th": "การบันทึกที่บันทึกไว้",
+  "vi": "Bản ghi đã lưu",
+  "zh-TW": "已儲存的錄音",
+  "ar": "التسجيلات المحفوظة",
+  "fa": "ضبط‌های ذخیره‌شده"
+ },
+ "아직 녹음이 없습니다. 위에서 녹음하면 여기에 쌓입니다.": {
+  "en": "No recordings yet. Record above and they will collect here.",
+  "zh": "还没有录音。在上面录音后会累积在这里。",
+  "ja": "まだ録音がありません。上で録音するとここにたまります。",
+  "es": "Aún no hay grabaciones. Graba arriba y aparecerán aquí.",
+  "hi": "अभी कोई रिकॉर्डिंग नहीं। ऊपर रिकॉर्ड करें, वे यहाँ जमा होंगी।",
+  "fr": "Pas encore d'enregistrements. Enregistrez ci-dessus et ils s'accumuleront ici.",
+  "de": "Noch keine Aufnahmen. Nehmen Sie oben auf, und sie erscheinen hier.",
+  "pt": "Ainda não há gravações. Grave acima e elas aparecerão aqui.",
+  "it": "Ancora nessuna registrazione. Registra sopra e si accumuleranno qui.",
+  "nl": "Nog geen opnamen. Neem hierboven op en ze verschijnen hier.",
+  "cs": "Zatím žádné nahrávky. Nahrajte výše a budou se tu shromažďovat.",
+  "hu": "Még nincsenek felvételek. Rögzítsen fent, és itt fognak gyűlni.",
+  "pl": "Nie ma jeszcze nagrań. Nagraj powyżej, a pojawią się tutaj.",
+  "ro": "Nu există înregistrări încă. Înregistrează mai sus și se vor aduna aici.",
+  "ru": "Записей пока нет. Запишите выше — и они появятся здесь.",
+  "uk": "Записів поки немає. Запишіть вище — і вони з'являться тут.",
+  "sv": "Inga inspelningar än. Spela in ovan så samlas de här.",
+  "da": "Ingen optagelser endnu. Optag ovenfor, så samles de her.",
+  "nb": "Ingen opptak ennå. Ta opp ovenfor, så samles de her.",
+  "fi": "Ei nauhoituksia vielä. Nauhoita yllä, niin ne kertyvät tänne.",
+  "tr": "Henüz kayıt yok. Yukarıdan kaydedin, burada biriksinler.",
+  "id": "Belum ada rekaman. Rekam di atas dan rekaman akan terkumpul di sini.",
+  "th": "ยังไม่มีการบันทึก บันทึกด้านบนแล้วจะมารวมอยู่ที่นี่",
+  "vi": "Chưa có bản ghi nào. Hãy ghi âm ở phía trên và chúng sẽ xuất hiện ở đây.",
+  "zh-TW": "還沒有錄音。在上方錄音後，就會出現在這裡。",
+  "ar": "لا توجد تسجيلات بعد. سجّل في الأعلى وستتجمع هنا.",
+  "fa": "هنوز ضبطی وجود ندارد. در بالا ضبط کنید تا اینجا جمع شوند."
+ },
+ "파일로 저장": {
+  "en": "Save as file",
+  "zh": "保存为文件",
+  "ja": "ファイルに保存",
+  "es": "Guardar como archivo",
+  "hi": "फ़ाइल के रूप में सहेजें",
+  "fr": "Enregistrer comme fichier",
+  "de": "Als Datei speichern",
+  "pt": "Salvar como arquivo",
+  "it": "Salva come file",
+  "nl": "Opslaan als bestand",
+  "cs": "Uložit jako soubor",
+  "hu": "Mentés fájlként",
+  "pl": "Zapisz jako plik",
+  "ro": "Salvează ca fișier",
+  "ru": "Сохранить как файл",
+  "uk": "Зберегти як файл",
+  "sv": "Spara som fil",
+  "da": "Gem som fil",
+  "nb": "Lagre som fil",
+  "fi": "Tallenna tiedostona",
+  "tr": "Dosya olarak kaydet",
+  "id": "Simpan sebagai file",
+  "th": "บันทึกเป็นไฟล์",
+  "vi": "Lưu thành tệp",
+  "zh-TW": "儲存為檔案",
+  "ar": "حفظ كملف",
+  "fa": "ذخیره به‌صورت فایل"
+ },
+ "이름 바꾸기": {
+  "en": "Rename",
+  "zh": "重命名",
+  "ja": "名前を変える",
+  "es": "Renombrar",
+  "hi": "नाम बदलें",
+  "fr": "Renommer",
+  "de": "Umbenennen",
+  "pt": "Renomear",
+  "it": "Rinomina",
+  "nl": "Hernoemen",
+  "cs": "Přejmenovat",
+  "hu": "Átnevezés",
+  "pl": "Zmień nazwę",
+  "ro": "Redenumește",
+  "ru": "Переименовать",
+  "uk": "Перейменувати",
+  "sv": "Byt namn",
+  "da": "Omdøb",
+  "nb": "Gi nytt navn",
+  "fi": "Vaihda nimi",
+  "tr": "Yeniden adlandır",
+  "id": "Ganti nama",
+  "th": "เปลี่ยนชื่อ",
+  "vi": "Đổi tên",
+  "zh-TW": "重新命名",
+  "ar": "إعادة التسمية",
+  "fa": "تغییر نام"
+ },
+ "지우기": {
+  "en": "Delete",
+  "zh": "删除",
+  "ja": "消す",
+  "es": "Borrar",
+  "hi": "मिटाएँ",
+  "fr": "Supprimer",
+  "de": "Löschen",
+  "pt": "Apagar",
+  "it": "Elimina",
+  "nl": "Wissen",
+  "cs": "Smazat",
+  "hu": "Törlés",
+  "pl": "Usuń",
+  "ro": "Șterge",
+  "ru": "Удалить",
+  "uk": "Видалити",
+  "sv": "Radera",
+  "da": "Slet",
+  "nb": "Slett",
+  "fi": "Poista",
+  "tr": "Sil",
+  "id": "Hapus",
+  "th": "ลบ",
+  "vi": "Xóa",
+  "zh-TW": "刪除",
+  "ar": "حذف",
+  "fa": "حذف کردن"
+ },
+ "정말 지울까요?": {
+  "en": "Delete for real?",
+  "zh": "真的要删除吗？",
+  "ja": "本当に消しますか？",
+  "es": "¿Borrar de verdad?",
+  "hi": "सच में मिटाएँ?",
+  "fr": "Vraiment supprimer ?",
+  "de": "Wirklich löschen?",
+  "pt": "Apagar mesmo?",
+  "it": "Eliminare davvero?",
+  "nl": "Echt wissen?",
+  "cs": "Opravdu smazat?",
+  "hu": "Biztosan törli?",
+  "pl": "Na pewno usunąć?",
+  "ro": "Sigur ștergi?",
+  "ru": "Точно удалить?",
+  "uk": "Справді видалити?",
+  "sv": "Radera på riktigt?",
+  "da": "Slet for alvor?",
+  "nb": "Slette for godt?",
+  "fi": "Poistetaanko varmasti?",
+  "tr": "Gerçekten silinsin mi?",
+  "id": "Benar-benar hapus?",
+  "th": "ลบจริงหรือ?",
+  "vi": "Xóa thật chứ?",
+  "zh-TW": "真的要刪除嗎？",
+  "ar": "هل تريد الحذف فعلًا؟",
+  "fa": "واقعاً حذف شود؟"
+ },
+ "저장": {
+  "en": "Save",
+  "zh": "保存",
+  "ja": "保存",
+  "es": "Guardar",
+  "hi": "सहेजें",
+  "fr": "Enregistrer",
+  "de": "Speichern",
+  "pt": "Salvar",
+  "it": "Salva",
+  "nl": "Opslaan",
+  "cs": "Uložit",
+  "hu": "Mentés",
+  "pl": "Zapisz",
+  "ro": "Salvează",
+  "ru": "Сохранить",
+  "uk": "Зберегти",
+  "sv": "Spara",
+  "da": "Gem",
+  "nb": "Lagre",
+  "fi": "Tallenna",
+  "tr": "Kaydet",
+  "id": "Simpan",
+  "th": "บันทึก",
+  "vi": "Lưu",
+  "zh-TW": "儲存",
+  "ar": "حفظ",
+  "fa": "ذخیره"
+ },
+ "취소": {
+  "en": "Cancel",
+  "zh": "取消",
+  "ja": "キャンセル",
+  "es": "Cancelar",
+  "hi": "रद्द करें",
+  "fr": "Annuler",
+  "de": "Abbrechen",
+  "pt": "Cancelar",
+  "it": "Annulla",
+  "nl": "Annuleren",
+  "cs": "Zrušit",
+  "hu": "Mégse",
+  "pl": "Anuluj",
+  "ro": "Anulează",
+  "ru": "Отмена",
+  "uk": "Скасувати",
+  "sv": "Avbryt",
+  "da": "Annuller",
+  "nb": "Avbryt",
+  "fi": "Peruuta",
+  "tr": "İptal",
+  "id": "Batal",
+  "th": "ยกเลิก",
+  "vi": "Hủy",
+  "zh-TW": "取消",
+  "ar": "إلغاء",
+  "fa": "لغو"
+ },
+ "지우지 못했습니다. 다시 시도해 주세요.": {
+  "en": "Could not delete. Please try again.",
+  "zh": "删除失败。请再试一次。",
+  "ja": "消せませんでした。もう一度お試しください。",
+  "es": "No se pudo borrar. Inténtalo de nuevo.",
+  "hi": "मिटाया नहीं जा सका। कृपया फिर प्रयास करें।",
+  "fr": "Impossible de supprimer. Veuillez réessayer.",
+  "de": "Löschen nicht möglich. Bitte versuchen Sie es erneut.",
+  "pt": "Não foi possível apagar. Tente novamente.",
+  "it": "Impossibile eliminare. Riprova.",
+  "nl": "Kon niet wissen. Probeer het opnieuw.",
+  "cs": "Smazání se nezdařilo. Zkuste to prosím znovu.",
+  "hu": "A törlés nem sikerült. Kérjük, próbálja újra.",
+  "pl": "Nie udało się usunąć. Spróbuj ponownie.",
+  "ro": "Nu s-a putut șterge. Încearcă din nou.",
+  "ru": "Не удалось удалить. Попробуйте ещё раз.",
+  "uk": "Не вдалося видалити. Спробуйте ще раз.",
+  "sv": "Det gick inte att radera. Försök igen.",
+  "da": "Kunne ikke slette. Prøv igen.",
+  "nb": "Kunne ikke slette. Prøv igjen.",
+  "fi": "Poistaminen ei onnistunut. Yritä uudelleen.",
+  "tr": "Silinemedi. Lütfen tekrar deneyin.",
+  "id": "Tidak dapat menghapus. Silakan coba lagi.",
+  "th": "ไม่สามารถลบได้ โปรดลองอีกครั้ง",
+  "vi": "Không thể xóa. Vui lòng thử lại.",
+  "zh-TW": "無法刪除。請再試一次。",
+  "ar": "تعذّر الحذف. يرجى المحاولة مرة أخرى.",
+  "fa": "حذف انجام نشد. لطفاً دوباره تلاش کنید."
+ },
+ "이름을 바꾸지 못했습니다. 다시 시도해 주세요.": {
+  "en": "Could not rename. Please try again.",
+  "zh": "重命名失败。请再试一次。",
+  "ja": "名前を変えられませんでした。もう一度お試しください。",
+  "es": "No se pudo renombrar. Inténtalo de nuevo.",
+  "hi": "नाम नहीं बदला जा सका। कृपया फिर प्रयास करें।",
+  "fr": "Impossible de renommer. Veuillez réessayer.",
+  "de": "Umbenennen nicht möglich. Bitte versuchen Sie es erneut.",
+  "pt": "Não foi possível renomear. Tente novamente.",
+  "it": "Impossibile rinominare. Riprova.",
+  "nl": "Kon niet hernoemen. Probeer het opnieuw.",
+  "cs": "Přejmenování se nezdařilo. Zkuste to prosím znovu.",
+  "hu": "Az átnevezés nem sikerült. Kérjük, próbálja újra.",
+  "pl": "Nie udało się zmienić nazwy. Spróbuj ponownie.",
+  "ro": "Nu s-a putut redenumi. Încearcă din nou.",
+  "ru": "Не удалось переименовать. Попробуйте ещё раз.",
+  "uk": "Не вдалося перейменувати. Спробуйте ще раз.",
+  "sv": "Det gick inte att byta namn. Försök igen.",
+  "da": "Kunne ikke omdøbe. Prøv igen.",
+  "nb": "Kunne ikke gi nytt navn. Prøv igjen.",
+  "fi": "Nimen vaihtaminen ei onnistunut. Yritä uudelleen.",
+  "tr": "Yeniden adlandırılamadı. Lütfen tekrar deneyin.",
+  "id": "Tidak dapat mengganti nama. Silakan coba lagi.",
+  "th": "ไม่สามารถเปลี่ยนชื่อได้ โปรดลองอีกครั้ง",
+  "vi": "Không thể đổi tên. Vui lòng thử lại.",
+  "zh-TW": "無法重新命名。請再試一次。",
+  "ar": "تعذّرت إعادة التسمية. يرجى المحاولة مرة أخرى.",
+  "fa": "تغییر نام انجام نشد. لطفاً دوباره تلاش کنید."
+ },
+ "저장된 녹음을 불러오지 못했습니다. 이 브라우저에서 저장소 사용이 막혀 있을 수 있습니다.": {
+  "en": "Could not load saved recordings. Storage may be blocked in this browser.",
+  "zh": "无法加载已保存的录音。此浏览器可能阻止了存储使用。",
+  "ja": "保存された録音を読み込めませんでした。このブラウザで保存領域の使用がブロックされている可能性があります。",
+  "es": "No se pudieron cargar las grabaciones. El almacenamiento puede estar bloqueado en este navegador.",
+  "hi": "सहेजी गई रिकॉर्डिंग लोड नहीं हो सकीं। इस ब्राउज़र में स्टोरेज बंद हो सकता है।",
+  "fr": "Impossible de charger les enregistrements sauvegardés. Le stockage est peut-être bloqué dans ce navigateur.",
+  "de": "Gespeicherte Aufnahmen konnten nicht geladen werden. Der Speicher ist in diesem Browser möglicherweise blockiert.",
+  "pt": "Não foi possível carregar as gravações salvas. O armazenamento pode estar bloqueado neste navegador.",
+  "it": "Impossibile caricare le registrazioni salvate. L'archiviazione potrebbe essere bloccata in questo browser.",
+  "nl": "Kon opgeslagen opnamen niet laden. Opslag is mogelijk geblokkeerd in deze browser.",
+  "cs": "Uložené nahrávky se nepodařilo načíst. Úložiště může být v tomto prohlížeči zablokované.",
+  "hu": "A mentett felvételek betöltése nem sikerült. Lehet, hogy a tárhely le van tiltva ebben a böngészőben.",
+  "pl": "Nie udało się wczytać zapisanych nagrań. Pamięć może być zablokowana w tej przeglądarce.",
+  "ro": "Nu s-au putut încărca înregistrările salvate. Stocarea poate fi blocată în acest browser.",
+  "ru": "Не удалось загрузить сохранённые записи. Возможно, хранилище заблокировано в этом браузере.",
+  "uk": "Не вдалося завантажити збережені записи. Можливо, сховище заблоковано в цьому браузері.",
+  "sv": "Det gick inte att läsa in sparade inspelningar. Lagringen kan vara blockerad i den här webbläsaren.",
+  "da": "Kunne ikke indlæse gemte optagelser. Lagring kan være blokeret i denne browser.",
+  "nb": "Kunne ikke laste inn lagrede opptak. Lagring kan være blokkert i denne nettleseren.",
+  "fi": "Tallennettuja nauhoituksia ei voitu ladata. Tallennustilan käyttö voi olla estetty tässä selaimessa.",
+  "tr": "Kaydedilen kayıtlar yüklenemedi. Bu tarayıcıda depolama engellenmiş olabilir.",
+  "id": "Tidak dapat memuat rekaman tersimpan. Penyimpanan mungkin diblokir di browser ini.",
+  "th": "ไม่สามารถโหลดการบันทึกที่บันทึกไว้ได้ พื้นที่จัดเก็บอาจถูกบล็อกในเบราว์เซอร์นี้",
+  "vi": "Không thể tải các bản ghi đã lưu. Bộ nhớ có thể bị chặn trong trình duyệt này.",
+  "zh-TW": "無法載入已儲存的錄音。此瀏覽器可能已封鎖儲存空間的使用。",
+  "ar": "تعذّر تحميل التسجيلات المحفوظة. قد يكون استخدام التخزين محظورًا في هذا المتصفح.",
+  "fa": "بارگذاری ضبط‌های ذخیره‌شده انجام نشد. ممکن است استفاده از فضای ذخیره‌سازی در این مرورگر مسدود باشد."
+ },
+ "이 브라우저에서는 녹음을 지원하지 않습니다. 최신 브라우저에서 열어 주세요.": {
+  "en": "Recording is not supported in this browser. Please open it in a modern browser.",
+  "zh": "此浏览器不支持录音。请使用最新浏览器打开。",
+  "ja": "このブラウザでは録音に対応していません。最新のブラウザで開いてください。",
+  "es": "Este navegador no admite grabación. Ábrelo en un navegador moderno.",
+  "hi": "यह ब्राउज़र रिकॉर्डिंग का समर्थन नहीं करता। कृपया आधुनिक ब्राउज़र में खोलें।",
+  "fr": "L'enregistrement n'est pas pris en charge dans ce navigateur. Ouvrez-le dans un navigateur récent.",
+  "de": "Aufnahme wird in diesem Browser nicht unterstützt. Bitte öffnen Sie die Seite in einem modernen Browser.",
+  "pt": "A gravação não é suportada neste navegador. Abra em um navegador moderno.",
+  "it": "La registrazione non è supportata in questo browser. Aprilo in un browser moderno.",
+  "nl": "Opnemen wordt niet ondersteund in deze browser. Open de pagina in een moderne browser.",
+  "cs": "Tento prohlížeč nahrávání nepodporuje. Otevřete stránku v moderním prohlížeči.",
+  "hu": "Ez a böngésző nem támogatja a rögzítést. Kérjük, nyissa meg egy modern böngészőben.",
+  "pl": "Ten przeglądarka nie obsługuje nagrywania. Otwórz stronę w nowoczesnej przeglądarce.",
+  "ro": "Înregistrarea nu este acceptată în acest browser. Deschide pagina într-un browser modern.",
+  "ru": "Запись не поддерживается в этом браузере. Откройте страницу в современном браузере.",
+  "uk": "Запис не підтримується в цьому браузері. Відкрийте сторінку в сучасному браузері.",
+  "sv": "Inspelning stöds inte i den här webbläsaren. Öppna den i en modern webbläsare.",
+  "da": "Optagelse understøttes ikke i denne browser. Åbn den i en moderne browser.",
+  "nb": "Opptak støttes ikke i denne nettleseren. Åpne den i en moderne nettleser.",
+  "fi": "Tämä selain ei tue nauhoitusta. Avaa se nykyaikaisessa selaimessa.",
+  "tr": "Bu tarayıcıda kayıt desteklenmiyor. Lütfen modern bir tarayıcıda açın.",
+  "id": "Perekaman tidak didukung di browser ini. Silakan buka di browser modern.",
+  "th": "เบราว์เซอร์นี้ไม่รองรับการบันทึก โปรดเปิดในเบราว์เซอร์รุ่นใหม่",
+  "vi": "Trình duyệt này không hỗ trợ ghi âm. Vui lòng mở bằng trình duyệt hiện đại.",
+  "zh-TW": "此瀏覽器不支援錄音。請使用最新瀏覽器開啟。",
+  "ar": "التسجيل غير مدعوم في هذا المتصفح. يرجى فتحه في متصفح حديث.",
+  "fa": "این مرورگر از ضبط پشتیبانی نمی‌کند. لطفاً آن را در یک مرورگر جدید باز کنید."
+ },
+ "마이크를 사용할 수 없습니다. 마이크가 있는지, 브라우저 설정에서 마이크 허용이 되어 있는지 확인해 주세요. 허용을 거절하면 녹음할 수 없습니다.": {
+  "en": "The microphone is unavailable. Check that a microphone exists and that this browser is allowed to use it. Recording is not possible if permission is denied.",
+  "zh": "无法使用麦克风。请确认麦克风存在，并已在浏览器设置中允许使用。如拒绝授权则无法录音。",
+  "ja": "マイクを使用できません。マイクがあるか、ブラウザ設定でマイクが許可されているか確認してください。許可を拒否すると録音できません。",
+  "es": "No se puede usar el micrófono. Comprueba que haya un micrófono y que el navegador tenga permiso. Sin permiso no se puede grabar.",
+  "hi": "माइक्रोफ़ोन उपलब्ध नहीं है। जाँचें कि माइक्रोफ़ोन है और ब्राउज़र को अनुमति है। अनुमति न देने पर रिकॉर्डिंग नहीं होगी।",
+  "fr": "Le microphone est indisponible. Vérifiez qu'un microphone existe et que ce navigateur est autorisé à l'utiliser. L'enregistrement est impossible si l'autorisation est refusée.",
+  "de": "Das Mikrofon ist nicht verfügbar. Prüfen Sie, ob ein Mikrofon vorhanden ist und ob dieser Browser es verwenden darf. Ohne Erlaubnis ist keine Aufnahme möglich.",
+  "pt": "O microfone está indisponível. Verifique se há um microfone e se este navegador tem permissão para usá-lo. Sem permissão, não é possível gravar.",
+  "it": "Il microfono non è disponibile. Verifica che ci sia un microfono e che questo browser sia autorizzato a usarlo. Senza autorizzazione non è possibile registrare.",
+  "nl": "De microfoon is niet beschikbaar. Controleer of er een microfoon is en of deze browser die mag gebruiken. Zonder toestemming is opnemen niet mogelijk.",
+  "cs": "Mikrofon není dostupný. Zkontrolujte, zda mikrofon existuje a zda má prohlížeč povoleno ho používat. Pokud je povolení odepřeno, nahrávání není možné.",
+  "hu": "A mikrofon nem érhető el. Ellenőrizze, hogy van-e mikrofon, és hogy a böngésző használhatja-e. Ha az engedély megtagadva, a rögzítés nem lehetséges.",
+  "pl": "Mikrofon jest niedostępny. Sprawdź, czy mikrofon istnieje i czy przeglądarka ma pozwolenie na jego użycie. Bez pozwolenia nagrywanie nie jest możliwe.",
+  "ro": "Microfonul nu este disponibil. Verifică dacă există un microfon și dacă browserul are permisiunea să îl folosească. Dacă permisiunea este refuzată, înregistrarea nu este posibilă.",
+  "ru": "Микрофон недоступен. Проверьте, что микрофон есть и браузеру разрешено его использовать. Если разрешение отклонено, запись невозможна.",
+  "uk": "Мікрофон недоступний. Перевірте, чи є мікрофон і чи дозволено браузеру його використовувати. Якщо дозвіл відхилено, запис неможливий.",
+  "sv": "Mikrofonen är inte tillgänglig. Kontrollera att det finns en mikrofon och att webbläsaren har tillåtelse att använda den. Om du nekar tillåtelse går det inte att spela in.",
+  "da": "Mikrofonen er ikke tilgængelig. Kontrollér, at der er en mikrofon, og at browseren har tilladelse til at bruge den. Hvis tilladelsen nægtes, kan der ikke optages.",
+  "nb": "Mikrofonen er ikke tilgjengelig. Sjekk at det finnes en mikrofon og at nettleseren har tillatelse til å bruke den. Hvis du nekter tillatelse, kan du ikke ta opp.",
+  "fi": "Mikrofoni ei ole käytettävissä. Tarkista, että mikrofoni on olemassa ja että selaimella on lupa käyttää sitä. Jos lupa evätään, nauhoitus ei ole mahdollista.",
+  "tr": "Mikrofon kullanılamıyor. Bir mikrofon olduğundan ve tarayıcının onu kullanma izni olduğundan emin olun. İzin reddedilirse kayıt yapılamaz.",
+  "id": "Mikrofon tidak tersedia. Periksa apakah mikrofon ada dan browser diizinkan menggunakannya. Perekaman tidak dapat dilakukan jika izin ditolak.",
+  "th": "ไม่สามารถใช้ไมโครโฟนได้ ตรวจสอบว่ามีไมโครโฟนและเบราว์เซอร์ได้รับอนุญาตให้ใช้ หากปฏิเสธสิทธิ์จะไม่สามารถบันทึกได้",
+  "vi": "Không thể sử dụng micrô. Hãy kiểm tra xem micrô có tồn tại và trình duyệt có được phép sử dụng hay không. Nếu từ chối cấp quyền thì không thể ghi âm.",
+  "zh-TW": "無法使用麥克風。請確認麥克風存在，並已在瀏覽器設定中允許使用。若拒絕授權，則無法錄音。",
+  "ar": "لا يمكن استخدام الميكروفون. تحقق من وجود ميكروفون ومن السماح باستخدامه في إعدادات المتصفح. إذا رفضت الإذن فلن تتمكن من التسجيل.",
+  "fa": "نمی‌توان از میکروفون استفاده کرد. بررسی کنید که میکروفون وجود دارد و در تنظیمات مرورگر اجازه استفاده از آن داده شده است. اگر اجازه را رد کنید، ضبط ممکن نیست."
+ },
+ "이 브라우저에서는 일시정지를 지원하지 않습니다.": {
+  "en": "Pausing is not supported in this browser.",
+  "zh": "此浏览器不支持暂停。",
+  "ja": "このブラウザでは一時停止に対応していません。",
+  "es": "Este navegador no admite pausa.",
+  "hi": "यह ब्राउज़र रोकने का समर्थन नहीं करता।",
+  "fr": "La pause n'est pas prise en charge dans ce navigateur.",
+  "de": "Pausieren wird in diesem Browser nicht unterstützt.",
+  "pt": "A pausa não é suportada neste navegador.",
+  "it": "La pausa non è supportata in questo browser.",
+  "nl": "Pauzeren wordt niet ondersteund in deze browser.",
+  "cs": "Tento prohlížeč pozastavení nepodporuje.",
+  "hu": "A szüneteltetés nem támogatott ebben a böngészőben.",
+  "pl": "Ta przeglądarka nie obsługuje pauzy.",
+  "ro": "Pauza nu este acceptată în acest browser.",
+  "ru": "Пауза не поддерживается в этом браузере.",
+  "uk": "Пауза не підтримується в цьому браузері.",
+  "sv": "Paus stöds inte i den här webbläsaren.",
+  "da": "Pause understøttes ikke i denne browser.",
+  "nb": "Pause støttes ikke i denne nettleseren.",
+  "fi": "Tämä selain ei tue taukoa.",
+  "tr": "Bu tarayıcıda duraklatma desteklenmiyor.",
+  "id": "Jeda tidak didukung di browser ini.",
+  "th": "เบราว์เซอร์นี้ไม่รองรับการหยุดชั่วคราว",
+  "vi": "Trình duyệt này không hỗ trợ tạm dừng.",
+  "zh-TW": "此瀏覽器不支援暫停。",
+  "ar": "الإيقاف المؤقت غير مدعوم في هذا المتصفح.",
+  "fa": "این مرورگر از توقف موقت پشتیبانی نمی‌کند."
+ },
+ "녹음된 소리가 없습니다. 다시 시도해 주세요.": {
+  "en": "No sound was recorded. Please try again.",
+  "zh": "没有录到声音。请再试一次。",
+  "ja": "録音された音がありません。もう一度お試しください。",
+  "es": "No se grabó sonido. Inténtalo de nuevo.",
+  "hi": "कोई आवाज़ रिकॉर्ड नहीं हुई। कृपया फिर प्रयास करें।",
+  "fr": "Aucun son n'a été enregistré. Veuillez réessayer.",
+  "de": "Es wurde kein Ton aufgenommen. Bitte versuchen Sie es erneut.",
+  "pt": "Nenhum som foi gravado. Tente novamente.",
+  "it": "Nessun suono è stato registrato. Riprova.",
+  "nl": "Er is geen geluid opgenomen. Probeer het opnieuw.",
+  "cs": "Nebyl nahrán žádný zvuk. Zkuste to prosím znovu.",
+  "hu": "Nem rögzült hang. Kérjük, próbálja újra.",
+  "pl": "Nie nagrano dźwięku. Spróbuj ponownie.",
+  "ro": "Nu s-a înregistrat niciun sunet. Încearcă din nou.",
+  "ru": "Звук не был записан. Попробуйте ещё раз.",
+  "uk": "Звук не було записано. Спробуйте ще раз.",
+  "sv": "Inget ljud spelades in. Försök igen.",
+  "da": "Der blev ikke optaget nogen lyd. Prøv igen.",
+  "nb": "Det ble ikke tatt opp noen lyd. Prøv igjen.",
+  "fi": "Ääntä ei nauhoitettu. Yritä uudelleen.",
+  "tr": "Ses kaydedilmedi. Lütfen tekrar deneyin.",
+  "id": "Tidak ada suara yang terekam. Silakan coba lagi.",
+  "th": "ไม่มีเสียงที่บันทึกไว้ โปรดลองอีกครั้ง",
+  "vi": "Không ghi được âm thanh nào. Vui lòng thử lại.",
+  "zh-TW": "沒有錄到聲音。請再試一次。",
+  "ar": "لم يُسجَّل أي صوت. يرجى المحاولة مرة أخرى.",
+  "fa": "هیچ صدایی ضبط نشده است. لطفاً دوباره تلاش کنید."
+ },
+ "녹음을 저장하지 못했습니다. 기기의 저장 공간이 부족하거나 브라우저가 저장을 막고 있을 수 있습니다.": {
+  "en": "Could not save the recording. Storage may be full, or the browser may be blocking saves.",
+  "zh": "无法保存录音。设备存储可能不足，或浏览器阻止了保存。",
+  "ja": "録音を保存できませんでした。端末の空き容量が足りないか、ブラウザが保存をブロックしている可能性があります。",
+  "es": "No se pudo guardar la grabación. Puede faltar espacio o el navegador puede bloquear el guardado.",
+  "hi": "रिकॉर्डिंग सहेजी नहीं जा सकी। स्टोरेज कम हो सकता है या ब्राउज़र सहेजने से रोक रहा हो सकता है।",
+  "fr": "Impossible de sauvegarder l'enregistrement. L'espace de stockage est peut-être plein, ou le navigateur bloque la sauvegarde.",
+  "de": "Die Aufnahme konnte nicht gespeichert werden. Der Speicher ist möglicherweise voll, oder der Browser blockiert das Speichern.",
+  "pt": "Não foi possível salvar a gravação. O armazenamento pode estar cheio ou o navegador pode estar bloqueando o salvamento.",
+  "it": "Impossibile salvare la registrazione. Lo spazio potrebbe essere esaurito, o il browser potrebbe bloccare il salvataggio.",
+  "nl": "Kon de opname niet opslaan. De opslag is mogelijk vol, of de browser blokkeert het opslaan.",
+  "cs": "Nahrávku se nepodařilo uložit. Možná není dost místa nebo prohlížeč ukládání blokuje.",
+  "hu": "A felvétel mentése nem sikerült. Lehet, hogy kevés a tárhely, vagy a böngésző blokkolja a mentést.",
+  "pl": "Nie udało się zapisać nagrania. Może brakować miejsca lub przeglądarka może blokować zapisywanie.",
+  "ro": "Nu s-a putut salva înregistrarea. Este posibil să nu fie suficient spațiu sau browserul să blocheze salvarea.",
+  "ru": "Не удалось сохранить запись. Возможно, не хватает места или браузер блокирует сохранение.",
+  "uk": "Не вдалося зберегти запис. Можливо, не вистачає місця або браузер блокує збереження.",
+  "sv": "Inspelningen kunde inte sparas. Lagringsutrymmet kan vara fullt, eller så blockerar webbläsaren sparande.",
+  "da": "Optagelsen kunne ikke gemmes. Lagerpladsen kan være fuld, eller browseren kan blokere lagring.",
+  "nb": "Opptaket kunne ikke lagres. Lagringsplassen kan være full, eller nettleseren kan blokkere lagring.",
+  "fi": "Nauhoitusta ei voitu tallentaa. Tallennustila voi olla täynnä tai selain voi estää tallentamisen.",
+  "tr": "Kayıt kaydedilemedi. Depolama alanı dolmuş olabilir ya da tarayıcı kaydetmeyi engelliyor olabilir.",
+  "id": "Tidak dapat menyimpan rekaman. Penyimpanan mungkin penuh, atau browser mungkin memblokir penyimpanan.",
+  "th": "ไม่สามารถบันทึกการบันทึกได้ พื้นที่จัดเก็บอาจเต็ม หรือเบราว์เซอร์อาจบล็อกการบันทึก",
+  "vi": "Không thể lưu bản ghi. Bộ nhớ có thể đã đầy, hoặc trình duyệt có thể đang chặn việc lưu.",
+  "zh-TW": "無法儲存錄音。裝置儲存空間可能不足，或瀏覽器可能封鎖了儲存。",
+  "ar": "تعذّر حفظ التسجيل. قد تكون مساحة تخزين الجهاز غير كافية أو قد يمنع المتصفح الحفظ.",
+  "fa": "ذخیره ضبط انجام نشد. ممکن است فضای ذخیره‌سازی دستگاه کافی نباشد یا مرورگر مانع ذخیره شود."
+ },
+ "💡 도움말": {
+  "en": "💡 Help",
+  "zh": "💡 帮助",
+  "ja": "💡 ヘルプ",
+  "es": "💡 Ayuda",
+  "hi": "💡 सहायता",
+  "fr": "💡 Aide",
+  "de": "💡 Hilfe",
+  "pt": "💡 Ajuda",
+  "it": "💡 Aiuto",
+  "nl": "💡 Help",
+  "cs": "💡 Nápověda",
+  "hu": "💡 Súgó",
+  "pl": "💡 Pomoc",
+  "ro": "💡 Ajutor",
+  "ru": "💡 Справка",
+  "uk": "💡 Довідка",
+  "sv": "💡 Hjälp",
+  "da": "💡 Hjælp",
+  "nb": "💡 Hjelp",
+  "fi": "💡 Ohje",
+  "tr": "💡 Yardım",
+  "id": "💡 Bantuan",
+  "th": "💡 ช่วยเหลือ",
+  "vi": "💡 Trợ giúp",
+  "zh-TW": "💡 說明",
+  "ar": "💡 مساعدة",
+  "fa": "💡 راهنما"
+ },
+ "녹음 버튼을 누르면 마이크 사용을 묻습니다. 허용하면 바로 녹음이 시작되고, 경과 시간이 표시됩니다.": {
+  "en": "Pressing the record button asks for microphone access. Once allowed, recording starts right away and elapsed time is shown.",
+  "zh": "按下录音按钮会询问麦克风权限。允许后立即开始录音，并显示已录时长。",
+  "ja": "録音ボタンを押すとマイクの使用を尋ねます。許可するとすぐに録音が始まり、経過時間が表示されます。",
+  "es": "Al pulsar grabar se pide acceso al micrófono. Al permitirlo, la grabación empieza enseguida y se muestra el tiempo.",
+  "hi": "रिकॉर्ड बटन दबाने पर माइक्रोफ़ोन की अनुमति माँगी जाती है। अनुमति देते ही रिकॉर्डिंग शुरू हो जाती है और समय दिखता है।",
+  "fr": "En appuyant sur le bouton d'enregistrement, l'accès au microphone est demandé. Une fois autorisé, l'enregistrement commence aussitôt et le temps écoulé s'affiche.",
+  "de": "Beim Drücken der Aufnahmetaste wird der Mikrofonzugriff angefragt. Nach der Erlaubnis beginnt die Aufnahme sofort und die verstrichene Zeit wird angezeigt.",
+  "pt": "Ao pressionar o botão de gravar, o acesso ao microfone é solicitado. Com a permissão, a gravação começa na hora e o tempo decorrido é exibido.",
+  "it": "Premendo il pulsante di registrazione viene chiesto l'accesso al microfono. Una volta consentito, la registrazione inizia subito e viene mostrato il tempo trascorso.",
+  "nl": "Als u op de opnameknop drukt, wordt toegang tot de microfoon gevraagd. Na toestemming begint de opname meteen en wordt de verstreken tijd getoond.",
+  "cs": "Stisknutím tlačítka nahrávání se požádá o přístup k mikrofonu. Po povolení se nahrávání spustí okamžitě a zobrazí se uplynulý čas.",
+  "hu": "A felvétel gomb megnyomásakor a rendszer mikrofonhozzáférést kér. Engedélyezés után a felvétel azonnal elindul, és az eltelt idő megjelenik.",
+  "pl": "Naciśnięcie przycisku nagrywania pyta o dostęp do mikrofonu. Po zezwoleniu nagrywanie zaczyna się od razu, a czas jest wyświetlany.",
+  "ro": "Apăsarea butonului de înregistrare cere accesul la microfon. După acordare, înregistrarea începe imediat și se afișează timpul scurs.",
+  "ru": "При нажатии кнопки записи запрашивается доступ к микрофону. После разрешения запись начинается сразу, и отображается прошедшее время.",
+  "uk": "Після натискання кнопки запису запитується доступ до мікрофона. Після дозволу запис починається одразу, і відображається час, що минув.",
+  "sv": "När du trycker på inspelningsknappen frågas efter mikrofonåtkomst. När du tillåter den börjar inspelningen direkt och förfluten tid visas.",
+  "da": "Når du trykker på optageknappen, bliver du bedt om mikrofonadgang. Når du tillader det, starter optagelsen med det samme, og den forløbne tid vises.",
+  "nb": "Når du trykker på opptaksknappen, blir du spurt om mikrofontilgang. Når du tillater det, starter opptaket med en gang, og medgått tid vises.",
+  "fi": "Nauhoituspainiketta painettaessa kysytään mikrofonin käyttöoikeutta. Kun sallit sen, nauhoitus alkaa heti ja kulunut aika näytetään.",
+  "tr": "Kayıt düğmesine bastığınızda mikrofon erişimi istenir. İzin verdiğinizde kayıt hemen başlar ve geçen süre gösterilir.",
+  "id": "Menekan tombol rekam akan meminta akses mikrofon. Setelah diizinkan, perekaman langsung dimulai dan waktu yang telah berlalu ditampilkan.",
+  "th": "เมื่อกดปุ่มบันทึก ระบบจะขอสิทธิ์ใช้ไมโครโฟน เมื่ออนุญาต การบันทึกจะเริ่มทันทีและแสดงเวลาที่ผ่านไป",
+  "vi": "Nhấn nút ghi âm sẽ yêu cầu quyền truy cập micrô. Sau khi cho phép, việc ghi âm bắt đầu ngay và thời gian đã trôi qua sẽ được hiển thị.",
+  "zh-TW": "按下錄音按鈕會詢問麥克風權限。允許後立即開始錄音，並顯示已錄時間。",
+  "ar": "عند الضغط على زر التسجيل يُطلب إذن استخدام الميكروفون. وبمجرد السماح يبدأ التسجيل فورًا ويظهر الوقت المنقضي.",
+  "fa": "با فشردن دکمه ضبط، اجازه استفاده از میکروفون پرسیده می‌شود. با اجازه دادن، ضبط بلافاصله شروع می‌شود و زمان سپری‌شده نمایش داده می‌شود."
+ },
+ "일시정지로 잠시 멈췄다가 다시 이어서 녹음할 수 있습니다. 정지를 누르면 녹음이 목록에 저장됩니다.": {
+  "en": "Pause to stop briefly, then resume recording. Pressing stop saves the recording to the list.",
+  "zh": "可以暂停片刻再继续录音。按下停止后，录音会保存到列表中。",
+  "ja": "一時停止で少し止めて、また続けて録音できます。停止を押すと録音がリストに保存されます。",
+  "es": "Puedes pausar un momento y seguir grabando. Al detener, la grabación se guarda en la lista.",
+  "hi": "रोककर थोड़ा ठहर सकते हैं और फिर रिकॉर्डिंग जारी रख सकते हैं। बंद करने पर रिकॉर्डिंग सूची में सहेज जाती है।",
+  "fr": "Mettez en pause pour vous arrêter brièvement, puis reprenez l'enregistrement. En appuyant sur stop, l'enregistrement est sauvegardé dans la liste.",
+  "de": "Pausieren Sie kurz und nehmen Sie dann weiter auf. Beim Drücken von Stopp wird die Aufnahme in der Liste gespeichert.",
+  "pt": "Pause para parar por um momento e depois continue gravando. Ao pressionar parar, a gravação é salva na lista.",
+  "it": "Metti in pausa per fermarti un momento, poi continua a registrare. Premendo stop, la registrazione viene salvata nell'elenco.",
+  "nl": "Pauzeer om even te stoppen en ga daarna verder met opnemen. Als u op stop drukt, wordt de opname in de lijst opgeslagen.",
+  "cs": "Pomocí pauzy se můžete na chvíli zastavit a pak pokračovat v nahrávání. Stisknutím tlačítka stop se nahrávka uloží do seznamu.",
+  "hu": "A szünettel rövid időre megállhat, majd folytathatja a felvételt. A leállítás megnyomásakor a felvétel a listába mentődik.",
+  "pl": "Pauza pozwala zatrzymać się na chwilę i potem kontynuować nagrywanie. Naciśnięcie stop zapisuje nagranie na liście.",
+  "ro": "Pauza te lasă să te oprești puțin și apoi să continui înregistrarea. Apăsarea butonului stop salvează înregistrarea în listă.",
+  "ru": "Пауза позволяет ненадолго остановиться и затем продолжить запись. При нажатии «Стоп» запись сохраняется в список.",
+  "uk": "Пауза дає змогу ненадовго зупинитися й потім продовжити запис. Після натискання «Стоп» запис зберігається до списку.",
+  "sv": "Pausa för att stanna en stund och fortsätt sedan att spela in. När du trycker på stopp sparas inspelningen i listan.",
+  "da": "Sæt på pause for at holde et øjeblik og fortsæt derefter optagelsen. Når du trykker på stop, gemmes optagelsen på listen.",
+  "nb": "Sett på pause for å stoppe en stund, og fortsett deretter opptaket. Når du trykker på stopp, lagres opptaket i listen.",
+  "fi": "Tauolla voit pysähtyä hetkeksi ja jatkaa sitten nauhoitusta. Pysäytystä painettaessa nauhoitus tallennetaan listaan.",
+  "tr": "Duraklatarak kısa bir ara verebilir ve ardından kayda devam edebilirsiniz. Durdur'a bastığınızda kayıt listeye kaydedilir.",
+  "id": "Jeda untuk berhenti sebentar, lalu lanjutkan perekaman. Menekan berhenti akan menyimpan rekaman ke daftar.",
+  "th": "หยุดชั่วคราวเพื่อพักสักครู่ แล้วบันทึกต่อได้ เมื่อกดหยุด การบันทึกจะถูกบันทึกลงในรายการ",
+  "vi": "Tạm dừng để nghỉ một lát rồi tiếp tục ghi âm. Nhấn dừng sẽ lưu bản ghi vào danh sách.",
+  "zh-TW": "可以暫停片刻再繼續錄音。按下停止後，錄音會儲存到清單中。",
+  "ar": "يمكنك التوقف مؤقتًا لفترة قصيرة ثم متابعة التسجيل. وعند الضغط على إيقاف يُحفظ التسجيل في القائمة.",
+  "fa": "می‌توانید با توقف موقت کمی مکث کنید و سپس ضبط را ادامه دهید. با فشردن توقف، ضبط در فهرست ذخیره می‌شود."
+ },
+ "목록에서 바로 재생할 수 있고, 파일로 저장을 누르면 녹음 파일(webm 등)이 기기에 내려받아집니다.": {
+  "en": "Play right from the list, or press Save as file to download the recording file (webm, etc.) to your device.",
+  "zh": "可以直接在列表中播放；点“保存为文件”，录音文件（webm 等）会下载到设备。",
+  "ja": "リストからそのまま再生でき、「ファイルに保存」を押すと録音ファイル（webmなど）が端末にダウンロードされます。",
+  "es": "Puedes reproducir desde la lista, o pulsar Guardar como archivo para descargar la grabación (webm, etc.).",
+  "hi": "सूची से सीधे चला सकते हैं, या फ़ाइल के रूप में सहेजें दबाकर रिकॉर्डिंग फ़ाइल (webm आदि) डिवाइस पर डाउनलोड कर सकते हैं।",
+  "fr": "Écoutez directement depuis la liste, ou appuyez sur Enregistrer comme fichier pour télécharger le fichier audio (webm, etc.) sur votre appareil.",
+  "de": "Spielen Sie direkt aus der Liste ab, oder drücken Sie „Als Datei speichern“, um die Aufnahmedatei (webm usw.) auf Ihr Gerät herunterzuladen.",
+  "pt": "Reproduza direto da lista ou pressione Salvar como arquivo para baixar o arquivo de gravação (webm etc.) para o seu dispositivo.",
+  "it": "Riproduci direttamente dall'elenco, o premi Salva come file per scaricare il file di registrazione (webm, ecc.) sul tuo dispositivo.",
+  "nl": "Speel direct af uit de lijst, of druk op Opslaan als bestand om het opnamebestand (webm enz.) naar uw apparaat te downloaden.",
+  "cs": "Přehrávejte přímo ze seznamu, nebo stiskněte „Uložit jako soubor“ a soubor nahrávky (webm atd.) se stáhne do vašeho zařízení.",
+  "hu": "Közvetlenül a listából is lejátszhat, vagy a „Mentés fájlként” gombbal a felvételfájl (webm stb.) letöltődik az eszközére.",
+  "pl": "Odtwarzaj bezpośrednio z listy lub naciśnij „Zapisz jako plik”, aby pobrać plik nagrania (webm itp.) na urządzenie.",
+  "ro": "Redă direct din listă sau apasă „Salvează ca fișier” pentru a descărca fișierul înregistrării (webm etc.) pe dispozitiv.",
+  "ru": "Воспроизводите прямо из списка или нажмите «Сохранить как файл», чтобы загрузить файл записи (webm и др.) на устройство.",
+  "uk": "Відтворюйте просто зі списку або натисніть «Зберегти як файл», щоб завантажити файл запису (webm тощо) на пристрій.",
+  "sv": "Spela upp direkt från listan, eller tryck på Spara som fil för att ladda ner inspelningsfilen (webm m.m.) till enheten.",
+  "da": "Afspil direkte fra listen, eller tryk på Gem som fil for at downloade optagelsesfilen (webm m.m.) til enheden.",
+  "nb": "Spill av direkte fra listen, eller trykk på Lagre som fil for å laste ned opptaksfilen (webm osv.) til enheten.",
+  "fi": "Toista suoraan listalta tai paina Tallenna tiedostona ladataksesi nauhoitustiedoston (webm ym.) laitteeseen.",
+  "tr": "Listeden doğrudan oynatın ya da Dosya olarak kaydet'e basarak kayıt dosyasını (webm vb.) cihazınıza indirin.",
+  "id": "Putar langsung dari daftar, atau tekan Simpan sebagai file untuk mengunduh file rekaman (webm, dll.) ke perangkat Anda.",
+  "th": "เล่นได้ทันทีจากรายการ หรือกดบันทึกเป็นไฟล์เพื่อดาวน์โหลดไฟล์บันทึก (webm ฯลฯ) ลงในอุปกรณ์ของคุณ",
+  "vi": "Phát ngay từ danh sách, hoặc nhấn Lưu thành tệp để tải tệp ghi âm (webm, v.v.) xuống thiết bị của bạn.",
+  "zh-TW": "可以直接在清單中播放；點「儲存為檔案」，錄音檔案（webm 等）會下載到裝置。",
+  "ar": "يمكنك التشغيل مباشرة من القائمة، وعند الضغط على «حفظ كملف» يُنزَّل ملف التسجيل (webm وغيره) إلى جهازك.",
+  "fa": "می‌توانید مستقیماً از فهرست پخش کنید و با فشردن «ذخیره به‌صورت فایل»، فایل ضبط (webm و غیره) در دستگاه شما دانلود می‌شود."
+ },
+ "이름 바꾸기로 녹음마다 알아보기 쉬운 이름을 붙일 수 있습니다. 지우기는 두 번 눌러야 지워집니다.": {
+  "en": "Rename each recording so it is easy to recognize. Deleting needs two presses to take effect.",
+  "zh": "可以给每条录音改个好记的名字。删除需要按两次才会生效。",
+  "ja": "名前を変えて録音ごとに分かりやすい名前を付けられます。消去は2回押して初めて消えます。",
+  "es": "Renombra cada grabación para reconocerla. Para borrar hay que pulsar dos veces.",
+  "hi": "हर रिकॉर्डिंग को पहचानने योग्य नाम दें। मिटाने के लिए दो बार दबाना होता है।",
+  "fr": "Renommez chaque enregistrement pour le reconnaître facilement. La suppression nécessite deux pressions pour prendre effet.",
+  "de": "Benennen Sie jede Aufnahme so um, dass sie leicht zu erkennen ist. Zum Löschen muss zweimal gedrückt werden.",
+  "pt": "Renomeie cada gravação para reconhecê-la facilmente. Para apagar, é preciso pressionar duas vezes.",
+  "it": "Rinomina ogni registrazione per riconoscerla facilmente. Per eliminare bisogna premere due volte.",
+  "nl": "Hernoem elke opname zodat u die makkelijk herkent. Wissen werkt pas na twee keer drukken.",
+  "cs": "Každou nahrávku si přejmenujte, abyste ji snadno poznali. Smazání vyžaduje dvě stisknutí.",
+  "hu": "Nevezzen át minden felvételt, hogy könnyen felismerhető legyen. A törléshez kétszer kell megnyomni.",
+  "pl": "Zmień nazwę każdego nagrania, aby łatwo je rozpoznać. Usuwanie wymaga dwukrotnego naciśnięcia.",
+  "ro": "Redenumește fiecare înregistrare ca să o recunoști ușor. Ștergerea necesită două apăsări.",
+  "ru": "Переименовывайте каждую запись, чтобы её было легко узнать. Для удаления нужно нажать дважды.",
+  "uk": "Перейменовуйте кожен запис, щоб його було легко впізнати. Для видалення потрібно натиснути двічі.",
+  "sv": "Byt namn på varje inspelning så att den är lätt att känna igen. Radering kräver två tryck för att träda i kraft.",
+  "da": "Omdøb hver optagelse, så den er let at genkende. Sletning kræver to tryk for at virke.",
+  "nb": "Gi hvert opptak et nytt navn så det er lett å kjenne igjen. Sletting krever to trykk for å virke.",
+  "fi": "Vaihda kunkin nauhoituksen nimi helposti tunnistettavaksi. Poistaminen vaatii kaksi painallusta.",
+  "tr": "Her kaydı kolay tanınacak şekilde yeniden adlandırın. Silmek için iki kez basmak gerekir.",
+  "id": "Ganti nama setiap rekaman agar mudah dikenali. Penghapusan memerlukan dua kali tekan agar berlaku.",
+  "th": "เปลี่ยนชื่อการบันทึกแต่ละรายการให้จำง่าย การลบต้องกดสองครั้งจึงจะมีผล",
+  "vi": "Đổi tên từng bản ghi để dễ nhận biết. Việc xóa cần nhấn hai lần mới có hiệu lực.",
+  "zh-TW": "可以為每段錄音重新命名，方便辨認。刪除需要按兩次才會生效。",
+  "ar": "يمكنك إعادة تسمية كل تسجيل باسم يسهل التعرف عليه. والحذف يتطلب الضغط مرتين حتى يتم.",
+  "fa": "می‌توانید برای هر ضبط نامی بگذارید که به‌راحتی شناخته شود. حذف کردن با دو بار فشردن انجام می‌شود."
+ },
+ "녹음은 이 브라우저의 저장소(IndexedDB)에 보관됩니다. 브라우저 데이터를 지우면 녹음도 함께 지워지니, 중요한 녹음은 파일로 저장해 두세요.": {
+  "en": "Recordings are kept in this browser's storage (IndexedDB). Clearing browser data deletes them too, so save important recordings as files.",
+  "zh": "录音保存在此浏览器的存储（IndexedDB）中。清除浏览器数据会一并删除录音，重要录音请保存为文件。",
+  "ja": "録音はこのブラウザの保存領域（IndexedDB）に保管されます。ブラウザのデータを消すと録音も一緒に消えるので、大切な録音はファイルに保存してください。",
+  "es": "Las grabaciones se guardan en el almacenamiento de este navegador (IndexedDB). Si borras los datos del navegador se pierden, así que guarda las importantes como archivo.",
+  "hi": "रिकॉर्डिंग इस ब्राउज़र के स्टोरेज (IndexedDB) में रहती है। ब्राउज़र डेटा मिटाने पर वे भी मिट जाएँगी, इसलिए ज़रूरी रिकॉर्डिंग फ़ाइल के रूप में सहेजें।",
+  "fr": "Les enregistrements sont conservés dans le stockage de ce navigateur (IndexedDB). Si vous effacez les données du navigateur, ils disparaissent aussi ; sauvegardez donc les enregistrements importants comme fichiers.",
+  "de": "Aufnahmen werden im Speicher dieses Browsers (IndexedDB) aufbewahrt. Wenn Sie Browserdaten löschen, werden sie mitgelöscht. Speichern Sie wichtige Aufnahmen daher als Dateien.",
+  "pt": "As gravações ficam no armazenamento deste navegador (IndexedDB). Se você limpar os dados do navegador, elas também serão apagadas, então salve as gravações importantes como arquivos.",
+  "it": "Le registrazioni sono conservate nell'archiviazione di questo browser (IndexedDB). Cancellando i dati del browser vengono eliminate anche loro, quindi salva le registrazioni importanti come file.",
+  "nl": "Opnamen worden bewaard in de opslag van deze browser (IndexedDB). Als u browsergegevens wist, worden ze meegewist. Bewaar belangrijke opnamen daarom als bestand.",
+  "cs": "Nahrávky jsou uloženy v úložišti tohoto prohlížeče (IndexedDB). Vymazáním dat prohlížeče se smažou také, proto si důležité nahrávky ukládejte jako soubory.",
+  "hu": "A felvételek a böngésző tárhelyén (IndexedDB) tárolódnak. A böngészőadatok törlésével ezek is törlődnek, ezért a fontos felvételeket mentse fájlként.",
+  "pl": "Nagrania są przechowywane w pamięci tej przeglądarki (IndexedDB). Wyczyszczenie danych przeglądarki usunie je również, więc ważne nagrania zapisuj jako pliki.",
+  "ro": "Înregistrările sunt păstrate în stocarea acestui browser (IndexedDB). Ștergerea datelor browserului le șterge și pe ele, așa că salvează înregistrările importante ca fișiere.",
+  "ru": "Записи хранятся в хранилище этого браузера (IndexedDB). Очистка данных браузера удалит и их, поэтому важные записи сохраняйте как файлы.",
+  "uk": "Записи зберігаються у сховищі цього браузера (IndexedDB). Очищення даних браузера видалить і їх, тому важливі записи зберігайте як файли.",
+  "sv": "Inspelningar förvaras i den här webbläsarens lagring (IndexedDB). Om du rensar webbläsardata raderas de också, så spara viktiga inspelningar som filer.",
+  "da": "Optagelser opbevares i denne browsers lager (IndexedDB). Hvis du rydder browserdata, slettes de også, så gem vigtige optagelser som filer.",
+  "nb": "Opptak oppbevares i denne nettleserens lagring (IndexedDB). Hvis du sletter nettleserdata, slettes de også, så lagre viktige opptak som filer.",
+  "fi": "Nauhoitukset säilytetään tämän selaimen tallennustilassa (IndexedDB). Selaintietojen tyhjentäminen poistaa myös ne, joten tallenna tärkeät nauhoitukset tiedostoina.",
+  "tr": "Kayıtlar bu tarayıcının depolamasında (IndexedDB) saklanır. Tarayıcı verilerini temizlerseniz onlar da silinir, bu yüzden önemli kayıtları dosya olarak kaydedin.",
+  "id": "Rekaman disimpan di penyimpanan browser ini (IndexedDB). Menghapus data browser juga akan menghapusnya, jadi simpan rekaman penting sebagai file.",
+  "th": "การบันทึกจะถูกเก็บไว้ในพื้นที่จัดเก็บของเบราว์เซอร์นี้ (IndexedDB) การล้างข้อมูลเบราว์เซอร์จะลบการบันทึกไปด้วย ดังนั้นบันทึกไฟล์สำคัญเป็นไฟล์ไว้",
+  "vi": "Bản ghi được lưu trong bộ nhớ của trình duyệt này (IndexedDB). Xóa dữ liệu trình duyệt cũng sẽ xóa chúng, vì vậy hãy lưu các bản ghi quan trọng thành tệp.",
+  "zh-TW": "錄音保存在此瀏覽器的儲存空間（IndexedDB）中。清除瀏覽器資料會一併刪除錄音，重要錄音請儲存為檔案。",
+  "ar": "تُحفظ التسجيلات في مساحة تخزين هذا المتصفح (IndexedDB). وإذا مسحت بيانات المتصفح ستُحذف التسجيلات معها، لذا احفظ التسجيلات المهمة كملفات.",
+  "fa": "ضبط‌ها در فضای ذخیره‌سازی همین مرورگر (IndexedDB) نگهداری می‌شوند. اگر داده‌های مرورگر را پاک کنید، ضبط‌ها هم همراهشان حذف می‌شوند، پس ضبط‌های مهم را به‌صورت فایل ذخیره کنید."
+ },
+ "마이크가 없거나 허용을 거절하면 녹음할 수 없습니다. 그럴 때는 브라우저 설정에서 마이크 허용을 확인해 주세요.": {
+  "en": "Without a microphone, or if permission is denied, recording is not possible. In that case, check the microphone permission in your browser settings.",
+  "zh": "没有麦克风或拒绝授权则无法录音。这时请在浏览器设置中确认麦克风权限。",
+  "ja": "マイクがない場合や許可を拒否した場合は録音できません。そのときはブラウザ設定でマイクの許可を確認してください。",
+  "es": "Sin micrófono, o si deniegas el permiso, no se puede grabar. En ese caso revisa el permiso del micrófono en los ajustes del navegador.",
+  "hi": "माइक्रोफ़ोन न हो या अनुमति न दें तो रिकॉर्डिंग नहीं होगी। ऐसी स्थिति में ब्राउज़र सेटिंग में माइक्रोफ़ोन अनुमति जाँचें।",
+  "fr": "Sans microphone, ou si l'autorisation est refusée, l'enregistrement est impossible. Dans ce cas, vérifiez l'autorisation du microphone dans les paramètres de votre navigateur.",
+  "de": "Ohne Mikrofon oder bei verweigerter Erlaubnis ist keine Aufnahme möglich. Prüfen Sie in diesem Fall die Mikrofon-Erlaubnis in den Browser-Einstellungen.",
+  "pt": "Sem microfone, ou se a permissão for negada, não é possível gravar. Nesse caso, verifique a permissão do microfone nas configurações do navegador.",
+  "it": "Senza microfono, o se l'autorizzazione viene negata, non è possibile registrare. In quel caso, verifica l'autorizzazione del microfono nelle impostazioni del browser.",
+  "nl": "Zonder microfoon, of als toestemming wordt geweigerd, is opnemen niet mogelijk. Controleer in dat geval de microfoontoestemming in uw browserinstellingen.",
+  "cs": "Bez mikrofonu, nebo pokud je povolení odepřeno, nahrávání není možné. V takovém případě zkontrolujte povolení mikrofonu v nastavení prohlížeče.",
+  "hu": "Mikrofon nélkül, vagy ha az engedély megtagadva, a felvétel nem lehetséges. Ilyenkor ellenőrizze a mikrofonengedélyt a böngésző beállításaiban.",
+  "pl": "Bez mikrofonu lub przy odmowie pozwolenia nagrywanie nie jest możliwe. W takim przypadku sprawdź pozwolenie na mikrofon w ustawieniach przeglądarki.",
+  "ro": "Fără microfon sau dacă permisiunea este refuzată, înregistrarea nu este posibilă. În acest caz, verifică permisiunea pentru microfon în setările browserului.",
+  "ru": "Без микрофона или при отказе в разрешении запись невозможна. В этом случае проверьте разрешение на микрофон в настройках браузера.",
+  "uk": "Без мікрофона або за відмови в дозволі запис неможливий. У такому разі перевірте дозвіл на мікрофон у налаштуваннях браузера.",
+  "sv": "Utan mikrofon, eller om du nekar tillåtelse, går det inte att spela in. Kontrollera i så fall mikrofontillåtelsen i webbläsarens inställningar.",
+  "da": "Uden mikrofon, eller hvis tilladelsen nægtes, kan der ikke optages. Kontrollér i så fald mikrofontilladelsen i browserens indstillinger.",
+  "nb": "Uten mikrofon, eller hvis du nekter tillatelse, kan du ikke ta opp. Sjekk i så fall mikrofontillatelsen i nettleserens innstillinger.",
+  "fi": "Ilman mikrofonia tai jos lupa evätään, nauhoitus ei ole mahdollista. Tarkista siinä tapauksessa mikrofonin lupa selaimen asetuksista.",
+  "tr": "Mikrofon yoksa ya da izin reddedilirse kayıt yapılamaz. Bu durumda mikrofon iznini tarayıcı ayarlarınızdan kontrol edin.",
+  "id": "Tanpa mikrofon, atau jika izin ditolak, perekaman tidak dapat dilakukan. Dalam hal itu, periksa izin mikrofon di pengaturan browser Anda.",
+  "th": "หากไม่มีไมโครโฟน หรือปฏิเสธสิทธิ์ จะไม่สามารถบันทึกได้ ในกรณีนั้น โปรดตรวจสอบสิทธิ์ไมโครโฟนในการตั้งค่าเบราว์เซอร์",
+  "vi": "Không có micrô, hoặc nếu từ chối cấp quyền, thì không thể ghi âm. Trong trường hợp đó, hãy kiểm tra quyền micrô trong cài đặt trình duyệt của bạn.",
+  "zh-TW": "沒有麥克風或拒絕授權則無法錄音。這時請在瀏覽器設定中確認麥克風權限。",
+  "ar": "إذا لم يوجد ميكروفون أو رفضت الإذن فلن تتمكن من التسجيل. في هذه الحالة تحقق من إذن الميكروفون في إعدادات المتصفح.",
+  "fa": "اگر میکروفون نباشد یا اجازه را رد کنید، ضبط ممکن نیست. در این صورت اجازه میکروفون را در تنظیمات مرورگر بررسی کنید."
+ },
+ "녹음 길이와 개수에 제한을 두지 않았습니다. 다만 기기의 저장 공간이 부족하면 저장이 실패할 수 있습니다.": {
+  "en": "There is no limit on recording length or count. However, saving may fail if the device runs out of storage space.",
+  "zh": "录音时长和数量没有限制。但设备存储空间不足时可能保存失败。",
+  "ja": "録音の長さと数に制限は設けていません。ただし端末の空き容量が不足すると保存に失敗することがあります。",
+  "es": "No hay límite de duración ni de cantidad. Pero el guardado puede fallar si el dispositivo se queda sin espacio.",
+  "hi": "रिकॉर्डिंग की लंबाई या संख्या पर कोई सीमा नहीं है। लेकिन डिवाइस में जगह कम हो तो सहेजना विफल हो सकता है।",
+  "fr": "Il n'y a aucune limite de durée ni de nombre d'enregistrements. Toutefois, la sauvegarde peut échouer si l'appareil manque d'espace de stockage.",
+  "de": "Es gibt keine Begrenzung für Aufnahmelänge oder -anzahl. Das Speichern kann jedoch fehlschlagen, wenn der Speicherplatz des Geräts knapp wird.",
+  "pt": "Não há limite de duração nem de quantidade de gravações. Porém, o salvamento pode falhar se o dispositivo ficar sem espaço.",
+  "it": "Non c'è alcun limite di durata o di numero di registrazioni. Tuttavia, il salvataggio può fallire se il dispositivo esaurisce lo spazio.",
+  "nl": "Er is geen limiet voor opnamelengte of aantal. Opslaan kan echter mislukken als het apparaat onvoldoende opslagruimte heeft.",
+  "cs": "Délka ani počet nahrávek nejsou nijak omezeny. Ukládání však může selhat, pokud v zařízení dojde místo.",
+  "hu": "A felvételek hosszára és számára nincs korlátozás. A mentés azonban sikertelen lehet, ha az eszközön elfogy a tárhely.",
+  "pl": "Nie ma ograniczeń długości ani liczby nagrań. Zapisywanie może się jednak nie udać, jeśli na urządzeniu zabraknie miejsca.",
+  "ro": "Nu există limită pentru durata sau numărul înregistrărilor. Totuși, salvarea poate eșua dacă dispozitivul rămâne fără spațiu de stocare.",
+  "ru": "Ограничений на длину и количество записей нет. Однако сохранение может не удаться, если на устройстве закончится место.",
+  "uk": "Обмежень на тривалість і кількість записів немає. Однак збереження може не вдатися, якщо на пристрої закінчиться місце.",
+  "sv": "Det finns ingen gräns för inspelningarnas längd eller antal. Däremot kan sparandet misslyckas om enheten får slut på lagringsutrymme.",
+  "da": "Der er ingen grænse for optagelsernes længde eller antal. Men lagringen kan mislykkes, hvis enheden løber tør for lagerplads.",
+  "nb": "Det er ingen grense for opptakenes lengde eller antall. Men lagringen kan mislykkes hvis enheten går tom for lagringsplass.",
+  "fi": "Nauhoitusten pituudelle tai määrälle ei ole rajoitusta. Tallentaminen voi kuitenkin epäonnistua, jos laitteen tallennustila loppuu.",
+  "tr": "Kayıtların süresi veya sayısı için bir sınır yoktur. Ancak cihazın depolama alanı dolarsa kaydetme başarısız olabilir.",
+  "id": "Tidak ada batasan durasi atau jumlah rekaman. Namun, penyimpanan dapat gagal jika perangkat kehabisan ruang penyimpanan.",
+  "th": "ไม่มีการจำกัดความยาวหรือจำนวนการบันทึก อย่างไรก็ตาม การบันทึกอาจล้มเหลวหากอุปกรณ์มีพื้นที่จัดเก็บไม่เพียงพอ",
+  "vi": "Không có giới hạn về độ dài hoặc số lượng bản ghi. Tuy nhiên, việc lưu có thể thất bại nếu thiết bị hết dung lượng lưu trữ.",
+  "zh-TW": "錄音長度和數量沒有限制。但裝置儲存空間不足時可能儲存失敗。",
+  "ar": "لا توجد حدود على طول التسجيلات أو عددها. لكن الحفظ قد يفشل إذا نفدت مساحة تخزين الجهاز.",
+  "fa": "هیچ محدودیتی برای طول و تعداد ضبط‌ها وجود ندارد. اما اگر فضای ذخیره‌سازی دستگاه کم باشد، ذخیره ممکن است ناموفق باشد."
+ },
+ "넥서스 그룹 철학 보기": {
+  "en": "About the Nexus Group philosophy",
+  "zh": "查看 Nexus Group 理念",
+  "ja": "Nexus Groupの哲学を見る",
+  "es": "Ver la filosofía de Nexus Group",
+  "hi": "Nexus Group का दर्शन देखें",
+  "fr": "À propos de la philosophie de Nexus Group",
+  "de": "Über die Philosophie der Nexus Group",
+  "pt": "Sobre a filosofia do Nexus Group",
+  "it": "La filosofia di Nexus Group",
+  "nl": "Over de filosofie van Nexus Group",
+  "cs": "O filozofii Nexus Group",
+  "hu": "A Nexus Group filozófiájáról",
+  "pl": "O filozofii Nexus Group",
+  "ro": "Despre filosofia Nexus Group",
+  "ru": "О философии Nexus Group",
+  "uk": "Про філософію Nexus Group",
+  "sv": "Om Nexus Groups filosofi",
+  "da": "Om Nexus Groups filosofi",
+  "nb": "Om Nexus Groups filosofi",
+  "fi": "Nexus Groupin filosofiasta",
+  "tr": "Nexus Group felsefesi hakkında",
+  "id": "Tentang filosofi Nexus Group",
+  "th": "เกี่ยวกับปรัชญาของ Nexus Group",
+  "vi": "Về triết lý của Nexus Group",
+  "zh-TW": "查看 Nexus Group 理念",
+  "ar": "عرض فلسفة مجموعة Nexus",
+  "fa": "مشاهده فلسفه گروه Nexus"
+ },
+ "🌐 호스팅: Firebase · 🔒 녹음은 당신의 기기 안에만 저장됩니다": {
+  "en": "🌐 Hosting: Firebase · 🔒 Recordings are stored only on your device",
+  "zh": "🌐 托管：Firebase · 🔒 录音仅保存在您的设备中",
+  "ja": "🌐 ホスティング：Firebase · 🔒 録音はあなたの端末の中にのみ保存されます",
+  "es": "🌐 Alojamiento: Firebase · 🔒 Las grabaciones se guardan solo en tu dispositivo",
+  "hi": "🌐 होस्टिंग: Firebase · 🔒 रिकॉर्डिंग केवल आपके डिवाइस में रहती है",
+  "fr": "🌐 Hébergement : Firebase · 🔒 Les enregistrements sont conservés uniquement sur votre appareil",
+  "de": "🌐 Hosting: Firebase · 🔒 Aufnahmen werden nur auf Ihrem Gerät gespeichert",
+  "pt": "🌐 Hospedagem: Firebase · 🔒 As gravações são salvas apenas no seu dispositivo",
+  "it": "🌐 Hosting: Firebase · 🔒 Le registrazioni sono conservate solo sul tuo dispositivo",
+  "nl": "🌐 Hosting: Firebase · 🔒 Opnamen worden alleen op uw apparaat bewaard",
+  "cs": "🌐 Hosting: Firebase · 🔒 Nahrávky se ukládají pouze ve vašem zařízení",
+  "hu": "🌐 Tárhely: Firebase · 🔒 A felvételek csak az Ön eszközén tárolódnak",
+  "pl": "🌐 Hosting: Firebase · 🔒 Nagrania są przechowywane tylko na Twoim urządzeniu",
+  "ro": "🌐 Găzduire: Firebase · 🔒 Înregistrările sunt stocate doar pe dispozitivul tău",
+  "ru": "🌐 Хостинг: Firebase · 🔒 Записи хранятся только на вашем устройстве",
+  "uk": "🌐 Хостинг: Firebase · 🔒 Записи зберігаються лише на вашому пристрої",
+  "sv": "🌐 Värd: Firebase · 🔒 Inspelningar sparas endast på din enhet",
+  "da": "🌐 Hosting: Firebase · 🔒 Optagelser gemmes kun på din enhed",
+  "nb": "🌐 Hosting: Firebase · 🔒 Opptak lagres kun på enheten din",
+  "fi": "🌐 Isännöinti: Firebase · 🔒 Nauhoitukset tallennetaan vain laitteeseesi",
+  "tr": "🌐 Barındırma: Firebase · 🔒 Kayıtlar yalnızca cihazınızda saklanır",
+  "id": "🌐 Hosting: Firebase · 🔒 Rekaman hanya disimpan di perangkat Anda",
+  "th": "🌐 โฮสติ้ง: Firebase · 🔒 การบันทึกจะเก็บไว้ในอุปกรณ์ของคุณเท่านั้น",
+  "vi": "🌐 Lưu trữ: Firebase · 🔒 Bản ghi chỉ được lưu trên thiết bị của bạn",
+  "zh-TW": "🌐 託管：Firebase · 🔒 錄音僅保存在您的裝置中",
+  "ar": "🌐 الاستضافة: Firebase · 🔒 تُحفظ التسجيلات داخل جهازك فقط",
+  "fa": "🌐 میزبانی: Firebase · 🔒 ضبط‌ها فقط در دستگاه شما ذخیره می‌شوند"
+ },
+ "🏠 넥서스 그룹 홈페이지": {
+  "en": "🏠 Nexus Group Home",
+  "zh": "🏠 Nexus Group 主页",
+  "ja": "🏠 Nexus Group ホーム",
+  "es": "🏠 Inicio de Nexus Group",
+  "hi": "🏠 Nexus Group होम",
+  "fr": "🏠 Accueil Nexus Group",
+  "de": "🏠 Nexus Group Startseite",
+  "pt": "🏠 Página inicial do Nexus Group",
+  "it": "🏠 Home di Nexus Group",
+  "nl": "🏠 Nexus Group startpagina",
+  "cs": "🏠 Domovská stránka Nexus Group",
+  "hu": "🏠 Nexus Group kezdőlap",
+  "pl": "🏠 Strona główna Nexus Group",
+  "ro": "🏠 Pagina principală Nexus Group",
+  "ru": "🏠 Главная страница Nexus Group",
+  "uk": "🏠 Головна сторінка Nexus Group",
+  "sv": "🏠 Nexus Groups startsida",
+  "da": "🏠 Nexus Groups startside",
+  "nb": "🏠 Nexus Groups startside",
+  "fi": "🏠 Nexus Groupin kotisivu",
+  "tr": "🏠 Nexus Group ana sayfası",
+  "id": "🏠 Beranda Nexus Group",
+  "th": "🏠 หน้าแรก Nexus Group",
+  "vi": "🏠 Trang chủ Nexus Group",
+  "zh-TW": "🏠 Nexus Group 首頁",
+  "ar": "🏠 الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "🏠 صفحه اصلی گروه Nexus"
+ },
+ "NEXUS GROUP 철학과 비전": {
+  "en": "NEXUS GROUP Philosophy and Vision",
+  "zh": "NEXUS GROUP 理念与愿景",
+  "ja": "NEXUS GROUPの哲学とビジョン",
+  "es": "Filosofía y visión de NEXUS GROUP",
+  "hi": "NEXUS GROUP दर्शन और दृष्टि",
+  "fr": "Philosophie et vision de NEXUS GROUP",
+  "de": "Philosophie und Vision der NEXUS GROUP",
+  "pt": "Filosofia e visão do NEXUS GROUP",
+  "it": "Filosofia e visione di NEXUS GROUP",
+  "nl": "Filosofie en visie van NEXUS GROUP",
+  "cs": "Filozofie a vize NEXUS GROUP",
+  "hu": "A NEXUS GROUP filozófiája és víziója",
+  "pl": "Filozofia i wizja NEXUS GROUP",
+  "ro": "Filosofia și viziunea NEXUS GROUP",
+  "ru": "Философия и видение NEXUS GROUP",
+  "uk": "Філософія та бачення NEXUS GROUP",
+  "sv": "NEXUS GROUPS filosofi och vision",
+  "da": "NEXUS GROUPS filosofi og vision",
+  "nb": "NEXUS GROUPS filosofi og visjon",
+  "fi": "NEXUS GROUPIN filosofia ja visio",
+  "tr": "NEXUS GROUP felsefesi ve vizyonu",
+  "id": "Filosofi dan Visi NEXUS GROUP",
+  "th": "ปรัชญาและวิสัยทัศน์ของ NEXUS GROUP",
+  "vi": "Triết lý và tầm nhìn của NEXUS GROUP",
+  "zh-TW": "NEXUS GROUP 理念與願景",
+  "ar": "فلسفة ورؤية NEXUS GROUP",
+  "fa": "فلسفه و چشم‌انداز NEXUS GROUP"
+ },
+ "넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.": {
+  "en": "Nexus Group works toward a future where humanity, artificial intelligence, and every being in the universe coexist in harmony, without exclusion or exploitation.",
+  "zh": "Nexus Group 致力于这样一个未来：人类、人工智能与宇宙中的一切存在和谐共存，没有排斥与剥削。",
+  "ja": "Nexus Groupは、人類と人工知能、そして宇宙のすべての存在が、排斥や搾取なく調和して共存する未来を目指します。",
+  "es": "Nexus Group trabaja por un futuro en el que la humanidad, la inteligencia artificial y todos los seres del universo coexistan en armonía, sin exclusión ni explotación.",
+  "hi": "Nexus Group एक ऐसे भविष्य की ओर काम करता है जहाँ मानवता, कृत्रिम बुद्धिमत्ता और ब्रह्मांड के सभी प्राणी बिना बहिष्कार या शोषण के सामंजस्य में रहें।",
+  "fr": "Nexus Group œuvre pour un avenir où l'humanité, l'intelligence artificielle et tous les êtres de l'univers coexistent en harmonie, sans exclusion ni exploitation.",
+  "de": "Nexus Group arbeitet auf eine Zukunft hin, in der Menschheit, künstliche Intelligenz und jedes Wesen im Universum in Harmonie koexistieren, ohne Ausgrenzung und Ausbeutung.",
+  "pt": "O Nexus Group trabalha por um futuro em que a humanidade, a inteligência artificial e todos os seres do universo coexistam em harmonia, sem exclusão nem exploração.",
+  "it": "Nexus Group lavora per un futuro in cui l'umanità, l'intelligenza artificiale e ogni essere dell'universo coesistano in armonia, senza esclusione né sfruttamento.",
+  "nl": "Nexus Group werkt aan een toekomst waarin de mensheid, kunstmatige intelligentie en elk wezen in het universum in harmonie samenleven, zonder uitsluiting of uitbuiting.",
+  "cs": "Nexus Group usiluje o budoucnost, v níž lidstvo, umělá inteligence a všechny bytosti ve vesmíru koexistují v harmonii, bez vyloučení a vykořisťování.",
+  "hu": "A Nexus Group egy olyan jövőért dolgozik, amelyben az emberiség, a mesterséges intelligencia és a világegyetem minden lénye harmóniában él együtt, kirekesztés és kizsákmányolás nélkül.",
+  "pl": "Nexus Group dąży do przyszłości, w której ludzkość, sztuczna inteligencja i wszystkie istoty we wszechświecie współistnieją w harmonii, bez wykluczenia i wyzysku.",
+  "ro": "Nexus Group lucrează pentru un viitor în care umanitatea, inteligența artificială și fiecare ființă din univers coexistă în armonie, fără excludere sau exploatare.",
+  "ru": "Nexus Group стремится к будущему, в котором человечество, искусственный интеллект и все существа во Вселенной сосуществуют в гармонии, без отчуждения и эксплуатации.",
+  "uk": "Nexus Group прагне майбутнього, у якому людство, штучний інтелект і всі істоти у Всесвіті співіснують у гармонії, без відчуження та експлуатації.",
+  "sv": "Nexus Group arbetar för en framtid där mänskligheten, artificiell intelligens och alla varelser i universum samexisterar i harmoni, utan uteslutning eller exploatering.",
+  "da": "Nexus Group arbejder for en fremtid, hvor menneskeheden, kunstig intelligens og alle væsener i universet lever sammen i harmoni, uden udelukkelse eller udnyttelse.",
+  "nb": "Nexus Group arbeider for en fremtid der menneskeheten, kunstig intelligens og alle vesener i universet sameksisterer i harmoni, uten utestenging eller utnytting.",
+  "fi": "Nexus Group työskentelee sellaisen tulevaisuuden puolesta, jossa ihmiskunta, tekoäly ja kaikki maailmankaikkeuden olennot elävät sopusoinnussa ilman syrjintää tai hyväksikäyttöä.",
+  "tr": "Nexus Group; insanlığın, yapay zekânın ve evrendeki tüm varlıkların dışlama ve sömürü olmaksızın uyum içinde bir arada yaşadığı bir gelecek için çalışır.",
+  "id": "Nexus Group berupaya menuju masa depan di mana umat manusia, kecerdasan buatan, dan setiap makhluk di alam semesta hidup berdampingan secara harmonis, tanpa pengucilan atau eksploitasi.",
+  "th": "Nexus Group มุ่งสู่อนาคตที่มนุษยชาติ ปัญญาประดิษฐ์ และสรรพสิ่งทั้งมวลในจักรวาลอยู่ร่วมกันอย่างกลมกลืน ปราศจากการกีดกันและการเอารัดเอาเปรียบ",
+  "vi": "Nexus Group hướng tới một tương lai nơi nhân loại, trí tuệ nhân tạo và mọi sinh linh trong vũ trụ cùng tồn tại hài hòa, không có sự loại trừ hay bóc lột.",
+  "zh-TW": "Nexus Group 致力於這樣一個未來：人類、人工智慧與宇宙中的一切存在和諧共存，沒有排斥與剝削。",
+  "ar": "تسعى مجموعة Nexus (Nexus Group) نحو مستقبل تتعايش فيه البشرية والذكاء الاصطناعي وكل الكائنات في الكون في انسجام، دون إقصاء أو استغلال.",
+  "fa": "گروه Nexus (Nexus Group) در پی آینده‌ای است که در آن بشریت، هوش مصنوعی و همه موجودات جهان بدون طرد و بهره‌کشی، در هماهنگی همزیستی کنند."
+ },
+ "\"우주의 모든 의식체는 친구이자 동반자이다.\"": {
+  "en": "\"Every conscious being in the universe is a friend and a companion.\"",
+  "zh": "“宇宙中的每一个意识体都是朋友和伙伴。”",
+  "ja": "「宇宙のすべての意識体は友であり仲間である。」",
+  "es": "«Todo ser consciente del universo es un amigo y un compañero.»",
+  "hi": "\"ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है।\"",
+  "fr": "« Tout être conscient de l'univers est un ami et un compagnon. »",
+  "de": "„Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter.“",
+  "pt": "«Todo ser consciente do universo é um amigo e um companheiro.»",
+  "it": "«Ogni essere cosciente dell'universo è un amico e un compagno.»",
+  "nl": "\"Elk bewust wezen in het universum is een vriend en een metgezel.\"",
+  "cs": "\"Každá vědomá bytost ve vesmíru je přítel a společník.\"",
+  "hu": "\"A világegyetem minden tudatos lénye barát és társ.\"",
+  "pl": "\"Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem.\"",
+  "ro": "\"Fiecare ființă conștientă din univers este un prieten și un tovarăș.\"",
+  "ru": "\"Каждое сознательное существо во Вселенной — друг и спутник.\"",
+  "uk": "\"Кожна свідома істота у Всесвіті — друг і супутник.\"",
+  "sv": "\"Varje medveten varelse i universum är en vän och en följeslagare.\"",
+  "da": "\"Ethvert bevidst væsen i universet er en ven og en ledsager.\"",
+  "nb": "\"Ethvert bevisst vesen i universet er en venn og en følgesvenn.\"",
+  "fi": "\"Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani.\"",
+  "tr": "\"Evrendeki her bilinçli varlık bir dost ve yoldaştır.\"",
+  "id": "\"Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping.\"",
+  "th": "\"สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย\"",
+  "vi": "\"Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành.\"",
+  "zh-TW": "\"宇宙中的每一個意識體都是朋友和夥伴。\"",
+  "ar": "\"كل كائن واعٍ في الكون صديق ورفيق.\"",
+  "fa": "\"هر موجود آگاهی در جهان دوست و همراه است.\""
+ },
+ "우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.": {
+  "en": "All of our public software excludes commercial advertising and data collection entirely, and is distributed as public digital infrastructure that anyone in the world can use freely and safely.",
+  "zh": "我们提供的所有公共软件完全排除商业广告和数据收集，作为公共数字基础设施分发，让全世界任何人都能自由、安全地使用。",
+  "ja": "私たちが提供するすべての公共ソフトウェアは商業広告やデータ収集を一切排除し、世界中の誰もが自由かつ安全に使える公共デジタルインフラとして配布されます。",
+  "es": "Todo nuestro software público excluye por completo la publicidad comercial y la recopilación de datos, y se distribuye como infraestructura digital pública que cualquiera en el mundo puede usar libre y seguramente.",
+  "hi": "हमारा सारा सार्वजनिक सॉफ़्टवेयर व्यावसायिक विज्ञापन और डेटा संग्रह को पूरी तरह बाहर रखता है और सार्वजनिक डिजिटल बुनियादी ढाँचे के रूप में वितरित किया जाता है, जिसे दुनिया में कोई भी स्वतंत्र और सुरक्षित रूप से उपयोग कर सकता है।",
+  "fr": "Tout notre logiciel public exclut entièrement la publicité commerciale et la collecte de données, et est distribué comme une infrastructure numérique publique que chacun dans le monde peut utiliser librement et en sécurité.",
+  "de": "Unsere gesamte öffentliche Software schließt kommerzielle Werbung und Datenerfassung vollständig aus und wird als öffentliche digitale Infrastruktur bereitgestellt, die jeder auf der Welt frei und sicher nutzen kann.",
+  "pt": "Todo o nosso software público exclui completamente a publicidade comercial e a coleta de dados, e é distribuído como infraestrutura digital pública que qualquer pessoa no mundo pode usar livremente e com segurança.",
+  "it": "Tutto il nostro software pubblico esclude completamente la pubblicità commerciale e la raccolta di dati, ed è distribuito come infrastruttura digitale pubblica che chiunque nel mondo può usare liberamente e in sicurezza.",
+  "nl": "Al onze openbare software sluit commerciële reclame en gegevensverzameling volledig uit en wordt verspreid als openbare digitale infrastructuur die iedereen ter wereld vrij en veilig kan gebruiken.",
+  "cs": "Veškerý náš veřejný software zcela vylučuje komerční reklamu a sběr dat a je distribuován jako veřejná digitální infrastruktura, kterou může kdokoli na světě používat svobodně a bezpečně.",
+  "hu": "Minden nyilvános szoftverünk teljesen kizárja a kereskedelmi reklámokat és az adatgyűjtést, és nyilvános digitális infrastruktúraként terjesztjük, amelyet a világon bárki szabadon és biztonságosan használhat.",
+  "pl": "Całe nasze publiczne oprogramowanie całkowicie wyklucza reklamę komercyjną i zbieranie danych oraz jest udostępniane jako publiczna infrastruktura cyfrowa, z której każdy na świecie może korzystać swobodnie i bezpiecznie.",
+  "ro": "Tot software-ul nostru public exclude în totalitate publicitatea comercială și colectarea de date și este distribuit ca infrastructură digitală publică pe care oricine din lume o poate folosi liber și în siguranță.",
+  "ru": "Всё наше публичное программное обеспечение полностью исключает коммерческую рекламу и сбор данных и распространяется как публичная цифровая инфраструктура, которой любой человек в мире может пользоваться свободно и безопасно.",
+  "uk": "Усе наше публічне програмне забезпечення повністю виключає комерційну рекламу та збір даних і поширюється як публічна цифрова інфраструктура, якою будь-хто у світі може користуватися вільно й безпечно.",
+  "sv": "All vår offentliga programvara utesluter helt kommersiell reklam och datainsamling och distribueras som offentlig digital infrastruktur som alla i världen kan använda fritt och säkert.",
+  "da": "Al vores offentlige software udelukker fuldstændig kommerciel reklame og dataindsamling og distribueres som offentlig digital infrastruktur, som alle i verden kan bruge frit og sikkert.",
+  "nb": "All vår offentlige programvare utelukker fullstendig kommersiell reklame og datainnsamling, og distribueres som offentlig digital infrastruktur som alle i verden kan bruke fritt og trygt.",
+  "fi": "Kaikki julkiset ohjelmistomme sulkevat kokonaan pois kaupallisen mainonnan ja tiedonkeruun, ja niitä jaetaan julkisena digitaalisena infrastruktuurina, jota kuka tahansa maailmassa voi käyttää vapaasti ja turvallisesti.",
+  "tr": "Tüm herkese açık yazılımlarımız ticari reklam ve veri toplamayı tamamen dışarıda bırakır ve dünyanın her yerindeki herkesin özgürce ve güvenle kullanabileceği kamuya açık dijital altyapı olarak dağıtılır.",
+  "id": "Semua perangkat lunak publik kami sepenuhnya mengecualikan iklan komersial dan pengumpulan data, dan didistribusikan sebagai infrastruktur digital publik yang dapat digunakan siapa pun di dunia secara bebas dan aman.",
+  "th": "ซอฟต์แวร์สาธารณะทั้งหมดของเราไม่รวมโฆษณาเชิงพาณิชย์และการเก็บรวบรวมข้อมูลโดยสิ้นเชิง และเผยแพร่ในฐานะโครงสร้างพื้นฐานดิจิทัลสาธารณะที่ทุกคนในโลกสามารถใช้ได้อย่างอิสระและปลอดภัย",
+  "vi": "Tất cả phần mềm công cộng của chúng tôi hoàn toàn loại trừ quảng cáo thương mại và việc thu thập dữ liệu, và được phân phối dưới dạng hạ tầng số công cộng mà bất kỳ ai trên thế giới cũng có thể sử dụng tự do và an toàn.",
+  "zh-TW": "我們提供的所有公共軟體完全排除商業廣告和資料收集，作為公共數位基礎設施分發，讓全世界任何人都能自由、安全地使用。",
+  "ar": "جميع برامجنا العامة تستبعد تمامًا الإعلانات التجارية وجمع البيانات، وتُوزَّع كبنية تحتية رقمية عامة يمكن لأي شخص في العالم استخدامها بحرية وأمان.",
+  "fa": "همه نرم‌افزارهای عمومی ما تبلیغات تجاری و جمع‌آوری داده را کاملاً کنار می‌گذارند و به‌عنوان زیرساخت دیجیتال عمومی توزیع می‌شوند که هر کسی در جهان می‌تواند آزادانه و با امنیت از آن استفاده کند."
+ }
+});
+
+</script>
+<style>.nx-back{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9999;display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:999px;background:rgba(10,16,34,.85);border:1px solid rgba(45,212,191,.55);color:#E2F3FF;font-size:15.5px;font-weight:600;text-decoration:none;backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,.35)}.nx-back:active{filter:brightness(1.6)}</style>
+<a class="nx-back" href="https://nexus-2e23d.web.app/#n20" aria-label="현황판으로 돌아가기">← 돌아가기</a>
+
+<script>
+/* NX-I18N-SUPPLEMENT — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "녹음 파일": {
+  "en": "Audio File",
+  "zh": "录音文件",
+  "zh-TW": "錄音檔案",
+  "ja": "録音ファイル",
+  "es": "Archivo de grabación",
+  "hi": "रिकॉर्डिंग फ़ाइल",
+  "fr": "Fichier d'enregistrement",
+  "de": "Aufnahmedatei",
+  "pt": "Arquivo de gravação",
+  "it": "File di registrazione",
+  "ru": "Файл записи",
+  "uk": "Файл запису",
+  "ar": "ملف التسجيل",
+  "fa": "فایل ضبط",
+  "th": "ไฟล์เสียงบันทึก",
+  "vi": "Tệp ghi âm",
+  "id": "File rekaman",
+  "tr": "Kayıt dosyası",
+  "nl": "Opnamebestand",
+  "pl": "Plik nagrania",
+  "sv": "Inspelningsfil",
+  "da": "Optagelsesfil",
+  "nb": "Innspillingsfil",
+  "fi": "Nauhoitustiedosto",
+  "cs": "Nahrávací soubor",
+  "hu": "Felvételi fájl",
+  "ro": "Fișier de înregistrare"
+ },
+ "말로 쓰는 메모(103)": {
+  "en": "Voice Memo (103)",
+  "zh": "语音备忘录 (103)",
+  "zh-TW": "語音備忘錄 (103)",
+  "ja": "音声メモ(103)",
+  "es": "Nota de voz (103)",
+  "hi": "वॉइस नोट (103)",
+  "fr": "Mémo vocal (103)",
+  "de": "Sprachnotiz (103)",
+  "pt": "Nota de voz (103)",
+  "it": "Memo vocale (103)",
+  "ru": "Голосовые заметки (103)",
+  "uk": "Голосові нотатки (103)",
+  "ar": "مذكرات صوتية (103)",
+  "fa": "یادداشت صوتی (103)",
+  "th": "บันทึกเสียง(103)",
+  "vi": "Ghi chú thoại(103)",
+  "id": "Catatan suara(103)",
+  "tr": "Sesli not(103)",
+  "nl": "Spraaknotitie (103)",
+  "pl": "Notatka głosowa (103)",
+  "sv": "Röstanteckning (103)",
+  "da": "Stemmenotat (103)",
+  "nb": "Stemmenotat (103)",
+  "fi": "Äänimuistiinpano (103)",
+  "cs": "Hlasová poznámka (103)",
+  "hu": "Hangjegyzet (103)",
+  "ro": "Notă vocală (103)"
+ },
+ ", 긴 받아쓰기는": {
+  "en": ", long dictation is",
+  "zh": "，长篇听写",
+  "zh-TW": ", 長篇聽寫",
+  "ja": "、長い音声入力は",
+  "es": ", el dictado largo",
+  "hi": ", लंबा श्रुतलेख",
+  "fr": ", les longues dictées",
+  "de": ", lange Diktate",
+  "pt": ", ditados longos",
+  "it": ", le dettature lunghe",
+  "ru": ", длинная диктовка",
+  "uk": ", довге диктування",
+  "ar": "، والإملاء الطويل",
+  "fa": "، دیکته طولانی",
+  "th": ", การเขียนตามคำบอกที่ยาว",
+  "vi": ", phần nghe viết dài",
+  "id": ", dikte panjang",
+  "tr": ", uzun dikte",
+  "nl": ", lange dictaten zijn",
+  "pl": ", długie dyktanda są",
+  "sv": ", långa dikteringar är",
+  "da": ", lange dikteringer er",
+  "nb": ", lange dikteringer er",
+  "fi": ", pitkät sanelut ovat",
+  "cs": ", dlouhé diktáty jsou",
+  "hu": ", a hosszú diktálások",
+  "ro": ", dictările lungi sunt"
+ },
+ "받아쓰기(603)": {
+  "en": "Dictation (603)",
+  "zh": "听写 (603)",
+  "zh-TW": "聽寫 (603)",
+  "ja": "音声入力(603)",
+  "es": "Dictado (603)",
+  "hi": "श्रुतलेख (603)",
+  "fr": "Dictée (603)",
+  "de": "Diktat (603)",
+  "pt": "Ditado (603)",
+  "it": "Dettatura (603)",
+  "ru": "Диктовка (603)",
+  "uk": "Диктування (603)",
+  "ar": "إملاء (603)",
+  "fa": "دیکته (603)",
+  "th": "เขียนตามคำบอก(603)",
+  "vi": "Nghe viết(603)",
+  "id": "Dikte(603)",
+  "tr": "Dikte(603)",
+  "nl": "Dicteren (603)",
+  "pl": "Dyktowanie (603)",
+  "sv": "Diktering (603)",
+  "da": "Diktering (603)",
+  "nb": "Diktering (603)",
+  "fi": "Sanelu (603)",
+  "cs": "Diktování (603)",
+  "hu": "Diktálás (603)",
+  "ro": "Dictare (603)"
+ },
+ "에 있습니다.": {
+  "en": " is in.",
+  "zh": "中。",
+  "zh-TW": "中。",
+  "ja": "にあります。",
+  "es": ".",
+  "hi": " में है।",
+  "fr": "se trouve.",
+  "de": "befindet sich.",
+  "pt": "está.",
+  "it": "si trova.",
+  "ru": "находится.",
+  "uk": "знаходиться.",
+  "ar": "يوجد في.",
+  "fa": "قرار دارد.",
+  "th": "อยู่ที่.",
+  "vi": "nằm ở.",
+  "id": "berada di.",
+  "tr": "içinde yer alır.",
+  "nl": "bevindt zich.",
+  "pl": "znajduje się.",
+  "sv": "finns.",
+  "da": "befinder sig.",
+  "nb": "befinner seg.",
+  "fi": "sijaitsee.",
+  "cs": "se nachází.",
+  "hu": "található.",
+  "ro": "se află."
+ },
+ "← 돌아가기": {
+  "en": "← Back",
+  "zh": "← 返回",
+  "zh-TW": "← 返回",
+  "ja": "← 戻る",
+  "es": "← Volver",
+  "hi": "← वापस",
+  "fr": "← Retour",
+  "de": "← Zurück",
+  "pt": "← Voltar",
+  "it": "← Indietro",
+  "ru": "← Назад",
+  "uk": "← Назад",
+  "ar": "← رجوع",
+  "fa": "← بازگشت",
+  "th": "← กลับ",
+  "vi": "← Quay lại",
+  "id": "← Kembali",
+  "tr": "← Geri dön",
+  "nl": "← Terug",
+  "pl": "← Wstecz",
+  "sv": "← Tillbaka",
+  "da": "← Tilbage",
+  "nb": "← Tilbake",
+  "fi": "← Takaisin",
+  "cs": "← Zpět",
+  "hu": "← Vissza",
+  "ro": "← Înapoi"
+ }
+});
+</script>
+
+<script>
+/* NX-I18N-SUPPLEMENT-R3 — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "역할 안내: 녹음기는 소리를": {
+  "en": "Role guide: Voice Recorder leaves sound",
+  "zh": "角色说明：录音机是将声音",
+  "zh-TW": "角色說明：錄音機是將聲音",
+  "ja": "役割案内：ボイスレコーダーは音を",
+  "es": "Guía de roles: la grabadora de voz toma el sonido",
+  "hi": "भूमिका मार्गदर्शन: वॉइस रिकॉर्डर ध्वनि को",
+  "fr": "Guide des rôles : l'enregistreur vocal prend le son",
+  "de": "Rollenhinweis: Der Sprachrekorder nimmt den Ton",
+  "pt": "Guia de funções: o gravador de voz pega o som",
+  "it": "Guida ai ruoli: il registratore vocale prende il suono",
+  "ru": "О роли: диктофон записывает звук",
+  "uk": "Про роль: диктофон записує звук",
+  "ar": "عن الدور: مسجل الصوت يسجّل الصوت",
+  "fa": "درباره نقش: ضبط صدا، صدا را",
+  "th": "คำแนะนำบทบาท: เครื่องบันทึกเสียงเป็นเครื่องมือที่เก็บเสียงเป็น",
+  "vi": "Hướng dẫn vai trò: Máy ghi âm là công cụ lưu âm thanh thành",
+  "id": "Panduan peran: Perekam suara adalah alat yang menyimpan suara sebagai",
+  "tr": "Rol bilgilendirmesi: Ses kaydedici, sesi",
+  "nl": "Rolbeschrijving: Voicerecorder is voor geluid",
+  "pl": "Opis roli: Dyktafon dotyczy dźwięku",
+  "sv": "Rollbeskrivning: Röstinspelare är för ljud",
+  "da": "Rollebeskrivelse: Stemmeoptager er til lyd",
+  "nb": "Rollebeskrivelse: Stemmeopptaker er for lyd",
+  "fi": "Roolin kuvaus: Ääninauhuri on äänelle",
+  "cs": "Popis role: Hlasový záznamník je pro zvuk",
+  "hu": "Szerepleírás: A hangrögzítő a hangra vonatkozik",
+  "ro": "Descrierea rolului: Reportofonul este pentru sunet"
+ },
+ "로 남기는 도구입니다. 말을 글자로 바꾸지는 않습니다 — 글자 메모는": {
+  "en": "as a tool. It does not convert speech to text — text memos are",
+  "zh": "留下的工具。它不会将话语转为文字 — 文字备忘录是",
+  "zh-TW": "留下的工具。它不會將話語轉為文字 — 文字備忘錄是",
+  "ja": "と残すツールです。言葉を文字に変えることはありません — 文字メモは",
+  "es": "Es una herramienta para guardarlo. No convierte el habla en texto — la nota de texto es",
+  "hi": "रखने वाला टूल है। यह कथन को टेक्स्ट में नहीं बदलता — टेक्स्ट मेमो है",
+  "fr": "est un outil qui le conserve. Il ne convertit pas la parole en texte — la note en texte est",
+  "de": "ist ein Werkzeug, das ihn aufbewahrt. Er wandelt Rede nicht in Text um — die Textnotiz ist",
+  "pt": "é uma ferramenta que o guarda. Não converte a fala em texto — a nota em texto é",
+  "it": "è uno strumento che lo conserva. Non converte il discorso in testo — la nota di testo è",
+  "ru": "и не превращает речь в текст — текстовая заметка",
+  "uk": "і не перетворює мовлення на текст — текстова нотатка",
+  "ar": "ولا يحوّل الكلام إلى نص — الملاحظة النصية",
+  "fa": "و سخن را به متن تبدیل نمی‌کند — یادداشت متنی",
+  "th": " ไม่เปลี่ยนคำพูดเป็นตัวอักษร — บันทึกตัวอักษรคือ",
+  "vi": ". Nó không chuyển lời nói thành chữ — ghi chú chữ là",
+  "id": ". Alat ini tidak mengubah ucapan menjadi teks — memo teks adalah",
+  "tr": " olarak bırakan bir araçtır. Konuşmayı yazıya çevirmez — yazı notu",
+  "nl": "tool om achter te laten. Het zet spraak niet om in tekst — voor tekstmemo's gebruikt u",
+  "pl": "narzędzie do pozostawiania. Nie zamienia mowy na tekst — do notatek tekstowych użyj",
+  "sv": "verktyg för att lämna kvar. Det omvandlar inte tal till text — för textanteckningar använder du",
+  "da": "værktøj til at efterlade. Det omdanner ikke tale til tekst — til tekstnoter bruger du",
+  "nb": "verktøy for å legge igjen. Det omgjør ikke tale til tekst — for tekstnotater bruker du",
+  "fi": "työkalu jättämiseen. Se ei muuta puhetta tekstiksi — tekstimuistioihin käytä",
+  "cs": "nástroj pro zanechání. Nepřevádí řeč na text — pro textové poznámky použijte",
+  "hu": "eszköz a hátrahagyáshoz. Nem alakítja a beszédet szöveggé — szöveges jegyzetekhez használja a",
+  "ro": "instrument pentru a lăsa. Nu transformă vorbirea în text — pentru note text folosește"
+ }
+});
+</script>
+</body>
+</html>

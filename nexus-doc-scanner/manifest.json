@@ -1,0 +1,1 @@
+{"background_color":"#0B0F19","description":"사진으로 찍은 문서를 반듯하게 펴서 PDF로 만드는 도구","display":"standalone","icons":[{"sizes":"192x192","src":"/icon-192.png","type":"image/png"},{"sizes":"512x512","src":"/icon-512.png","type":"image/png"}],"name":"넥서스 문서 스캔","short_name":"문서 스캔","start_url":"/","theme_color":"#0B0F19"}

@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 게임즈 — Nexus Games</title>
+<meta name="description" content="유아부터 어른까지, 나이에 맞는 놀이를 한곳에 모은 게임 방 — 장보기 매치3, 오늘의 낱말 한 판, 기억 한 스푼">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png">
+<meta property="og:title" content="넥서스 게임즈">
+<meta property="og:description" content="나이에 맞는 놀이를 한곳에 모은 게임 방입니다">
+<meta property="og:image" content="/og.jpg">
+<style>
+  :root{--bg:#0B1226;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--green:#4ADE80;--amber:#FBBF24;--ink:#F8FAFC;--muted:#A8B3C7;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;font-size:18px;line-height:1.6;-webkit-tap-highlight-color:transparent}
+  @keyframes nxspin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  .nxspin{transform-origin:50% 50%;animation:nxspin 26s linear infinite}
+  @keyframes nxIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  .testbadge{flex:none;font-size:12px;font-weight:700;color:#FDE68A;border:1px solid rgba(253,230,138,.5);border-radius:999px;padding:5px 10px}
+  header .homebtn{flex:none;font-size:14px;font-weight:700;color:#06121F;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:10px 16px;text-decoration:none;white-space:nowrap}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 90px;animation:nxIn .5s ease both}
+  h1{font-size:29px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:17px;margin:0 0 8px}
+  .promise{margin:14px 0 4px;background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.35);border-radius:14px;padding:12px 16px;font-size:16px}
+  .roomtitle{display:flex;align-items:center;gap:9px;margin:30px 0 12px;font-size:21px;font-weight:800}
+  .roomdot{width:11px;height:11px;border-radius:50%;background:var(--room,#fff);box-shadow:0 0 12px var(--room,#fff)}
+  .roomtitle .en{font-size:12px;color:var(--muted);letter-spacing:.18em;font-weight:600}
+  .roomtitle .ages{margin-left:auto;font-size:14px;color:var(--muted);font-weight:600}
+  .grid{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+  a.gcard{display:flex;gap:14px;align-items:flex-start;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;transition:transform .15s ease,border-color .15s ease;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+  a.gcard:active{transform:scale(.985)}
+  .gcard .gic{width:64px;height:64px;flex:none;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .gcard h3{margin:2px 0 4px;font-size:20px}
+  .gcard p{margin:0;color:var(--muted);font-size:16px}
+  .gcard .go{margin-top:8px;display:inline-block;font-weight:700;color:var(--cyan);font-size:16px}
+  .sooncard{display:flex;gap:14px;align-items:flex-start;background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.25);border-radius:18px;padding:18px}
+  .soonpill{flex:none;font-size:13px;font-weight:800;color:#0B1226;background:var(--amber);border-radius:999px;padding:4px 11px;margin-top:3px}
+  .sooncard h3{margin:2px 0 4px;font-size:20px}
+  .sooncard p{margin:0;color:var(--muted);font-size:16px}
+  footer{max-width:920px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:14px}
+  /* ---- 모듈 공통 ---- */
+  .modbar{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .backlink{flex:none;text-decoration:none;color:#06121F;background:linear-gradient(135deg,var(--cyan),var(--violet));font-weight:800;border-radius:999px;padding:10px 16px;font-size:16px}
+  .modtitle{font-size:26px;margin:8px 0 2px}
+  .howto{color:var(--muted);font-size:17px;margin:0 0 14px}
+  .senior{font-size:20px}
+  .senior button{font-family:inherit}
+  .bigbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:14px 22px;font-size:20px;font-weight:700;cursor:pointer;min-height:60px}
+  .bigbtn:active{transform:scale(.98)}
+  .bigbtn.primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121F;border:0}
+  .bigbtn:disabled{opacity:.45;cursor:default}
+  .msg{min-height:32px;font-size:19px;font-weight:700;margin:10px 0}
+  .donebox{margin-top:18px;background:rgba(74,222,128,.09);border:1px solid rgba(74,222,128,.4);border-radius:18px;padding:22px;text-align:center;animation:nxIn .5s ease both}
+  .donebox h3{font-size:25px;margin:4px 0 8px}
+  .donebox p{font-size:18px;color:var(--ink);margin:6px 0}
+  .donebox .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  /* ---- 매치3 ---- */
+  .m3wrap{display:flex;flex-direction:column;gap:14px}
+  @media(min-width:760px){.m3wrap{flex-direction:row;align-items:flex-start}}
+  .m3side{flex:1;min-width:230px}
+  .goalbox{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .goalbox h4{margin:0 0 10px;font-size:19px}
+  .goalrow{display:flex;align-items:center;gap:10px;font-size:19px;margin:7px 0}
+  .goalrow .cnt{margin-left:auto;font-weight:800}
+  .goalrow.done .cnt{color:var(--green)}
+  .m3board{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;max-width:520px;width:100%;margin:0 auto;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:18px;padding:8px}
+  .m3tile{position:relative;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.06);aspect-ratio:1/1.08;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;cursor:pointer;padding:2px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:transform .15s ease,box-shadow .15s ease,opacity .18s ease}
+  .m3tile svg{width:62%;height:auto;display:block}
+  .m3tile .tn{font-size:11px;color:var(--ink);line-height:1.1;font-weight:700}
+  @media(min-width:480px){.m3tile .tn{font-size:12.5px}}
+  .m3tile.sel{box-shadow:0 0 0 3px var(--amber),0 0 18px rgba(251,191,36,.5);transform:scale(1.06);z-index:2}
+  .m3tile.hint{box-shadow:0 0 0 3px var(--cyan),0 0 16px rgba(56,189,248,.55)}
+  .m3tile.clearing{opacity:0;transform:scale(.4)}
+  /* ---- 낱말 ---- */
+  .wdate{font-size:17px;color:var(--amber);font-weight:800;letter-spacing:.02em}
+  .wprog{font-size:17px;color:var(--muted);font-weight:700}
+  .wclue{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;font-size:21px;margin:12px 0}
+  .wchoseong{font-size:19px;color:var(--cyan);font-weight:800;margin-top:8px}
+  .wslots{display:flex;gap:9px;justify-content:center;margin:18px 0 8px;flex-wrap:wrap}
+  .wslot{width:62px;height:68px;border-radius:14px;border:2px dashed rgba(255,255,255,.35);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800}
+  .wslot.filled{border-style:solid;border-color:var(--teal);background:rgba(45,212,191,.12)}
+  .wslot.locked{border-color:var(--amber);background:rgba(251,191,36,.13)}
+  .wpool{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+  .wtile{width:58px;height:62px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.09);font-size:26px;font-weight:800;color:var(--ink);cursor:pointer}
+  .wtile:disabled{opacity:.22;cursor:default}
+  .wrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+  /* ---- 기억 ---- */
+  .memgrid{display:flex;gap:11px;flex-wrap:wrap;justify-content:center;margin:16px 0}
+  .memtile{width:104px;min-height:104px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.06);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px;font-size:18px;font-weight:800;color:var(--ink)}
+  .memtile svg{width:44px;height:auto}
+  button.memtile{cursor:pointer;font-family:inherit}
+  button.memtile.picked{box-shadow:0 0 0 3px var(--amber);background:rgba(251,191,36,.13)}
+  button.memtile.right{box-shadow:0 0 0 3px var(--green);background:rgba(74,222,128,.14)}
+  button.memtile.missed{box-shadow:0 0 0 3px var(--cyan);background:rgba(56,189,248,.10)}
+  button.memtile.wrong{opacity:.45}
+  .membar{height:12px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;max-width:520px;margin:10px auto}
+  .membar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--teal));width:100%}
+  .memphase{font-size:21px;font-weight:800;text-align:center}
+  .center{text-align:center}
+</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{min-width:0}header .brand{min-width:0;overflow:hidden}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nx-langwrap{flex:none!important}</style></head>
+<body>
+<header>
+  <svg class="logo nxspin" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="#2DD4BF" stroke-width="2" stroke-dasharray="4 5" opacity=".8"/><circle cx="24" cy="24" r="6.5" fill="#38BDF8"/><ellipse cx="24" cy="24" rx="20" ry="8.5" fill="none" stroke="#818CF8" stroke-width="2" transform="rotate(-24 24 24)"/></svg>
+  <div class="brand"><b>넥서스 게임즈</b><span>NEXUS GAMES</span></div>
+  <span class="testbadge">테스트 중</span>
+  </header>
+
+<!-- ================= 허브 ================= -->
+<main id="view-hub">
+  <h1>넥서스 게임즈</h1>
+  <p class="sub">유아부터 어른까지 — 나이에 맞는 놀이를 한곳에 모은 게임 방입니다. 고르고 싶은 방을 눌러 들어가세요.</p>
+  <!-- NX-BOUNDARY-2026-11-04 --><p class="sub nx-boundary" style="border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 10px">역할 안내: <b>기억 한 스푼은 보고 외웠다가 떠올리는 놀이</b>입니다. 카드를 뒤집어 짝을 맞추는 훈련은 <a href="https://nexus-games-2e23d.web.app">머리 체조 · 기억 카드(802)</a>에 있습니다.</p>
+  <div class="promise">이곳의 게임에는 <b>광고도, 결제도, 시간 재촉도 없습니다.</b> 천천히 놀다가, 멈추고 싶을 때 멈추면 됩니다.</div>
+
+  <div class="roomtitle" style="--room:#FBBF24"><span class="roomdot"></span>유아 놀이방<span class="en">LITTLE KIDS</span><span class="ages">만 3~6세 · 보호자와 함께</span></div>
+  <div class="grid">
+    <div class="sooncard" aria-disabled="true">
+      <span class="soonpill">준비 중</span>
+      <div>
+        <h3>아이와 함께 여는 놀이방</h3>
+        <p>숫자 세기, 소리 흉내, 몸으로 따라 하기 — 어린 아이가 보호자와 함께 노는 방을 만들고 있습니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="roomtitle" style="--room:#4ADE80"><span class="roomdot"></span>머리 체조<span class="en">BRAIN GYM</span><span class="ages">누구나</span></div>
+  <div class="grid">
+    <a class="gcard" href="https://nexus-games-2e23d.web.app/">
+      <span class="gic"><svg width="40" height="40" viewBox="0 0 48 48"><rect x="13.5" y="13.5" width="21" height="21" rx="5" fill="none" stroke="#E7ECF7" stroke-width="2.6"/><circle cx="19.5" cy="19.5" r="2.3" fill="#4ADE80"/><circle cx="28.5" cy="19.5" r="2.3" fill="#4ADE80"/><circle cx="24" cy="24" r="2.3" fill="#4ADE80"/><circle cx="19.5" cy="28.5" r="2.3" fill="#4ADE80"/><circle cx="28.5" cy="28.5" r="2.3" fill="#4ADE80"/></svg></span>
+      <div><h3>넥서스 머리 체조</h3><p>기억 카드, 순서 기억, 규칙 추리, 처리 속도 — 짧게 머리를 깨우는 게임 네 가지.</p><span class="go">들어가기 →</span></div>
+    </a>
+  </div>
+
+  <div class="roomtitle" style="--room:#2DD4BF"><span class="roomdot"></span>중장년 놀이<span class="en">FOR GROWN-UPS</span><span class="ages">40~64세</span></div>
+  <div class="grid">
+    <a class="gcard" href="?m=match3">
+      <span class="gic"><svg width="40" height="40" viewBox="0 0 48 48"><circle cx="17" cy="19" r="7.5" fill="#EF4444"/><path d="M17 12c1-3.4 4-4.6 6.4-4.4-.4 2.6-2 4.6-4.8 4.8" fill="#4ADE80"/><rect x="27" y="12" width="9" height="13" rx="2" fill="#F8FAFC"/><rect x="27" y="12" width="9" height="4.6" fill="#38BDF8"/><circle cx="17" cy="34" r="6.4" fill="#FBBF24"/><circle cx="30" cy="34" r="6.4" fill="#A78BFA"/></svg></span>
+      <div><h3>장보기 매치3</h3><p>장보기 재료를 셋씩 맞추는 퍼즐. 장보기 목록을 다 채우면 한 판 완성입니다.</p><span class="go">놀러 가기 →</span></div>
+    </a>
+    <a class="gcard" href="?m=word">
+      <span class="gic"><svg width="40" height="40" viewBox="0 0 48 48"><rect x="10" y="10" width="12" height="12" rx="3" fill="rgba(255,255,255,.1)" stroke="#E7ECF7" stroke-width="2"/><rect x="26" y="10" width="12" height="12" rx="3" fill="rgba(255,255,255,.1)" stroke="#E7ECF7" stroke-width="2"/><rect x="10" y="26" width="12" height="12" rx="3" fill="rgba(45,212,191,.25)" stroke="#2DD4BF" stroke-width="2"/><rect x="26" y="26" width="12" height="12" rx="3" fill="rgba(255,255,255,.1)" stroke="#E7ECF7" stroke-width="2"/><path d="M14.4 19.6v-7M13 15.8h2.8M30 14.4c1.8 2 1.8 3.4 0 5.4M14 30.4h4.4M16.2 28.2v4.4" stroke="#F8FAFC" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></span>
+      <div><h3>오늘의 낱말 한 판</h3><p>매일 바뀌는 낱말 다섯 개. 뜻과 초성을 보고 글자를 맞춰 한 판을 채웁니다.</p><span class="go">놀러 가기 →</span></div>
+    </a>
+    <a class="gcard" href="?m=memory">
+      <span class="gic"><svg width="40" height="40" viewBox="0 0 48 48"><path d="M24 9c5 0 8.6 3.4 8.6 8 0 3-1.4 5-3 6.8-1.2 1.4-1.9 2.6-2 4.4h-7.2c-.1-1.8-.8-3-2-4.4-1.6-1.8-3-3.8-3-6.8 0-4.6 3.6-8 8.6-8Z" fill="none" stroke="#E7ECF7" stroke-width="2.4"/><path d="M20.4 34.6h7.2M21.6 39h4.8" stroke="#FBBF24" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+      <div><h3>기억 한 스푼</h3><p>물건들을 잠깐 보고 외웠다가, 가린 뒤에 떠올려 맞히는 가벼운 기억 놀이.</p><span class="go">놀러 가기 →</span></div>
+    </a>
+  </div>
+
+  <div class="roomtitle" style="--room:#818CF8"><span class="roomdot"></span>대국실<span class="en">BOARD GAMES</span><span class="ages">둘이 두는 놀이</span></div>
+  <div class="grid">
+    <a class="gcard" href="https://nexus-boardgames.web.app/">
+      <span class="gic"><svg width="40" height="40" viewBox="0 0 48 48"><path d="M14 34V14M24 34V14M34 34V14M14 24h20M14 14h20M14 34h20" stroke="#818CF8" stroke-opacity=".6" stroke-width="1.6"/><circle cx="14" cy="14" r="4.6" fill="#0F172A" stroke="#E2E8F0" stroke-width="1.3"/><circle cx="24" cy="24" r="4.6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.3"/><circle cx="34" cy="34" r="4.6" fill="#0F172A" stroke="#E2E8F0" stroke-width="1.3"/></svg></span>
+      <div><h3>넥서스 대국실</h3><p>오목, 장기, 체스, 바둑 — 혼자서도, 방을 만들어 둘이서도 둘 수 있습니다.</p><span class="go">들어가기 →</span></div>
+    </a>
+  </div>
+</main>
+<footer id="foot-hub">넥서스 게임즈는 넥서스 툴즈와 나란히 서는 게임 전용 방입니다. 놀이 기록은 이 기기 안에만 남습니다.</footer>
+
+<!-- ================= 장보기 매치3 ================= -->
+<main id="view-match3" class="senior" hidden>
+  <div class="modbar"><a class="backlink" href="./">← 게임즈로</a></div>
+  <h2 class="modtitle">장보기 매치3</h2>
+  <p class="howto">옆에 붙은 재료 두 개를 차례로 눌러 자리를 바꾸세요. 같은 재료가 셋 이상 모이면 장바구니에 담깁니다. 왼쪽 장보기 목록을 다 채우면 한 판 완성 — 시간 제한은 없으니 천천히 하세요.</p>
+  <div class="m3wrap">
+    <div class="m3side">
+      <div class="goalbox">
+        <h4>오늘의 장보기 목록</h4>
+        <div id="m3-goals"></div>
+        <p style="margin:12px 0 4px;font-size:18px">움직인 횟수 <b id="m3-moves">0</b> / <span id="m3-maxmoves">40</span> · 점수 <b id="m3-score">0</b></p>
+        <div class="msg" id="m3-msg" role="status"></div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap">
+          <button class="bigbtn" id="m3-hint" type="button">힌트 보기</button>
+          <button class="bigbtn" id="m3-restart" type="button">처음부터</button>
+        </div>
+      </div>
+    </div>
+    <div style="flex:none;width:100%;max-width:540px">
+      <div class="m3board" id="m3-board" aria-label="매치3 판"></div>
+    </div>
+  </div>
+  <div class="donebox" id="m3-done" hidden>
+    <h3>장보기를 마쳤어요!</h3>
+    <p id="m3-done-text"></p>
+    <div class="row">
+      <button class="bigbtn primary" id="m3-again" type="button">한 판 더 하기</button>
+      <a class="bigbtn" href="./" style="text-decoration:none;display:inline-flex;align-items:center">게임즈로 돌아가기</a>
+    </div>
+  </div>
+  <div class="donebox" id="m3-out" hidden style="background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.4)">
+    <h3>오늘은 여기까지예요</h3>
+    <p>움직일 수 있는 횟수를 다 썼습니다. 아쉽지만 잘하셨어요 — 목록은 그대로 두고 다시 해 볼 수 있습니다.</p>
+    <div class="row">
+      <button class="bigbtn primary" id="m3-again2" type="button">다시 해 보기</button>
+      <a class="bigbtn" href="./" style="text-decoration:none;display:inline-flex;align-items:center">게임즈로 돌아가기</a>
+    </div>
+  </div>
+</main>
+
+<!-- ================= 오늘의 낱말 한 판 ================= -->
+<main id="view-word" class="senior" hidden>
+  <div class="modbar"><a class="backlink" href="./">← 게임즈로</a></div>
+  <h2 class="modtitle">오늘의 낱말 한 판</h2>
+  <p class="howto">뜻과 초성을 보고, 아래 글자 조각을 눌러 낱말을 완성하세요. 날짜마다 판이 바뀝니다. 틀려도 괜찮습니다 — 힌트는 언제든 쓸 수 있습니다.</p>
+  <p><span class="wdate" id="w-date"></span> · <span class="wprog" id="w-prog"></span></p>
+  <div class="wclue"><span id="w-clue"></span><div class="wchoseong" id="w-cho"></div></div>
+  <div class="wslots" id="w-slots"></div>
+  <div class="wpool" id="w-pool"></div>
+  <div class="msg center" id="w-msg" role="status"></div>
+  <div class="wrow">
+    <button class="bigbtn" id="w-hint" type="button">힌트 (첫 글자)</button>
+    <button class="bigbtn primary" id="w-check" type="button">맞는지 보기</button>
+  </div>
+  <div class="donebox" id="w-done" hidden>
+    <h3>오늘의 낱말 한 판 완성!</h3>
+    <p id="w-done-text"></p>
+    <div class="row">
+      <button class="bigbtn primary" id="w-again" type="button">오늘 판 다시 풀기</button>
+      <a class="bigbtn" href="./" style="text-decoration:none;display:inline-flex;align-items:center">게임즈로 돌아가기</a>
+    </div>
+  </div>
+</main>
+
+<!-- ================= 기억 한 스푼 ================= -->
+<main id="view-memory" class="senior" hidden>
+  <div class="modbar"><a class="backlink" href="./">← 게임즈로</a></div>
+  <h2 class="modtitle">기억 한 스푼</h2>
+  <p class="howto">물건들을 잠깐 보여 드립니다. 천천히 눈에 담아 두셨다가, 화면이 바뀌면 아까 본 물건들을 골라 보세요. 세 차례 반복하면 한 스푼 완성입니다. 머리를 쓰는 즐거움, 그걸로 충분합니다.</p>
+  <p class="memphase" id="mem-phase"></p>
+  <div class="membar" id="mem-barwrap" hidden><i id="mem-bar"></i></div>
+  <div class="memgrid" id="mem-grid"></div>
+  <div class="msg center" id="mem-msg" role="status"></div>
+  <div class="wrow">
+    <button class="bigbtn primary" id="mem-main" type="button">시작하기</button>
+    <button class="bigbtn" id="mem-reshow" type="button" hidden>한 번 더 보기</button>
+  </div>
+  <div class="donebox" id="mem-done" hidden>
+    <h3>기억 한 스푼 완성!</h3>
+    <p id="mem-done-text"></p>
+    <div class="row">
+      <button class="bigbtn primary" id="mem-again" type="button">한 스푼 더 하기</button>
+      <a class="bigbtn" href="./" style="text-decoration:none;display:inline-flex;align-items:center">게임즈로 돌아가기</a>
+    </div>
+  </div>
+</main>
+
+<script>
+window.NXGAMES = window.NXGAMES || {};
+(function(){
+  var m = new URLSearchParams(location.search).get('m');
+  var views = { hub:'view-hub', match3:'view-match3', word:'view-word', memory:'view-memory' };
+  var key = views[m] ? m : 'hub';
+  Object.keys(views).forEach(function(k){ document.getElementById(views[k]).hidden = (k !== key); });
+  document.getElementById('foot-hub').hidden = (key !== 'hub');
+  window.NXGAMES.module = key;
+  if (key === 'match3') startMatch3();
+  if (key === 'word') startWord();
+  if (key === 'memory') startMemory();
+  function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  /* ================= 장보기 매치3 ================= */
+  function startMatch3(){
+    var TYPES = [
+      { id:'apple',  name:'사과', svg:'<svg viewBox="0 0 48 48"><circle cx="24" cy="28" r="13" fill="#EF4444"/><path d="M24 16c1-4.4 5-6.2 8.4-5.8-.4 3.4-2.6 6-6 6.2" fill="#4ADE80"/><rect x="22.8" y="12" width="2.6" height="6" rx="1.3" fill="#92400E"/></svg>' },
+      { id:'carrot', name:'당근', svg:'<svg viewBox="0 0 48 48"><path d="M14 14 L30 30 c2.4 2.4 1 6-2 6 L14 22 Z" fill="#F97316" transform="rotate(8 24 24)"/><path d="M13 15c-2.6-3.4-1.6-6.8 0-8.6 1.4 1.8 1.6 4.4.6 6.6M16.4 12.4C16 8.6 18 5.8 20 4.4c1 2.4.4 5-1.2 7" fill="none" stroke="#4ADE80" stroke-width="2.4" stroke-linecap="round"/></svg>' },
+      { id:'milk',   name:'우유', svg:'<svg viewBox="0 0 48 48"><path d="M17 14 L24 7 l7 7 v24 a2 2 0 0 1 -2 2 H19 a2 2 0 0 1 -2 -2 Z" fill="#F8FAFC"/><path d="M17 14 h14 v7 H17 Z" fill="#38BDF8"/><rect x="20" y="25" width="8" height="8" rx="2" fill="#38BDF8" opacity=".55"/></svg>' },
+      { id:'bread',  name:'빵',   svg:'<svg viewBox="0 0 48 48"><path d="M10 22c0-6 6-10 14-10s14 4 14 10c0 2.4-1.2 4-3 5v7a2 2 0 0 1 -2 2 H15 a2 2 0 0 1 -2 -2 v-7c-1.8-1-3-2.6-3-5Z" fill="#E8B04B"/><path d="M18 18.4c1.4 1.4 1.4 3 0 4.4M24 17.4c1.4 1.4 1.4 3 0 4.4M30 18.4c1.4 1.4 1.4 3 0 4.4" stroke="#B97F26" stroke-width="2" fill="none" stroke-linecap="round"/></svg>' },
+      { id:'cheese', name:'치즈', svg:'<svg viewBox="0 0 48 48"><path d="M7 33 L41 15 v18 a2 2 0 0 1 -2 2 H9 a2 2 0 0 1 -2 -2Z" fill="#FBBF24"/><circle cx="18" cy="28" r="3" fill="#D97706" opacity=".65"/><circle cx="30" cy="27" r="2.2" fill="#D97706" opacity=".65"/><circle cx="25" cy="32" r="1.7" fill="#D97706" opacity=".65"/></svg>' },
+      { id:'fish',   name:'생선', svg:'<svg viewBox="0 0 48 48"><path d="M6 24c6-8 13-11 20-11 6 0 10 4 13 11-3 7-7 11-13 11-7 0-14-3-20-11Z" fill="#38BDF8"/><path d="M39 24l6-6v12Z" fill="#0284C7"/><circle cx="15" cy="21.4" r="2" fill="#0B1226"/></svg>' }
+    ];
+    var N = 8, MAXMOVES = 40;
+    var GOALS = [ {id:'apple', n:6}, {id:'milk', n:6}, {id:'bread', n:6} ];
+    var grid = [], sel = null, busy = false, moves = 0, score = 0, got = {}, over = false;
+    var boardEl = document.getElementById('m3-board');
+    var msgEl = document.getElementById('m3-msg');
+    function typeName(id){ for (var i=0;i<TYPES.length;i++) if (TYPES[i].id===id) return TYPES[i].name; return id; }
+    function newTile(r,c){
+      var bad = {};
+      if (c>=2 && grid[r][c-1]===grid[r][c-2] && grid[r][c-1]>=0) bad[grid[r][c-1]]=1;
+      if (r>=2 && grid[r-1][c]===grid[r-2][c] && grid[r-1][c]>=0) bad[grid[r-1][c]]=1;
+      var t; do { t = (Math.random()*TYPES.length)|0; } while (bad[t]);
+      return t;
+    }
+    function reset(){
+      grid = []; sel = null; busy = false; moves = 0; score = 0; got = {}; over = false;
+      GOALS.forEach(function(g){ got[g.id]=0; });
+      for (var r=0;r<N;r++){ grid.push([]); for (var c=0;c<N;c++) grid[r].push(newTile(r,c)); }
+      if (!findMove()) { reset(); return; }
+      document.getElementById('m3-done').hidden = true;
+      document.getElementById('m3-out').hidden = true;
+      msgEl.textContent = '재료 두 개를 골라 자리를 바꿔 보세요.';
+      render();
+    }
+    function render(){
+      boardEl.innerHTML = '';
+      for (var r=0;r<N;r++) for (var c=0;c<N;c++){
+        (function(r,c){
+          var b = document.createElement('button');
+          b.type = 'button'; b.className = 'm3tile';
+          b.dataset.r = r; b.dataset.c = c;
+          var t = TYPES[grid[r][c]];
+          b.innerHTML = t.svg + '<span class="tn">' + t.name + '</span>';
+          b.setAttribute('aria-label', t.name);
+          if (sel && sel.r===r && sel.c===c) b.classList.add('sel');
+          b.addEventListener('click', function(){ onTap(r,c); });
+          boardEl.appendChild(b);
+        })(r,c);
+      }
+      var g = document.getElementById('m3-goals'); g.innerHTML = '';
+      GOALS.forEach(function(goal){
+        var row = document.createElement('div');
+        row.className = 'goalrow' + (got[goal.id] >= goal.n ? ' done' : '');
+        row.innerHTML = '<span>' + typeName(goal.id) + '</span><span class="cnt">' + Math.min(got[goal.id], goal.n) + ' / ' + goal.n + (got[goal.id] >= goal.n ? ' ✓' : '') + '</span>';
+        g.appendChild(row);
+      });
+      document.getElementById('m3-moves').textContent = moves;
+      document.getElementById('m3-maxmoves').textContent = MAXMOVES;
+      document.getElementById('m3-score').textContent = score;
+    }
+    function findMatches(){
+      var hit = {};
+      var r,c,k;
+      for (r=0;r<N;r++){ c=0; while (c<N){ k=c+1; while (k<N && grid[r][k]===grid[r][c]) k++; if (grid[r][c]>=0 && k-c>=3) for (var i=c;i<k;i++) hit[r+','+i]=1; c=k; } }
+      for (c=0;c<N;c++){ r=0; while (r<N){ k=r+1; while (k<N && grid[k][c]===grid[r][c]) k++; if (grid[r][c]>=0 && k-r>=3) for (var j=r;j<k;j++) hit[j+','+c]=1; r=k; } }
+      return Object.keys(hit).map(function(s){ var p=s.split(','); return [ +p[0], +p[1] ]; });
+    }
+    function swap(a,b){ var t = grid[a[0]][a[1]]; grid[a[0]][a[1]] = grid[b[0]][b[1]]; grid[b[0]][b[1]] = t; }
+    function findMove(){
+      var dirs = [[0,1],[1,0]], best = null;
+      for (var r=0;r<N;r++) for (var c=0;c<N;c++) for (var d=0;d<2;d++){
+        var r2 = r+dirs[d][0], c2 = c+dirs[d][1];
+        if (r2>=N || c2>=N) continue;
+        swap([r,c],[r2,c2]);
+        var m = findMatches();
+        swap([r,c],[r2,c2]);
+        if (m.length){
+          var gain = 0;
+          m.forEach(function(cell){ var id = TYPES[grid[cell[0]][cell[1]]].id; if (got[id] !== undefined && got[id] < (GOALS.filter(function(g){return g.id===id;})[0]||{}).n) gain++; });
+          var cand = { a:[r,c], b:[r2,c2], gain:gain, n:m.length };
+          if (!best || cand.gain > best.gain || (cand.gain===best.gain && cand.n > best.n)) best = cand;
+        }
+      }
+      return best;
+    }
+    function goalDone(){ return GOALS.every(function(g){ return got[g.id] >= g.n; }); }
+    async function resolveChain(){
+      busy = true; var combo = 0;
+      while (true){
+        var m = findMatches();
+        if (!m.length) break;
+        combo++;
+        m.forEach(function(cell){
+          var id = TYPES[grid[cell[0]][cell[1]]].id;
+          if (got[id] !== undefined) got[id]++;
+          score += 10 * combo;
+          var el = boardEl.children[cell[0]*N + cell[1]];
+          if (el) el.classList.add('clearing');
+        });
+        renderSide();
+        await wait(240);
+        m.forEach(function(cell){ grid[cell[0]][cell[1]] = -1; });
+        for (var c=0;c<N;c++){
+          var stack = [];
+          for (var r=N-1;r>=0;r--) if (grid[r][c] >= 0) stack.push(grid[r][c]);
+          for (var r2=N-1;r2>=0;r2--) grid[r2][c] = stack.length ? stack.shift() : newTile(r2,c);
+        }
+        render();
+        await wait(130);
+      }
+      busy = false;
+      if (goalDone()){ over = true; finish(true); return; }
+      if (moves >= MAXMOVES){ over = true; finish(false); return; }
+      if (!findMove()){
+        msgEl.textContent = '더 맞출 곳이 없어 판을 새로 섞었어요.';
+        for (var r3=0;r3<N;r3++) for (var c3=0;c3<N;c3++) grid[r3][c3] = newTile(r3,c3);
+        render();
+      }
+    }
+    function renderSide(){
+      var g = document.getElementById('m3-goals'); g.innerHTML = '';
+      GOALS.forEach(function(goal){
+        var row = document.createElement('div');
+        row.className = 'goalrow' + (got[goal.id] >= goal.n ? ' done' : '');
+        row.innerHTML = '<span>' + typeName(goal.id) + '</span><span class="cnt">' + Math.min(got[goal.id], goal.n) + ' / ' + goal.n + (got[goal.id] >= goal.n ? ' ✓' : '') + '</span>';
+        g.appendChild(row);
+      });
+      document.getElementById('m3-score').textContent = score;
+    }
+    function finish(won){
+      render();
+      if (won){
+        document.getElementById('m3-done-text').textContent = '움직인 횟수 ' + moves + '번, 점수 ' + score + '점. 장보기 목록을 모두 채웠습니다.';
+        document.getElementById('m3-done').hidden = false;
+        msgEl.textContent = '목록을 다 채웠어요!';
+      } else {
+        document.getElementById('m3-out').hidden = false;
+        msgEl.textContent = '횟수를 다 썼어요.';
+      }
+    }
+    async function onTap(r,c){
+      if (busy || over) return;
+      clearHints();
+      if (!sel){ sel = {r:r,c:c}; render(); return; }
+      if (sel.r===r && sel.c===c){ sel = null; render(); return; }
+      var adj = Math.abs(sel.r-r) + Math.abs(sel.c-c) === 1;
+      if (!adj){ sel = {r:r,c:c}; render(); return; }
+      var a = [sel.r, sel.c], b = [r, c]; sel = null;
+      swap(a,b); render();
+      busy = true; await wait(160);
+      if (!findMatches().length){
+        swap(a,b); render();
+        msgEl.textContent = '셋이 모이지 않았어요. 다른 짝을 골라 보세요.';
+        busy = false; return;
+      }
+      moves++;
+      document.getElementById('m3-moves').textContent = moves;
+      msgEl.textContent = '담겼어요!';
+      await resolveChain();
+      if (!over) msgEl.textContent = '좋아요. 다음 짝을 골라 보세요.';
+      render();
+    }
+    function clearHints(){ boardEl.querySelectorAll('.hint').forEach(function(el){ el.classList.remove('hint'); }); }
+    document.getElementById('m3-hint').addEventListener('click', function(){
+      if (busy || over) return;
+      var mv = findMove(); if (!mv) return;
+      clearHints();
+      [mv.a, mv.b].forEach(function(cell){ var el = boardEl.children[cell[0]*N+cell[1]]; if (el) el.classList.add('hint'); });
+      msgEl.textContent = '반짝이는 두 재료를 바꿔 보세요.';
+    });
+    document.getElementById('m3-restart').addEventListener('click', reset);
+    document.getElementById('m3-again').addEventListener('click', reset);
+    document.getElementById('m3-again2').addEventListener('click', reset);
+    window.NXGAMES.match3 = {
+      state: function(){ return { moves:moves, maxMoves:MAXMOVES, score:score, got:Object.assign({},got), goals:GOALS.map(function(g){return {id:g.id,n:g.n};}), busy:busy, over:over, won: over && goalDone() }; },
+      findMove: findMove
+    };
+    reset();
+  }
+
+  /* ================= 오늘의 낱말 한 판 ================= */
+  function startWord(){
+    var WORDS = [
+      { w:'사과', h:'빨갛고 둥근 과일. 아침에 먹는 것을 금이라고도 합니다' },
+      { w:'장보기', h:'시장이나 가게에서 필요한 물건을 사 오는 일' },
+      { w:'냉장고', h:'음식을 차갑게 보관하는 가전제품' },
+      { w:'우산', h:'비가 오는 날 머리와 몸이 젖지 않게 펴서 드는 것' },
+      { w:'달력', h:'날짜와 요일을 한눈에 볼 수 있게 만든 표' },
+      { w:'안경', h:'눈이 잘 보이지 않을 때 코에 걸어 쓰는 것' },
+      { w:'손수건', h:'손이나 얼굴의 땀을 닦을 때 쓰는 작은 천' },
+      { w:'베란다', h:'아파트에서 빨래를 널거나 화분을 두는 바깥 공간' },
+      { w:'고추장', h:'고춧가루로 만든, 밥 비벼 먹는 매운 장' },
+      { w:'된장국', h:'된장을 풀어 끓인 구수한 국' },
+      { w:'김밥', h:'김에 밥과 여러 재료를 넣어 말아 썰어 먹는 음식' },
+      { w:'떡국', h:'설날 아침에 먹으면 한 살 더 먹는다는 국' },
+      { w:'감자', h:'땅속에서 캐는 둥근 작물. 쪄서 먹어도, 국에 넣어도 좋습니다' },
+      { w:'양파', h:'까면 눈물이 나는, 요리마다 들어가는 채소' },
+      { w:'마늘', h:'김치와 나물에 빠지지 않는 톡 쏘는 재료' },
+      { w:'생강차', h:'목이 칼칼할 때 마시면 몸이 따뜻해지는 차' },
+      { w:'보리차', h:'물 대신 구수하게 끓여 마시는 차' },
+      { w:'식탁', h:'밥을 차려 놓고 둘러앉아 먹는 상' },
+      { w:'장갑', h:'겨울에 손이 시릴 때 끼는 것' },
+      { w:'목도리', h:'추운 날 목에 두르는 긴 천' },
+      { w:'신문', h:'세상 소식을 인쇄해 아침마다 배달되는 종이' },
+      { w:'우체국', h:'편지와 소포를 보내고 받는 곳' },
+      { w:'약국', h:'처방전을 가지고 약을 지어 오는 곳' },
+      { w:'시장', h:'여러 가게가 모여 물건을 사고파는 곳' },
+      { w:'버스', h:'정류장에서 타고 내리는 큰 대중교통' },
+      { w:'지하철', h:'땅 아래로 다니는 전철' },
+      { w:'공원', h:'산책하고 쉬러 가는, 나무가 많은 곳' },
+      { w:'도서관', h:'책을 빌려 읽을 수 있는 조용한 곳' },
+      { w:'미용실', h:'머리를 자르고 다듬어 주는 가게' },
+      { w:'빨래', h:'더러워진 옷을 물에 씻는 일, 또는 그 옷가지' },
+      { w:'청소', h:'방을 쓸고 닦아 깨끗하게 하는 일' },
+      { w:'설거지', h:'밥 먹은 뒤 그릇을 씻는 일' },
+      { w:'텃밭', h:'집 가까이 채소를 가꾸는 작은 밭' },
+      { w:'장미', h:'가시가 있지만 향기롭고 붉은 꽃' },
+      { w:'국화', h:'가을에 피는, 차로도 마시는 꽃' },
+      { w:'단풍', h:'가을에 잎이 붉고 노랗게 물드는 것' },
+      { w:'눈사람', h:'겨울에 눈을 뭉쳐 만든 사람 모양' },
+      { w:'무지개', h:'비 온 뒤 하늘에 뜨는 일곱 빛깔 띠' },
+      { w:'달걀', h:'닭이 낳는 것. 프라이로도, 삶아서도 먹습니다' },
+      { w:'두부', h:'콩으로 만든 하얗고 부드러운 음식 재료' },
+      { w:'콩나물', h:'콩에서 싹을 틔운, 국과 무침에 쓰는 나물' },
+      { w:'시금치', h:'초록 잎을 데쳐 무쳐 먹는 나물' },
+      { w:'호박죽', h:'늙은 호박을 푹 끓여 만든 달콤한 죽' },
+      { w:'식혜', h:'추석과 설에 마시는 달콤한 전통 음료' },
+      { w:'수정과', h:'계피와 생강을 넣은 달콤한 전통 음료' },
+      { w:'저금통', h:'동전을 모아 두는 작은 통' },
+      { w:'통장', h:'은행에 돈을 맡기고 기록해 두는 책자' },
+      { w:'영수증', h:'물건을 사고 돈을 냈다는 증표 종이' },
+      { w:'리모컨', h:'멀리서 텔레비전을 켜고 끄는 작은 기계' },
+      { w:'선풍기', h:'여름에 바람을 일으켜 시원하게 해 주는 기계' },
+      { w:'난로', h:'겨울 방을 데우는 기구' },
+      { w:'이불', h:'잘 때 몸에 덮는 포근한 것' },
+      { w:'베개', h:'잘 때 머리를 괴는 것' },
+      { w:'거울', h:'얼굴을 비춰 보는 반짝이는 판' },
+      { w:'빗', h:'머리를 곱게 넘길 때 쓰는 도구' },
+      { w:'치약', h:'이를 닦을 때 칫솔에 짜서 쓰는 것' },
+      { w:'수건', h:'씻고 나서 물기를 닦는 천' },
+      { w:'우유', h:'아침에 한 잔 마시면 든든한 하얀 음료' },
+      { w:'요구르트', h:'우유를 발효시킨 새콤한 음료' },
+      { w:'고구마', h:'겨울에 쪄 먹으면 달콤한 뿌리 작물' },
+      { w:'밤', h:'가을에 줍는, 껍질을 까서 먹는 열매. 군것으로도 좋습니다' },
+      { w:'대추', h:'약식과 차에 넣는 붉은 열매' },
+      { w:'인삼', h:'몸에 좋다고 알려진 뿌리 약재' },
+      { w:'꿀', h:'벌이 모아 주는 달콤한 것' }
+    ];
+    var CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+    function choOf(word){ return Array.prototype.map.call(word, function(ch){ var code = ch.charCodeAt(0) - 0xAC00; return code < 0 ? ch : CHO[Math.floor(code/588)]; }).join(' '); }
+    function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+    var now = new Date();
+    var seed = now.getFullYear()*10000 + (now.getMonth()+1)*100 + now.getDate();
+    var rng = mulberry32(seed);
+    var order = WORDS.map(function(_,i){ return i; });
+    for (var i=order.length-1;i>0;i--){ var j = Math.floor(rng()*(i+1)); var t=order[i]; order[i]=order[j]; order[j]=t; }
+    var daily = order.slice(0,5).map(function(i){ return WORDS[i]; });
+    var DAYS = ['일','월','화','수','목','금','토'];
+    document.getElementById('w-date').textContent = now.getFullYear() + '년 ' + (now.getMonth()+1) + '월 ' + now.getDate() + '일 (' + DAYS[now.getDay()] + '요일)의 판';
+    var idx = 0, slots = [], pool = [], solvedWords = [];
+    var msgEl = document.getElementById('w-msg');
+    function syllables(w){ return w.split(''); }
+    function loadWord(){
+      var item = daily[idx], ans = syllables(item.w);
+      slots = ans.map(function(){ return { ch:'', locked:false, tile:-1 }; });
+      var tiles = ans.map(function(s,k){ return { ch:s, ans:true, used:false }; });
+      var extra = [];
+      var guard = 0;
+      while (extra.length < 4 && guard++ < 200){
+        var src = WORDS[Math.floor(rng()*WORDS.length)].w;
+        var s = src[Math.floor(rng()*src.length)];
+        if (ans.indexOf(s) === -1 && extra.indexOf(s) === -1) extra.push(s);
+      }
+      extra.forEach(function(s){ tiles.push({ ch:s, ans:false, used:false }); });
+      for (var k=tiles.length-1;k>0;k--){ var j2 = Math.floor(rng()*(k+1)); var t2=tiles[k]; tiles[k]=tiles[j2]; tiles[j2]=t2; }
+      pool = tiles;
+      document.getElementById('w-prog').textContent = (idx+1) + '번째 낱말 / 모두 ' + daily.length + '개';
+      document.getElementById('w-clue').textContent = '뜻: ' + item.h;
+      document.getElementById('w-cho').textContent = '초성 힌트: ' + choOf(item.w);
+      msgEl.textContent = '';
+      renderWord();
+    }
+    function renderWord(){
+      var sl = document.getElementById('w-slots'); sl.innerHTML = '';
+      slots.forEach(function(s,i){
+        var d = document.createElement('button');
+        d.type = 'button'; d.className = 'wslot' + (s.ch ? ' filled' : '') + (s.locked ? ' locked' : '');
+        d.textContent = s.ch || '';
+        d.setAttribute('aria-label', s.ch ? s.ch : '빈 칸');
+        d.addEventListener('click', function(){
+          if (s.locked || !s.ch) return;
+          pool[s.tile].used = false; s.ch = ''; s.tile = -1; renderWord();
+        });
+        sl.appendChild(d);
+      });
+      var pl = document.getElementById('w-pool'); pl.innerHTML = '';
+      pool.forEach(function(t2,i){
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'wtile'; b.textContent = t2.ch; b.disabled = t2.used;
+        b.addEventListener('click', function(){
+          var empty = slots.findIndex(function(s){ return !s.ch; });
+          if (empty === -1) { msgEl.textContent = '칸이 다 찼어요. 칸을 누르면 글자가 돌아갑니다.'; return; }
+          slots[empty].ch = t2.ch; slots[empty].tile = i; t2.used = true; renderWord();
+        });
+        pl.appendChild(b);
+      });
+    }
+    document.getElementById('w-check').addEventListener('click', function(){
+      var item = daily[idx], ans = item.w;
+      if (slots.some(function(s){ return !s.ch; })){ msgEl.textContent = '아직 빈 칸이 있어요.'; return; }
+      var made = slots.map(function(s){ return s.ch; }).join('');
+      if (made === ans){
+        solvedWords.push(ans);
+        idx++;
+        if (idx >= daily.length){
+          document.getElementById('w-done-text').textContent = '오늘의 낱말: ' + solvedWords.join(' · ') + '. 내일이면 또 새 판이 열립니다.';
+          document.getElementById('w-done').hidden = false;
+          msgEl.textContent = '한 판을 다 채웠어요!';
+          try { localStorage.setItem('nxgames_word_done', String(seed)); } catch(e){}
+        } else {
+          msgEl.textContent = '맞았어요! 다음 낱말입니다.';
+          loadWord();
+        }
+      } else {
+        msgEl.textContent = '조금 아쉬워요. 뜻과 초성을 다시 보고 바꿔 보세요.';
+      }
+    });
+    document.getElementById('w-hint').addEventListener('click', function(){
+      var ans = syllables(daily[idx].w);
+      slots.forEach(function(s){ if (!s.locked && s.ch){ pool[s.tile].used = false; s.ch=''; s.tile=-1; } });
+      var i = 0;
+      slots[0].locked = true; slots[0].ch = ans[0];
+      for (var k=0;k<pool.length;k++){ if (!pool[k].used && pool[k].ch === ans[0]){ pool[k].used = true; slots[0].tile = k; break; } }
+      msgEl.textContent = '첫 글자를 알려 드렸어요: ' + ans[0];
+      renderWord();
+    });
+    document.getElementById('w-again').addEventListener('click', function(){
+      idx = 0; solvedWords = [];
+      document.getElementById('w-done').hidden = true;
+      loadWord();
+    });
+    window.NXGAMES.word = {
+      state: function(){ return { seed: seed, index: idx, total: daily.length, answer: daily[Math.min(idx, daily.length-1)].w, done: idx >= daily.length, daily: daily.map(function(d){ return d.w; }) }; }
+    };
+    loadWord();
+  }
+
+  /* ================= 기억 한 스푼 ================= */
+  function startMemory(){
+    var GLYPH = {
+      apple:'<svg viewBox="0 0 48 48"><circle cx="24" cy="28" r="13" fill="#EF4444"/><path d="M24 16c1-4.4 5-6.2 8.4-5.8-.4 3.4-2.6 6-6 6.2" fill="#4ADE80"/></svg>',
+      milk:'<svg viewBox="0 0 48 48"><path d="M17 14 L24 7 l7 7 v24 a2 2 0 0 1 -2 2 H19 a2 2 0 0 1 -2 -2 Z" fill="#F8FAFC"/><path d="M17 14 h14 v7 H17 Z" fill="#38BDF8"/></svg>',
+      bread:'<svg viewBox="0 0 48 48"><path d="M10 22c0-6 6-10 14-10s14 4 14 10c0 2.4-1.2 4-3 5v7a2 2 0 0 1 -2 2 H15 a2 2 0 0 1 -2 -2 v-7c-1.8-1-3-2.6-3-5Z" fill="#E8B04B"/></svg>',
+      egg:'<svg viewBox="0 0 48 48"><ellipse cx="24" cy="27" rx="11" ry="14" fill="#FDE68A"/><circle cx="24" cy="29" r="5.4" fill="#F59E0B"/></svg>',
+      grape:'<svg viewBox="0 0 48 48"><circle cx="18" cy="22" r="5.6" fill="#A78BFA"/><circle cx="30" cy="22" r="5.6" fill="#8B5CF6"/><circle cx="24" cy="31" r="5.6" fill="#A78BFA"/><circle cx="14" cy="31" r="5" fill="#8B5CF6"/><circle cx="34" cy="31" r="5" fill="#7C3AED"/><path d="M24 15c.6-3.6 3-5.4 5.6-5.6-.2 3-1.8 5.2-4.4 5.6" fill="#4ADE80"/></svg>',
+      onion:'<svg viewBox="0 0 48 48"><path d="M24 10c7 5 11 10 11 16a11 11 0 1 1 -22 0c0-6 4-11 11-16Z" fill="#E9D5FF"/><path d="M24 14v24M18.5 17.5C16 21 14.8 24 14.6 27M29.5 17.5C32 21 33.2 24 33.4 27" stroke="#C084FC" stroke-width="1.7" fill="none"/></svg>',
+      potato:'<svg viewBox="0 0 48 48"><ellipse cx="24" cy="25" rx="14" ry="11" fill="#C89B62"/><circle cx="19" cy="21" r="1.7" fill="#A97B43"/><circle cx="28" cy="27" r="1.7" fill="#A97B43"/><circle cx="24" cy="31" r="1.4" fill="#A97B43"/></svg>',
+      tofu:'<svg viewBox="0 0 48 48"><rect x="11" y="13" width="26" height="22" rx="4" fill="#F8FAFC"/><rect x="11" y="13" width="26" height="22" rx="4" fill="none" stroke="#CBD5E1" stroke-width="2"/></svg>',
+      mushroom:'<svg viewBox="0 0 48 48"><path d="M8 23a16 10 0 0 1 32 0Z" fill="#F87171"/><circle cx="18" cy="18" r="2.2" fill="#FEE2E2"/><circle cx="29" cy="16" r="1.8" fill="#FEE2E2"/><path d="M20 23h8l1.4 11a3 3 0 0 1 -3 3.4h-4.8a3 3 0 0 1 -3 -3.4Z" fill="#FDE68A"/></svg>',
+      carrot:'<svg viewBox="0 0 48 48"><path d="M15 15 L31 31c2.4 2.4 1 6-2 6 L15 23 Z" fill="#F97316"/><path d="M14 16c-2.6-3.4-1.6-6.8 0-8.6 1.4 1.8 1.6 4.4.6 6.6" fill="none" stroke="#4ADE80" stroke-width="2.4" stroke-linecap="round"/></svg>',
+      cheese:'<svg viewBox="0 0 48 48"><path d="M7 33 L41 15 v18 a2 2 0 0 1 -2 2 H9 a2 2 0 0 1 -2 -2Z" fill="#FBBF24"/><circle cx="18" cy="28" r="3" fill="#D97706" opacity=".65"/><circle cx="30" cy="27" r="2.2" fill="#D97706" opacity=".65"/></svg>',
+      fish:'<svg viewBox="0 0 48 48"><path d="M6 24c6-8 13-11 20-11 6 0 10 4 13 11-3 7-7 11-13 11-7 0-14-3-20-11Z" fill="#38BDF8"/><path d="M39 24l6-6v12Z" fill="#0284C7"/><circle cx="15" cy="21.4" r="2" fill="#0B1226"/></svg>'
+    };
+    var ITEMS = [
+      { id:'apple', name:'사과' }, { id:'milk', name:'우유' }, { id:'bread', name:'빵' }, { id:'egg', name:'달걀' },
+      { id:'grape', name:'포도' }, { id:'onion', name:'양파' }, { id:'potato', name:'감자' }, { id:'tofu', name:'두부' },
+      { id:'mushroom', name:'버섯' }, { id:'carrot', name:'당근' }, { id:'cheese', name:'치즈' }, { id:'fish', name:'생선' }
+    ];
+    var ROUNDS = [ { n:4, sec:5 }, { n:5, sec:6 }, { n:6, sec:7 } ];
+    var round = 0, phase = 'idle', answers = [], choices = [], picked = {}, totalHit = 0, totalN = 0, timer = null, reshowUsed = false, checked = false;
+    var gridEl = document.getElementById('mem-grid'), phaseEl = document.getElementById('mem-phase'), msgEl = document.getElementById('mem-msg');
+    var mainBtn = document.getElementById('mem-main'), reshowBtn = document.getElementById('mem-reshow'), barWrap = document.getElementById('mem-barwrap'), barEl = document.getElementById('mem-bar');
+    function shuffle(a){ for (var i=a.length-1;i>0;i--){ var j = Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+    function tile(item, btn){
+      var d = document.createElement(btn ? 'button' : 'div');
+      if (btn) d.type = 'button';
+      d.className = 'memtile'; d.dataset.id = item.id;
+      d.innerHTML = GLYPH[item.id] + '<span>' + item.name + '</span>';
+      return d;
+    }
+    function startRound(){
+      var cfg = ROUNDS[round];
+      answers = shuffle(ITEMS.slice()).slice(0, cfg.n);
+      picked = {}; checked = false; reshowUsed = false;
+      document.getElementById('mem-done').hidden = true;
+      showPhase(cfg.sec);
+    }
+    function showPhase(sec){
+      phase = 'show';
+      phaseEl.textContent = (round+1) + '번째 숟가락 — 물건 ' + answers.length + '개를 보여 드립니다';
+      msgEl.textContent = '천천히 눈에 담아 두세요.';
+      gridEl.innerHTML = '';
+      answers.forEach(function(it){ gridEl.appendChild(tile(it, false)); });
+      mainBtn.hidden = true; reshowBtn.hidden = true;
+      barWrap.hidden = false;
+      barEl.style.transition = 'none'; barEl.style.width = '100%';
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){
+        barEl.style.transition = 'width ' + sec + 's linear'; barEl.style.width = '0%';
+      }); });
+      clearTimeout(timer);
+      timer = setTimeout(recallPhase, sec*1000);
+    }
+    function recallPhase(){
+      clearTimeout(timer);
+      phase = 'recall';
+      picked = {};
+      var need = answers.length;
+      var others = shuffle(ITEMS.filter(function(it){ return answers.indexOf(it) === -1; })).slice(0, 9 - need);
+      choices = shuffle(answers.concat(others));
+      phaseEl.textContent = '아까 본 물건 ' + need + '개를 골라 보세요';
+      msgEl.textContent = '';
+      gridEl.innerHTML = '';
+      choices.forEach(function(it){
+        var b = tile(it, true);
+        b.addEventListener('click', function(){
+          if (checked) return;
+          if (picked[it.id]) { delete picked[it.id]; b.classList.remove('picked'); }
+          else {
+            if (Object.keys(picked).length >= need){ msgEl.textContent = need + '개까지 고를 수 있어요. 하나를 빼고 골라 보세요.'; return; }
+            picked[it.id] = 1; b.classList.add('picked');
+          }
+        });
+        gridEl.appendChild(b);
+      });
+      barWrap.hidden = true;
+      mainBtn.hidden = false; mainBtn.textContent = '다 골랐어요 — 확인';
+      reshowBtn.hidden = reshowUsed;
+    }
+    function checkRound(){
+      checked = true;
+      var hit = 0;
+      gridEl.querySelectorAll('.memtile').forEach(function(el){
+        var id = el.dataset.id;
+        var was = answers.some(function(a){ return a.id === id; });
+        var isPicked = !!picked[id];
+        if (was && isPicked){ el.classList.add('right'); hit++; }
+        else if (was && !isPicked){ el.classList.add('missed'); }
+        else if (!was && isPicked){ el.classList.add('wrong'); }
+        el.disabled = true;
+      });
+      totalHit += hit; totalN += answers.length;
+      msgEl.textContent = answers.length + '개 중 ' + hit + '개를 맞혔어요.' + (hit === answers.length ? ' 다 기억하셨네요!' : ' 초록 테두리는 맞힌 것, 파란 테두리는 놓친 것입니다.');
+      reshowBtn.hidden = true;
+      if (round < ROUNDS.length - 1){ mainBtn.textContent = '다음 숟가락으로'; }
+      else { mainBtn.textContent = '결과 보기'; }
+      phase = 'feedback';
+    }
+    mainBtn.addEventListener('click', function(){
+      if (phase === 'idle'){ round = 0; totalHit = 0; totalN = 0; startRound(); }
+      else if (phase === 'recall'){
+        if (Object.keys(picked).length === 0){ msgEl.textContent = '하나라도 골라 보세요.'; return; }
+        checkRound();
+      }
+      else if (phase === 'feedback'){
+        if (round < ROUNDS.length - 1){ round++; startRound(); }
+        else {
+          phase = 'done';
+          mainBtn.hidden = true;
+          document.getElementById('mem-done-text').textContent = '모두 ' + totalN + '개 가운데 ' + totalHit + '개를 맞혔습니다. 오늘 머리를 쓰는 즐거운 한 판이었어요.';
+          document.getElementById('mem-done').hidden = false;
+          phaseEl.textContent = '세 숟가락을 모두 마쳤습니다';
+        }
+      }
+    });
+    reshowBtn.addEventListener('click', function(){
+      if (phase !== 'recall' || reshowUsed) return;
+      reshowUsed = true; reshowBtn.hidden = true;
+      showPhase(3);
+      msgEl.textContent = '한 번 더 보여 드립니다. 이번에는 짧게요.';
+    });
+    document.getElementById('mem-again').addEventListener('click', function(){
+      round = 0; totalHit = 0; totalN = 0; phase = 'idle';
+      document.getElementById('mem-done').hidden = true;
+      startRound();
+    });
+    phaseEl.textContent = '시작하기를 누르면 물건이 잠깐 나타납니다';
+    window.NXGAMES.memory = {
+      state: function(){ return { round: round, phase: phase, answers: answers.map(function(a){ return a.id; }), picked: Object.keys(picked), totalHit: totalHit, totalN: totalN, done: phase === 'done' }; }
+    };
+  }
+})();
+</script>
+</body>
+</html>

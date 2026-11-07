@@ -1,0 +1,1 @@
+{"background_color":"#0B0F19","description":"길이·무게·온도·부피·넓이·속도·시간·데이터·요리 계량을 변환하는 도구","display":"standalone","icons":[{"sizes":"192x192","src":"/icon-192.png","type":"image/png"},{"sizes":"512x512","src":"/icon-512.png","type":"image/png"}],"name":"넥서스 단위 변환","short_name":"단위 변환","start_url":"/","theme_color":"#0B0F19"}

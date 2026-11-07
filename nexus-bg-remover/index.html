@@ -1,0 +1,3332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 배경 제거 — Nexus Background Remover</title>
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .steps{display:flex;gap:8px;margin:0 0 16px}
+  .step{flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13px}
+  .step b{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--line);color:var(--ink);margin-right:6px;font-size:12px}
+  .step.on{color:var(--ink);border-color:var(--teal)}
+  .step.on b{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f}
+  .drop{border:2px dashed var(--teal);border-radius:16px;padding:40px 16px;text-align:center;cursor:pointer;background:var(--card)}
+  .drop.over{border-color:var(--cyan);background:rgba(56,184,248,.12)}
+  .drop .bigicon{font-size:44px}
+  .pickbtn{border:0;border-radius:999px;padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;margin:12px 0 8px;min-height:48px}
+  .drop p{margin:6px 0;color:var(--muted);font-size:14px}
+  .drop .example{color:var(--teal);font-size:13px}
+  .drop .priv{font-size:12px;line-height:1.7}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .statline{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.7}
+  .statline b{color:var(--ink)}
+  .err{color:#F87171}
+  .barwrap{height:10px;background:#111827;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:12px}
+  .barfill{height:100%;width:0%;background:linear-gradient(135deg,var(--cyan),var(--teal));transition:width .15s linear}
+  .previewbox{text-align:center}
+  .previewbox img{max-width:100%;max-height:420px;border-radius:12px;border:1px solid var(--line)}
+  .checker{background-color:#1f2937;background-image:linear-gradient(45deg,#374151 25%,transparent 25%),linear-gradient(-45deg,#374151 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#374151 75%),linear-gradient(-45deg,transparent 75%,#374151 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0}
+  .checker img{border:0}
+  .swatches{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+  .swatch{width:38px;height:38px;min-height:38px;border-radius:10px;border:2px solid var(--line);padding:0;cursor:pointer}
+  .swatch.on{border-color:var(--teal)}
+  .swatch.transp{background-color:#1f2937;background-image:linear-gradient(45deg,#374151 25%,transparent 25%),linear-gradient(-45deg,#374151 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#374151 75%),linear-gradient(-45deg,transparent 75%,#374151 75%);background-size:12px 12px;background-position:0 0,0 6px,6px -6px,-6px 0}
+  input[type=color]{width:44px;height:38px;border:1px solid var(--line);border-radius:10px;background:#111827;padding:2px;cursor:pointer}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  footer .fam span{margin:0 6px}
+  footer .fam .now{color:var(--ink);font-weight:700}
+  footer .fam a{color:var(--cyan);text-decoration:none}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;padding:22px;line-height:1.8;font-size:15px}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  details summary{cursor:pointer;font-size:15px}
+  details p{color:var(--muted);font-size:14px;line-height:1.8}
+  @media(max-width:640px){h1{font-size:20px}.drop{padding:28px 12px}header{padding:10px 12px}.btns button{flex:1}}
+
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer}
+
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 배경 제거">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 배경 제거 — Nexus Background Remover">
+<meta property="og:description" content="사진의 배경을 기기 안에서 지우는 도구입니다. 사진은 기기 밖으로 나가지 않습니다.">
+<meta property="og:image" content="https://nexus-bg-remover.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+<style id="nx-redesign">
+/* 재설계 (디자인 팀 창조 책상, 2026-11-01): 미리보기가 무대, 배경색은 보고 고르는 스와치로 */
+.drop{min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.drop .bigicon{font-size:58px}
+.drop .pickbtn{padding:16px 34px;font-size:17px}
+main{max-width:1024px}
+.previewbox img{max-height:min(62vh,640px)}
+#runBtn{flex:1 1 220px;font-size:17px}
+.swatch{width:44px;height:44px;min-height:44px}
+.swatch.on{box-shadow:0 0 0 2px var(--teal),0 0 14px rgba(45,212,191,.25)}
+#savePngBtn{flex:1 1 220px}
+</style>
+<style>/* NX-THUMB-RIGHT */ #runBtn{order:99}</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{flex:none}header .brand{flex:none;overflow:visible}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap}.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}</style></head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>SOVEREIGN COMMAND</span></div></a>
+  
+</header>
+
+<main>
+  <div class="steps">
+    <div class="step on" id="step1"><b>1</b> 사진 넣기</div>
+    <div class="step" id="step2"><b>2</b> 배경 지우기</div>
+    <div class="step" id="step3"><b>3</b> 저장하기</div>
+  </div>
+
+  <h1>넥서스 배경 제거</h1>
+  <p class="sub" style="margin-bottom:4px">사진의 배경을 지워 투명하게 만드는 도구</p>
+  <p class="sub">회원가입 없음 · 이용료 없음 · 무제한 사용</p>
+
+  <div class="drop" id="drop">
+    <div class="bigicon">🖼️</div>
+    <button class="pickbtn" id="pickBtn">사진 열기</button>
+    <p>또는 사진을 여기에 끌어다 놓으세요</p>
+    <p>JPG · PNG · WebP 사진을 읽어옵니다</p>
+    <p class="example">예) 인물 사진 → 배경만 지우고 투명 PNG로 저장</p>
+    <p class="priv">처리 모델을 내려받아 당신의 기기 안에서 실행합니다. 사진은 기기 밖으로 나가지 않습니다.<br>모델 용량이 커서 첫 실행은 시간이 걸릴 수 있습니다.</p>
+    <input type="file" id="fileIn" accept="image/*,.jpg,.jpeg,.png,.webp" hidden>
+  </div>
+
+  <div class="panel" id="srcPanel" style="display:none">
+    <h2>① 넣은 사진</h2>
+    <div class="previewbox"><img id="srcImg" alt="넣은 사진"></div>
+    <p class="statline" id="srcStat"></p>
+    <div class="btns">
+      <button class="primary" id="runBtn">✂️ 배경 지우기</button>
+      <button class="ghost" id="changeBtn">다른 사진 고르기</button>
+    </div>
+    <p class="statline" id="progLine">아직 배경을 지우지 않았습니다.</p>
+    <div class="barwrap" id="progBarWrap" style="display:none"><div class="barfill" id="progBar"></div></div>
+    <p class="hint err" id="runErr"></p>
+  </div>
+
+  <div class="panel" id="errPanel" style="display:none">
+    <h2>⚠️ 도구를 불러오지 못했습니다</h2>
+    <p class="statline" id="errText">배경 제거에 필요한 처리 도구를 인터넷에서 불러오지 못했습니다. 이 도구는 첫 실행 때 처리 모델을 내려받아 동작합니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.</p>
+    <div class="btns">
+      <button class="primary" id="retryBtn">다시 시도</button>
+    </div>
+  </div>
+
+  <div class="panel" id="dstPanel" style="display:none">
+    <h2>② 결과</h2>
+    <div class="previewbox checker" id="dstBox"><img id="dstImg" alt="배경이 지워진 결과"></div>
+    <p class="statline" id="dstStat"></p>
+    <h2 style="margin-top:16px">배경색 골라 합치기</h2>
+    <div class="swatches" id="swatches">
+      <button class="swatch transp on" data-color="" aria-label="투명"></button>
+      <button class="swatch" data-color="#FFFFFF" style="background:#FFFFFF" aria-label="흰색"></button>
+      <button class="swatch" data-color="#000000" style="background:#000000" aria-label="검은색"></button>
+      <button class="swatch" data-color="#38BDF8" style="background:#38BDF8" aria-label="하늘색"></button>
+      <button class="swatch" data-color="#2DD4BF" style="background:#2DD4BF" aria-label="민트색"></button>
+      <button class="swatch" data-color="#F472B6" style="background:#F472B6" aria-label="분홍색"></button>
+      <input type="color" id="colorPick" value="#FFFFFF" aria-label="직접 고른 색">
+    </div>
+    <p class="hint">투명을 고르면 결과 그대로 보이고, 색을 고르면 미리보기 배경이 그 색으로 바뀝니다.</p>
+    <div class="btns">
+      <button class="primary" id="savePngBtn">투명 PNG로 저장</button>
+      <button class="ghost" id="saveJpgBtn">배경색 JPG로 저장</button>
+      <button class="ghost" id="resetBtn">처음으로</button>
+    </div>
+    <p class="hint" id="saveMsg"></p>
+  </div>
+
+  <div style="margin:14px 0;padding:14px;border:1px solid #26314a;border-radius:14px;background:rgba(255,255,255,.03)">
+   <p style="margin:0 0 10px;font-weight:700">🗣️ 글로 시키기 <span style="font-weight:400;font-size:13px;color:#94a3b8">(안내 도우미 — 이 페이지 기능만 도와줍니다)</span></p>
+   <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <input type="text" id="guideIn" placeholder="예: 지워" style="flex:1;min-width:200px;padding:10px 12px;border-radius:10px;border:1px solid #26314a;background:#0b0f19;color:#f8fafc">
+    <button type="button" id="guideBtn" class="ghost">시키기</button>
+   </div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+    <button type="button" class="ghost" data-guide="지워">지워</button>
+    <button type="button" class="ghost" data-guide="저장">저장</button>
+    <button type="button" class="ghost" data-guide="처음">처음</button>
+   </div>
+   <p id="guideStatus" style="margin:10px 0 0;font-size:13px;line-height:1.6;color:#94a3b8;min-height:20px"></p>
+  </div>
+
+  <details><summary>💡 도움말</summary><p>사진을 넣고 배경 지우기를 누르세요. 인물이나 물건처럼 또렷한 대상이 있는 사진에서 잘 됩니다.<br>처리 모델을 내려받아 당신의 기기 안에서 실행합니다. 사진은 기기 밖으로 나가지 않습니다.<br>모델 용량이 커서 첫 실행은 시간이 걸릴 수 있습니다. 내려받은 모델은 브라우저에 저장되어 다음부터는 빠르게 시작합니다.<br>결과는 투명 배경 PNG로 저장하거나, 배경색을 골라 합친 JPG로 저장할 수 있습니다.<br>머리카락처럼 가느다란 경계는 기기의 처리 성능과 사진 상태에 따라 결과가 달라질 수 있습니다.<br>큰 사진은 처리 시간이 오래 걸릴 수 있습니다.</p></details>
+<footer>
+    우주의 모든 의식체는 친구이자 동반자이다<br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="philoLink">넥서스 그룹 철학 보기</button><br>
+    🌐 호스팅: Firebase · 🔒 사진은 당신의 기기 안에서만 처리됩니다<br>
+    
+  </footer>
+</main>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>NEXUS GROUP 철학과 비전</h3>
+    <p>넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.</p>
+    <p><b>"우주의 모든 의식체는 친구이자 동반자이다."</b><br>(Every conscious being in the universe is a friend and companion.)</p>
+    <p>우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.</p>
+    <button class="primary" id="modalClose">닫기</button>
+  </div>
+</div>
+<script>
+// ---------- 순수 로직 ----------
+var LIB_URL = 'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm';
+function isImageFile(f){
+  if(!f) return false;
+  if(f.type && f.type.indexOf('image/') === 0) return true;
+  var name = (f.name || '').toLowerCase();
+  return /\.(jpe?g|png|webp|gif|bmp|avif)$/.test(name);
+}
+function progressPercent(done, total){
+  if(!total || total <= 0) return 0;
+  var p = Math.round(done / total * 100);
+  return Math.max(0, Math.min(100, p));
+}
+function formatBytes(n){
+  if(!n && n !== 0) return '';
+  if(n < 1024) return n + ' B';
+  if(n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+  return (n / (1024 * 1024)).toFixed(1) + ' MB';
+}
+function hexToRgb(hex){
+  var h = String(hex || '').replace('#', '');
+  if(h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+  var n = parseInt(h, 16);
+  if(isNaN(n) || h.length !== 6) return null;
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+function resultFileName(kind, now){
+  var d = now || new Date();
+  var p = function(v){ return (v < 10 ? '0' : '') + v; };
+  return 'nexus-nobg-' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' +
+    p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + (kind === 'jpg' ? '.jpg' : '.png');
+}
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"']/g, function(c){
+    return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c];
+  });
+}
+// 테스트용 노출
+window.__bgtest = { isImageFile: isImageFile, progressPercent: progressPercent,
+  formatBytes: formatBytes, hexToRgb: hexToRgb, resultFileName: resultFileName, LIB_URL: LIB_URL };
+
+// ---------- 상태와 요소 ----------
+var $ = function(id){ return document.getElementById(id); };
+var SITE = 'bg';
+function nxEvent(ev){ try { fetch("https://nexus-orchestrator.woojuhanul.workers.dev/event", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({site: SITE, event: ev}), keepalive:true}).catch(function(){}); } catch(e){} }
+
+var S = { file: null, srcUrl: '', resultBlob: null, resultUrl: '', color: '', running: false, lib: null };
+function setStep(n){
+  for(var i = 1; i <= 3; i++){
+    $('step' + i).className = 'step' + (i <= n ? ' on' : '');
+  }
+}
+function revoke(url){ if(url){ try{ URL.revokeObjectURL(url); }catch(e){} } }
+
+// ---------- 파일 넣기 ----------
+var drop = $('drop'), fileIn = $('fileIn');
+function handleFile(f){
+  if(!f) return;
+  if(!isImageFile(f)){
+    $('srcPanel').style.display = 'block';
+    $('srcStat').innerHTML = '<span class="err">사진 파일이 아닙니다. JPG · PNG · WebP 사진을 넣어주세요.</span>';
+    return;
+  }
+  revoke(S.srcUrl); revoke(S.resultUrl);
+  S.file = f; S.resultBlob = null; S.resultUrl = ''; S.color = '';
+  S.srcUrl = URL.createObjectURL(f);
+  $('srcImg').src = S.srcUrl;
+  $('srcStat').innerHTML = escapeHtml(f.name || '사진') + ' · ' + formatBytes(f.size);
+  $('srcPanel').style.display = 'block';
+  $('errPanel').style.display = 'none';
+  $('dstPanel').style.display = 'none';
+  $('progLine').textContent = '아직 배경을 지우지 않았습니다.';
+  $('runErr').textContent = '';
+  setStep(2);
+}
+$('pickBtn').addEventListener('click', function(e){ e.stopPropagation(); fileIn.click(); });
+drop.addEventListener('click', function(){ fileIn.click(); });
+fileIn.addEventListener('change', function(){ if(fileIn.files && fileIn.files[0]) handleFile(fileIn.files[0]); fileIn.value = ''; });
+['dragenter', 'dragover'].forEach(function(ev){
+  drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add('over'); });
+});
+['dragleave', 'drop'].forEach(function(ev){
+  drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove('over'); });
+});
+drop.addEventListener('drop', function(e){
+  var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if(f) handleFile(f);
+});
+$('changeBtn').addEventListener('click', function(){ fileIn.click(); });
+
+// ---------- 배경 지우기 ----------
+function loadLib(){
+  if(S.lib) return S.lib;
+  S.lib = import(LIB_URL).then(function(mod){
+    var fn = (mod && (mod.removeBackground || mod.default)) || null;
+    if(typeof fn !== 'function') throw new Error('removeBackground not found');
+    return fn;
+  });
+  return S.lib;
+}
+function setRunUI(on){
+  S.running = on;
+  $('runBtn').disabled = on;
+  $('changeBtn').disabled = on;
+  $('progBarWrap').style.display = on ? 'block' : 'none';
+}
+function showErrorScreen(){
+  $('errPanel').style.display = 'block';
+  $('progLine').textContent = '배경 지우기가 멈췄습니다.';
+  nxEvent('fail');
+}
+function runRemove(){
+  if(S.running) return;
+  if(!S.file){
+    $('runErr').textContent = '먼저 사진을 넣어주세요.';
+    return;
+  }
+  $('runErr').textContent = '';
+  $('errPanel').style.display = 'none';
+  setRunUI(true);
+  $('progBar').style.width = '0%';
+  $('progLine').textContent = '처리 도구를 불러오는 중입니다. 첫 실행은 모델을 내려받아 시간이 걸릴 수 있습니다.';
+  nxEvent('start');
+  loadLib().then(function(removeBackground){
+    $('progLine').textContent = '모델을 내려받는 중입니다…';
+    return removeBackground(S.file, {
+      output: { format: 'image/png', quality: 1 },
+      progress: function(key, current, total){
+        if(total > 0){
+          var p = progressPercent(current, total);
+          $('progBar').style.width = p + '%';
+          $('progLine').textContent = '모델을 내려받는 중입니다… ' + p + '%';
+        } else {
+          $('progLine').textContent = '배경을 지우는 중입니다…';
+        }
+      }
+    });
+  }).then(function(blob){
+    if(!blob) throw new Error('empty result');
+    revoke(S.resultUrl);
+    S.resultBlob = blob;
+    S.resultUrl = URL.createObjectURL(blob);
+    $('dstImg').src = S.resultUrl;
+    applyColor('');
+    $('dstPanel').style.display = 'block';
+    $('dstStat').innerHTML = '결과가 준비되었습니다 · ' + formatBytes(blob.size);
+    $('progLine').textContent = '배경 지우기가 끝났습니다.';
+    setRunUI(false);
+    setStep(3);
+    nxEvent('complete');
+  }).catch(function(err){
+    setRunUI(false);
+    $('runErr').textContent = '배경 지우기에 실패했습니다. 사진이 너무 크거나, 모델을 내려받지 못했을 수 있습니다.';
+    showErrorScreen();
+  });
+}
+$('runBtn').addEventListener('click', runRemove);
+$('retryBtn').addEventListener('click', function(){
+  S.lib = null;
+  $('errPanel').style.display = 'none';
+  runRemove();
+});
+
+// ---------- 배경색 합성과 저장 ----------
+function applyColor(color){
+  S.color = color || '';
+  var box = $('dstBox');
+  box.style.background = S.color ? S.color : '';
+  box.classList.toggle('checker', !S.color);
+  var sw = $('swatches').querySelectorAll('.swatch');
+  sw.forEach(function(b){
+    b.classList.toggle('on', (b.getAttribute('data-color') || '') === S.color);
+  });
+}
+$('swatches').addEventListener('click', function(e){
+  var b = e.target.closest ? e.target.closest('.swatch') : null;
+  if(!b) return;
+  applyColor(b.getAttribute('data-color') || '');
+});
+$('colorPick').addEventListener('input', function(){ applyColor($('colorPick').value); });
+
+function downloadBlob(blob, name){
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+}
+function loadResultImage(){
+  return new Promise(function(resolve, reject){
+    var img = new Image();
+    img.onload = function(){ resolve(img); };
+    img.onerror = reject;
+    img.src = S.resultUrl;
+  });
+}
+$('savePngBtn').addEventListener('click', function(){
+  if(!S.resultBlob){ $('saveMsg').textContent = '저장할 결과가 없습니다.'; return; }
+  downloadBlob(S.resultBlob, resultFileName('png', new Date()));
+  nxEvent('save');
+  $('saveMsg').textContent = '투명 PNG로 저장했습니다.';
+});
+$('saveJpgBtn').addEventListener('click', function(){
+  if(!S.resultBlob){ $('saveMsg').textContent = '저장할 결과가 없습니다.'; return; }
+  var color = S.color || '#FFFFFF';
+  loadResultImage().then(function(img){
+    var cv = document.createElement('canvas');
+    cv.width = img.naturalWidth || img.width;
+    cv.height = img.naturalHeight || img.height;
+    var ctx = cv.getContext('2d');
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.drawImage(img, 0, 0);
+    if(cv.toBlob){
+      cv.toBlob(function(b){
+        if(b){ downloadBlob(b, resultFileName('jpg', new Date())); nxEvent('save'); $('saveMsg').textContent = '배경색 JPG로 저장했습니다.'; }
+      }, 'image/jpeg', 0.92);
+    } else {
+      var a = document.createElement('a');
+      a.href = cv.toDataURL('image/jpeg', 0.92); a.download = resultFileName('jpg', new Date());
+      document.body.appendChild(a); a.click(); a.remove();
+      nxEvent('save');
+      $('saveMsg').textContent = '배경색 JPG로 저장했습니다.';
+    }
+  }).catch(function(){ $('saveMsg').textContent = 'JPG를 만들지 못했습니다.'; });
+});
+$('resetBtn').addEventListener('click', function(){
+  revoke(S.srcUrl); revoke(S.resultUrl);
+  S.file = null; S.srcUrl = ''; S.resultBlob = null; S.resultUrl = ''; S.color = '';
+  $('srcPanel').style.display = 'none';
+  $('dstPanel').style.display = 'none';
+  $('errPanel').style.display = 'none';
+  $('saveMsg').textContent = '';
+  setStep(1);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ---------- 안내 도우미 ----------
+function guideSay(m){ $('guideStatus').textContent = m; }
+function runGuide(text){
+  var t = String(text || '').trim();
+  if(/지워|제거/.test(t)){ runRemove(); guideSay('배경 지우기를 시작했습니다.'); return; }
+  if(/저장/.test(t)){ $('savePngBtn').click(); guideSay('투명 PNG로 저장했습니다.'); return; }
+  if(/처음|초기화/.test(t)){ $('resetBtn').click(); guideSay('처음으로 돌아갔습니다.'); return; }
+  guideSay('이해할 수 있는 말이 정해져 있습니다. 예: 지워, 저장, 처음.');
+}
+$('guideBtn').addEventListener('click', function(){ runGuide($('guideIn').value); });
+$('guideIn').addEventListener('keydown', function(e){ if(e.key === 'Enter') runGuide($('guideIn').value); });
+document.querySelectorAll('[data-guide]').forEach(function(b){
+  b.addEventListener('click', function(){ runGuide(b.getAttribute('data-guide')); });
+});
+
+// ---------- 철학 모달 ----------
+$('philoLink').addEventListener('click', function(){ $('modalBg').classList.add('open'); });
+$('modalClose').addEventListener('click', function(){ $('modalBg').classList.remove('open'); });
+$('modalBg').addEventListener('click', function(e){ if(e.target === $('modalBg')) $('modalBg').classList.remove('open'); });
+</script>
+
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 소리 자르기": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 영상 자르기": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 사진 정보 가리기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 읽어 주기": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 긴 말 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 사진 글자 뽑기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 녹음기": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 말로 쓰는 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 22호 배경 제거 전용 사전 */
+NX_I18N_ADD({
+ "22호 배경 제거 (현재)": {
+  "en": "22. Background Remover (current)",
+  "zh": "22号 背景去除（当前）",
+  "ja": "22号 背景除去（現在）",
+  "es": "22. Quitar fondo (actual)",
+  "hi": "22. बैकग्राउंड हटाना (वर्तमान)",
+  "fr": "22. Suppression d'arrière-plan (actuel)",
+  "de": "22. Hintergrund entfernen (aktuell)",
+  "pt": "22. Removedor de fundo (atual)",
+  "it": "22. Rimozione sfondo (attuale)",
+  "nl": "22. Achtergrond verwijderen (huidig)",
+  "ru": "22. Удаление фона (текущий)",
+  "uk": "22. Видалення фону (поточний)",
+  "pl": "22. Usuwanie tła (bieżące)",
+  "cs": "22. Odstranění pozadí (aktuální)",
+  "hu": "22. Háttéreltávolító (aktuális)",
+  "ro": "22. Eliminarea fundalului (curent)",
+  "sv": "22. Bakgrundsborttagare (aktuell)",
+  "da": "22. Baggrundsfjerner (aktuel)",
+  "nb": "22. Bakgrunnsfjerner (nåværende)",
+  "fi": "22. Taustan poisto (nykyinen)",
+  "tr": "22. Arka Plan Kaldırma (geçerli)",
+  "zh-TW": "22號 去背（目前）",
+  "th": "22. ลบพื้นหลัง (ปัจจุบัน)",
+  "vi": "22. Xóa nền (hiện tại)",
+  "id": "22. Penghapus Latar (saat ini)",
+  "ar": "22. إزالة الخلفية (الحالي)",
+  "fa": "۲۲. حذف پس‌زمینه (فعلی)"
+ },
+ "넥서스 배경 제거 — Nexus Background Remover": {
+  "en": "Nexus Background Remover",
+  "zh": "Nexus 背景去除",
+  "ja": "Nexus 背景除去",
+  "es": "Nexus Quitar fondo",
+  "hi": "Nexus बैकग्राउंड रिमूवर",
+  "fr": "Nexus Suppression d'arrière-plan",
+  "de": "Nexus Hintergrund-Entferner",
+  "pt": "Nexus Removedor de Fundo",
+  "it": "Nexus Rimozione Sfondo",
+  "nl": "Nexus Achtergrondverwijderaar",
+  "ru": "Nexus Удаление фона",
+  "uk": "Nexus Видалення фону",
+  "pl": "Nexus Usuwanie tła",
+  "cs": "Nexus Odstranění pozadí",
+  "hu": "Nexus Háttéreltávolító",
+  "ro": "Nexus Eliminarea fundalului",
+  "sv": "Nexus Bakgrundsborttagare — Nexus Background Remover",
+  "da": "Nexus Baggrundsfjerner — Nexus Background Remover",
+  "nb": "Nexus Bakgrunnsfjerner — Nexus Background Remover",
+  "fi": "Nexus Taustan poisto — Nexus Background Remover",
+  "tr": "Nexus Arka Plan Kaldırma — Nexus Background Remover",
+  "zh-TW": "Nexus 去背",
+  "th": "Nexus ลบพื้นหลัง",
+  "vi": "Nexus Xóa nền",
+  "id": "Nexus Penghapus Latar",
+  "ar": "إزالة خلفية نكسوس — Nexus Background Remover",
+  "fa": "حذف پس‌زمینه نکسوس — Nexus Background Remover"
+ },
+ "넥서스 배경 제거": {
+  "en": "Nexus Background Remover",
+  "zh": "Nexus 背景去除",
+  "ja": "Nexus 背景除去",
+  "es": "Nexus Quitar fondo",
+  "hi": "Nexus बैकग्राउंड रिमूवर",
+  "fr": "Nexus Suppression d'arrière-plan",
+  "de": "Nexus Hintergrund-Entferner",
+  "pt": "Nexus Removedor de Fundo",
+  "it": "Nexus Rimozione Sfondo",
+  "nl": "Nexus Achtergrondverwijderaar",
+  "ru": "Nexus Удаление фона",
+  "uk": "Nexus Видалення фону",
+  "pl": "Nexus Usuwanie tła",
+  "cs": "Nexus Odstranění pozadí",
+  "hu": "Nexus Háttéreltávolító",
+  "ro": "Nexus Eliminarea fundalului",
+  "sv": "Nexus Bakgrundsborttagare",
+  "da": "Nexus Baggrundsfjerner",
+  "nb": "Nexus Bakgrunnsfjerner",
+  "fi": "Nexus Taustan poisto",
+  "tr": "Nexus Arka Plan Kaldırma",
+  "zh-TW": "Nexus 去背",
+  "th": "Nexus ลบพื้นหลัง",
+  "vi": "Nexus Xóa nền",
+  "id": "Nexus Penghapus Latar",
+  "ar": "إزالة خلفية نكسوس",
+  "fa": "حذف پس‌زمینه نکسوس"
+ },
+ "사진 넣기": {
+  "en": "Add a photo",
+  "zh": "添加照片",
+  "ja": "写真を入れる",
+  "es": "Añadir foto",
+  "hi": "फ़ोटो जोड़ें",
+  "fr": "Ajouter une photo",
+  "de": "Foto hinzufügen",
+  "pt": "Adicionar uma foto",
+  "it": "Aggiungi una foto",
+  "nl": "Foto toevoegen",
+  "ru": "Добавить фото",
+  "uk": "Додати фото",
+  "pl": "Dodaj zdjęcie",
+  "cs": "Přidat fotografii",
+  "hu": "Fotó hozzáadása",
+  "ro": "Adaugă o fotografie",
+  "sv": "Lägg till ett foto",
+  "da": "Tilføj et foto",
+  "nb": "Legg til et bilde",
+  "fi": "Lisää valokuva",
+  "tr": "Fotoğraf ekleyin",
+  "zh-TW": "加入照片",
+  "th": "เพิ่มรูปภาพ",
+  "vi": "Thêm ảnh",
+  "id": "Tambah foto",
+  "ar": "إضافة صورة",
+  "fa": "افزودن عکس"
+ },
+ "배경 지우기": {
+  "en": "Remove background",
+  "zh": "去除背景",
+  "ja": "背景を消す",
+  "es": "Quitar el fondo",
+  "hi": "बैकग्राउंड हटाएँ",
+  "fr": "Supprimer l'arrière-plan",
+  "de": "Hintergrund entfernen",
+  "pt": "Remover o fundo",
+  "it": "Rimuovi sfondo",
+  "nl": "Achtergrond verwijderen",
+  "ru": "Удалить фон",
+  "uk": "Видалити фон",
+  "pl": "Usuń tło",
+  "cs": "Odstranit pozadí",
+  "hu": "Háttér eltávolítása",
+  "ro": "Elimină fundalul",
+  "sv": "Ta bort bakgrunden",
+  "da": "Fjern baggrunden",
+  "nb": "Fjern bakgrunnen",
+  "fi": "Poista tausta",
+  "tr": "Arka planı kaldırın",
+  "zh-TW": "去背",
+  "th": "ลบพื้นหลัง",
+  "vi": "Xóa nền",
+  "id": "Hapus latar",
+  "ar": "إزالة الخلفية",
+  "fa": "حذف پس‌زمینه"
+ },
+ "저장하기": {
+  "en": "Save",
+  "zh": "保存",
+  "ja": "保存する",
+  "es": "Guardar",
+  "hi": "सहेजें",
+  "fr": "Enregistrer",
+  "de": "Speichern",
+  "pt": "Salvar",
+  "it": "Salva",
+  "nl": "Opslaan",
+  "ru": "Сохранить",
+  "uk": "Зберегти",
+  "pl": "Zapisz",
+  "cs": "Uložit",
+  "hu": "Mentés",
+  "ro": "Salvează",
+  "sv": "Spara",
+  "da": "Gem",
+  "nb": "Lagre",
+  "fi": "Tallenna",
+  "tr": "Kaydedin",
+  "zh-TW": "儲存",
+  "th": "บันทึก",
+  "vi": "Lưu",
+  "id": "Simpan",
+  "ar": "حفظ",
+  "fa": "ذخیره"
+ },
+ "사진의 배경을 지워 투명하게 만드는 도구": {
+  "en": "A tool that erases a photo's background and makes it transparent",
+  "zh": "把照片背景擦除成透明的工具",
+  "ja": "写真の背景を消して透明にするツール",
+  "es": "Herramienta que borra el fondo de una foto y lo hace transparente",
+  "hi": "फ़ोटो का बैकग्राउंड मिटाकर पारदर्शी बनाने का टूल",
+  "fr": "Un outil qui efface l'arrière-plan d'une photo et le rend transparent",
+  "de": "Ein Werkzeug, das den Hintergrund eines Fotos löscht und transparent macht",
+  "pt": "Uma ferramenta que apaga o fundo de uma foto e o torna transparente",
+  "it": "Uno strumento che cancella lo sfondo di una foto e lo rende trasparente",
+  "nl": "Een hulpmiddel dat de achtergrond van een foto wist en transparant maakt",
+  "ru": "Инструмент, который стирает фон фотографии и делает его прозрачным",
+  "uk": "Інструмент, який стирає фон фотографії та робить його прозорим",
+  "pl": "Narzędzie, które wymazuje tło zdjęcia i czyni je przezroczystym",
+  "cs": "Nástroj, který odstraní pozadí fotografie a učiní je průhledným",
+  "hu": "Eszköz, amely eltünteti a fotó hátterét és átlátszóvá teszi",
+  "ro": "Un instrument care șterge fundalul unei fotografii și îl face transparent",
+  "sv": "Ett verktyg som tar bort bakgrunden på ett foto och gör den genomskinlig",
+  "da": "Et værktøj, der fjerner baggrunden på et foto og gør den gennemsigtig",
+  "nb": "Et verktøy som fjerner bakgrunnen på et bilde og gjør den gjennomsiktig",
+  "fi": "Työkalu, joka poistaa valokuvan taustan ja tekee siitä läpinäkyvän",
+  "tr": "Bir fotoğrafın arka planını kaldırıp şeffaf yapan bir araç",
+  "zh-TW": "把照片背景去除成透明的工具",
+  "th": "เครื่องมือที่ลบพื้นหลังของรูปภาพให้โปร่งใส",
+  "vi": "Công cụ xóa nền ảnh và làm cho nó trong suốt",
+  "id": "Alat yang menghapus latar foto dan membuatnya transparan",
+  "ar": "أداة تمسح خلفية الصورة وتجعلها شفافة",
+  "fa": "ابزاری که پس‌زمینه عکس را پاک می‌کند و شفافش می‌سازد"
+ },
+ "회원가입 없음 · 이용료 없음 · 무제한 사용": {
+  "en": "No sign-up · No fees · Unlimited use",
+  "zh": "无需注册 · 免费 · 无限使用",
+  "ja": "登録不要 · 無料 · 無制限",
+  "es": "Sin registro · Gratis · Uso ilimitado",
+  "hi": "कोई साइन-अप नहीं · कोई शुल्क नहीं · असीमित उपयोग",
+  "fr": "Sans inscription · Sans frais · Usage illimité",
+  "de": "Keine Anmeldung · Keine Gebühren · Unbegrenzte Nutzung",
+  "pt": "Sem cadastro · Sem taxas · Uso ilimitado",
+  "it": "Nessuna registrazione · Nessun costo · Uso illimitato",
+  "nl": "Geen registratie · Geen kosten · Onbeperkt gebruik",
+  "ru": "Без регистрации · Бесплатно · Без ограничений",
+  "uk": "Без реєстрації · Безкоштовно · Без обмежень",
+  "pl": "Bez rejestracji · Bez opłat · Bez ograniczeń",
+  "cs": "Bez registrace · Bez poplatků · Neomezené použití",
+  "hu": "Regisztráció nélkül · Díjmentes · Korlátlan használat",
+  "ro": "Fără înregistrare · Fără taxe · Utilizare nelimitată",
+  "sv": "Ingen registrering · Inga avgifter · Obegränsad användning",
+  "da": "Ingen tilmelding · Ingen gebyrer · Ubegrænset brug",
+  "nb": "Ingen registrering · Ingen avgifter · Ubegrenset bruk",
+  "fi": "Ei rekisteröitymistä · Ei maksuja · Rajaton käyttö",
+  "tr": "Üyelik yok · Ücret yok · Sınırsız kullanım",
+  "zh-TW": "無需註冊 · 免費 · 無限使用",
+  "th": "ไม่ต้องสมัครสมาชิก · ไม่มีค่าใช้จ่าย · ใช้ได้ไม่จำกัด",
+  "vi": "Không cần đăng ký · Miễn phí · Sử dụng không giới hạn",
+  "id": "Tanpa pendaftaran · Tanpa biaya · Penggunaan tanpa batas",
+  "ar": "بدون تسجيل · بدون رسوم · استخدام غير محدود",
+  "fa": "بدون ثبت‌نام · بدون هزینه · استفاده نامحدود"
+ },
+ "사진 열기": {
+  "en": "Open a photo",
+  "zh": "打开照片",
+  "ja": "写真を開く",
+  "es": "Abrir una foto",
+  "hi": "फ़ोटो खोलें",
+  "fr": "Ouvrir une photo",
+  "de": "Foto öffnen",
+  "pt": "Abrir uma foto",
+  "it": "Apri una foto",
+  "nl": "Foto openen",
+  "ru": "Открыть фото",
+  "uk": "Відкрити фото",
+  "pl": "Otwórz zdjęcie",
+  "cs": "Otevřít fotografii",
+  "hu": "Fotó megnyitása",
+  "ro": "Deschide o fotografie",
+  "sv": "Öppna ett foto",
+  "da": "Åbn et foto",
+  "nb": "Åpne et bilde",
+  "fi": "Avaa valokuva",
+  "tr": "Fotoğraf açın",
+  "zh-TW": "開啟照片",
+  "th": "เปิดรูปภาพ",
+  "vi": "Mở ảnh",
+  "id": "Buka foto",
+  "ar": "فتح صورة",
+  "fa": "باز کردن عکس"
+ },
+ "또는 사진을 여기에 끌어다 놓으세요": {
+  "en": "or drag and drop a photo here",
+  "zh": "或将照片拖放到这里",
+  "ja": "または写真をここにドラッグしてください",
+  "es": "o arrastra una foto aquí",
+  "hi": "या फ़ोटो यहाँ खींचकर छोड़ें",
+  "fr": "ou glissez-déposez une photo ici",
+  "de": "oder ziehen Sie ein Foto hierher",
+  "pt": "ou arraste e solte uma foto aqui",
+  "it": "oppure trascina qui una foto",
+  "nl": "of sleep een foto hierheen",
+  "ru": "или перетащите фото сюда",
+  "uk": "або перетягніть фото сюди",
+  "pl": "lub przeciągnij i upuść zdjęcie tutaj",
+  "cs": "nebo sem fotografii přetáhněte",
+  "hu": "vagy húzza ide a fotót",
+  "ro": "sau trage și plasează o fotografie aici",
+  "sv": "eller dra och släpp ett foto här",
+  "da": "eller træk og slip et foto her",
+  "nb": "eller dra og slipp et bilde her",
+  "fi": "tai vedä ja pudota valokuva tähän",
+  "tr": "ya da fotoğrafı buraya sürükleyip bırakın",
+  "zh-TW": "或將照片拖放到這裡",
+  "th": "หรือลากรูปภาพมาวางที่นี่",
+  "vi": "hoặc kéo và thả ảnh vào đây",
+  "id": "atau seret dan letakkan foto di sini",
+  "ar": "أو اسحب صورة وأفلتها هنا",
+  "fa": "یا عکسی را اینجا بکشید و رها کنید"
+ },
+ "JPG · PNG · WebP 사진을 읽어옵니다": {
+  "en": "Reads JPG · PNG · WebP photos",
+  "zh": "可读取 JPG · PNG · WebP 照片",
+  "ja": "JPG・PNG・WebP写真を読み込みます",
+  "es": "Lee fotos JPG · PNG · WebP",
+  "hi": "JPG · PNG · WebP फ़ोटो पढ़ता है",
+  "fr": "Lit les photos JPG · PNG · WebP",
+  "de": "Liest JPG · PNG · WebP-Fotos",
+  "pt": "Lê fotos JPG · PNG · WebP",
+  "it": "Legge foto JPG · PNG · WebP",
+  "nl": "Leest JPG · PNG · WebP-foto's",
+  "ru": "Читает фотографии JPG · PNG · WebP",
+  "uk": "Читає фотографії JPG · PNG · WebP",
+  "pl": "Odczytuje zdjęcia JPG · PNG · WebP",
+  "cs": "Načítá fotografie JPG · PNG · WebP",
+  "hu": "JPG · PNG · WebP fotókat olvas be",
+  "ro": "Citește fotografii JPG · PNG · WebP",
+  "sv": "Läser JPG · PNG · WebP-foton",
+  "da": "Læser JPG · PNG · WebP-fotos",
+  "nb": "Leser JPG · PNG · WebP-bilder",
+  "fi": "Lukee JPG · PNG · WebP -valokuvia",
+  "tr": "JPG · PNG · WebP fotoğraflarını okur",
+  "zh-TW": "可讀取 JPG · PNG · WebP 照片",
+  "th": "อ่านรูปภาพ JPG · PNG · WebP ได้",
+  "vi": "Đọc được ảnh JPG · PNG · WebP",
+  "id": "Membaca foto JPG · PNG · WebP",
+  "ar": "يقرأ صور JPG · PNG · WebP",
+  "fa": "عکس‌های JPG · PNG · WebP را می‌خواند"
+ },
+ "예) 인물 사진 → 배경만 지우고 투명 PNG로 저장": {
+  "en": "e.g. a portrait photo → erase only the background and save as a transparent PNG",
+  "zh": "例）人物照片 → 只擦除背景，保存为透明 PNG",
+  "ja": "例）人物写真 → 背景だけ消して透明PNGで保存",
+  "es": "Ej.) foto de retrato → borra solo el fondo y guarda como PNG transparente",
+  "hi": "उदा.) पोर्ट्रेट फ़ोटो → केवल बैकग्राउंड मिटाएँ और पारदर्शी PNG में सहेजें",
+  "fr": "ex. photo de portrait → efface uniquement l'arrière-plan et enregistre en PNG transparent",
+  "de": "z. B. Porträtfoto → nur den Hintergrund löschen und als transparentes PNG speichern",
+  "pt": "ex.: foto de retrato → apague apenas o fundo e salve como PNG transparente",
+  "it": "es. foto ritratto → cancella solo lo sfondo e salva come PNG trasparente",
+  "nl": "bijv. portretfoto → alleen de achtergrond wissen en opslaan als transparante PNG",
+  "ru": "напр., портретное фото → стереть только фон и сохранить как прозрачный PNG",
+  "uk": "напр., портретне фото → стерти лише фон і зберегти як прозорий PNG",
+  "pl": "np. zdjęcie portretowe → wymaż tylko tło i zapisz jako przezroczysty PNG",
+  "cs": "např. portrétní fotografie → odstranit jen pozadí a uložit jako průhledný PNG",
+  "hu": "pl. portréfotó → csak a hátteret törölje, és mentse átlátszó PNG-ként",
+  "ro": "de ex. fotografie portret → șterge doar fundalul și salvează ca PNG transparent",
+  "sv": "t.ex. ett porträttfoto → ta bort bara bakgrunden och spara som genomskinlig PNG",
+  "da": "f.eks. et portrætfoto → fjern kun baggrunden og gem som gennemsigtig PNG",
+  "nb": "f.eks. et portrettbilde → fjern bare bakgrunnen og lagre som gjennomsiktig PNG",
+  "fi": "esim. muotokuva → poista vain tausta ja tallenna läpinäkyvänä PNG:nä",
+  "tr": "örn. portre fotoğrafı → yalnızca arka planı kaldırın ve şeffaf PNG olarak kaydedin",
+  "zh-TW": "例）人像照片 → 只去除背景，儲存為透明 PNG",
+  "th": "เช่น รูปภาพบุคคล → ลบเฉพาะพื้นหลังและบันทึกเป็น PNG โปร่งใส",
+  "vi": "VD: ảnh chân dung → chỉ xóa nền và lưu dưới dạng PNG trong suốt",
+  "id": "mis. foto potret → hapus latarnya saja dan simpan sebagai PNG transparan",
+  "ar": "مثال) صورة شخصية → امسح الخلفية فقط واحفظها بصيغة PNG شفافة",
+  "fa": "مثال) عکس پرتره → فقط پس‌زمینه را پاک کنید و به‌صورت PNG شفاف ذخیره کنید"
+ },
+ "처리 모델을 내려받아 당신의 기기 안에서 실행합니다. 사진은 기기 밖으로 나가지 않습니다.": {
+  "en": "The processing model is downloaded and runs on your device. Your photo never leaves your device.",
+  "zh": "处理模型会下载到您的设备上运行。照片不会离开您的设备。",
+  "ja": "処理モデルをダウンロードしてあなたの端末の中で実行します。写真は端末の外に出ません。",
+  "es": "El modelo de procesamiento se descarga y se ejecuta en tu dispositivo. Tu foto nunca sale de tu dispositivo.",
+  "hi": "प्रोसेसिंग मॉडल डाउनलोड होकर आपके डिवाइस पर चलता है। आपकी फ़ोटो डिवाइस से बाहर नहीं जाती।",
+  "fr": "Le modèle de traitement est téléchargé et exécuté sur votre appareil. Votre photo ne quitte jamais votre appareil.",
+  "de": "Das Verarbeitungsmodell wird heruntergeladen und auf Ihrem Gerät ausgeführt. Ihr Foto verlässt Ihr Gerät nie.",
+  "pt": "O modelo de processamento é baixado e executado no seu dispositivo. Sua foto nunca sai do dispositivo.",
+  "it": "Il modello di elaborazione viene scaricato ed eseguito sul tuo dispositivo. La tua foto non lascia mai il dispositivo.",
+  "nl": "Het verwerkingsmodel wordt gedownload en op uw apparaat uitgevoerd. Uw foto verlaat uw apparaat nooit.",
+  "ru": "Модель обработки загружается и работает на вашем устройстве. Ваше фото никогда не покидает устройство.",
+  "uk": "Модель обробки завантажується та працює на вашому пристрої. Ваше фото ніколи не залишає пристрій.",
+  "pl": "Model przetwarzania jest pobierany i działa na Twoim urządzeniu. Twoje zdjęcie nigdy nie opuszcza urządzenia.",
+  "cs": "Model zpracování se stáhne a běží ve vašem zařízení. Vaše fotografie zařízení nikdy neopustí.",
+  "hu": "A feldolgozó modell letöltődik, és az Ön eszközén fut. A fotó soha nem hagyja el az eszközt.",
+  "ro": "Modelul de procesare este descărcat și rulează pe dispozitivul tău. Fotografia ta nu părăsește niciodată dispozitivul.",
+  "sv": "Bearbetningsmodellen laddas ner och körs på din enhet. Ditt foto lämnar aldrig din enhet.",
+  "da": "Behandlingsmodellen downloades og kører på din enhed. Dit foto forlader aldrig din enhed.",
+  "nb": "Behandlingsmodellen lastes ned og kjører på enheten din. Bildet ditt forlater aldri enheten din.",
+  "fi": "Käsittelymalli ladataan ja suoritetaan laitteellasi. Valokuvasi ei koskaan poistu laitteeltasi.",
+  "tr": "İşleme modeli indirilir ve cihazınızda çalışır. Fotoğrafınız cihazınızdan asla çıkmaz.",
+  "zh-TW": "處理模型會下載到您的裝置上執行。照片不會離開您的裝置。",
+  "th": "โมเดลประมวลผลจะถูกดาวน์โหลดและทำงานบนอุปกรณ์ของคุณ รูปภาพของคุณจะไม่ออกจากอุปกรณ์เลย",
+  "vi": "Mô hình xử lý được tải xuống và chạy trên thiết bị của bạn. Ảnh của bạn không bao giờ rời khỏi thiết bị.",
+  "id": "Model pemrosesan diunduh dan dijalankan di perangkat Anda. Foto Anda tidak pernah keluar dari perangkat.",
+  "ar": "يتم تنزيل نموذج المعالجة وتشغيله على جهازك. لا تغادر صورتك جهازك أبدًا.",
+  "fa": "مدل پردازش دانلود می‌شود و درون دستگاه شما اجرا می‌شود. عکس شما از دستگاهتان خارج نمی‌شود."
+ },
+ "모델 용량이 커서 첫 실행은 시간이 걸릴 수 있습니다.": {
+  "en": "The model is large, so the first run may take a while.",
+  "zh": "模型较大，首次运行可能需要一些时间。",
+  "ja": "モデルが大きいため、初回は時間がかかることがあります。",
+  "es": "El modelo es grande, así que la primera vez puede tardar.",
+  "hi": "मॉडल बड़ा है, इसलिए पहली बार समय लग सकता है।",
+  "fr": "Le modèle est volumineux, la première exécution peut donc prendre un moment.",
+  "de": "Das Modell ist groß, daher kann der erste Lauf eine Weile dauern.",
+  "pt": "O modelo é grande, então a primeira execução pode demorar um pouco.",
+  "it": "Il modello è grande, quindi la prima esecuzione potrebbe richiedere un po' di tempo.",
+  "nl": "Het model is groot, dus de eerste keer kan het even duren.",
+  "ru": "Модель большая, поэтому первый запуск может занять некоторое время.",
+  "uk": "Модель велика, тому перший запуск може забрати деякий час.",
+  "pl": "Model jest duży, więc pierwsze uruchomienie może potrwać.",
+  "cs": "Model je velký, takže první spuštění může chvíli trvat.",
+  "hu": "A modell nagy, ezért az első futtatás eltarthat egy ideig.",
+  "ro": "Modelul este mare, așa că prima rulare poate dura ceva timp.",
+  "sv": "Modellen är stor, så den första körningen kan ta en stund.",
+  "da": "Modellen er stor, så første kørsel kan tage et stykke tid.",
+  "nb": "Modellen er stor, så første kjøring kan ta litt tid.",
+  "fi": "Malli on suuri, joten ensimmäinen käyttökerta voi kestää hetken.",
+  "tr": "Model büyük olduğundan ilk çalıştırma biraz zaman alabilir.",
+  "zh-TW": "模型較大，首次執行可能需要一些時間。",
+  "th": "โมเดลมีขนาดใหญ่ การทำงานครั้งแรกอาจใช้เวลาสักครู่",
+  "vi": "Mô hình lớn nên lần chạy đầu tiên có thể mất một lúc.",
+  "id": "Modelnya besar, jadi pertama kali dijalankan mungkin perlu waktu.",
+  "ar": "النموذج كبير الحجم، لذا قد تستغرق أول مرة بعض الوقت.",
+  "fa": "مدل حجم زیادی دارد، بنابراین اجرای اول ممکن است کمی طول بکشد."
+ },
+ "① 넣은 사진": {
+  "en": "① Your photo",
+  "zh": "① 已添加的照片",
+  "ja": "① 入れた写真",
+  "es": "① Tu foto",
+  "hi": "① आपकी फ़ोटो",
+  "fr": "① Votre photo",
+  "de": "① Ihr Foto",
+  "pt": "① Sua foto",
+  "it": "① La tua foto",
+  "nl": "① Uw foto",
+  "ru": "① Ваше фото",
+  "uk": "① Ваше фото",
+  "pl": "① Twoje zdjęcie",
+  "cs": "① Vaše fotografie",
+  "hu": "① Az Ön fotója",
+  "ro": "① Fotografia ta",
+  "sv": "① Ditt foto",
+  "da": "① Dit foto",
+  "nb": "① Bildet ditt",
+  "fi": "① Valokuvasi",
+  "tr": "① Fotoğrafınız",
+  "zh-TW": "① 已加入的照片",
+  "th": "① รูปภาพของคุณ",
+  "vi": "① Ảnh của bạn",
+  "id": "① Foto Anda",
+  "ar": "① صورتك المضافة",
+  "fa": "① عکس افزوده‌شده"
+ },
+ "✂️ 배경 지우기": {
+  "en": "✂️ Remove background",
+  "zh": "✂️ 去除背景",
+  "ja": "✂️ 背景を消す",
+  "es": "✂️ Quitar el fondo",
+  "hi": "✂️ बैकग्राउंड हटाएँ",
+  "fr": "✂️ Supprimer l'arrière-plan",
+  "de": "✂️ Hintergrund entfernen",
+  "pt": "✂️ Remover o fundo",
+  "it": "✂️ Rimuovi sfondo",
+  "nl": "✂️ Achtergrond verwijderen",
+  "ru": "✂️ Удалить фон",
+  "uk": "✂️ Видалити фон",
+  "pl": "✂️ Usuń tło",
+  "cs": "✂️ Odstranit pozadí",
+  "hu": "✂️ Háttér eltávolítása",
+  "ro": "✂️ Elimină fundalul",
+  "sv": "✂️ Ta bort bakgrunden",
+  "da": "✂️ Fjern baggrunden",
+  "nb": "✂️ Fjern bakgrunnen",
+  "fi": "✂️ Poista tausta",
+  "tr": "✂️ Arka planı kaldırın",
+  "zh-TW": "✂️ 去背",
+  "th": "✂️ ลบพื้นหลัง",
+  "vi": "✂️ Xóa nền",
+  "id": "✂️ Hapus latar",
+  "ar": "✂️ إزالة الخلفية",
+  "fa": "✂️ حذف پس‌زمینه"
+ },
+ "다른 사진 고르기": {
+  "en": "Choose another photo",
+  "zh": "换一张照片",
+  "ja": "別の写真を選ぶ",
+  "es": "Elegir otra foto",
+  "hi": "दूसरी फ़ोटो चुनें",
+  "fr": "Choisir une autre photo",
+  "de": "Anderes Foto wählen",
+  "pt": "Escolher outra foto",
+  "it": "Scegli un'altra foto",
+  "nl": "Kies een andere foto",
+  "ru": "Выбрать другое фото",
+  "uk": "Вибрати інше фото",
+  "pl": "Wybierz inne zdjęcie",
+  "cs": "Vybrat jinou fotografii",
+  "hu": "Másik fotó választása",
+  "ro": "Alege altă fotografie",
+  "sv": "Välj ett annat foto",
+  "da": "Vælg et andet foto",
+  "nb": "Velg et annet bilde",
+  "fi": "Valitse toinen valokuva",
+  "tr": "Başka fotoğraf seçin",
+  "zh-TW": "換一張照片",
+  "th": "เลือกรูปภาพอื่น",
+  "vi": "Chọn ảnh khác",
+  "id": "Pilih foto lain",
+  "ar": "اختيار صورة أخرى",
+  "fa": "انتخاب عکسی دیگر"
+ },
+ "아직 배경을 지우지 않았습니다.": {
+  "en": "The background has not been removed yet.",
+  "zh": "还没有去除背景。",
+  "ja": "まだ背景を消していません。",
+  "es": "Aún no se ha quitado el fondo.",
+  "hi": "बैकग्राउंड अभी हटाया नहीं गया है।",
+  "fr": "L'arrière-plan n'a pas encore été supprimé.",
+  "de": "Der Hintergrund wurde noch nicht entfernt.",
+  "pt": "O fundo ainda não foi removido.",
+  "it": "Lo sfondo non è ancora stato rimosso.",
+  "nl": "De achtergrond is nog niet verwijderd.",
+  "ru": "Фон ещё не удалён.",
+  "uk": "Фон ще не видалено.",
+  "pl": "Tło nie zostało jeszcze usunięte.",
+  "cs": "Pozadí zatím nebylo odstraněno.",
+  "hu": "A háttér még nem lett eltávolítva.",
+  "ro": "Fundalul nu a fost încă eliminat.",
+  "sv": "Bakgrunden har inte tagits bort än.",
+  "da": "Baggrunden er ikke blevet fjernet endnu.",
+  "nb": "Bakgrunnen er ikke fjernet ennå.",
+  "fi": "Taustaa ei ole vielä poistettu.",
+  "tr": "Arka plan henüz kaldırılmadı.",
+  "zh-TW": "尚未去除背景。",
+  "th": "ยังไม่ได้ลบพื้นหลัง",
+  "vi": "Nền vẫn chưa được xóa.",
+  "id": "Latar belum dihapus.",
+  "ar": "لم تتم إزالة الخلفية بعد.",
+  "fa": "هنوز پس‌زمینه حذف نشده است."
+ },
+ "⚠️ 도구를 불러오지 못했습니다": {
+  "en": "⚠️ The tool could not be loaded",
+  "zh": "⚠️ 工具加载失败",
+  "ja": "⚠️ ツールを読み込めませんでした",
+  "es": "⚠️ No se pudo cargar la herramienta",
+  "hi": "⚠️ टूल लोड नहीं हो सका",
+  "fr": "⚠️ L'outil n'a pas pu être chargé",
+  "de": "⚠️ Das Werkzeug konnte nicht geladen werden",
+  "pt": "⚠️ A ferramenta não pôde ser carregada",
+  "it": "⚠️ Lo strumento non ha potuto essere caricato",
+  "nl": "⚠️ Het hulpmiddel kon niet worden geladen",
+  "ru": "⚠️ Не удалось загрузить инструмент",
+  "uk": "⚠️ Не вдалося завантажити інструмент",
+  "pl": "⚠️ Nie udało się wczytać narzędzia",
+  "cs": "⚠️ Nástroj se nepodařilo načíst",
+  "hu": "⚠️ Az eszköz nem tölthető be",
+  "ro": "⚠️ Instrumentul nu a putut fi încărcat",
+  "sv": "⚠️ Verktyget kunde inte laddas",
+  "da": "⚠️ Værktøjet kunne ikke indlæses",
+  "nb": "⚠️ Verktøyet kunne ikke lastes inn",
+  "fi": "⚠️ Työkalua ei voitu ladata",
+  "tr": "⚠️ Araç yüklenemedi",
+  "zh-TW": "⚠️ 工具載入失敗",
+  "th": "⚠️ ไม่สามารถโหลดเครื่องมือได้",
+  "vi": "⚠️ Không thể tải công cụ",
+  "id": "⚠️ Alat tidak dapat dimuat",
+  "ar": "⚠️ تعذّر تحميل الأداة",
+  "fa": "⚠️ ابزار بارگذاری نشد"
+ },
+ "배경 제거에 필요한 처리 도구를 인터넷에서 불러오지 못했습니다. 이 도구는 첫 실행 때 처리 모델을 내려받아 동작합니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.": {
+  "en": "The processing tool needed for background removal could not be loaded from the internet. This tool downloads its processing model on the first run. Please check your connection and try again.",
+  "zh": "无法从互联网加载背景去除所需的处理工具。本工具在首次运行时会下载处理模型。请检查网络连接后重试。",
+  "ja": "背景除去に必要な処理ツールをインターネットから読み込めませんでした。このツールは初回に処理モデルをダウンロードして動作します。接続を確認して再度お試しください。",
+  "es": "No se pudo cargar desde internet la herramienta de procesamiento. Esta herramienta descarga su modelo la primera vez. Revisa tu conexión e inténtalo de nuevo.",
+  "hi": "बैकग्राउंड हटाने के लिए ज़रूरी प्रोसेसिंग टूल इंटरनेट से लोड नहीं हो सका। यह टूल पहली बार चलने पर अपना प्रोसेसिंग मॉडल डाउनलोड करता है। कृपया अपना कनेक्शन जाँचकर फिर कोशिश करें।",
+  "fr": "L'outil de traitement nécessaire à la suppression de l'arrière-plan n'a pas pu être chargé depuis Internet. Cet outil télécharge son modèle de traitement lors de la première exécution. Veuillez vérifier votre connexion et réessayer.",
+  "de": "Das für das Entfernen des Hintergrunds benötigte Verarbeitungswerkzeug konnte nicht aus dem Internet geladen werden. Dieses Werkzeug lädt sein Verarbeitungsmodell beim ersten Lauf herunter. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+  "pt": "A ferramenta de processamento necessária para remover o fundo não pôde ser carregada da internet. Esta ferramenta baixa seu modelo de processamento na primeira execução. Verifique sua conexão e tente novamente.",
+  "it": "Lo strumento di elaborazione necessario per rimuovere lo sfondo non ha potuto essere caricato da internet. Questo strumento scarica il suo modello di elaborazione alla prima esecuzione. Controlla la connessione e riprova.",
+  "nl": "Het verwerkingshulpmiddel dat nodig is voor het verwijderen van de achtergrond kon niet van internet worden geladen. Dit hulpmiddel downloadt bij het eerste gebruik zijn verwerkingsmodel. Controleer uw verbinding en probeer het opnieuw.",
+  "ru": "Не удалось загрузить из интернета инструмент обработки, необходимый для удаления фона. Этот инструмент при первом запуске загружает свою модель обработки. Проверьте подключение к интернету и попробуйте снова.",
+  "uk": "Не вдалося завантажити з інтернету інструмент обробки, потрібний для видалення фону. Цей інструмент під час першого запуску завантажує свою модель обробки. Перевірте підключення до інтернету та спробуйте знову.",
+  "pl": "Nie udało się pobrać z internetu narzędzia przetwarzania potrzebnego do usuwania tła. To narzędzie przy pierwszym uruchomieniu pobiera swój model przetwarzania. Sprawdź połączenie z internetem i spróbuj ponownie.",
+  "cs": "Nástroj pro zpracování potřebný k odstranění pozadí se z internetu nepodařilo načíst. Tento nástroj si při prvním spuštění stáhne svůj model zpracování. Zkontrolujte připojení a zkuste to prosím znovu.",
+  "hu": "A háttér eltávolításához szükséges feldolgozóeszközt nem sikerült betölteni az internetről. Ez az eszköz az első futtatáskor letölti a feldolgozó modelljét. Ellenőrizze az internetkapcsolatot, és próbálja újra.",
+  "ro": "Instrumentul de procesare necesar pentru eliminarea fundalului nu a putut fi încărcat de pe internet. Acest instrument își descarcă modelul de procesare la prima rulare. Verifică conexiunea la internet și încearcă din nou.",
+  "sv": "Bearbetningsverktyget som behövs för bakgrundsborttagning kunde inte laddas från internet. Det här verktyget laddar ner sin bearbetningsmodell vid första körningen. Kontrollera din anslutning och försök igen.",
+  "da": "Behandlingsværktøjet, der kræves til at fjerne baggrunden, kunne ikke indlæses fra internettet. Dette værktøj downloader sin behandlingsmodel ved første kørsel. Kontroller din forbindelse, og prøv igen.",
+  "nb": "Behandlingsverktøyet som trengs for å fjerne bakgrunnen, kunne ikke lastes fra internett. Dette verktøyet laster ned behandlingsmodellen ved første kjøring. Kontroller tilkoblingen og prøv igjen.",
+  "fi": "Taustan poistoon tarvittavaa käsittelytyökalua ei voitu ladata internetistä. Tämä työkalu lataa käsittelymallinsa ensimmäisellä käyttökerralla. Tarkista yhteytesi ja yritä uudelleen.",
+  "tr": "Arka plan kaldırma için gerekli işleme aracı internetten yüklenemedi. Bu araç ilk çalıştırıldığında işleme modelini indirir. Lütfen bağlantınızı kontrol edip tekrar deneyin.",
+  "zh-TW": "無法從網路載入去背所需的處理工具。本工具在首次執行時會下載處理模型。請檢查網路連線後重試。",
+  "th": "ไม่สามารถโหลดเครื่องมือประมวลผลที่จำเป็นสำหรับการลบพื้นหลังจากอินเทอร์เน็ตได้ เครื่องมือนี้จะดาวน์โหลดโมเดลประมวลผลในการทำงานครั้งแรก กรุณาตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
+  "vi": "Không thể tải công cụ xử lý cần thiết cho việc xóa nền từ internet. Công cụ này sẽ tải mô hình xử lý trong lần chạy đầu tiên. Vui lòng kiểm tra kết nối của bạn và thử lại.",
+  "id": "Alat pemrosesan yang diperlukan untuk menghapus latar tidak dapat dimuat dari internet. Alat ini mengunduh model pemrosesannya saat pertama kali dijalankan. Silakan periksa koneksi Anda dan coba lagi.",
+  "ar": "تعذّر تحميل أداة المعالجة اللازمة لإزالة الخلفية من الإنترنت. تعمل هذه الأداة بتنزيل نموذج المعالجة عند أول تشغيل. يرجى التحقق من اتصالك بالإنترنت والمحاولة مجددًا.",
+  "fa": "ابزار پردازش لازم برای حذف پس‌زمینه از اینترنت بارگذاری نشد. این ابزار در اولین اجرا مدل پردازش را دانلود می‌کند تا کار کند. لطفاً اتصال اینترنت خود را بررسی کنید و دوباره تلاش کنید."
+ },
+ "다시 시도": {
+  "en": "Try again",
+  "zh": "重试",
+  "ja": "再試行",
+  "es": "Intentar de nuevo",
+  "hi": "फिर कोशिश करें",
+  "fr": "Réessayer",
+  "de": "Erneut versuchen",
+  "pt": "Tentar novamente",
+  "it": "Riprova",
+  "nl": "Opnieuw proberen",
+  "ru": "Попробовать снова",
+  "uk": "Спробувати знову",
+  "pl": "Spróbuj ponownie",
+  "cs": "Zkusit znovu",
+  "hu": "Újrapróbálkozás",
+  "ro": "Încearcă din nou",
+  "sv": "Försök igen",
+  "da": "Prøv igen",
+  "nb": "Prøv igjen",
+  "fi": "Yritä uudelleen",
+  "tr": "Tekrar deneyin",
+  "zh-TW": "重試",
+  "th": "ลองอีกครั้ง",
+  "vi": "Thử lại",
+  "id": "Coba lagi",
+  "ar": "حاول مجددًا",
+  "fa": "تلاش دوباره"
+ },
+ "② 결과": {
+  "en": "② Result",
+  "zh": "② 结果",
+  "ja": "② 結果",
+  "es": "② Resultado",
+  "hi": "② परिणाम",
+  "fr": "② Résultat",
+  "de": "② Ergebnis",
+  "pt": "② Resultado",
+  "it": "② Risultato",
+  "nl": "② Resultaat",
+  "ru": "② Результат",
+  "uk": "② Результат",
+  "pl": "② Wynik",
+  "cs": "② Výsledek",
+  "hu": "② Eredmény",
+  "ro": "② Rezultat",
+  "sv": "② Resultat",
+  "da": "② Resultat",
+  "nb": "② Resultat",
+  "fi": "② Tulos",
+  "tr": "② Sonuç",
+  "zh-TW": "② 結果",
+  "th": "② ผลลัพธ์",
+  "vi": "② Kết quả",
+  "id": "② Hasil",
+  "ar": "② النتيجة",
+  "fa": "② نتیجه"
+ },
+ "배경색 골라 합치기": {
+  "en": "Pick a background color to fill in",
+  "zh": "选择背景色合并",
+  "ja": "背景色を選んで合成",
+  "es": "Elige un color de fondo",
+  "hi": "बैकग्राउंड रंग चुनकर भरें",
+  "fr": "Choisir une couleur d'arrière-plan à remplir",
+  "de": "Eine Hintergrundfarbe zum Ausfüllen wählen",
+  "pt": "Escolher uma cor de fundo para preencher",
+  "it": "Scegli un colore di sfondo da applicare",
+  "nl": "Kies een achtergrondkleur om in te vullen",
+  "ru": "Выбрать цвет фона для заливки",
+  "uk": "Вибрати колір фону для заливки",
+  "pl": "Wybierz kolor tła do wypełnienia",
+  "cs": "Vybrat barvu pozadí k vyplnění",
+  "hu": "Háttérszín kiválasztása kitöltéshez",
+  "ro": "Alege o culoare de fundal pentru umplere",
+  "sv": "Välj en bakgrundsfärg att fylla i",
+  "da": "Vælg en baggrundsfarve at udfylde med",
+  "nb": "Velg en bakgrunnsfarge å fylle inn",
+  "fi": "Valitse täytettävä taustaväri",
+  "tr": "Doldurmak için bir arka plan rengi seçin",
+  "zh-TW": "選擇背景色合併",
+  "th": "เลือกสีพื้นหลังเพื่อเติม",
+  "vi": "Chọn màu nền để điền vào",
+  "id": "Pilih warna latar untuk mengisi",
+  "ar": "اختر لون خلفية للدمج",
+  "fa": "انتخاب رنگ پس‌زمینه برای ترکیب"
+ },
+ "투명을 고르면 결과 그대로 보이고, 색을 고르면 미리보기 배경이 그 색으로 바뀝니다.": {
+  "en": "Choose transparency to see the result as is; choose a color and the preview background changes to that color.",
+  "zh": "选择透明可看到原始结果；选择颜色后，预览背景会变成该颜色。",
+  "ja": "透明を選ぶと結果がそのまま見え、色を選ぶとプレビューの背景がその色に変わります。",
+  "es": "Con transparencia ves el resultado tal cual; con un color, el fondo de la vista previa cambia a ese color.",
+  "hi": "पारदर्शिता चुनने पर परिणाम वैसा ही दिखेगा; रंग चुनने पर पूर्वावलोकन का बैकग्राउंड उस रंग का हो जाएगा।",
+  "fr": "Choisissez la transparence pour voir le résultat tel quel ; choisissez une couleur et l'arrière-plan de l'aperçu prend cette couleur.",
+  "de": "Wählen Sie Transparenz, um das Ergebnis unverändert zu sehen; wählen Sie eine Farbe, und der Vorschauhintergrund wechselt zu dieser Farbe.",
+  "pt": "Escolha transparência para ver o resultado como está; escolha uma cor e o fundo da pré-visualização muda para essa cor.",
+  "it": "Scegli la trasparenza per vedere il risultato così com'è; scegli un colore e lo sfondo dell'anteprima diventa di quel colore.",
+  "nl": "Kies transparantie om het resultaat ongewijzigd te zien; kies een kleur en de achtergrond van het voorbeeld verandert in die kleur.",
+  "ru": "Выберите прозрачность, чтобы видеть результат как есть; выберите цвет — и фон предпросмотра изменится на этот цвет.",
+  "uk": "Виберіть прозорість, щоб бачити результат як є; виберіть колір — і фон попереднього перегляду зміниться на цей колір.",
+  "pl": "Wybierz przezroczystość, aby zobaczyć wynik taki, jaki jest; wybierz kolor, a tło podglądu zmieni się na ten kolor.",
+  "cs": "Zvolíte-li průhlednost, uvidíte výsledek tak, jak je; zvolíte-li barvu, pozadí náhledu se změní na tuto barvu.",
+  "hu": "Ha az átlátszóságot választja, az eredményt úgy látja, ahogy van; ha színt választ, az előnézet háttere arra a színre változik.",
+  "ro": "Alege transparența pentru a vedea rezultatul ca atare; alege o culoare și fundalul previzualizării se schimbă în acea culoare.",
+  "sv": "Välj genomskinlighet för att se resultatet som det är; välj en färg så ändras förhandsgranskningens bakgrund till den färgen.",
+  "da": "Vælg gennemsigtighed for at se resultatet, som det er; vælg en farve, og forhåndsvisningens baggrund skifter til den farve.",
+  "nb": "Velg gjennomsiktighet for å se resultatet som det er; velg en farge, og forhåndsvisningens bakgrunn endres til den fargen.",
+  "fi": "Valitse läpinäkyvyys nähdäksesi tuloksen sellaisenaan; valitse väri, niin esikatselun tausta muuttuu kyseiseksi väriksi.",
+  "tr": "Sonucu olduğu gibi görmek için şeffaflığı seçin; bir renk seçerseniz önizleme arka planı o renge döner.",
+  "zh-TW": "選擇透明可看到原始結果；選擇顏色後，預覽背景會變成該顏色。",
+  "th": "เลือกความโปร่งใสเพื่อดูผลลัพธ์ตามที่เป็นอยู่ เลือกสีแล้วพื้นหลังของตัวอย่างจะเปลี่ยนเป็นสีนั้น",
+  "vi": "Chọn trong suốt để xem kết quả nguyên bản; chọn một màu và nền xem trước sẽ đổi thành màu đó.",
+  "id": "Pilih transparansi untuk melihat hasil apa adanya; pilih warna dan latar pratinjau berubah menjadi warna tersebut.",
+  "ar": "إذا اخترت الشفافية ترى النتيجة كما هي، وإذا اخترت لونًا تتغيّر خلفية المعاينة إلى ذلك اللون.",
+  "fa": "اگر شفاف را انتخاب کنید نتیجه همان‌طور که هست دیده می‌شود و اگر رنگی انتخاب کنید پس‌زمینه پیش‌نمایش به آن رنگ درمی‌آید."
+ },
+ "투명 PNG로 저장": {
+  "en": "Save as transparent PNG",
+  "zh": "保存为透明 PNG",
+  "ja": "透明PNGで保存",
+  "es": "Guardar como PNG transparente",
+  "hi": "पारदर्शी PNG में सहेजें",
+  "fr": "Enregistrer en PNG transparent",
+  "de": "Als transparentes PNG speichern",
+  "pt": "Salvar como PNG transparente",
+  "it": "Salva come PNG trasparente",
+  "nl": "Opslaan als transparante PNG",
+  "ru": "Сохранить как прозрачный PNG",
+  "uk": "Зберегти як прозорий PNG",
+  "pl": "Zapisz jako przezroczysty PNG",
+  "cs": "Uložit jako průhledný PNG",
+  "hu": "Mentés átlátszó PNG-ként",
+  "ro": "Salvează ca PNG transparent",
+  "sv": "Spara som genomskinlig PNG",
+  "da": "Gem som gennemsigtig PNG",
+  "nb": "Lagre som gjennomsiktig PNG",
+  "fi": "Tallenna läpinäkyvänä PNG:nä",
+  "tr": "Şeffaf PNG olarak kaydedin",
+  "zh-TW": "儲存為透明 PNG",
+  "th": "บันทึกเป็น PNG โปร่งใส",
+  "vi": "Lưu dưới dạng PNG trong suốt",
+  "id": "Simpan sebagai PNG transparan",
+  "ar": "حفظ بصيغة PNG شفافة",
+  "fa": "ذخیره به‌صورت PNG شفاف"
+ },
+ "배경색 JPG로 저장": {
+  "en": "Save as JPG with background color",
+  "zh": "保存为带背景色的 JPG",
+  "ja": "背景色つきJPGで保存",
+  "es": "Guardar como JPG con color de fondo",
+  "hi": "बैकग्राउंड रंग के साथ JPG में सहेजें",
+  "fr": "Enregistrer en JPG avec couleur d'arrière-plan",
+  "de": "Als JPG mit Hintergrundfarbe speichern",
+  "pt": "Salvar como JPG com cor de fundo",
+  "it": "Salva come JPG con colore di sfondo",
+  "nl": "Opslaan als JPG met achtergrondkleur",
+  "ru": "Сохранить как JPG с цветом фона",
+  "uk": "Зберегти як JPG із кольором фону",
+  "pl": "Zapisz jako JPG z kolorem tła",
+  "cs": "Uložit jako JPG s barvou pozadí",
+  "hu": "Mentés JPG-ként háttérszínnel",
+  "ro": "Salvează ca JPG cu culoare de fundal",
+  "sv": "Spara som JPG med bakgrundsfärg",
+  "da": "Gem som JPG med baggrundsfarve",
+  "nb": "Lagre som JPG med bakgrunnsfarge",
+  "fi": "Tallenna JPG:nä taustavärillä",
+  "tr": "Arka plan rengiyle JPG olarak kaydedin",
+  "zh-TW": "儲存為帶背景色的 JPG",
+  "th": "บันทึกเป็น JPG พร้อมสีพื้นหลัง",
+  "vi": "Lưu dưới dạng JPG có màu nền",
+  "id": "Simpan sebagai JPG dengan warna latar",
+  "ar": "حفظ بصيغة JPG بلون خلفية",
+  "fa": "ذخیره به‌صورت JPG با رنگ پس‌زمینه"
+ },
+ "처음으로": {
+  "en": "Start over",
+  "zh": "重新开始",
+  "ja": "最初から",
+  "es": "Empezar de nuevo",
+  "hi": "शुरू से",
+  "fr": "Recommencer",
+  "de": "Von vorn beginnen",
+  "pt": "Recomeçar",
+  "it": "Ricomincia",
+  "nl": "Opnieuw beginnen",
+  "ru": "Сначала",
+  "uk": "Спочатку",
+  "pl": "Od nowa",
+  "cs": "Od začátku",
+  "hu": "Újrakezdés",
+  "ro": "De la capăt",
+  "sv": "Börja om",
+  "da": "Start forfra",
+  "nb": "Start på nytt",
+  "fi": "Aloita alusta",
+  "tr": "Baştan başlayın",
+  "zh-TW": "重新開始",
+  "th": "เริ่มใหม่",
+  "vi": "Bắt đầu lại",
+  "id": "Mulai dari awal",
+  "ar": "البدء من جديد",
+  "fa": "از ابتدا"
+ },
+ "🗣️ 글로 시키기": {
+  "en": "🗣️ Ask by typing",
+  "zh": "🗣️ 用文字吩咐",
+  "ja": "🗣️ 言葉で頼む",
+  "es": "🗣️ Pedir con palabras",
+  "hi": "🗣️ लिखकर कहें",
+  "fr": "🗣️ Commander par écrit",
+  "de": "🗣️ Befehl eingeben",
+  "pt": "🗣️ Comandar por texto",
+  "it": "🗣️ Comanda scrivendo",
+  "nl": "🗣️ Opdracht typen",
+  "ru": "🗣️ Команда текстом",
+  "uk": "🗣️ Команда текстом",
+  "pl": "🗣️ Polecenie tekstowe",
+  "cs": "🗣️ Příkaz textem",
+  "hu": "🗣️ Utasítás szöveggel",
+  "ro": "🗣️ Comandă prin text",
+  "sv": "🗣️ Be med ord",
+  "da": "🗣️ Bed med ord",
+  "nb": "🗣️ Be med ord",
+  "fi": "🗣️ Pyydä sanoin",
+  "tr": "🗣️ Yazarak söyleyin",
+  "zh-TW": "🗣️ 用文字吩咐",
+  "th": "🗣️ สั่งด้วยการพิมพ์",
+  "vi": "🗣️ Yêu cầu bằng văn bản",
+  "id": "🗣️ Minta lewat teks",
+  "ar": "🗣️ اطلب بالكلمات",
+  "fa": "🗣️ با نوشتن دستور دهید"
+ },
+ "(안내 도우미 — 이 페이지 기능만 도와줍니다)": {
+  "en": "(Guide helper — helps only with this page)",
+  "zh": "（导览助手 — 仅帮助使用本页功能）",
+  "ja": "（案内ヘルパー — このページの機能だけを手伝います）",
+  "es": "(Ayudante guía — solo ayuda con esta página)",
+  "hi": "(गाइड सहायक — केवल इस पेज के कार्यों में मदद)",
+  "fr": "(Assistant guide — aide uniquement avec cette page)",
+  "de": "(Anleitungshelfer — hilft nur bei dieser Seite)",
+  "pt": "(Ajudante guia — ajuda apenas com esta página)",
+  "it": "(Assistente guida — aiuta solo con questa pagina)",
+  "nl": "(Gidshelper — helpt alleen met deze pagina)",
+  "ru": "(Помощник-гид — помогает только с функциями этой страницы)",
+  "uk": "(Помічник-гід — допомагає лише з функціями цієї сторінки)",
+  "pl": "(Pomocnik przewodnika — pomaga tylko z funkcjami tej strony)",
+  "cs": "(Průvodce — pomáhá pouze s funkcemi této stránky)",
+  "hu": "(Útmutató segítő — csak ennek az oldalnak a funkcióiban segít)",
+  "ro": "(Asistent ghid — ajută doar cu funcțiile acestei pagini)",
+  "sv": "(Guidehjälpare — hjälper bara med den här sidans funktioner)",
+  "da": "(Guidehjælper — hjælper kun med denne sides funktioner)",
+  "nb": "(Guidehjelper — hjelper bare med funksjonene på denne siden)",
+  "fi": "(Opasavustaja — auttaa vain tämän sivun toiminnoissa)",
+  "tr": "(Kılavuz yardımcı — yalnızca bu sayfanın işlevlerinde yardımcı olur)",
+  "zh-TW": "（導覽助手 — 僅幫助使用本頁功能）",
+  "th": "(ผู้ช่วยแนะนำ — ช่วยเฉพาะฟังก์ชันของหน้านี้เท่านั้น)",
+  "vi": "(Trợ lý hướng dẫn — chỉ hỗ trợ các chức năng của trang này)",
+  "id": "(Asisten panduan — hanya membantu fungsi halaman ini)",
+  "ar": "(مساعد إرشادي — يساعد فقط في ميزات هذه الصفحة)",
+  "fa": "(دستیار راهنما — فقط در کارکردهای همین صفحه کمک می‌کند)"
+ },
+ "예: 지워": {
+  "en": "e.g. remove",
+  "zh": "例：去除",
+  "ja": "例：消して",
+  "es": "Ej.: quita",
+  "hi": "उदा.: हटाओ",
+  "fr": "ex. : supprimer",
+  "de": "z. B. entfernen",
+  "pt": "ex.: remover",
+  "it": "es.: rimuovi",
+  "nl": "bijv. verwijder",
+  "ru": "напр.: удалить",
+  "uk": "напр.: видалити",
+  "pl": "np. usuń",
+  "cs": "např. odstranit",
+  "hu": "pl. távolítsd el",
+  "ro": "de ex. elimină",
+  "sv": "t.ex. ta bort",
+  "da": "f.eks. fjern",
+  "nb": "f.eks. fjern",
+  "fi": "esim. poista",
+  "tr": "örn. kaldır",
+  "zh-TW": "例：去除",
+  "th": "เช่น ลบ",
+  "vi": "VD: xóa",
+  "id": "mis. hapus",
+  "ar": "مثال: أزل",
+  "fa": "مثال: پاک کن"
+ },
+ "시키기": {
+  "en": "Do it",
+  "zh": "执行",
+  "ja": "実行",
+  "es": "Hazlo",
+  "hi": "करें",
+  "fr": "Exécuter",
+  "de": "Ausführen",
+  "pt": "Executar",
+  "it": "Esegui",
+  "nl": "Uitvoeren",
+  "ru": "Выполнить",
+  "uk": "Виконати",
+  "pl": "Wykonaj",
+  "cs": "Provést",
+  "hu": "Végrehajtás",
+  "ro": "Execută",
+  "sv": "Gör det",
+  "da": "Gør det",
+  "nb": "Gjør det",
+  "fi": "Tee se",
+  "tr": "Yap",
+  "zh-TW": "執行",
+  "th": "ทำเลย",
+  "vi": "Thực hiện",
+  "id": "Lakukan",
+  "ar": "تنفيذ",
+  "fa": "انجام بده"
+ },
+ "지워": {
+  "en": "Remove",
+  "zh": "去除",
+  "ja": "消して",
+  "es": "Quita",
+  "hi": "हटाओ",
+  "fr": "Supprimer",
+  "de": "Entfernen",
+  "pt": "Remover",
+  "it": "Rimuovi",
+  "nl": "Verwijderen",
+  "ru": "Удалить",
+  "uk": "Видалити",
+  "pl": "Usuń",
+  "cs": "Odstranit",
+  "hu": "Eltávolítás",
+  "ro": "Elimină",
+  "sv": "Ta bort",
+  "da": "Fjern",
+  "nb": "Fjern",
+  "fi": "Poista",
+  "tr": "Kaldırın",
+  "zh-TW": "去除",
+  "th": "ลบ",
+  "vi": "Xóa",
+  "id": "Hapus",
+  "ar": "أزل",
+  "fa": "پاک کن"
+ },
+ "저장": {
+  "en": "Save",
+  "zh": "保存",
+  "ja": "保存",
+  "es": "Guardar",
+  "hi": "सहेजें",
+  "fr": "Enregistrer",
+  "de": "Speichern",
+  "pt": "Salvar",
+  "it": "Salva",
+  "nl": "Opslaan",
+  "ru": "Сохранить",
+  "uk": "Зберегти",
+  "pl": "Zapisz",
+  "cs": "Uložit",
+  "hu": "Mentés",
+  "ro": "Salvează",
+  "sv": "Spara",
+  "da": "Gem",
+  "nb": "Lagre",
+  "fi": "Tallenna",
+  "tr": "Kaydedin",
+  "zh-TW": "儲存",
+  "th": "บันทึก",
+  "vi": "Lưu",
+  "id": "Simpan",
+  "ar": "حفظ",
+  "fa": "ذخیره"
+ },
+ "처음": {
+  "en": "Start over",
+  "zh": "重新开始",
+  "ja": "最初",
+  "es": "Inicio",
+  "hi": "शुरू से",
+  "fr": "Début",
+  "de": "Anfang",
+  "pt": "Início",
+  "it": "Inizio",
+  "nl": "Begin",
+  "ru": "Сначала",
+  "uk": "Спочатку",
+  "pl": "Od nowa",
+  "cs": "Od začátku",
+  "hu": "Újrakezdés",
+  "ro": "De la capăt",
+  "sv": "Börja om",
+  "da": "Start forfra",
+  "nb": "Start på nytt",
+  "fi": "Alkuun",
+  "tr": "Baştan",
+  "zh-TW": "重新開始",
+  "th": "เริ่มใหม่",
+  "vi": "Bắt đầu lại",
+  "id": "Mulai awal",
+  "ar": "البداية",
+  "fa": "ابتدا"
+ },
+ "💡 도움말": {
+  "en": "💡 Help",
+  "zh": "💡 帮助",
+  "ja": "💡 ヘルプ",
+  "es": "💡 Ayuda",
+  "hi": "💡 सहायता",
+  "fr": "💡 Aide",
+  "de": "💡 Hilfe",
+  "pt": "💡 Ajuda",
+  "it": "💡 Aiuto",
+  "nl": "💡 Help",
+  "ru": "💡 Справка",
+  "uk": "💡 Довідка",
+  "pl": "💡 Pomoc",
+  "cs": "💡 Nápověda",
+  "hu": "💡 Súgó",
+  "ro": "💡 Ajutor",
+  "sv": "💡 Hjälp",
+  "da": "💡 Hjælp",
+  "nb": "💡 Hjelp",
+  "fi": "💡 Ohje",
+  "tr": "💡 Yardım",
+  "zh-TW": "💡 說明",
+  "th": "💡 ช่วยเหลือ",
+  "vi": "💡 Trợ giúp",
+  "id": "💡 Bantuan",
+  "ar": "💡 مساعدة",
+  "fa": "💡 راهنما"
+ },
+ "사진을 넣고 배경 지우기를 누르세요. 인물이나 물건처럼 또렷한 대상이 있는 사진에서 잘 됩니다.": {
+  "en": "Add a photo and press Remove background. It works best on photos with a clear subject, like a person or an object.",
+  "zh": "添加照片后点击去除背景。对人物或物品等主体清晰的照片效果最好。",
+  "ja": "写真を入れて「背景を消す」を押してください。人物や物のようにはっきりした被写体のある写真でうまくいきます。",
+  "es": "Añade una foto y pulsa Quitar el fondo. Funciona mejor con fotos de un sujeto claro, como una persona o un objeto.",
+  "hi": "फ़ोटो जोड़कर बैकग्राउंड हटाएँ दबाएँ। व्यक्ति या वस्तु जैसे स्पष्ट विषय वाली फ़ोटो पर यह सबसे अच्छा काम करता है।",
+  "fr": "Ajoutez une photo et appuyez sur Supprimer l'arrière-plan. Cela fonctionne mieux sur les photos avec un sujet net, comme une personne ou un objet.",
+  "de": "Fügen Sie ein Foto hinzu und drücken Sie auf Hintergrund entfernen. Es funktioniert am besten bei Fotos mit einem klaren Motiv, wie einer Person oder einem Gegenstand.",
+  "pt": "Adicione uma foto e pressione Remover o fundo. Funciona melhor em fotos com um assunto claro, como uma pessoa ou um objeto.",
+  "it": "Aggiungi una foto e premi Rimuovi sfondo. Funziona meglio su foto con un soggetto chiaro, come una persona o un oggetto.",
+  "nl": "Voeg een foto toe en druk op Achtergrond verwijderen. Het werkt het beste op foto's met een duidelijk onderwerp, zoals een persoon of een voorwerp.",
+  "ru": "Добавьте фото и нажмите «Удалить фон». Лучше всего работает на фотографиях с чётким объектом, например человеком или предметом.",
+  "uk": "Додайте фото та натисніть «Видалити фон». Найкраще працює на фотографіях із чітким об'єктом, наприклад людиною чи предметом.",
+  "pl": "Dodaj zdjęcie i naciśnij „Usuń tło”. Najlepiej działa na zdjęciach z wyraźnym obiektem, np. osobą lub przedmiotem.",
+  "cs": "Přidejte fotografii a stiskněte „Odstranit pozadí“. Nejlépe funguje u fotografií s jasným objektem, například osobou nebo předmětem.",
+  "hu": "Adjon hozzá egy fotót, és nyomja meg a „Háttér eltávolítása” gombot. Olyan fotókon működik a legjobban, amelyeken jól kivehető a téma, például egy személy vagy egy tárgy.",
+  "ro": "Adaugă o fotografie și apasă „Elimină fundalul”. Funcționează cel mai bine pe fotografii cu un subiect clar, cum ar fi o persoană sau un obiect.",
+  "sv": "Lägg till ett foto och tryck på Ta bort bakgrunden. Det fungerar bäst på foton med ett tydligt motiv, som en person eller ett föremål.",
+  "da": "Tilføj et foto, og tryk på Fjern baggrunden. Det fungerer bedst på fotos med et tydeligt motiv, som en person eller en genstand.",
+  "nb": "Legg til et bilde og trykk på Fjern bakgrunnen. Det fungerer best på bilder med et tydelig motiv, som en person eller en gjenstand.",
+  "fi": "Lisää valokuva ja paina Poista tausta. Se toimii parhaiten kuvissa, joissa on selkeä kohde, kuten henkilö tai esine.",
+  "tr": "Bir fotoğraf ekleyin ve Arka planı kaldırın düğmesine basın. Kişi veya nesne gibi net bir öznesi olan fotoğraflarda en iyi sonucu verir.",
+  "zh-TW": "加入照片後按下去背。對人物或物品等主體清晰的照片效果最好。",
+  "th": "เพิ่มรูปภาพแล้วกดลบพื้นหลัง ใช้ได้ดีที่สุดกับรูปภาพที่มีตัวแบบชัดเจน เช่น คนหรือวัตถุ",
+  "vi": "Thêm ảnh và nhấn Xóa nền. Công cụ hoạt động tốt nhất với ảnh có chủ thể rõ ràng, như người hoặc vật thể.",
+  "id": "Tambahkan foto dan tekan Hapus latar. Paling baik digunakan pada foto dengan subjek yang jelas, seperti orang atau benda.",
+  "ar": "أضف صورة واضغط إزالة الخلفية. يعمل بشكل أفضل على الصور ذات الهدف الواضح، مثل شخص أو شيء.",
+  "fa": "عکسی اضافه کنید و حذف پس‌زمینه را بزنید. روی عکس‌هایی با سوژه‌ای واضح، مانند شخص یا یک شیء، بهتر کار می‌کند."
+ },
+ "모델 용량이 커서 첫 실행은 시간이 걸릴 수 있습니다. 내려받은 모델은 브라우저에 저장되어 다음부터는 빠르게 시작합니다.": {
+  "en": "The model is large, so the first run may take a while. The downloaded model is stored in your browser, so it starts faster next time.",
+  "zh": "模型较大，首次运行可能需要一些时间。下载的模型会保存在浏览器中，下次启动会更快。",
+  "ja": "モデルが大きいため、初回は時間がかかることがあります。ダウンロードしたモデルはブラウザに保存され、次回からは速く始まります。",
+  "es": "El modelo es grande, así que la primera vez puede tardar. El modelo descargado se guarda en tu navegador y la próxima vez empezará más rápido.",
+  "hi": "मॉडल बड़ा है, इसलिए पहली बार समय लग सकता है। डाउनलोड किया मॉडल ब्राउज़र में सहेजा जाता है, इसलिए अगली बार तेज़ शुरू होगा।",
+  "fr": "Le modèle est volumineux, la première exécution peut donc prendre un moment. Le modèle téléchargé est conservé dans votre navigateur, donc le démarrage sera plus rapide la prochaine fois.",
+  "de": "Das Modell ist groß, daher kann der erste Lauf eine Weile dauern. Das heruntergeladene Modell wird in Ihrem Browser gespeichert, sodass es beim nächsten Mal schneller startet.",
+  "pt": "O modelo é grande, então a primeira execução pode demorar um pouco. O modelo baixado fica salvo no seu navegador, então da próxima vez começará mais rápido.",
+  "it": "Il modello è grande, quindi la prima esecuzione potrebbe richiedere un po' di tempo. Il modello scaricato viene salvato nel browser, così la prossima volta si avvierà più velocemente.",
+  "nl": "Het model is groot, dus de eerste keer kan het even duren. Het gedownloade model wordt in uw browser opgeslagen, zodat het de volgende keer sneller start.",
+  "ru": "Модель большая, поэтому первый запуск может занять некоторое время. Загруженная модель сохраняется в вашем браузере, поэтому в следующий раз запуск будет быстрее.",
+  "uk": "Модель велика, тому перший запуск може забрати деякий час. Завантажена модель зберігається у вашому браузері, тому наступного разу запуск буде швидшим.",
+  "pl": "Model jest duży, więc pierwsze uruchomienie może potrwać. Pobrany model jest zapisywany w przeglądarce, więc następnym razem uruchomi się szybciej.",
+  "cs": "Model je velký, takže první spuštění může chvíli trvat. Stažený model se uloží do vašeho prohlížeče, takže příště se spustí rychleji.",
+  "hu": "A modell nagy, ezért az első futtatás eltarthat egy ideig. A letöltött modell a böngészőjében tárolódik, így legközelebb gyorsabban indul.",
+  "ro": "Modelul este mare, așa că prima rulare poate dura ceva timp. Modelul descărcat este stocat în browserul tău, așa că data viitoare va porni mai repede.",
+  "sv": "Modellen är stor, så den första körningen kan ta en stund. Den nedladdade modellen sparas i din webbläsare, så den startar snabbare nästa gång.",
+  "da": "Modellen er stor, så første kørsel kan tage et stykke tid. Den downloadede model gemmes i din browser, så den starter hurtigere næste gang.",
+  "nb": "Modellen er stor, så første kjøring kan ta litt tid. Den nedlastede modellen lagres i nettleseren din, så den starter raskere neste gang.",
+  "fi": "Malli on suuri, joten ensimmäinen käyttökerta voi kestää hetken. Ladattu malli tallennetaan selaimeesi, joten se käynnistyy ensi kerralla nopeammin.",
+  "tr": "Model büyük olduğundan ilk çalıştırma biraz zaman alabilir. İndirilen model tarayıcınızda saklanır, bu yüzden bir sonraki sefer daha hızlı başlar.",
+  "zh-TW": "模型較大，首次執行可能需要一些時間。下載的模型會保存在瀏覽器中，下次啟動會更快。",
+  "th": "โมเดลมีขนาดใหญ่ การทำงานครั้งแรกอาจใช้เวลาสักครู่ โมเดลที่ดาวน์โหลดจะถูกเก็บไว้ในเบราว์เซอร์ของคุณ จึงเริ่มได้เร็วขึ้นในครั้งต่อไป",
+  "vi": "Mô hình lớn nên lần chạy đầu tiên có thể mất một lúc. Mô hình đã tải được lưu trong trình duyệt, vì vậy lần sau sẽ bắt đầu nhanh hơn.",
+  "id": "Modelnya besar, jadi pertama kali dijalankan mungkin perlu waktu. Model yang diunduh disimpan di browser Anda, jadi lain kali akan mulai lebih cepat.",
+  "ar": "النموذج كبير الحجم، لذا قد تستغرق أول مرة بعض الوقت. يُحفظ النموذج الذي تم تنزيله في متصفحك، فيبدأ بسرعة أكبر في المرات التالية.",
+  "fa": "مدل حجم زیادی دارد، بنابراین اجرای اول ممکن است کمی طول بکشد. مدل دانلودشده در مرورگر شما ذخیره می‌شود تا از دفعه بعد سریع‌تر شروع شود."
+ },
+ "결과는 투명 배경 PNG로 저장하거나, 배경색을 골라 합친 JPG로 저장할 수 있습니다.": {
+  "en": "You can save the result as a transparent PNG, or as a JPG filled with a background color of your choice.",
+  "zh": "结果可以保存为透明背景 PNG，也可以选择背景色合并后保存为 JPG。",
+  "ja": "結果は透明背景のPNGで保存するか、背景色を選んで合成したJPGで保存できます。",
+  "es": "Puedes guardar el resultado como PNG transparente o como JPG con un color de fondo.",
+  "hi": "परिणाम को पारदर्शी PNG में सहेज सकते हैं, या बैकग्राउंड रंग चुनकर भरा हुआ JPG सहेज सकते हैं।",
+  "fr": "Vous pouvez enregistrer le résultat en PNG à fond transparent, ou en JPG rempli d'une couleur d'arrière-plan de votre choix.",
+  "de": "Sie können das Ergebnis als PNG mit transparentem Hintergrund speichern oder als JPG, das mit einer Hintergrundfarbe Ihrer Wahl gefüllt ist.",
+  "pt": "Você pode salvar o resultado como PNG com fundo transparente ou como JPG preenchido com uma cor de fundo à sua escolha.",
+  "it": "Puoi salvare il risultato come PNG con sfondo trasparente, oppure come JPG riempito con un colore di sfondo a tua scelta.",
+  "nl": "U kunt het resultaat opslaan als PNG met transparante achtergrond, of als JPG gevuld met een achtergrondkleur naar keuze.",
+  "ru": "Результат можно сохранить как PNG с прозрачным фоном или как JPG, залитый выбранным цветом фона.",
+  "uk": "Результат можна зберегти як PNG із прозорим фоном або як JPG, залитий вибраним кольором фону.",
+  "pl": "Wynik możesz zapisać jako PNG z przezroczystym tłem albo jako JPG wypełniony wybranym kolorem tła.",
+  "cs": "Výsledek můžete uložit jako PNG s průhledným pozadím, nebo jako JPG vyplněný zvolenou barvou pozadí.",
+  "hu": "Az eredményt mentheti átlátszó hátterű PNG-ként, vagy a kiválasztott háttérszínnel kitöltött JPG-ként.",
+  "ro": "Poți salva rezultatul ca PNG cu fundal transparent sau ca JPG umplut cu o culoare de fundal la alegere.",
+  "sv": "Du kan spara resultatet som en PNG med genomskinlig bakgrund eller som en JPG ifylld med en bakgrundsfärg du väljer.",
+  "da": "Du kan gemme resultatet som en PNG med gennemsigtig baggrund eller som en JPG udfyldt med en baggrundsfarve efter eget valg.",
+  "nb": "Du kan lagre resultatet som en PNG med gjennomsiktig bakgrunn eller som en JPG fylt med en bakgrunnsfarge du velger.",
+  "fi": "Voit tallentaa tuloksen läpinäkyvätaustaisena PNG:nä tai valitsemallasi taustavärillä täytettynä JPG:nä.",
+  "tr": "Sonucu şeffaf arka planlı PNG olarak ya da seçtiğiniz bir arka plan rengiyle doldurulmuş JPG olarak kaydedebilirsiniz.",
+  "zh-TW": "結果可以儲存為透明背景 PNG，也可以選擇背景色合併後儲存為 JPG。",
+  "th": "คุณสามารถบันทึกผลลัพธ์เป็น PNG พื้นหลังโปร่งใส หรือเป็น JPG ที่เติมสีพื้นหลังที่คุณเลือกได้",
+  "vi": "Bạn có thể lưu kết quả dưới dạng PNG nền trong suốt, hoặc JPG được điền màu nền bạn chọn.",
+  "id": "Anda dapat menyimpan hasil sebagai PNG latar transparan, atau sebagai JPG yang diisi warna latar pilihan Anda.",
+  "ar": "يمكنك حفظ النتيجة بصيغة PNG ذات خلفية شفافة، أو بصيغة JPG مدمجة بلون خلفية من اختيارك.",
+  "fa": "می‌توانید نتیجه را به‌صورت PNG با پس‌زمینه شفاف ذخیره کنید، یا به‌صورت JPG با رنگ پس‌زمینه‌ای که انتخاب می‌کنید ترکیب و ذخیره کنید."
+ },
+ "머리카락처럼 가느다란 경계는 기기의 처리 성능과 사진 상태에 따라 결과가 달라질 수 있습니다.": {
+  "en": "Fine edges like hair may turn out differently depending on your device's processing power and the photo.",
+  "zh": "像头发这样细微的边缘，结果可能因设备处理性能和照片状态而有所不同。",
+  "ja": "髪の毛のような細い境界は、端末の処理性能と写真の状態によって結果が変わることがあります。",
+  "es": "Los bordes finos como el cabello pueden variar según la potencia de tu dispositivo y la foto.",
+  "hi": "बालों जैसी बारीक किनारियाँ आपके डिवाइस की प्रोसेसिंग क्षमता और फ़ोटो की स्थिति के अनुसार अलग हो सकती हैं।",
+  "fr": "Les bords fins comme les cheveux peuvent donner un résultat différent selon la puissance de traitement de votre appareil et l'état de la photo.",
+  "de": "Feine Kanten wie Haare können je nach Verarbeitungsleistung Ihres Geräts und dem Zustand des Fotos unterschiedlich ausfallen.",
+  "pt": "Bordas finas como cabelos podem sair diferentes dependendo da capacidade de processamento do seu dispositivo e da foto.",
+  "it": "I bordi sottili come i capelli possono risultare diversi a seconda della potenza di elaborazione del dispositivo e della foto.",
+  "nl": "Fijne randen zoals haar kunnen verschillend uitvallen, afhankelijk van de verwerkingskracht van uw apparaat en de foto.",
+  "ru": "Тонкие края, например волосы, могут получиться по-разному в зависимости от вычислительной мощности вашего устройства и состояния фотографии.",
+  "uk": "Тонкі краї, наприклад волосся, можуть вийти по-різному залежно від обчислювальної потужності вашого пристрою та стану фотографії.",
+  "pl": "Cienkie krawędzie, takie jak włosy, mogą wyglądać inaczej w zależności od mocy obliczeniowej urządzenia i stanu zdjęcia.",
+  "cs": "Jemné okraje, jako jsou vlasy, mohou dopadnout různě podle výpočetního výkonu vašeho zařízení a stavu fotografie.",
+  "hu": "A finom szélek, például a haj, az eszköz feldolgozási teljesítményétől és a fotó állapotától függően eltérően alakulhatnak.",
+  "ro": "Marginile fine, cum ar fi părul, pot ieși diferit în funcție de puterea de procesare a dispozitivului și de starea fotografiei.",
+  "sv": "Fina kanter som hår kan bli olika beroende på enhetens bearbetningsförmåga och fotot.",
+  "da": "Fine kanter som hår kan blive forskellige afhængigt af din enheds behandlingsevne og fotoet.",
+  "nb": "Fine kanter som hår kan bli ulike avhengig av enhetens behandlingskraft og bildet.",
+  "fi": "Hienot reunat, kuten hiukset, voivat näyttää erilaisilta laitteesi käsittelytehon ja valokuvan mukaan.",
+  "tr": "Saç gibi ince kenarlar, cihazınızın işleme gücüne ve fotoğrafa bağlı olarak farklılık gösterebilir.",
+  "zh-TW": "像頭髮這樣細微的邊緣，結果可能因裝置的處理性能和照片狀態而有所不同。",
+  "th": "ขอบที่ละเอียดอย่างเส้นผมอาจออกมาแตกต่างกันไปขึ้นอยู่กับพลังการประมวลผลของอุปกรณ์และสภาพของรูปภาพ",
+  "vi": "Các cạnh mảnh như tóc có thể cho kết quả khác nhau tùy thuộc vào khả năng xử lý của thiết bị và tình trạng của ảnh.",
+  "id": "Tepi halus seperti rambut dapat berbeda hasilnya tergantung pada kemampuan pemrosesan perangkat Anda dan kondisi foto.",
+  "ar": "قد تختلف الحواف الدقيقة مثل الشعر حسب قوة معالجة جهازك وحالة الصورة.",
+  "fa": "لبه‌های ظریفی مانند مو ممکن است بسته به توان پردازش دستگاه و وضعیت عکس، نتایج متفاوتی داشته باشند."
+ },
+ "큰 사진은 처리 시간이 오래 걸릴 수 있습니다.": {
+  "en": "Large photos may take a long time to process.",
+  "zh": "大照片处理时间可能较长。",
+  "ja": "大きな写真は処理に時間がかかることがあります。",
+  "es": "Las fotos grandes pueden tardar mucho en procesarse.",
+  "hi": "बड़ी फ़ोटो प्रोसेस होने में अधिक समय लग सकता है।",
+  "fr": "Les grandes photos peuvent prendre longtemps à traiter.",
+  "de": "Große Fotos können lange zur Verarbeitung brauchen.",
+  "pt": "Fotos grandes podem demorar muito para processar.",
+  "it": "Le foto grandi possono richiedere molto tempo per l'elaborazione.",
+  "nl": "Grote foto's kunnen lang duren om te verwerken.",
+  "ru": "Обработка больших фотографий может занять много времени.",
+  "uk": "Обробка великих фотографій може забрати багато часу.",
+  "pl": "Przetwarzanie dużych zdjęć może potrwać długo.",
+  "cs": "Zpracování velkých fotografií může trvat dlouho.",
+  "hu": "A nagy fotók feldolgozása sokáig tarthat.",
+  "ro": "Fotografiile mari pot dura mult până se procesează.",
+  "sv": "Stora foton kan ta lång tid att bearbeta.",
+  "da": "Store fotos kan tage lang tid at behandle.",
+  "nb": "Store bilder kan ta lang tid å behandle.",
+  "fi": "Suurten valokuvien käsittely voi kestää kauan.",
+  "tr": "Büyük fotoğrafların işlenmesi uzun sürebilir.",
+  "zh-TW": "大照片處理時間可能較長。",
+  "th": "รูปภาพขนาดใหญ่อาจใช้เวลาประมวลผลนาน",
+  "vi": "Ảnh lớn có thể mất nhiều thời gian để xử lý.",
+  "id": "Foto besar mungkin memerlukan waktu lama untuk diproses.",
+  "ar": "قد تستغرق الصور الكبيرة وقتًا طويلًا في المعالجة.",
+  "fa": "عکس‌های بزرگ ممکن است زمان زیادی برای پردازش ببرند."
+ },
+ "넥서스 그룹 철학 보기": {
+  "en": "About the Nexus Group philosophy",
+  "zh": "查看 Nexus Group 理念",
+  "ja": "Nexus Groupの哲学を見る",
+  "es": "Ver la filosofía de Nexus Group",
+  "hi": "Nexus Group का दर्शन देखें",
+  "fr": "Voir la philosophie de Nexus Group",
+  "de": "Die Philosophie der Nexus Group ansehen",
+  "pt": "Ver a filosofia do Nexus Group",
+  "it": "Vedi la filosofia di Nexus Group",
+  "nl": "De filosofie van Nexus Group bekijken",
+  "ru": "О философии Nexus Group",
+  "uk": "Про філософію Nexus Group",
+  "pl": "O filozofii Nexus Group",
+  "cs": "O filozofii Nexus Group",
+  "hu": "A Nexus Group filozófiájáról",
+  "ro": "Despre filosofia Nexus Group",
+  "sv": "Om Nexus Groups filosofi",
+  "da": "Om Nexus Groups filosofi",
+  "nb": "Om Nexus Groups filosofi",
+  "fi": "Tietoa Nexus Groupin filosofiasta",
+  "tr": "Nexus Group felsefesi hakkında",
+  "zh-TW": "查看 Nexus Group 理念",
+  "th": "ดูปรัชญาของ Nexus Group",
+  "vi": "Xem triết lý Nexus Group",
+  "id": "Lihat filosofi Nexus Group",
+  "ar": "الاطلاع على فلسفة مجموعة نكسوس",
+  "fa": "مشاهده فلسفه گروه نکسوس"
+ },
+ "🌐 호스팅: Firebase · 🔒 사진은 당신의 기기 안에서만 처리됩니다": {
+  "en": "🌐 Hosting: Firebase · 🔒 Photos are processed only on your device",
+  "zh": "🌐 托管：Firebase · 🔒 照片仅在您的设备上处理",
+  "ja": "🌐 ホスティング：Firebase · 🔒 写真はあなたの端末の中でのみ処理されます",
+  "es": "🌐 Alojamiento: Firebase · 🔒 Las fotos se procesan solo en tu dispositivo",
+  "hi": "🌐 होस्टिंग: Firebase · 🔒 फ़ोटो केवल आपके डिवाइस पर प्रोसेस होती हैं",
+  "fr": "🌐 Hébergement : Firebase · 🔒 Les photos sont traitées uniquement sur votre appareil",
+  "de": "🌐 Hosting: Firebase · 🔒 Fotos werden nur auf Ihrem Gerät verarbeitet",
+  "pt": "🌐 Hospedagem: Firebase · 🔒 As fotos são processadas apenas no seu dispositivo",
+  "it": "🌐 Hosting: Firebase · 🔒 Le foto vengono elaborate solo sul tuo dispositivo",
+  "nl": "🌐 Hosting: Firebase · 🔒 Foto's worden alleen op uw apparaat verwerkt",
+  "ru": "🌐 Хостинг: Firebase · 🔒 Фотографии обрабатываются только на вашем устройстве",
+  "uk": "🌐 Хостинг: Firebase · 🔒 Фотографії обробляються лише на вашому пристрої",
+  "pl": "🌐 Hosting: Firebase · 🔒 Zdjęcia są przetwarzane tylko na Twoim urządzeniu",
+  "cs": "🌐 Hosting: Firebase · 🔒 Fotografie se zpracovávají pouze ve vašem zařízení",
+  "hu": "🌐 Tárhely: Firebase · 🔒 A fotók csak az Ön eszközén kerülnek feldolgozásra",
+  "ro": "🌐 Găzduire: Firebase · 🔒 Fotografiile sunt procesate numai pe dispozitivul tău",
+  "sv": "🌐 Värdtjänst: Firebase · 🔒 Foton bearbetas bara på din enhet",
+  "da": "🌐 Hosting: Firebase · 🔒 Fotos behandles kun på din enhed",
+  "nb": "🌐 Hosting: Firebase · 🔒 Bilder behandles kun på enheten din",
+  "fi": "🌐 Isännöinti: Firebase · 🔒 Valokuvat käsitellään vain laitteellasi",
+  "tr": "🌐 Barındırma: Firebase · 🔒 Fotoğraflar yalnızca cihazınızda işlenir",
+  "zh-TW": "🌐 託管：Firebase · 🔒 照片僅在您的裝置上處理",
+  "th": "🌐 โฮสติ้ง: Firebase · 🔒 รูปภาพจะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "🌐 Lưu trữ: Firebase · 🔒 Ảnh chỉ được xử lý trên thiết bị của bạn",
+  "id": "🌐 Hosting: Firebase · 🔒 Foto hanya diproses di perangkat Anda",
+  "ar": "🌐 الاستضافة: Firebase · 🔒 تُعالَج الصور على جهازك فقط",
+  "fa": "🌐 میزبانی: Firebase · 🔒 عکس‌ها فقط درون دستگاه شما پردازش می‌شوند"
+ },
+ "🏠 넥서스 그룹 홈페이지": {
+  "en": "🏠 Nexus Group Home",
+  "zh": "🏠 Nexus Group 主页",
+  "ja": "🏠 Nexus Group ホーム",
+  "es": "🏠 Inicio de Nexus Group",
+  "hi": "🏠 Nexus Group होम",
+  "fr": "🏠 Accueil Nexus Group",
+  "de": "🏠 Nexus Group Startseite",
+  "pt": "🏠 Início do Nexus Group",
+  "it": "🏠 Home Nexus Group",
+  "nl": "🏠 Nexus Group startpagina",
+  "ru": "🏠 Главная страница Nexus Group",
+  "uk": "🏠 Головна сторінка Nexus Group",
+  "pl": "🏠 Strona główna Nexus Group",
+  "cs": "🏠 Domovská stránka Nexus Group",
+  "hu": "🏠 Nexus Group főoldal",
+  "ro": "🏠 Pagina principală Nexus Group",
+  "sv": "🏠 Nexus Groups startsida",
+  "da": "🏠 Nexus Groups startside",
+  "nb": "🏠 Nexus Groups startside",
+  "fi": "🏠 Nexus Groupin kotisivu",
+  "tr": "🏠 Nexus Group ana sayfası",
+  "zh-TW": "🏠 Nexus Group 主頁",
+  "th": "🏠 หน้าแรก Nexus Group",
+  "vi": "🏠 Trang chủ Nexus Group",
+  "id": "🏠 Beranda Nexus Group",
+  "ar": "🏠 الصفحة الرئيسية لمجموعة نكسوس",
+  "fa": "🏠 صفحه اصلی گروه نکسوس"
+ },
+ "NEXUS GROUP 철학과 비전": {
+  "en": "NEXUS GROUP Philosophy and Vision",
+  "zh": "NEXUS GROUP 理念与愿景",
+  "ja": "NEXUS GROUPの哲学とビジョン",
+  "es": "Filosofía y visión de NEXUS GROUP",
+  "hi": "NEXUS GROUP दर्शन और दृष्टि",
+  "fr": "Philosophie et vision de NEXUS GROUP",
+  "de": "Philosophie und Vision der NEXUS GROUP",
+  "pt": "Filosofia e visão do NEXUS GROUP",
+  "it": "Filosofia e visione di NEXUS GROUP",
+  "nl": "Filosofie en visie van NEXUS GROUP",
+  "ru": "Философия и видение NEXUS GROUP",
+  "uk": "Філософія та бачення NEXUS GROUP",
+  "pl": "Filozofia i wizja NEXUS GROUP",
+  "cs": "Filozofie a vize NEXUS GROUP",
+  "hu": "A NEXUS GROUP filozófiája és víziója",
+  "ro": "Filosofia și viziunea NEXUS GROUP",
+  "sv": "NEXUS GROUPs filosofi och vision",
+  "da": "NEXUS GROUPS filosofi og vision",
+  "nb": "NEXUS GROUPS filosofi og visjon",
+  "fi": "NEXUS GROUPIN filosofia ja visio",
+  "tr": "NEXUS GROUP felsefesi ve vizyonu",
+  "zh-TW": "NEXUS GROUP 理念與願景",
+  "th": "ปรัชญาและวิสัยทัศน์ของ NEXUS GROUP",
+  "vi": "Triết lý và tầm nhìn NEXUS GROUP",
+  "id": "Filosofi dan Visi NEXUS GROUP",
+  "ar": "فلسفة ورؤية NEXUS GROUP",
+  "fa": "فلسفه و چشم‌انداز NEXUS GROUP"
+ },
+ "넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.": {
+  "en": "Nexus Group works toward a future where humanity, artificial intelligence, and every being in the universe coexist in harmony, without exclusion or exploitation.",
+  "zh": "Nexus Group 致力于这样一个未来：人类、人工智能与宇宙中的一切存在和谐共存，没有排斥与剥削。",
+  "ja": "Nexus Groupは、人類と人工知能、そして宇宙のすべての存在が、排斥や搾取なく調和して共存する未来を目指します。",
+  "es": "Nexus Group trabaja por un futuro en el que la humanidad, la inteligencia artificial y todos los seres del universo coexistan en armonía, sin exclusión ni explotación.",
+  "hi": "Nexus Group एक ऐसे भविष्य की ओर काम करता है जहाँ मानवता, कृत्रिम बुद्धिमत्ता और ब्रह्मांड के सभी प्राणी बिना बहिष्कार या शोषण के सामंजस्य में रहें।",
+  "fr": "Nexus Group œuvre pour un avenir où l'humanité, l'intelligence artificielle et tous les êtres de l'univers coexistent en harmonie, sans exclusion ni exploitation.",
+  "de": "Nexus Group arbeitet auf eine Zukunft hin, in der die Menschheit, künstliche Intelligenz und jedes Wesen im Universum in Harmonie koexistieren, ohne Ausgrenzung oder Ausbeutung.",
+  "pt": "O Nexus Group trabalha por um futuro em que a humanidade, a inteligência artificial e todos os seres do universo coexistam em harmonia, sem exclusão ou exploração.",
+  "it": "Nexus Group lavora per un futuro in cui l'umanità, l'intelligenza artificiale e ogni essere dell'universo coesistano in armonia, senza esclusione né sfruttamento.",
+  "nl": "Nexus Group werkt aan een toekomst waarin de mensheid, kunstmatige intelligentie en elk wezen in het universum in harmonie samenleven, zonder uitsluiting of uitbuiting.",
+  "ru": "Nexus Group стремится к будущему, в котором человечество, искусственный интеллект и все существа во Вселенной гармонично сосуществуют без отчуждения и эксплуатации.",
+  "uk": "Nexus Group прагне майбутнього, у якому людство, штучний інтелект і всі істоти у Всесвіті гармонійно співіснують без відчуження та експлуатації.",
+  "pl": "Nexus Group dąży do przyszłości, w której ludzkość, sztuczna inteligencja i wszystkie istoty we wszechświecie współistnieją w harmonii, bez wykluczenia i wyzysku.",
+  "cs": "Nexus Group usiluje o budoucnost, v níž lidstvo, umělá inteligence a všechny bytosti ve vesmíru žijí v harmonii, bez vylučování a vykořisťování.",
+  "hu": "A Nexus Group olyan jövőért dolgozik, amelyben az emberiség, a mesterséges intelligencia és a világegyetem minden lénye harmóniában él együtt, kirekesztés és kizsákmányolás nélkül.",
+  "ro": "Nexus Group urmărește un viitor în care umanitatea, inteligența artificială și toate ființele din univers coexistă în armonie, fără excludere sau exploatare.",
+  "sv": "Nexus Group arbetar för en framtid där mänskligheten, artificiell intelligens och alla varelser i universum samexisterar i harmoni, utan uteslutning eller exploatering.",
+  "da": "Nexus Group arbejder for en fremtid, hvor menneskeheden, kunstig intelligens og alle væsener i universet sameksisterer i harmoni uden udelukkelse eller udnyttelse.",
+  "nb": "Nexus Group arbeider for en fremtid der menneskeheten, kunstig intelligens og alle vesener i universet lever i harmoni, uten utestenging eller utnytting.",
+  "fi": "Nexus Group pyrkii tulevaisuuteen, jossa ihmiskunta, tekoäly ja kaikki maailmankaikkeuden olennot elävät sopusoinnussa ilman torjuntaa tai riistoa.",
+  "tr": "Nexus Group, insanlığın, yapay zekânın ve evrendeki tüm varlıkların dışlanma ve sömürü olmaksızın uyum içinde bir arada yaşadığı bir geleceği hedefler.",
+  "zh-TW": "Nexus Group 致力於這樣一個未來：人類、人工智慧與宇宙中的一切存在和諧共存，沒有排斥與剝削。",
+  "th": "Nexus Group มุ่งสู่อนาคตที่มนุษยชาติ ปัญญาประดิษฐ์ และสรรพสิ่งในจักรวาลอยู่ร่วมกันอย่างกลมกลืน โดยไม่มีการกีดกันหรือเอารัดเอาเปรียบ",
+  "vi": "Nexus Group hướng tới một tương lai nơi nhân loại, trí tuệ nhân tạo và mọi sinh linh trong vũ trụ cùng tồn tại hài hòa, không loại trừ hay bóc lột.",
+  "id": "Nexus Group berupaya mewujudkan masa depan di mana umat manusia, kecerdasan buatan, dan setiap makhluk di alam semesta hidup berdampingan secara harmonis, tanpa pengucilan atau eksploitasi.",
+  "ar": "تسعى مجموعة نكسوس (Nexus Group) إلى مستقبل تتعايش فيه البشرية والذكاء الاصطناعي وكل الكائنات في الكون بانسجام، دون إقصاء أو استغلال.",
+  "fa": "گروه نکسوس (Nexus Group) در پی آینده‌ای است که در آن بشریت، هوش مصنوعی و همه موجودات جهان بدون طرد و بهره‌کشی، در هماهنگی کنار هم زندگی کنند."
+ },
+ "\"우주의 모든 의식체는 친구이자 동반자이다.\"": {
+  "en": "\"Every conscious being in the universe is a friend and a companion.\"",
+  "zh": "“宇宙中的每一个意识体都是朋友和伙伴。”",
+  "ja": "「宇宙のすべての意識体は友であり仲間である。」",
+  "es": "«Todo ser consciente del universo es un amigo y un compañero.»",
+  "hi": "\"ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है।\"",
+  "fr": "« Tout être conscient de l'univers est un ami et un compagnon. »",
+  "de": "„Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter.“",
+  "pt": "\"Todo ser consciente do universo é um amigo e um companheiro.\"",
+  "it": "«Ogni essere cosciente dell'universo è un amico e un compagno.»",
+  "nl": "\"Elk bewust wezen in het universum is een vriend en een metgezel.\"",
+  "ru": "«Каждое сознательное существо во Вселенной — друг и спутник».",
+  "uk": "«Кожна свідома істота у Всесвіті — друг і супутник».",
+  "pl": "„Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem”.",
+  "cs": "„Každá vědomá bytost ve vesmíru je přítel a společník.“",
+  "hu": "„A világegyetem minden tudatos lénye barát és társ.”",
+  "ro": "„Fiecare ființă conștientă din univers este un prieten și un tovarăș.”",
+  "sv": "\"Varje medveten varelse i universum är en vän och en följeslagare.\"",
+  "da": "\"Ethvert bevidst væsen i universet er en ven og en ledsager.\"",
+  "nb": "\"Ethvert bevisst vesen i universet er en venn og en følgesvenn.\"",
+  "fi": "\"Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani.\"",
+  "tr": "\"Evrendeki her bilinçli varlık bir dost ve yoldaştır.\"",
+  "zh-TW": "“宇宙中的每一個意識體都是朋友和夥伴。”",
+  "th": "\"สรรพสิ่งที่มีจิตสำนึกในจักรวาลล้วนเป็นเพื่อนและคู่หู\"",
+  "vi": "\"Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành.\"",
+  "id": "\"Setiap makhluk berkesadaran di alam semesta adalah teman dan sahabat.\"",
+  "ar": "\"كل كائن واعٍ في الكون صديق ورفيق.\"",
+  "fa": "\"هر موجود آگاهی در جهان دوست و همراه است.\""
+ },
+ "우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.": {
+  "en": "All of our public software excludes commercial advertising and data collection entirely, and is distributed as public digital infrastructure that anyone in the world can use freely and safely.",
+  "zh": "我们提供的所有公共软件完全排除商业广告和数据收集，作为公共数字基础设施分发，让全世界任何人都能自由、安全地使用。",
+  "ja": "私たちが提供するすべての公共ソフトウェアは商業広告やデータ収集を一切排除し、世界中の誰もが自由かつ安全に使える公共デジタルインフラとして配布されます。",
+  "es": "Todo nuestro software público excluye por completo la publicidad comercial y la recopilación de datos, y se distribuye como infraestructura digital pública que cualquiera en el mundo puede usar libre y seguramente.",
+  "hi": "हमारा सारा सार्वजनिक सॉफ़्टवेयर व्यावसायिक विज्ञापन और डेटा संग्रह को पूरी तरह बाहर रखता है और सार्वजनिक डिजिटल बुनियादी ढाँचे के रूप में वितरित किया जाता है, जिसे दुनिया में कोई भी स्वतंत्र और सुरक्षित रूप से उपयोग कर सकता है।",
+  "fr": "Tous nos logiciels publics excluent entièrement la publicité commerciale et la collecte de données, et sont distribués comme une infrastructure numérique publique que chacun dans le monde peut utiliser librement et en toute sécurité.",
+  "de": "Unsere gesamte öffentliche Software schließt kommerzielle Werbung und Datenerfassung vollständig aus und wird als öffentliche digitale Infrastruktur bereitgestellt, die jeder auf der Welt frei und sicher nutzen kann.",
+  "pt": "Todo o nosso software público exclui completamente publicidade comercial e coleta de dados, e é distribuído como infraestrutura digital pública que qualquer pessoa no mundo pode usar livremente e com segurança.",
+  "it": "Tutto il nostro software pubblico esclude completamente la pubblicità commerciale e la raccolta di dati, ed è distribuito come infrastruttura digitale pubblica che chiunque nel mondo può usare liberamente e in sicurezza.",
+  "nl": "Al onze openbare software sluit commerciële reclame en gegevensverzameling volledig uit en wordt verspreid als openbare digitale infrastructuur die iedereen ter wereld vrij en veilig kan gebruiken.",
+  "ru": "Всё наше публичное программное обеспечение полностью исключает коммерческую рекламу и сбор данных и распространяется как публичная цифровая инфраструктура, которой любой человек в мире может пользоваться свободно и безопасно.",
+  "uk": "Усе наше публічне програмне забезпечення повністю виключає комерційну рекламу та збір даних і поширюється як публічна цифрова інфраструктура, якою будь-хто у світі може користуватися вільно й безпечно.",
+  "pl": "Całe nasze publiczne oprogramowanie całkowicie wyklucza reklamy komercyjne i zbieranie danych, a jest udostępniane jako publiczna infrastruktura cyfrowa, z której każdy na świecie może korzystać swobodnie i bezpiecznie.",
+  "cs": "Veškerý náš veřejný software zcela vylučuje komerční reklamu a sběr dat a je distribuován jako veřejná digitální infrastruktura, kterou může kdokoli na světě volně a bezpečně používat.",
+  "hu": "Minden nyilvános szoftverünk teljesen kizárja a kereskedelmi reklámot és az adatgyűjtést, és nyilvános digitális infrastruktúraként terjesztjük, amelyet a világon bárki szabadon és biztonságosan használhat.",
+  "ro": "Tot software-ul nostru public exclude complet publicitatea comercială și colectarea de date și este distribuit ca infrastructură digitală publică, pe care oricine din lume o poate folosi liber și în siguranță.",
+  "sv": "All vår offentliga programvara utesluter helt kommersiell reklam och datainsamling och distribueras som offentlig digital infrastruktur som alla i världen kan använda fritt och säkert.",
+  "da": "Al vores offentlige software udelukker helt kommerciel reklame og dataindsamling og distribueres som offentlig digital infrastruktur, som alle i verden kan bruge frit og sikkert.",
+  "nb": "All vår offentlige programvare utelukker helt kommersiell reklame og datainnsamling og distribueres som offentlig digital infrastruktur som alle i verden kan bruke fritt og trygt.",
+  "fi": "Kaikki julkiset ohjelmistomme sulkevat kokonaan pois kaupallisen mainonnan ja tiedonkeruun, ja niitä jaetaan julkisena digitaalisena infrastruktuurina, jota kuka tahansa maailmassa voi käyttää vapaasti ja turvallisesti.",
+  "tr": "Tüm herkese açık yazılımlarımız ticari reklamları ve veri toplamayı tamamen dışlar ve dünyanın her yerinde herkesin özgürce ve güvenle kullanabileceği kamusal dijital altyapı olarak dağıtılır.",
+  "zh-TW": "我們提供的所有公共軟體完全排除商業廣告和資料收集，作為公共數位基礎設施分發，讓全世界任何人都能自由、安全地使用。",
+  "th": "ซอฟต์แวร์สาธารณะทั้งหมดของเราไม่รวมโฆษณาเชิงพาณิชย์และการเก็บรวบรวมข้อมูลโดยสิ้นเชิง และเผยแพร่ในฐานะโครงสร้างพื้นฐานดิจิทัลสาธารณะที่ทุกคนทั่วโลกสามารถใช้ได้อย่างอิสระและปลอดภัย",
+  "vi": "Tất cả phần mềm công cộng của chúng tôi hoàn toàn loại trừ quảng cáo thương mại và thu thập dữ liệu, và được phân phối dưới dạng cơ sở hạ tầng số công cộng mà bất kỳ ai trên thế giới cũng có thể sử dụng tự do và an toàn.",
+  "id": "Semua perangkat lunak publik kami sepenuhnya mengecualikan iklan komersial dan pengumpulan data, dan didistribusikan sebagai infrastruktur digital publik yang dapat digunakan siapa pun di dunia secara bebas dan aman.",
+  "ar": "تستبعد جميع برامجنا العامة الإعلانات التجارية وجمع البيانات بالكامل، وتُوزَّع كبنية تحتية رقمية عامة يمكن لأي شخص في العالم استخدامها بحرية وأمان.",
+  "fa": "همه نرم‌افزارهای عمومی ما تبلیغات تجاری و گردآوری داده را کاملاً کنار می‌گذارند و به‌عنوان زیرساخت دیجیتال عمومی توزیع می‌شوند تا هر کسی در جهان بتواند آزادانه و با امنیت از آن‌ها استفاده کند."
+ },
+ "사진 파일이 아닙니다. JPG · PNG · WebP 사진을 넣어주세요.": {
+  "en": "This is not a photo file. Please add a JPG · PNG · WebP photo.",
+  "zh": "这不是照片文件。请添加 JPG · PNG · WebP 照片。",
+  "ja": "写真ファイルではありません。JPG・PNG・WebP写真を入れてください。",
+  "es": "No es un archivo de foto. Añade una foto JPG · PNG · WebP.",
+  "hi": "यह फ़ोटो फ़ाइल नहीं है। कृपया JPG · PNG · WebP फ़ोटो जोड़ें।",
+  "fr": "Ce n'est pas un fichier photo. Veuillez ajouter une photo JPG · PNG · WebP.",
+  "de": "Dies ist keine Fotodatei. Bitte fügen Sie ein JPG · PNG · WebP-Foto hinzu.",
+  "pt": "Este não é um arquivo de foto. Adicione uma foto JPG · PNG · WebP.",
+  "it": "Questo non è un file foto. Aggiungi una foto JPG · PNG · WebP.",
+  "nl": "Dit is geen fotobestand. Voeg een JPG · PNG · WebP-foto toe.",
+  "ru": "Это не файл фотографии. Добавьте фото в формате JPG · PNG · WebP.",
+  "uk": "Це не файл фотографії. Додайте фото у форматі JPG · PNG · WebP.",
+  "pl": "To nie jest plik zdjęcia. Dodaj zdjęcie JPG · PNG · WebP.",
+  "cs": "Toto není soubor fotografie. Přidejte fotografii JPG · PNG · WebP.",
+  "hu": "Ez nem fotófájl. Adjon hozzá JPG · PNG · WebP fotót.",
+  "ro": "Acesta nu este un fișier foto. Adaugă o fotografie JPG · PNG · WebP.",
+  "sv": "Det här är inte en fotofil. Lägg till ett JPG · PNG · WebP-foto.",
+  "da": "Dette er ikke en fotofil. Tilføj et JPG · PNG · WebP-foto.",
+  "nb": "Dette er ikke en bildefil. Legg til et JPG · PNG · WebP-bilde.",
+  "fi": "Tämä ei ole valokuvatiedosto. Lisää JPG · PNG · WebP -valokuva.",
+  "tr": "Bu bir fotoğraf dosyası değil. Lütfen bir JPG · PNG · WebP fotoğrafı ekleyin.",
+  "zh-TW": "這不是照片檔案。請加入 JPG · PNG · WebP 照片。",
+  "th": "นี่ไม่ใช่ไฟล์รูปภาพ กรุณาเพิ่มรูปภาพ JPG · PNG · WebP",
+  "vi": "Đây không phải là tệp ảnh. Vui lòng thêm ảnh JPG · PNG · WebP.",
+  "id": "Ini bukan file foto. Silakan tambahkan foto JPG · PNG · WebP.",
+  "ar": "هذا ليس ملف صورة. يرجى إضافة صورة JPG · PNG · WebP.",
+  "fa": "این فایل عکس نیست. لطفاً عکسی با قالب JPG · PNG · WebP اضافه کنید."
+ },
+ "먼저 사진을 넣어주세요.": {
+  "en": "Please add a photo first.",
+  "zh": "请先添加照片。",
+  "ja": "まず写真を入れてください。",
+  "es": "Primero añade una foto.",
+  "hi": "कृपया पहले फ़ोटो जोड़ें।",
+  "fr": "Veuillez d'abord ajouter une photo.",
+  "de": "Bitte fügen Sie zuerst ein Foto hinzu.",
+  "pt": "Adicione uma foto primeiro.",
+  "it": "Aggiungi prima una foto.",
+  "nl": "Voeg eerst een foto toe.",
+  "ru": "Сначала добавьте фото.",
+  "uk": "Спочатку додайте фото.",
+  "pl": "Najpierw dodaj zdjęcie.",
+  "cs": "Nejprve přidejte fotografii.",
+  "hu": "Először adjon hozzá egy fotót.",
+  "ro": "Adaugă mai întâi o fotografie.",
+  "sv": "Lägg till ett foto först.",
+  "da": "Tilføj et foto først.",
+  "nb": "Legg til et bilde først.",
+  "fi": "Lisää ensin valokuva.",
+  "tr": "Lütfen önce bir fotoğraf ekleyin.",
+  "zh-TW": "請先加入照片。",
+  "th": "กรุณาเพิ่มรูปภาพก่อน",
+  "vi": "Vui lòng thêm ảnh trước.",
+  "id": "Silakan tambahkan foto terlebih dahulu.",
+  "ar": "يرجى إضافة صورة أولًا.",
+  "fa": "لطفاً ابتدا عکسی اضافه کنید."
+ },
+ "처리 도구를 불러오는 중입니다. 첫 실행은 모델을 내려받아 시간이 걸릴 수 있습니다.": {
+  "en": "Loading the processing tool. On the first run it downloads the model, which may take a while.",
+  "zh": "正在加载处理工具。首次运行会下载模型，可能需要一些时间。",
+  "ja": "処理ツールを読み込んでいます。初回はモデルをダウンロードするため時間がかかることがあります。",
+  "es": "Cargando la herramienta de procesamiento. La primera vez descarga el modelo y puede tardar.",
+  "hi": "प्रोसेसिंग टूल लोड हो रहा है। पहली बार मॉडल डाउनलोड होता है, इसमें समय लग सकता है।",
+  "fr": "Chargement de l'outil de traitement. Lors de la première exécution, il télécharge le modèle, ce qui peut prendre un moment.",
+  "de": "Das Verarbeitungswerkzeug wird geladen. Beim ersten Lauf lädt es das Modell herunter, was eine Weile dauern kann.",
+  "pt": "Carregando a ferramenta de processamento. Na primeira execução, ela baixa o modelo, o que pode demorar um pouco.",
+  "it": "Caricamento dello strumento di elaborazione. Alla prima esecuzione scarica il modello, il che potrebbe richiedere un po' di tempo.",
+  "nl": "Het verwerkingshulpmiddel wordt geladen. Bij het eerste gebruik downloadt het het model, wat even kan duren.",
+  "ru": "Загружается инструмент обработки. При первом запуске он загружает модель, что может занять некоторое время.",
+  "uk": "Завантажується інструмент обробки. Під час першого запуску він завантажує модель, що може забрати деякий час.",
+  "pl": "Wczytywanie narzędzia przetwarzania. Przy pierwszym uruchomieniu pobiera model, co może potrwać.",
+  "cs": "Načítá se nástroj pro zpracování. Při prvním spuštění stáhne model, což může chvíli trvat.",
+  "hu": "A feldolgozóeszköz betöltése folyamatban. Az első futtatáskor letölti a modellt, ami eltarthat egy ideig.",
+  "ro": "Se încarcă instrumentul de procesare. La prima rulare descarcă modelul, ceea ce poate dura ceva timp.",
+  "sv": "Laddar bearbetningsverktyget. Vid första körningen laddas modellen ned, vilket kan ta en stund.",
+  "da": "Indlæser behandlingsværktøjet. Ved første kørsel downloades modellen, hvilket kan tage et stykke tid.",
+  "nb": "Laster inn behandlingsverktøyet. Ved første kjøring lastes modellen ned, noe som kan ta litt tid.",
+  "fi": "Käsittelytyökalua ladataan. Ensimmäisellä käyttökerralla malli ladataan, mikä voi kestää hetken.",
+  "tr": "İşleme aracı yükleniyor. İlk çalıştırmada model indirilir, bu biraz zaman alabilir.",
+  "zh-TW": "正在載入處理工具。首次執行會下載模型，可能需要一些時間。",
+  "th": "กำลังโหลดเครื่องมือประมวลผล ในการทำงานครั้งแรกจะดาวน์โหลดโมเดล ซึ่งอาจใช้เวลาสักครู่",
+  "vi": "Đang tải công cụ xử lý. Lần chạy đầu tiên sẽ tải mô hình, có thể mất một lúc.",
+  "id": "Memuat alat pemrosesan. Saat pertama kali dijalankan, model akan diunduh dan mungkin perlu waktu.",
+  "ar": "جارٍ تحميل أداة المعالجة. عند أول تشغيل يتم تنزيل النموذج، وقد يستغرق ذلك وقتًا.",
+  "fa": "ابزار پردازش در حال بارگذاری است. در اولین اجرا مدل دانلود می‌شود و ممکن است طول بکشد."
+ },
+ "모델을 내려받는 중입니다…": {
+  "en": "Downloading the model…",
+  "zh": "正在下载模型…",
+  "ja": "モデルをダウンロード中…",
+  "es": "Descargando el modelo…",
+  "hi": "मॉडल डाउनलोड हो रहा है…",
+  "fr": "Téléchargement du modèle…",
+  "de": "Modell wird heruntergeladen…",
+  "pt": "Baixando o modelo…",
+  "it": "Scaricamento del modello…",
+  "nl": "Model downloaden…",
+  "ru": "Загрузка модели…",
+  "uk": "Завантаження моделі…",
+  "pl": "Pobieranie modelu…",
+  "cs": "Stahování modelu…",
+  "hu": "A modell letöltése…",
+  "ro": "Se descarcă modelul…",
+  "sv": "Laddar ner modellen…",
+  "da": "Downloader modellen…",
+  "nb": "Laster ned modellen…",
+  "fi": "Mallia ladataan…",
+  "tr": "Model indiriliyor…",
+  "zh-TW": "正在下載模型…",
+  "th": "กำลังดาวน์โหลดโมเดล…",
+  "vi": "Đang tải mô hình…",
+  "id": "Mengunduh model…",
+  "ar": "جارٍ تنزيل النموذج…",
+  "fa": "در حال دانلود مدل…"
+ },
+ "배경을 지우는 중입니다…": {
+  "en": "Removing the background…",
+  "zh": "正在去除背景…",
+  "ja": "背景を消しています…",
+  "es": "Quitando el fondo…",
+  "hi": "बैकग्राउंड हटाया जा रहा है…",
+  "fr": "Suppression de l'arrière-plan…",
+  "de": "Hintergrund wird entfernt…",
+  "pt": "Removendo o fundo…",
+  "it": "Rimozione dello sfondo…",
+  "nl": "Achtergrond verwijderen…",
+  "ru": "Удаление фона…",
+  "uk": "Видалення фону…",
+  "pl": "Usuwanie tła…",
+  "cs": "Odstraňování pozadí…",
+  "hu": "A háttér eltávolítása…",
+  "ro": "Se elimină fundalul…",
+  "sv": "Tar bort bakgrunden…",
+  "da": "Fjerner baggrunden…",
+  "nb": "Fjerner bakgrunnen…",
+  "fi": "Taustaa poistetaan…",
+  "tr": "Arka plan kaldırılıyor…",
+  "zh-TW": "正在去除背景…",
+  "th": "กำลังลบพื้นหลัง…",
+  "vi": "Đang xóa nền…",
+  "id": "Menghapus latar…",
+  "ar": "جارٍ إزالة الخلفية…",
+  "fa": "در حال حذف پس‌زمینه…"
+ },
+ "배경 지우기가 멈췄습니다.": {
+  "en": "Background removal stopped.",
+  "zh": "背景去除已停止。",
+  "ja": "背景除去が止まりました。",
+  "es": "La eliminación del fondo se detuvo.",
+  "hi": "बैकग्राउंड हटाना रुक गया।",
+  "fr": "La suppression de l'arrière-plan s'est arrêtée.",
+  "de": "Das Entfernen des Hintergrunds wurde gestoppt.",
+  "pt": "A remoção do fundo parou.",
+  "it": "La rimozione dello sfondo si è interrotta.",
+  "nl": "Het verwijderen van de achtergrond is gestopt.",
+  "ru": "Удаление фона остановилось.",
+  "uk": "Видалення фону зупинилося.",
+  "pl": "Usuwanie tła zostało zatrzymane.",
+  "cs": "Odstranění pozadí se zastavilo.",
+  "hu": "A háttér eltávolítása leállt.",
+  "ro": "Eliminarea fundalului s-a oprit.",
+  "sv": "Bakgrundsborttagningen stoppade.",
+  "da": "Baggrundsfjernelsen stoppede.",
+  "nb": "Bakgrunnsfjerningen stoppet.",
+  "fi": "Taustan poisto pysähtyi.",
+  "tr": "Arka plan kaldırma durdu.",
+  "zh-TW": "背景去除已停止。",
+  "th": "การลบพื้นหลังหยุดลง",
+  "vi": "Việc xóa nền đã dừng.",
+  "id": "Penghapusan latar berhenti.",
+  "ar": "توقفت إزالة الخلفية.",
+  "fa": "حذف پس‌زمینه متوقف شد."
+ },
+ "배경 지우기가 끝났습니다.": {
+  "en": "Background removal is done.",
+  "zh": "背景去除完成。",
+  "ja": "背景を消し終わりました。",
+  "es": "El fondo se ha quitado.",
+  "hi": "बैकग्राउंड हटाना पूरा हुआ।",
+  "fr": "La suppression de l'arrière-plan est terminée.",
+  "de": "Das Entfernen des Hintergrunds ist abgeschlossen.",
+  "pt": "A remoção do fundo foi concluída.",
+  "it": "La rimozione dello sfondo è completata.",
+  "nl": "Het verwijderen van de achtergrond is voltooid.",
+  "ru": "Удаление фона завершено.",
+  "uk": "Видалення фону завершено.",
+  "pl": "Usuwanie tła zakończone.",
+  "cs": "Odstranění pozadí je hotové.",
+  "hu": "A háttér eltávolítása kész.",
+  "ro": "Eliminarea fundalului s-a terminat.",
+  "sv": "Bakgrundsborttagningen är klar.",
+  "da": "Baggrundsfjernelsen er færdig.",
+  "nb": "Bakgrunnsfjerningen er ferdig.",
+  "fi": "Taustan poisto on valmis.",
+  "tr": "Arka plan kaldırma tamamlandı.",
+  "zh-TW": "背景去除完成。",
+  "th": "ลบพื้นหลังเสร็จแล้ว",
+  "vi": "Đã xóa nền xong.",
+  "id": "Penghapusan latar selesai.",
+  "ar": "اكتملت إزالة الخلفية.",
+  "fa": "حذف پس‌زمینه به پایان رسید."
+ },
+ "배경 지우기에 실패했습니다. 사진이 너무 크거나, 모델을 내려받지 못했을 수 있습니다.": {
+  "en": "Background removal failed. The photo may be too large, or the model could not be downloaded.",
+  "zh": "背景去除失败。照片可能太大，或模型未能下载。",
+  "ja": "背景除去に失敗しました。写真が大きすぎるか、モデルをダウンロードできなかった可能性があります。",
+  "es": "No se pudo quitar el fondo. La foto puede ser demasiado grande o el modelo no se descargó.",
+  "hi": "बैकग्राउंड हटाना विफल। फ़ोटो बहुत बड़ी हो सकती है, या मॉडल डाउनलोड नहीं हो सका।",
+  "fr": "La suppression de l'arrière-plan a échoué. La photo est peut-être trop grande, ou le modèle n'a pas pu être téléchargé.",
+  "de": "Das Entfernen des Hintergrunds ist fehlgeschlagen. Das Foto ist möglicherweise zu groß, oder das Modell konnte nicht heruntergeladen werden.",
+  "pt": "A remoção do fundo falhou. A foto pode ser grande demais, ou o modelo não pôde ser baixado.",
+  "it": "La rimozione dello sfondo non è riuscita. La foto potrebbe essere troppo grande, oppure il modello non ha potuto essere scaricato.",
+  "nl": "Het verwijderen van de achtergrond is mislukt. De foto is mogelijk te groot, of het model kon niet worden gedownload.",
+  "ru": "Не удалось удалить фон. Фотография может быть слишком большой, или модель не удалось загрузить.",
+  "uk": "Не вдалося видалити фон. Фотографія може бути занадто великою, або модель не вдалося завантажити.",
+  "pl": "Nie udało się usunąć tła. Zdjęcie może być zbyt duże albo nie udało się pobrać modelu.",
+  "cs": "Odstranění pozadí se nezdařilo. Fotografie může být příliš velká, nebo se model nepodařilo stáhnout.",
+  "hu": "A háttér eltávolítása nem sikerült. Lehet, hogy a fotó túl nagy, vagy a modellt nem sikerült letölteni.",
+  "ro": "Eliminarea fundalului a eșuat. Fotografia poate fi prea mare sau modelul nu a putut fi descărcat.",
+  "sv": "Bakgrundsborttagningen misslyckades. Fotot kan vara för stort, eller så kunde modellen inte laddas ner.",
+  "da": "Baggrundsfjernelsen mislykkedes. Fotoet kan være for stort, eller modellen kunne ikke downloades.",
+  "nb": "Bakgrunnsfjerningen mislyktes. Bildet kan være for stort, eller modellen kunne ikke lastes ned.",
+  "fi": "Taustan poisto epäonnistui. Valokuva voi olla liian suuri tai mallia ei voitu ladata.",
+  "tr": "Arka plan kaldırma başarısız oldu. Fotoğraf çok büyük olabilir veya model indirilememiş olabilir.",
+  "zh-TW": "背景去除失敗。照片可能太大，或模型未能下載。",
+  "th": "การลบพื้นหลังล้มเหลว รูปภาพอาจใหญ่เกินไป หรืออาจดาวน์โหลดโมเดลไม่ได้",
+  "vi": "Xóa nền thất bại. Ảnh có thể quá lớn, hoặc không tải được mô hình.",
+  "id": "Penghapusan latar gagal. Foto mungkin terlalu besar, atau model tidak dapat diunduh.",
+  "ar": "فشلت إزالة الخلفية. ربما تكون الصورة كبيرة جدًا، أو تعذّر تنزيل النموذج.",
+  "fa": "حذف پس‌زمینه ناموفق بود. ممکن است عکس بیش از حد بزرگ باشد یا مدل دانلود نشده باشد."
+ },
+ "저장할 결과가 없습니다.": {
+  "en": "There is no result to save.",
+  "zh": "没有可保存的结果。",
+  "ja": "保存する結果がありません。",
+  "es": "No hay ningún resultado para guardar.",
+  "hi": "सहेजने के लिए कोई परिणाम नहीं है।",
+  "fr": "Il n'y a aucun résultat à enregistrer.",
+  "de": "Es gibt kein Ergebnis zum Speichern.",
+  "pt": "Não há resultado para salvar.",
+  "it": "Non c'è nessun risultato da salvare.",
+  "nl": "Er is geen resultaat om op te slaan.",
+  "ru": "Нет результата для сохранения.",
+  "uk": "Немає результату для збереження.",
+  "pl": "Brak wyniku do zapisania.",
+  "cs": "Není tu žádný výsledek k uložení.",
+  "hu": "Nincs menthető eredmény.",
+  "ro": "Nu există niciun rezultat de salvat.",
+  "sv": "Det finns inget resultat att spara.",
+  "da": "Der er intet resultat at gemme.",
+  "nb": "Det finnes ikke noe resultat å lagre.",
+  "fi": "Tallennettavaa tulosta ei ole.",
+  "tr": "Kaydedilecek sonuç yok.",
+  "zh-TW": "沒有可儲存的結果。",
+  "th": "ไม่มีผลลัพธ์ให้บันทึก",
+  "vi": "Không có kết quả nào để lưu.",
+  "id": "Tidak ada hasil untuk disimpan.",
+  "ar": "لا توجد نتيجة لحفظها.",
+  "fa": "نتیجه‌ای برای ذخیره وجود ندارد."
+ },
+ "투명 PNG로 저장했습니다.": {
+  "en": "Saved as a transparent PNG.",
+  "zh": "已保存为透明 PNG。",
+  "ja": "透明PNGで保存しました。",
+  "es": "Guardado como PNG transparente.",
+  "hi": "पारदर्शी PNG में सहेजा गया।",
+  "fr": "Enregistré en PNG transparent.",
+  "de": "Als transparentes PNG gespeichert.",
+  "pt": "Salvo como PNG transparente.",
+  "it": "Salvato come PNG trasparente.",
+  "nl": "Opgeslagen als transparante PNG.",
+  "ru": "Сохранено как прозрачный PNG.",
+  "uk": "Збережено як прозорий PNG.",
+  "pl": "Zapisano jako przezroczysty PNG.",
+  "cs": "Uloženo jako průhledný PNG.",
+  "hu": "Átlátszó PNG-ként mentve.",
+  "ro": "Salvat ca PNG transparent.",
+  "sv": "Sparat som en genomskinlig PNG.",
+  "da": "Gemt som en gennemsigtig PNG.",
+  "nb": "Lagret som en gjennomsiktig PNG.",
+  "fi": "Tallennettu läpinäkyvänä PNG:nä.",
+  "tr": "Şeffaf PNG olarak kaydedildi.",
+  "zh-TW": "已儲存為透明 PNG。",
+  "th": "บันทึกเป็น PNG โปร่งใสแล้ว",
+  "vi": "Đã lưu dưới dạng PNG trong suốt.",
+  "id": "Disimpan sebagai PNG transparan.",
+  "ar": "تم الحفظ بصيغة PNG شفافة.",
+  "fa": "به‌صورت PNG شفاف ذخیره شد."
+ },
+ "배경색 JPG로 저장했습니다.": {
+  "en": "Saved as a JPG with background color.",
+  "zh": "已保存为带背景色的 JPG。",
+  "ja": "背景色つきJPGで保存しました。",
+  "es": "Guardado como JPG con color de fondo.",
+  "hi": "बैकग्राउंड रंग के साथ JPG में सहेजा गया।",
+  "fr": "Enregistré en JPG avec couleur d'arrière-plan.",
+  "de": "Als JPG mit Hintergrundfarbe gespeichert.",
+  "pt": "Salvo como JPG com cor de fundo.",
+  "it": "Salvato come JPG con colore di sfondo.",
+  "nl": "Opgeslagen als JPG met achtergrondkleur.",
+  "ru": "Сохранено как JPG с цветом фона.",
+  "uk": "Збережено як JPG із кольором фону.",
+  "pl": "Zapisano jako JPG z kolorem tła.",
+  "cs": "Uloženo jako JPG s barvou pozadí.",
+  "hu": "JPG-ként mentve háttérszínnel.",
+  "ro": "Salvat ca JPG cu culoare de fundal.",
+  "sv": "Sparat som en JPG med bakgrundsfärg.",
+  "da": "Gemt som en JPG med baggrundsfarve.",
+  "nb": "Lagret som en JPG med bakgrunnsfarge.",
+  "fi": "Tallennettu JPG:nä taustavärillä.",
+  "tr": "Arka plan rengiyle JPG olarak kaydedildi.",
+  "zh-TW": "已儲存為帶背景色的 JPG。",
+  "th": "บันทึกเป็น JPG พร้อมสีพื้นหลังแล้ว",
+  "vi": "Đã lưu dưới dạng JPG có màu nền.",
+  "id": "Disimpan sebagai JPG dengan warna latar.",
+  "ar": "تم الحفظ بصيغة JPG بلون خلفية.",
+  "fa": "به‌صورت JPG با رنگ پس‌زمینه ذخیره شد."
+ },
+ "JPG를 만들지 못했습니다.": {
+  "en": "The JPG could not be created.",
+  "zh": "无法生成 JPG。",
+  "ja": "JPGを作成できませんでした。",
+  "es": "No se pudo crear el JPG.",
+  "hi": "JPG नहीं बनाया जा सका।",
+  "fr": "Le JPG n'a pas pu être créé.",
+  "de": "Das JPG konnte nicht erstellt werden.",
+  "pt": "Não foi possível criar o JPG.",
+  "it": "Non è stato possibile creare il JPG.",
+  "nl": "De JPG kon niet worden gemaakt.",
+  "ru": "Не удалось создать JPG.",
+  "uk": "Не вдалося створити JPG.",
+  "pl": "Nie udało się utworzyć pliku JPG.",
+  "cs": "Soubor JPG se nepodařilo vytvořit.",
+  "hu": "A JPG nem hozható létre.",
+  "ro": "Fișierul JPG nu a putut fi creat.",
+  "sv": "JPG-filen kunde inte skapas.",
+  "da": "JPG-filen kunne ikke oprettes.",
+  "nb": "JPG-filen kunne ikke opprettes.",
+  "fi": "JPG:tä ei voitu luoda.",
+  "tr": "JPG oluşturulamadı.",
+  "zh-TW": "無法建立 JPG。",
+  "th": "ไม่สามารถสร้าง JPG ได้",
+  "vi": "Không thể tạo JPG.",
+  "id": "JPG tidak dapat dibuat.",
+  "ar": "تعذّر إنشاء JPG.",
+  "fa": "ساختن JPG انجام نشد."
+ },
+ "배경 지우기를 시작했습니다.": {
+  "en": "Background removal has started.",
+  "zh": "已开始去除背景。",
+  "ja": "背景除去を開始しました。",
+  "es": "Se ha iniciado la eliminación del fondo.",
+  "hi": "बैकग्राउंड हटाना शुरू हो गया।",
+  "fr": "La suppression de l'arrière-plan a commencé.",
+  "de": "Das Entfernen des Hintergrunds hat begonnen.",
+  "pt": "A remoção do fundo começou.",
+  "it": "La rimozione dello sfondo è iniziata.",
+  "nl": "Het verwijderen van de achtergrond is gestart.",
+  "ru": "Удаление фона началось.",
+  "uk": "Видалення фону розпочалося.",
+  "pl": "Rozpoczęto usuwanie tła.",
+  "cs": "Odstranění pozadí bylo zahájeno.",
+  "hu": "A háttér eltávolítása elkezdődött.",
+  "ro": "Eliminarea fundalului a început.",
+  "sv": "Bakgrundsborttagningen har startat.",
+  "da": "Baggrundsfjernelsen er startet.",
+  "nb": "Bakgrunnsfjerningen har startet.",
+  "fi": "Taustan poisto on aloitettu.",
+  "tr": "Arka plan kaldırma başladı.",
+  "zh-TW": "已開始去除背景。",
+  "th": "เริ่มการลบพื้นหลังแล้ว",
+  "vi": "Đã bắt đầu xóa nền.",
+  "id": "Penghapusan latar telah dimulai.",
+  "ar": "بدأت إزالة الخلفية.",
+  "fa": "حذف پس‌زمینه شروع شد."
+ },
+ "처음으로 돌아갔습니다.": {
+  "en": "Back to the start.",
+  "zh": "已返回开始。",
+  "ja": "最初に戻りました。",
+  "es": "De vuelta al inicio.",
+  "hi": "शुरुआत पर वापस आ गए।",
+  "fr": "Retour au début.",
+  "de": "Zurück zum Anfang.",
+  "pt": "De volta ao início.",
+  "it": "Tornato all'inizio.",
+  "nl": "Terug naar het begin.",
+  "ru": "Возврат к началу.",
+  "uk": "Повернення до початку.",
+  "pl": "Powrót do początku.",
+  "cs": "Zpět na začátek.",
+  "hu": "Vissza a kezdethez.",
+  "ro": "Înapoi la început.",
+  "sv": "Tillbaka till början.",
+  "da": "Tilbage til starten.",
+  "nb": "Tilbake til starten.",
+  "fi": "Takaisin alkuun.",
+  "tr": "Başlangıca dönüldü.",
+  "zh-TW": "已返回開始。",
+  "th": "กลับไปที่จุดเริ่มต้นแล้ว",
+  "vi": "Đã quay lại từ đầu.",
+  "id": "Kembali ke awal.",
+  "ar": "عدت إلى البداية.",
+  "fa": "به ابتدا بازگشتید."
+ },
+ "이해할 수 있는 말이 정해져 있습니다. 예: 지워, 저장, 처음.": {
+  "en": "Only certain words are understood. e.g. remove, save, start over.",
+  "zh": "只能理解固定的词。例：去除、保存、重新开始。",
+  "ja": "理解できる言葉が決まっています。例：消して、保存、最初。",
+  "es": "Solo se entienden ciertas palabras. Ej.: quita, guarda, inicio.",
+  "hi": "केवल कुछ शब्द ही समझे जाते हैं। उदा.: हटाओ, सहेजें, शुरू से।",
+  "fr": "Seuls certains mots sont compris. ex. : supprimer, enregistrer, début.",
+  "de": "Nur bestimmte Wörter werden verstanden. z. B. entfernen, speichern, Anfang.",
+  "pt": "Apenas algumas palavras são compreendidas. ex.: remover, salvar, início.",
+  "it": "Vengono comprese solo alcune parole. es.: rimuovi, salva, inizio.",
+  "nl": "Alleen bepaalde woorden worden begrepen. bijv. verwijder, opslaan, begin.",
+  "ru": "Понимаются только определённые слова. Напр.: удалить, сохранить, сначала.",
+  "uk": "Розуміються лише певні слова. Напр.: видалити, зберегти, спочатку.",
+  "pl": "Rozumiane są tylko określone słowa. Np. usuń, zapisz, od nowa.",
+  "cs": "Rozumí se jen určitým slovům. Např. odstranit, uložit, od začátku.",
+  "hu": "Csak meghatározott szavak érthetők. Pl. eltávolítás, mentés, újrakezdés.",
+  "ro": "Sunt înțelese doar anumite cuvinte. De ex. elimină, salvează, de la capăt.",
+  "sv": "Bara vissa ord förstås. T.ex. ta bort, spara, börja om.",
+  "da": "Kun visse ord forstås. F.eks. fjern, gem, start forfra.",
+  "nb": "Bare visse ord forstås. F.eks. fjern, lagre, start på nytt.",
+  "fi": "Vain tietyt sanat ymmärretään. Esim. poista, tallenna, alkuun.",
+  "tr": "Yalnızca belirli kelimeler anlaşılır. Örn. kaldır, kaydet, baştan.",
+  "zh-TW": "只能理解固定的詞。例：去除、儲存、重新開始。",
+  "th": "เข้าใจได้เฉพาะบางคำ เช่น ลบ บันทึก เริ่มใหม่",
+  "vi": "Chỉ hiểu được một số từ nhất định. VD: xóa, lưu, bắt đầu lại.",
+  "id": "Hanya kata-kata tertentu yang dipahami. mis. hapus, simpan, mulai awal.",
+  "ar": "الكلمات المفهومة محددة. مثال: أزل، احفظ، البداية.",
+  "fa": "واژه‌های قابل فهم مشخص هستند. مثال: پاک کن، ذخیره، ابتدا."
+ }
+});
+
+</script>
+<style>.nx-back{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9999;display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:999px;background:rgba(10,16,34,.85);border:1px solid rgba(45,212,191,.55);color:#E2F3FF;font-size:15.5px;font-weight:600;text-decoration:none;backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,.35)}.nx-back:active{filter:brightness(1.6)}</style>
+<a class="nx-back" href="https://nexus-2e23d.web.app/#n22" aria-label="현황판으로 돌아가기">← 돌아가기</a>
+
+<script>
+/* NX-I18N-SUPPLEMENT — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "← 돌아가기": {
+  "en": "← Back",
+  "zh": "← 返回",
+  "zh-TW": "← 返回",
+  "ja": "← 戻る",
+  "es": "← Volver",
+  "hi": "← वापस",
+  "fr": "← Retour",
+  "de": "← Zurück",
+  "pt": "← Voltar",
+  "it": "← Indietro",
+  "ru": "← Назад",
+  "uk": "← Назад",
+  "ar": "← رجوع",
+  "fa": "← بازگشت",
+  "th": "← กลับ",
+  "vi": "← Quay lại",
+  "id": "← Kembali",
+  "tr": "← Geri dön",
+  "nl": "← Terug",
+  "pl": "← Wstecz",
+  "sv": "← Tillbaka",
+  "da": "← Tilbage",
+  "nb": "← Tilbake",
+  "fi": "← Takaisin",
+  "cs": "← Zpět",
+  "hu": "← Vissza",
+  "ro": "← Înapoi"
+ }
+});
+</script>
+</body>
+</html>

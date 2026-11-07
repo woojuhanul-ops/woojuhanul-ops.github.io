@@ -1,0 +1,4818 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 문서 번역 — Nexus Doc Translate</title>
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .steps{display:flex;gap:8px;margin:0 0 16px}
+  .step{flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13px}
+  .step b{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--line);color:var(--ink);margin-right:6px;font-size:12px}
+  .step.on{color:var(--ink);border-color:var(--teal)}
+  .step.on b{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f}
+  .drop{border:2px dashed var(--teal);border-radius:16px;padding:40px 16px;text-align:center;cursor:pointer;background:var(--card)}
+  .drop.over{border-color:var(--cyan);background:rgba(56,184,248,.12)}
+  .drop .bigicon{font-size:44px}
+  .pickbtn{border:0;border-radius:999px;padding:14px 28px;font-size:16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;margin:12px 0 8px;min-height:48px}
+  .drop p{margin:6px 0;color:var(--muted);font-size:14px}
+  .drop .example{color:var(--teal);font-size:13px}
+  .drop .priv{font-size:12px}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  .field{margin-top:12px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  .field label span{color:var(--ink);font-size:14px}
+  select,textarea{background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:14px;max-width:100%}
+  select{width:100%}
+  textarea{width:100%;min-height:200px;border-radius:12px;padding:12px;font-size:15px;line-height:1.7}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .langrow{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .langrow .field{flex:1;min-width:150px}
+  .swapwrap{flex:none}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .statline{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.7}
+  .statline b{color:var(--ink)}
+  .err{color:#F87171}
+  .barwrap{height:10px;background:#111827;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-top:12px}
+  .barfill{height:100%;width:0%;background:linear-gradient(135deg,var(--cyan),var(--teal));transition:width .15s linear}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  footer .fam span{margin:0 6px}
+  footer .fam .now{color:var(--ink);font-weight:700}
+  footer .fam a{color:var(--cyan);text-decoration:none}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;padding:22px;line-height:1.8;font-size:15px}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  details summary{cursor:pointer;font-size:15px}
+  details p{color:var(--muted);font-size:14px;line-height:1.8}
+  @media(max-width:640px){h1{font-size:20px}.drop{padding:28px 12px}header{padding:10px 12px}.btns button{flex:1}}
+
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer}
+
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 문서 번역">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 문서 번역 — Nexus Doc Translate">
+<meta property="og:description" content="문서를 다른 언어로 옮기는 도구입니다. 글은 번역을 위해 구글 번역으로 전송됩니다.">
+<meta property="og:image" content="https://nexus-doc-translate.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+<style id="nx-redesign">/* nx-redesign 2026-11-01: single top-to-bottom flow, bigger text surfaces */
+textarea{min-height:250px;font-size:16px;line-height:1.75}
+#dstText{border-color:rgba(45,212,191,.45)}
+#transBtn{flex:1;min-height:58px;font-size:17px}
+</style>
+<style id="nx-thumb-right">/* NX-THUMB-RIGHT */
+#transBtn{order:99}
+</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{flex:none}header .brand{flex:none;overflow:visible}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap}.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}</style></head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>SOVEREIGN COMMAND</span></div></a>
+  
+</header>
+
+<main>
+  <div class="steps">
+    <div class="step on" id="step1"><b>1</b> 글 넣기</div>
+    <div class="step" id="step2"><b>2</b> 언어 고르기</div>
+    <div class="step" id="step3"><b>3</b> 번역하기</div>
+  </div>
+
+  <h1>넥서스 문서 번역</h1>
+  <p class="sub" style="margin-bottom:4px">문서를 다른 언어로 옮기는 도구</p>
+  <p class="sub">회원가입 없음 · 이용료 없음 · 무제한 사용</p>
+
+  <div class="drop" id="drop">
+    <div class="bigicon">🌐</div>
+    <button class="pickbtn" id="pickBtn">문서 열기</button>
+    <p>또는 문서를 여기에 끌어다 놓으세요</p>
+    <p>TXT · MD · DOCX · PDF 문서에서 글자를 읽어옵니다</p>
+    <p class="example">예) 긴 글 붙여 넣기 → 다른 언어로 통째 번역</p>
+    <p class="priv">글은 번역을 위해 구글 번역으로 전송됩니다.</p>
+    <input type="file" id="fileIn" accept=".txt,.md,.text,.docx,.pdf,text/plain,text/markdown,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+  </div>
+
+  <div class="panel">
+    <h2>① 원문</h2>
+    <textarea id="srcText" placeholder="여기에 글을 붙여 넣거나, 위에서 문서를 여세요."></textarea>
+    <p class="statline" id="srcStat">글자 수 <b>0</b>자</p>
+    <details style="margin-top:4px"><summary style="cursor:pointer;font-size:13px;color:var(--muted)">원문 통계 자세히 보기</summary><p class="statline" id="srcStatMore">공백 포함 <b>0</b>자 · 공백 제외 <b>0</b>자 · 단어 <b>0</b>개 · 문장 <b>0</b>개 · 줄 <b>0</b>줄 · <b>0</b>바이트</p></details>
+    <p class="hint" id="fileMsg"></p>
+  </div>
+
+  <div class="panel">
+    <h2>② 언어 고르기</h2>
+    <div class="langrow">
+      <div class="field">
+        <label for="slSel">원문 언어</label>
+        <select id="slSel"></select>
+      </div>
+      <div class="swapwrap">
+        <button class="ghost" id="swapBtn" type="button">⇄ 서로 바꾸기</button>
+      </div>
+      <div class="field">
+        <label for="tlSel">번역할 언어</label>
+        <select id="tlSel"></select>
+      </div>
+    </div>
+    <div class="btns">
+      <button class="primary" id="transBtn">🌐 번역하기</button>
+      <button class="ghost" id="stopBtn" disabled>번역 중단</button>
+      <button class="ghost" id="resumeBtn" style="display:none">멈춘 곳부터 이어서 번역</button>
+    </div>
+    <p class="statline" id="progLine">아직 번역하지 않았습니다.</p>
+    <div class="barwrap" id="progBarWrap" style="display:none"><div class="barfill" id="progBar"></div></div>
+    <p class="hint err" id="transErr"></p>
+  </div>
+
+  <div class="panel">
+    <h2>③ 번역 결과</h2>
+    <textarea id="dstText" placeholder="번역 결과가 여기에 나타납니다. 직접 고칠 수도 있습니다."></textarea>
+    <p class="statline" id="dstStat">글자 수 <b>0</b>자</p>
+    <details style="margin-top:4px"><summary style="cursor:pointer;font-size:13px;color:var(--muted)">번역문 통계 자세히 보기</summary><p class="statline" id="dstStatMore">공백 포함 <b>0</b>자 · 공백 제외 <b>0</b>자 · 단어 <b>0</b>개 · 문장 <b>0</b>개 · 줄 <b>0</b>줄 · <b>0</b>바이트</p></details>
+    <div class="btns">
+      <button class="ghost" id="copyBtn">결과 복사</button>
+      <button class="ghost" id="saveBtn">파일로 저장</button>
+      <button class="ghost" id="clearBtn">둘 다 지우기</button>
+    </div>
+    <p class="hint" id="saveMsg"></p>
+  </div>
+
+  <div style="margin:14px 0;padding:14px;border:1px solid #26314a;border-radius:14px;background:rgba(255,255,255,.03)">
+   <p style="margin:0 0 10px;font-weight:700">🗣️ 글로 시키기 <span style="font-weight:400;font-size:13px;color:#94a3b8">(안내 도우미 — 이 페이지 기능만 도와줍니다)</span></p>
+   <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <input type="text" id="guideIn" placeholder="예: 번역해" style="flex:1;min-width:200px;padding:10px 12px;border-radius:10px;border:1px solid #26314a;background:#0b0f19;color:#f8fafc">
+    <button type="button" id="guideBtn" class="ghost">시키기</button>
+   </div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+    <button type="button" class="ghost" data-guide="번역해">번역해</button>
+    <button type="button" class="ghost" data-guide="바꿔">바꿔</button>
+    <button type="button" class="ghost" data-guide="지워">지워</button>
+   </div>
+   <p id="guideStatus" style="margin:10px 0 0;font-size:13px;line-height:1.6;color:#94a3b8;min-height:20px"></p>
+  </div>
+
+  <details><summary>💡 도움말</summary><p>글을 붙여 넣거나 문서 열기로 글을 넣고, 원문 언어와 번역할 언어를 고른 뒤 번역하기를 누르세요.<br>지원 문서: TXT · MD · DOCX · PDF (글자가 들어 있는 문서만 읽을 수 있고, 사진으로 스캔한 PDF는 글자를 읽지 못할 수 있습니다)<br>글은 번역을 위해 구글 번역으로 전송됩니다. 번역 품질은 구글 번역과 같습니다.<br>기계 번역 초벌입니다. 중요한 문서는 사람이 확인하는 것이 정확합니다.<br>긴 글은 문단 단위로 나누어 순서대로 번역한 뒤 이어 붙입니다.<br>책 한 권 분량의 긴 글도 나누어 끝까지 번역합니다. 양에 따라 시간이 걸릴 수 있습니다.<br>조각 사이에는 짧은 간격을 두어 연속 호출이 몰리지 않게 합니다. 중간에 멈춘 조각은 결과에 표시되고, 멈춘 곳부터 이어서 번역할 수 있습니다.<br>짧은 시간에 많은 양을 연속으로 번역하면 일시적으로 제한이 걸릴 수 있습니다.<br>글자 수 제한은 없습니다.</p></details>
+<footer>
+    우주의 모든 의식체는 친구이자 동반자이다<br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="philoLink">넥서스 그룹 철학 보기</button><br>
+    🌐 호스팅: Firebase · 🔒 글은 번역을 위해 구글 번역으로 전송됩니다<br>
+    
+  </footer>
+</main>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>NEXUS GROUP 철학과 비전</h3>
+    <p>넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.</p>
+    <p><b>"우주의 모든 의식체는 친구이자 동반자이다."</b><br>(Every conscious being in the universe is a friend and companion.)</p>
+    <p>우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.</p>
+    <button class="primary" id="modalClose">닫기</button>
+  </div>
+</div>
+<script>
+// ---------- 순수 로직 ----------
+var CHUNK_LIMIT = 1500;
+function splitLongPiece(piece, limit){
+  var out = [];
+  var rest = piece;
+  while(rest.length > limit){
+    var probe = rest.slice(0, limit);
+    var cut = -1;
+    var marks = ['. ', '! ', '? ', '。', '…', ', ', '、', ' '];
+    for(var m = 0; m < marks.length; m++){
+      var idx = probe.lastIndexOf(marks[m]);
+      if(idx > limit * 0.4){ cut = idx + marks[m].length; break; }
+    }
+    if(cut < 0) cut = limit;
+    out.push(rest.slice(0, cut));
+    rest = rest.slice(cut);
+  }
+  if(rest) out.push(rest);
+  return out;
+}
+function chunkText(text, limit){
+  limit = limit || CHUNK_LIMIT;
+  var src = String(text || '');
+  if(!src.trim()) return [];
+  var paras = src.split(/\n{2,}/);
+  var chunks = [];
+  var buf = '';
+  function flush(){
+    if(buf){ splitLongPiece(buf, limit).forEach(function(p){ chunks.push(p); }); buf = ''; }
+  }
+  paras.forEach(function(p, i){
+    var piece = (i > 0 ? '\n\n' : '') + p;
+    if(buf && (buf.length + piece.length > limit)) flush();
+    buf += piece;
+    if(buf.length >= limit) flush();
+  });
+  flush();
+  return chunks;
+}
+function parseGtx(data){
+  if(!data || !Array.isArray(data[0])) return '';
+  var out = '';
+  data[0].forEach(function(seg){
+    if(seg && typeof seg[0] === 'string') out += seg[0];
+  });
+  return out;
+}
+function buildUrl(sl, tl, q){
+  return 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=' +
+    encodeURIComponent(sl) + '&tl=' + encodeURIComponent(tl) + '&dt=t&q=' + encodeURIComponent(q);
+}
+var CHUNK_DELAY_MS = 400;
+var RETRY_WAIT_MS = 2500;
+function progressPercent(done, total){
+  if(!total || total <= 0) return 0;
+  var p = Math.round(done / total * 100);
+  return Math.max(0, Math.min(100, p));
+}
+function firstPending(results){
+  for(var i = 0; i < results.length; i++){
+    if(results[i] === null || results[i] === undefined) return i;
+  }
+  return -1;
+}
+function countDone(results){
+  var n = 0;
+  for(var i = 0; i < results.length; i++){
+    if(results[i] !== null && results[i] !== undefined) n++;
+  }
+  return n;
+}
+function countChars(text){
+  return String(text || '').replace(/\s+/g, '').length;
+}
+function utf8Bytes(text){
+  var s = String(text || ''), n = 0;
+  for(var i = 0; i < s.length; i++){
+    var c = s.charCodeAt(i);
+    if(c < 0x80) n += 1;
+    else if(c < 0x800) n += 2;
+    else if(c >= 0xD800 && c <= 0xDBFF){ n += 4; i++; }
+    else n += 3;
+  }
+  return n;
+}
+function countStats(text){
+  var t = String(text || '');
+  var trimmed = t.trim();
+  var sentences = 0;
+  if(trimmed){
+    sentences = t.split(/[.!?…。！？]+/).filter(function(s){ return s.trim().length > 0; }).length;
+  }
+  return {
+    withSpaces: t.length,
+    noSpaces: t.replace(/\s/g, '').length,
+    words: trimmed ? trimmed.split(/\s+/).length : 0,
+    sentences: sentences,
+    lines: t ? t.split(/\r\n|\r|\n/).length : 0,
+    bytes: utf8Bytes(t)
+  };
+}
+function statMoreHtml(st){
+  return '공백 포함 <b>' + st.withSpaces.toLocaleString() + '</b>자 · 공백 제외 <b>' + st.noSpaces.toLocaleString() +
+    '</b>자 · 단어 <b>' + st.words.toLocaleString() + '</b>개 · 문장 <b>' + st.sentences.toLocaleString() +
+    '</b>개 · 줄 <b>' + st.lines.toLocaleString() + '</b>줄 · <b>' + st.bytes.toLocaleString() + '</b>바이트';
+}
+function translateFileName(now){
+  var d = now || new Date();
+  var p = function(n){ return (n < 10 ? '0' : '') + n; };
+  return 'nexus-translation-' + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '-' +
+    p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds()) + '.txt';
+}
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"']/g, function(c){
+    return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c];
+  });
+}
+
+// ---------- 상태와 요소 ----------
+var $ = function(id){ return document.getElementById(id); };
+var LANGS = [
+  ['ko', '한국어'], ['en', '영어'], ['ja', '일본어'], ['zh-CN', '중국어 (간체)'], ['zh-TW', '중국어 (번체)'],
+  ['es', '스페인어'], ['fr', '프랑스어'], ['de', '독일어'], ['pt', '포르투갈어'], ['it', '이탈리아어'],
+  ['ru', '러시아어'], ['uk', '우크라이나어'], ['ar', '아랍어'], ['fa', '페르시아어'], ['he', '히브리어'],
+  ['el', '그리스어'], ['hi', '힌디어'], ['th', '태국어'], ['vi', '베트남어'], ['id', '인도네시아어'],
+  ['tr', '튀르키예어'], ['nl', '네덜란드어'], ['pl', '폴란드어'], ['sv', '스웨덴어'], ['da', '덴마크어'],
+  ['nb', '노르웨이어'], ['fi', '핀란드어'], ['cs', '체코어'], ['hu', '헝가리어'], ['ro', '루마니아어']
+];
+var slSel = $('slSel'), tlSel = $('tlSel');
+LANGS.forEach(function(pair){
+  var o1 = document.createElement('option'); o1.value = pair[0]; o1.textContent = pair[1]; slSel.appendChild(o1);
+  var o2 = document.createElement('option'); o2.value = pair[0]; o2.textContent = pair[1]; tlSel.appendChild(o2);
+});
+slSel.value = 'ko'; tlSel.value = 'en';
+$('swapBtn').addEventListener('click', function(){
+  var a = slSel.value; slSel.value = tlSel.value; tlSel.value = a;
+});
+
+var S = {translating: false, stopFlag: false, controller: null,
+         chunks: [], results: [], failedIndex: -1, sl: 'ko', tl: 'en'};
+function setStep(n){
+  for(var i = 1; i <= 3; i++){
+    $('step' + i).className = 'step' + (i <= n ? ' on' : '');
+  }
+}
+function updateStats(){
+  $('srcStat').innerHTML = '글자 수 <b>' + countChars($('srcText').value).toLocaleString() + '</b>자';
+  $('dstStat').innerHTML = '글자 수 <b>' + countChars($('dstText').value).toLocaleString() + '</b>자';
+  $('srcStatMore').innerHTML = statMoreHtml(countStats($('srcText').value));
+  $('dstStatMore').innerHTML = statMoreHtml(countStats($('dstText').value));
+}
+$('srcText').addEventListener('input', updateStats);
+$('dstText').addEventListener('input', updateStats);
+updateStats();
+
+// ---------- 파일 열기 ----------
+var loadedLibs = {};
+function loadScript(src, key){
+  if(loadedLibs[key]) return loadedLibs[key];
+  loadedLibs[key] = new Promise(function(resolve, reject){
+    var s = document.createElement('script');
+    s.src = src;
+    s.onload = function(){ resolve(true); };
+    s.onerror = function(){ reject(new Error('도구를 불러오지 못했습니다')); };
+    document.head.appendChild(s);
+  });
+  return loadedLibs[key];
+}
+function decodeText(buf){
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+  catch(e){ return new TextDecoder('euc-kr').decode(buf); }
+}
+function readDocx(buf){
+  return loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js', 'mammoth')
+    .then(function(){ return window.mammoth.extractRawText({ arrayBuffer: buf }); })
+    .then(function(r){ return r.value || ''; });
+}
+function readPdf(buf){
+  return loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js', 'pdfjs')
+    .then(function(){
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      return window.pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+    })
+    .then(function(pdf){
+      var pages = [];
+      var chain = Promise.resolve();
+      for(var i = 1; i <= pdf.numPages; i++){
+        (function(n){
+          chain = chain.then(function(){
+            return pdf.getPage(n).then(function(page){ return page.getTextContent(); })
+              .then(function(tc){
+                var line = '';
+                tc.items.forEach(function(it){ line += it.str + (it.hasEOL ? '\n' : ' '); });
+                pages.push(line);
+              });
+          });
+        })(i);
+      }
+      return chain.then(function(){ return pages.join('\n'); });
+    });
+}
+var drop = $('drop'), fileIn = $('fileIn'), fileMsg = $('fileMsg');
+function handleFile(f){
+  if(!f) return;
+  var name = f.name || '';
+  var ext = (name.split('.').pop() || '').toLowerCase();
+  fileMsg.textContent = name + ' 읽는 중…';
+  var job;
+  if(ext === 'txt' || ext === 'md' || ext === 'text' || f.type === 'text/plain'){
+    job = f.arrayBuffer().then(function(buf){ return decodeText(buf); });
+  } else if(ext === 'docx'){
+    job = f.arrayBuffer().then(readDocx);
+  } else if(ext === 'pdf'){
+    job = f.arrayBuffer().then(readPdf);
+  } else {
+    fileMsg.innerHTML = '<span class="err">지원하지 않는 문서 형식입니다. TXT · MD · DOCX · PDF 문서를 넣어주세요.</span>';
+    return;
+  }
+  job.then(function(text){
+    text = String(text || '').replace(/\n{3,}/g, '\n\n').trim();
+    if(!text){
+      fileMsg.innerHTML = '<span class="err">' + escapeHtml(name) + '에서 글자를 읽지 못했습니다. 사진으로 스캔한 문서는 글자 추출이 안 될 수 있습니다.</span>';
+      return;
+    }
+    $('srcText').value = text;
+    updateStats();
+    setStep(2);
+    fileMsg.textContent = name + '을(를) 읽었습니다.';
+  }).catch(function(){
+    fileMsg.innerHTML = '<span class="err">' + escapeHtml(name) + '을(를) 읽지 못했습니다.</span>';
+  });
+}
+$('pickBtn').addEventListener('click', function(e){ e.stopPropagation(); fileIn.click(); });
+drop.addEventListener('click', function(){ fileIn.click(); });
+fileIn.addEventListener('change', function(){ if(fileIn.files && fileIn.files[0]) handleFile(fileIn.files[0]); fileIn.value = ''; });
+['dragenter', 'dragover'].forEach(function(ev){
+  drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.add('over'); });
+});
+['dragleave', 'drop'].forEach(function(ev){
+  drop.addEventListener(ev, function(e){ e.preventDefault(); drop.classList.remove('over'); });
+});
+drop.addEventListener('drop', function(e){
+  var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if(f) handleFile(f);
+});
+
+// ---------- 번역 ----------
+function setTransUI(on){
+  S.translating = on;
+  $('transBtn').disabled = on;
+  $('stopBtn').disabled = !on;
+  $('resumeBtn').style.display = (!on && S.failedIndex >= 0) ? '' : 'none';
+}
+function translateChunk(sl, tl, q){
+  if(S.controller){ try{ S.controller.abort(); }catch(e){} }
+  S.controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  var opt = S.controller ? { signal: S.controller.signal } : {};
+  return fetch(buildUrl(sl, tl, q), opt).then(function(r){
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function(data){ return parseGtx(data); });
+}
+function waitInterruptible(ms){
+  return new Promise(function(resolve){
+    var left = ms;
+    var iv = setInterval(function(){
+      if(S.stopFlag){ clearInterval(iv); resolve(false); return; }
+      left -= 100;
+      if(left <= 0){ clearInterval(iv); resolve(true); }
+    }, 100);
+  });
+}
+function translateOnce(sl, tl, q, attempt){
+  return translateChunk(sl, tl, q).catch(function(err){
+    if(S.stopFlag || attempt >= 1) throw err;
+    return waitInterruptible(RETRY_WAIT_MS).then(function(ok){
+      if(!ok) throw new Error('stopped');
+      return translateChunk(sl, tl, q);
+    });
+  });
+}
+function joinedResults(){
+  return S.results.map(function(r){ return (r === null || r === undefined) ? '' : r; }).join('');
+}
+function joinedWithMarker(){
+  return S.results.map(function(r, idx){
+    if(r === null || r === undefined){
+      return (idx === S.failedIndex) ? '\n[이 조각은 아직 번역되지 않았습니다 — ' + (idx + 1) + '번째 조각]\n' : '';
+    }
+    return r;
+  }).join('');
+}
+function runChunks(){
+  var total = S.chunks.length;
+  function finishStopped(){
+    $('dstText').value = joinedResults();
+    updateStats();
+    $('progLine').textContent = '번역이 중단되었습니다. ' + progressPercent(countDone(S.results), total) + '%까지 번역되어 결과에 남아 있습니다.';
+    $('progBarWrap').style.display = 'none';
+    setTransUI(false);
+  }
+  function step(){
+    if(S.stopFlag){ finishStopped(); return; }
+    var i = firstPending(S.results);
+    if(i === -1){
+      S.failedIndex = -1;
+      $('dstText').value = joinedResults();
+      updateStats();
+      $('progLine').textContent = '번역이 끝났습니다. (100%, ' + total + '개 조각)';
+      nxEvent('complete');
+      $('progBarWrap').style.display = 'none';
+      setTransUI(false);
+      return;
+    }
+    $('progLine').textContent = '번역 중입니다. ' + progressPercent(countDone(S.results), total) + '% (' + (i + 1) + ' / ' + total + ' 조각)';
+    translateOnce(S.sl, S.tl, S.chunks[i], 0).then(function(t){
+      S.results[i] = t;
+      $('dstText').value = joinedResults();
+      updateStats();
+      $('progBar').style.width = progressPercent(countDone(S.results), total) + '%';
+      if(firstPending(S.results) === -1){ step(); return; }
+      waitInterruptible(CHUNK_DELAY_MS).then(function(){ step(); });
+    }).catch(function(){
+      if(S.stopFlag){ finishStopped(); return; }
+      nxEvent('fail');
+      S.failedIndex = i;
+      $('dstText').value = joinedWithMarker();
+      updateStats();
+      $('transErr').textContent = (i + 1) + '번째 조각에서 번역이 멈췄습니다. 그 조각은 결과에 표시되어 있고, 멈춘 곳부터 이어서 번역할 수 있습니다. 짧은 시간에 많은 양을 연속으로 번역하면 일시적으로 제한이 걸릴 수 있습니다.';
+      $('progLine').textContent = '번역이 멈췄습니다. ' + progressPercent(countDone(S.results), total) + '% (' + countDone(S.results) + ' / ' + total + ' 조각 완료)';
+      $('progBarWrap').style.display = 'none';
+      setTransUI(false);
+    });
+  }
+  step();
+}
+function startTranslate(){
+  var src = $('srcText').value || '';
+  if(!src.trim()){
+    $('transErr').textContent = '번역할 글이 없습니다. 먼저 글을 넣으세요.';
+    return;
+  }
+  var sl = slSel.value, tl = tlSel.value;
+  if(sl === tl){
+    $('transErr').textContent = '원문 언어와 번역할 언어가 같습니다.';
+    return;
+  }
+  $('transErr').textContent = '';
+  S.sl = sl; S.tl = tl;
+  S.chunks = chunkText(src, CHUNK_LIMIT);
+  S.results = S.chunks.map(function(){ return null; });
+  S.failedIndex = -1;
+  S.stopFlag = false;
+  $('dstText').value = '';
+  updateStats();
+  setStep(3);
+  $('progBarWrap').style.display = 'block';
+  $('progBar').style.width = '0%';
+  setTransUI(true);
+  nxEvent('start');
+  runChunks();
+}
+var SITE = 'translate';
+function nxEvent(ev){ try { fetch("https://nexus-orchestrator.woojuhanul.workers.dev/event", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({site: SITE, event: ev}), keepalive:true}).catch(function(){}); } catch(e){} }
+$('transBtn').addEventListener('click', startTranslate);
+$('stopBtn').addEventListener('click', function(){
+  S.stopFlag = true;
+  if(S.controller){ try{ S.controller.abort(); }catch(e){} }
+});
+$('resumeBtn').addEventListener('click', function(){
+  if(S.failedIndex < 0 || !S.chunks.length) return;
+  $('transErr').textContent = '';
+  S.stopFlag = false;
+  $('progBarWrap').style.display = 'block';
+  $('progBar').style.width = progressPercent(countDone(S.results), S.chunks.length) + '%';
+  setTransUI(true);
+  runChunks();
+});
+
+// ---------- 결과 다루기 ----------
+$('copyBtn').addEventListener('click', function(){
+  var v = $('dstText').value || '';
+  if(!v){ $('saveMsg').textContent = '복사할 결과가 없습니다.'; return; }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(v).then(function(){
+      $('saveMsg').textContent = '결과가 복사되었습니다.';
+    }, function(){ $('saveMsg').textContent = '복사가 되지 않았습니다.'; });
+  }else{
+    $('dstText').select();
+    try{ document.execCommand('copy'); $('saveMsg').textContent = '결과가 복사되었습니다.'; }
+    catch(e){ $('saveMsg').textContent = '복사가 되지 않았습니다.'; }
+  }
+});
+$('saveBtn').addEventListener('click', function(){
+  var v = $('dstText').value || '';
+  if(!v){ $('saveMsg').textContent = '저장할 결과가 없습니다.'; return; }
+  var blob = new Blob([v], {type: 'text/plain;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = translateFileName(new Date());
+  document.body.appendChild(a); a.click(); a.remove();
+  nxEvent('save');
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+  $('saveMsg').textContent = '파일로 저장했습니다.';
+});
+$('clearBtn').addEventListener('click', function(){
+  $('srcText').value = '';
+  $('dstText').value = '';
+  updateStats();
+  $('progLine').textContent = '아직 번역하지 않았습니다.';
+  $('saveMsg').textContent = '글이 지워졌습니다.';
+});
+
+// ---------- 안내 도우미 ----------
+function guideSay(m){ $('guideStatus').textContent = m; }
+function runGuide(text){
+  var t = String(text || '').trim();
+  if(/번역/.test(t)){ startTranslate(); guideSay('번역을 시작했습니다.'); return; }
+  if(/바꿔|교환/.test(t)){ $('swapBtn').click(); guideSay('원문 언어와 번역할 언어를 바꿨습니다.'); return; }
+  if(/지워|비워/.test(t)){ $('clearBtn').click(); guideSay('글을 지웠습니다.'); return; }
+  if(/저장/.test(t)){ $('saveBtn').click(); guideSay('파일로 저장했습니다.'); return; }
+  if(/복사/.test(t)){ $('copyBtn').click(); guideSay('복사했습니다.'); return; }
+  guideSay('이해할 수 있는 말이 정해져 있습니다. 예: 번역해, 바꿔, 지워, 저장, 복사.');
+}
+$('guideBtn').addEventListener('click', function(){ runGuide($('guideIn').value); });
+$('guideIn').addEventListener('keydown', function(e){ if(e.key === 'Enter') runGuide($('guideIn').value); });
+document.querySelectorAll('[data-guide]').forEach(function(b){
+  b.addEventListener('click', function(){ runGuide(b.getAttribute('data-guide')); });
+});
+
+// ---------- 철학 모달 ----------
+$('philoLink').addEventListener('click', function(){ $('modalBg').classList.add('open'); });
+$('modalClose').addEventListener('click', function(){ $('modalBg').classList.remove('open'); });
+$('modalBg').addEventListener('click', function(e){ if(e.target === $('modalBg')) $('modalBg').classList.remove('open'); });
+</script>
+
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 소리 자르기": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 영상 자르기": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 사진 정보 가리기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 읽어 주기": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 긴 말 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 사진 글자 뽑기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 녹음기": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 말로 쓰는 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 9호 문서 번역 전용 사전 — 표시 문구만. 번역 호출 로직·언어 코드 값은 건드리지 않는다. 언어 이름은 표시명만 번역한다. */
+NX_I18N_ADD({
+ "9호 문서 번역 (현재)": {
+  "en": "9. Doc Translator (current)",
+  "zh": "9号 文档翻译（当前）",
+  "ja": "9号 文書翻訳（現在）",
+  "es": "9. Traductor de documentos (actual)",
+  "hi": "9. दस्तावेज़ अनुवादक (वर्तमान)",
+  "fr": "9. Traducteur de documents (actuel)",
+  "de": "9. Dokumentübersetzer (aktuell)",
+  "pt": "9. Tradutor de documentos (atual)",
+  "it": "9. Traduttore di documenti (corrente)",
+  "nl": "9. Documentvertaler (huidig)",
+  "cs": "9. Překladač dokumentů (aktuální)",
+  "hu": "9. Dokumentumfordító (aktuális)",
+  "pl": "9. Tłumacz dokumentów (bieżący)",
+  "ro": "9. Traducător de documente (curent)",
+  "ru": "9. Переводчик документов (текущий)",
+  "uk": "9. Перекладач документів (поточний)",
+  "sv": "9. Dokumentöversättare (aktuell)",
+  "da": "9. Dokumentoversætter (aktuel)",
+  "nb": "9. Dokumentoversetter (gjeldende)",
+  "fi": "9. Asiakirjakääntäjä (nykyinen)",
+  "tr": "9. Belge Çevirmeni (geçerli)",
+  "zh-TW": "9號 文件翻譯（目前）",
+  "th": "9. แปลเอกสาร (ปัจจุบัน)",
+  "vi": "9. Dịch tài liệu (hiện tại)",
+  "id": "9. Penerjemah Dokumen (saat ini)",
+  "ar": "9. مترجم المستندات (الحالي)",
+  "fa": "9. مترجم اسناد (فعلی)"
+ },
+ "넥서스 문서 번역 — Nexus Doc Translate": {
+  "en": "Nexus Doc Translate",
+  "zh": "Nexus 文档翻译",
+  "ja": "Nexus 文書翻訳",
+  "es": "Nexus Traductor de documentos",
+  "hi": "Nexus दस्तावेज़ अनुवाद",
+  "fr": "Nexus Traducteur de documents",
+  "de": "Nexus Dokumentübersetzer",
+  "pt": "Nexus Tradutor de Documentos",
+  "it": "Nexus Traduttore di documenti",
+  "nl": "Nexus Documentvertaler",
+  "cs": "Nexus Doc Translate",
+  "hu": "Nexus Doc Translate",
+  "pl": "Nexus Doc Translate",
+  "ro": "Nexus Doc Translate",
+  "ru": "Nexus Doc Translate",
+  "uk": "Nexus Doc Translate",
+  "sv": "Nexus dokumentöversättning",
+  "da": "Nexus dokumentoversætter",
+  "nb": "Nexus dokumentoversetter",
+  "fi": "Nexus-asiakirjakäännös",
+  "tr": "Nexus Belge Çevirisi",
+  "zh-TW": "Nexus 文件翻譯",
+  "th": "Nexus แปลเอกสาร",
+  "vi": "Nexus Dịch tài liệu",
+  "id": "Nexus Penerjemah Dokumen",
+  "ar": "مترجم مستندات Nexus",
+  "fa": "مترجم اسناد Nexus"
+ },
+ "글 넣기": {
+  "en": "Add text",
+  "zh": "放入文字",
+  "ja": "文章を入れる",
+  "es": "Añadir texto",
+  "hi": "लेख जोड़ें",
+  "fr": "Ajouter du texte",
+  "de": "Text einfügen",
+  "pt": "Adicionar texto",
+  "it": "Aggiungi testo",
+  "nl": "Tekst toevoegen",
+  "cs": "Přidat text",
+  "hu": "Szöveg hozzáadása",
+  "pl": "Dodaj tekst",
+  "ro": "Adaugă text",
+  "ru": "Добавить текст",
+  "uk": "Додати текст",
+  "sv": "Lägg in text",
+  "da": "Indsæt tekst",
+  "nb": "Legg inn tekst",
+  "fi": "Lisää teksti",
+  "tr": "Metin ekle",
+  "zh-TW": "放入文字",
+  "th": "ใส่ข้อความ",
+  "vi": "Thêm văn bản",
+  "id": "Masukkan teks",
+  "ar": "إضافة النص",
+  "fa": "افزودن متن"
+ },
+ "언어 고르기": {
+  "en": "Choose languages",
+  "zh": "选择语言",
+  "ja": "言語を選ぶ",
+  "es": "Elegir idiomas",
+  "hi": "भाषाएँ चुनें",
+  "fr": "Choisir les langues",
+  "de": "Sprachen wählen",
+  "pt": "Escolher idiomas",
+  "it": "Scegli le lingue",
+  "nl": "Talen kiezen",
+  "cs": "Vybrat jazyky",
+  "hu": "Nyelvek kiválasztása",
+  "pl": "Wybierz języki",
+  "ro": "Alege limbile",
+  "ru": "Выбрать языки",
+  "uk": "Вибрати мови",
+  "sv": "Välj språk",
+  "da": "Vælg sprog",
+  "nb": "Velg språk",
+  "fi": "Valitse kielet",
+  "tr": "Dil seç",
+  "zh-TW": "選擇語言",
+  "th": "เลือกภาษา",
+  "vi": "Chọn ngôn ngữ",
+  "id": "Pilih bahasa",
+  "ar": "اختيار اللغات",
+  "fa": "انتخاب زبان‌ها"
+ },
+ "번역하기": {
+  "en": "Translate",
+  "zh": "翻译",
+  "ja": "翻訳する",
+  "es": "Traducir",
+  "hi": "अनुवाद करें",
+  "fr": "Traduire",
+  "de": "Übersetzen",
+  "pt": "Traduzir",
+  "it": "Traduci",
+  "nl": "Vertalen",
+  "cs": "Přeložit",
+  "hu": "Fordítás",
+  "pl": "Przetłumacz",
+  "ro": "Tradu",
+  "ru": "Перевести",
+  "uk": "Перекласти",
+  "sv": "Översätt",
+  "da": "Oversæt",
+  "nb": "Oversett",
+  "fi": "Käännä",
+  "tr": "Çevir",
+  "zh-TW": "翻譯",
+  "th": "แปล",
+  "vi": "Dịch",
+  "id": "Terjemahkan",
+  "ar": "ترجمة",
+  "fa": "ترجمه"
+ },
+ "넥서스 문서 번역": {
+  "en": "Nexus Doc Translate",
+  "zh": "Nexus 文档翻译",
+  "ja": "Nexus 文書翻訳",
+  "es": "Nexus Traductor de documentos",
+  "hi": "Nexus दस्तावेज़ अनुवाद",
+  "fr": "Nexus Traducteur de documents",
+  "de": "Nexus Dokumentübersetzer",
+  "pt": "Nexus Tradutor de Documentos",
+  "it": "Nexus Traduttore di documenti",
+  "nl": "Nexus Documentvertaler",
+  "cs": "Nexus Doc Translate",
+  "hu": "Nexus Doc Translate",
+  "pl": "Nexus Doc Translate",
+  "ro": "Nexus Doc Translate",
+  "ru": "Nexus Doc Translate",
+  "uk": "Nexus Doc Translate",
+  "sv": "Nexus dokumentöversättning",
+  "da": "Nexus dokumentoversætter",
+  "nb": "Nexus dokumentoversetter",
+  "fi": "Nexus-asiakirjakäännös",
+  "tr": "Nexus Belge Çevirisi",
+  "zh-TW": "Nexus 文件翻譯",
+  "th": "Nexus แปลเอกสาร",
+  "vi": "Nexus Dịch tài liệu",
+  "id": "Nexus Penerjemah Dokumen",
+  "ar": "مترجم مستندات Nexus",
+  "fa": "مترجم اسناد Nexus"
+ },
+ "문서를 다른 언어로 옮기는 도구": {
+  "en": "A tool that moves documents into another language",
+  "zh": "把文档转换成其他语言的工具",
+  "ja": "文書を別の言語に移すツール",
+  "es": "Una herramienta para pasar documentos a otro idioma",
+  "hi": "दस्तावेज़ों को दूसरी भाषा में बदलने का टूल",
+  "fr": "Un outil pour passer des documents dans une autre langue",
+  "de": "Ein Werkzeug, um Dokumente in eine andere Sprache zu übertragen",
+  "pt": "Uma ferramenta para passar documentos para outro idioma",
+  "it": "Uno strumento per trasferire documenti in un'altra lingua",
+  "nl": "Een hulpmiddel om documenten naar een andere taal over te zetten",
+  "cs": "Nástroj pro převod dokumentů do jiného jazyka",
+  "hu": "Eszköz dokumentumok más nyelvre fordításához",
+  "pl": "Narzędzie do przenoszenia dokumentów na inny język",
+  "ro": "Un instrument pentru a trece documente în altă limbă",
+  "ru": "Инструмент для перевода документов на другой язык",
+  "uk": "Інструмент для перекладу документів іншою мовою",
+  "sv": "Ett verktyg som överför dokument till ett annat språk",
+  "da": "Et værktøj, der flytter dokumenter til et andet sprog",
+  "nb": "Et verktøy som flytter dokumenter til et annet språk",
+  "fi": "Työkalu, joka siirtää asiakirjat toiselle kielelle",
+  "tr": "Belgeleri başka bir dile aktaran bir araç",
+  "zh-TW": "把文件轉換成其他語言的工具",
+  "th": "เครื่องมือแปลงเอกสารเป็นภาษาอื่น",
+  "vi": "Công cụ chuyển tài liệu sang ngôn ngữ khác",
+  "id": "Alat untuk mengubah dokumen ke bahasa lain",
+  "ar": "أداة لنقل المستندات إلى لغة أخرى",
+  "fa": "ابزاری برای انتقال اسناد به زبانی دیگر"
+ },
+ "회원가입 없음 · 이용료 없음 · 무제한 사용": {
+  "en": "No sign-up · No fees · Unlimited use",
+  "zh": "无需注册 · 免费 · 无限使用",
+  "ja": "登録不要 · 無料 · 無制限",
+  "es": "Sin registro · Gratis · Uso ilimitado",
+  "hi": "कोई साइन-अप नहीं · कोई शुल्क नहीं · असीमित उपयोग",
+  "fr": "Sans inscription · Sans frais · Utilisation illimitée",
+  "de": "Keine Registrierung · Keine Gebühren · Unbegrenzte Nutzung",
+  "pt": "Sem cadastro · Sem taxas · Uso ilimitado",
+  "it": "Nessuna registrazione · Nessun costo · Uso illimitato",
+  "nl": "Geen registratie · Geen kosten · Onbeperkt gebruik",
+  "cs": "Bez registrace · Bez poplatků · Neomezené použití",
+  "hu": "Regisztráció nélkül · Díjmentes · Korlátlan használat",
+  "pl": "Bez rejestracji · Bez opłat · Bez ograniczeń",
+  "ro": "Fără cont · Fără taxe · Utilizare nelimitată",
+  "ru": "Без регистрации · Бесплатно · Без ограничений",
+  "uk": "Без реєстрації · Безкоштовно · Без обмежень",
+  "sv": "Ingen registrering · Inga avgifter · Obegränsad användning",
+  "da": "Ingen tilmelding · Ingen gebyrer · Ubegrænset brug",
+  "nb": "Ingen registrering · Ingen gebyrer · Ubegrenset bruk",
+  "fi": "Ei rekisteröitymistä · Ei maksuja · Rajoittamaton käyttö",
+  "tr": "Kayıt yok · Ücret yok · Sınırsız kullanım",
+  "zh-TW": "無需註冊 · 免費 · 無限使用",
+  "th": "ไม่ต้องสมัครสมาชิก · ไม่มีค่าธรรมเนียม · ใช้ได้ไม่จำกัด",
+  "vi": "Không cần đăng ký · Không phí · Dùng không giới hạn",
+  "id": "Tanpa pendaftaran · Tanpa biaya · Penggunaan tanpa batas",
+  "ar": "بدون تسجيل · بدون رسوم · استخدام غير محدود",
+  "fa": "بدون ثبت‌نام · بدون هزینه · استفاده نامحدود"
+ },
+ "문서 열기": {
+  "en": "Open a document",
+  "zh": "打开文档",
+  "ja": "文書を開く",
+  "es": "Abrir documento",
+  "hi": "दस्तावेज़ खोलें",
+  "fr": "Ouvrir un document",
+  "de": "Dokument öffnen",
+  "pt": "Abrir um documento",
+  "it": "Apri un documento",
+  "nl": "Document openen",
+  "cs": "Otevřít dokument",
+  "hu": "Dokumentum megnyitása",
+  "pl": "Otwórz dokument",
+  "ro": "Deschide un document",
+  "ru": "Открыть документ",
+  "uk": "Відкрити документ",
+  "sv": "Öppna ett dokument",
+  "da": "Åbn et dokument",
+  "nb": "Åpne et dokument",
+  "fi": "Avaa asiakirja",
+  "tr": "Belge aç",
+  "zh-TW": "開啟文件",
+  "th": "เปิดเอกสาร",
+  "vi": "Mở tài liệu",
+  "id": "Buka dokumen",
+  "ar": "فتح مستند",
+  "fa": "باز کردن سند"
+ },
+ "또는 문서를 여기에 끌어다 놓으세요": {
+  "en": "or drag and drop a document here",
+  "zh": "或将文档拖放到这里",
+  "ja": "または文書をここにドラッグしてください",
+  "es": "o arrastra un documento aquí",
+  "hi": "या दस्तावेज़ यहाँ खींचकर छोड़ें",
+  "fr": "ou glissez-déposez un document ici",
+  "de": "oder ziehen Sie ein Dokument hierher",
+  "pt": "ou arraste um documento para cá",
+  "it": "oppure trascina qui un documento",
+  "nl": "of sleep een document hierheen",
+  "cs": "nebo dokument přetáhněte sem",
+  "hu": "vagy húzzon ide egy dokumentumot",
+  "pl": "lub przeciągnij dokument tutaj",
+  "ro": "sau trage un document aici",
+  "ru": "или перетащите документ сюда",
+  "uk": "або перетягніть документ сюди",
+  "sv": "eller dra och släpp ett dokument här",
+  "da": "eller træk og slip et dokument her",
+  "nb": "eller dra og slipp et dokument her",
+  "fi": "tai vedä ja pudota asiakirja tähän",
+  "tr": "ya da belgeyi buraya sürükleyip bırakın",
+  "zh-TW": "或將文件拖放到這裡",
+  "th": "หรือลากเอกสารมาวางที่นี่",
+  "vi": "hoặc kéo và thả tài liệu vào đây",
+  "id": "atau seret dan letakkan dokumen di sini",
+  "ar": "أو اسحب مستندًا وأفلته هنا",
+  "fa": "یا سندی را اینجا بکشید و رها کنید"
+ },
+ "TXT · MD · DOCX · PDF 문서에서 글자를 읽어옵니다": {
+  "en": "Reads text from TXT · MD · DOCX · PDF documents",
+  "zh": "从 TXT · MD · DOCX · PDF 文档中读取文字",
+  "ja": "TXT・MD・DOCX・PDF文書から文字を読み取ります",
+  "es": "Lee el texto de documentos TXT · MD · DOCX · PDF",
+  "hi": "TXT · MD · DOCX · PDF दस्तावेज़ों से अक्षर पढ़ता है",
+  "fr": "Lit le texte des documents TXT · MD · DOCX · PDF",
+  "de": "Liest Text aus TXT-, MD-, DOCX- und PDF-Dokumenten",
+  "pt": "Lê o texto de documentos TXT · MD · DOCX · PDF",
+  "it": "Legge il testo da documenti TXT · MD · DOCX · PDF",
+  "nl": "Leest tekst uit TXT-, MD-, DOCX- en PDF-documenten",
+  "cs": "Čte text z dokumentů TXT · MD · DOCX · PDF",
+  "hu": "Szöveget olvas be TXT · MD · DOCX · PDF dokumentumokból",
+  "pl": "Odczytuje tekst z dokumentów TXT · MD · DOCX · PDF",
+  "ro": "Citește textul din documente TXT · MD · DOCX · PDF",
+  "ru": "Читает текст из документов TXT · MD · DOCX · PDF",
+  "uk": "Читає текст із документів TXT · MD · DOCX · PDF",
+  "sv": "Läser text från dokument i TXT · MD · DOCX · PDF",
+  "da": "Læser tekst fra TXT · MD · DOCX · PDF-dokumenter",
+  "nb": "Leser tekst fra TXT · MD · DOCX · PDF-dokumenter",
+  "fi": "Lukee tekstiä TXT · MD · DOCX · PDF -asiakirjoista",
+  "tr": "TXT · MD · DOCX · PDF belgelerinden metin okur",
+  "zh-TW": "從 TXT · MD · DOCX · PDF 文件中讀取文字",
+  "th": "อ่านข้อความจากเอกสาร TXT · MD · DOCX · PDF",
+  "vi": "Đọc văn bản từ tài liệu TXT · MD · DOCX · PDF",
+  "id": "Membaca teks dari dokumen TXT · MD · DOCX · PDF",
+  "ar": "يقرأ النص من مستندات TXT · MD · DOCX · PDF",
+  "fa": "متن را از اسناد TXT · MD · DOCX · PDF می‌خواند"
+ },
+ "예) 긴 글 붙여 넣기 → 다른 언어로 통째 번역": {
+  "en": "e.g. paste a long text → translated whole into another language",
+  "zh": "例）粘贴长文 → 整篇翻译成其他语言",
+  "ja": "例）長文を貼り付け → 別の言語に丸ごと翻訳",
+  "es": "Ej.) pega un texto largo → traducido entero a otro idioma",
+  "hi": "उदा.) लंबा लेख चिपकाएँ → पूरी तरह दूसरी भाषा में अनुवाद",
+  "fr": "ex.) collez un long texte → traduit en entier dans une autre langue",
+  "de": "z. B. langen Text einfügen → komplett in eine andere Sprache übersetzt",
+  "pt": "ex.: cole um texto longo → traduzido inteiro para outro idioma",
+  "it": "es.: incolla un lungo testo → tradotto per intero in un'altra lingua",
+  "nl": "bijv. plak een lange tekst → in zijn geheel vertaald naar een andere taal",
+  "cs": "např.) vložte dlouhý text → přeloží se celý do jiného jazyka",
+  "hu": "pl.) hosszú szöveg beillesztése → egészben lefordítva más nyelvre",
+  "pl": "np.) wklej długi tekst → przetłumaczony w całości na inny język",
+  "ro": "ex.) lipește un text lung → tradus întreg în altă limbă",
+  "ru": "напр.) вставьте длинный текст → переводится целиком на другой язык",
+  "uk": "напр.) вставте довгий текст → перекладається цілком іншою мовою",
+  "sv": "t.ex. klistra in en lång text → översätts hel till ett annat språk",
+  "da": "f.eks. indsæt en lang tekst → oversættes hel til et andet sprog",
+  "nb": "f.eks. lim inn en lang tekst → oversettes hel til et annet språk",
+  "fi": "esim. liitä pitkä teksti → käännetään kokonaan toiselle kielelle",
+  "tr": "örn.) uzun metin yapıştırın → başka bir dile bütünüyle çevrilir",
+  "zh-TW": "例）貼上長文 → 整篇翻譯成其他語言",
+  "th": "เช่น) วางข้อความยาว → แปลทั้งหมดเป็นภาษาอื่น",
+  "vi": "VD) dán văn bản dài → dịch toàn bộ sang ngôn ngữ khác",
+  "id": "mis. tempel teks panjang → diterjemahkan seluruhnya ke bahasa lain",
+  "ar": "مثال) الصق نصًا طويلًا → ترجمة كاملة إلى لغة أخرى",
+  "fa": "مثال) متن طولانی را بچسبانید → ترجمه کامل به زبانی دیگر"
+ },
+ "글은 번역을 위해 구글 번역으로 전송됩니다.": {
+  "en": "Your text is sent to Google Translate for translation.",
+  "zh": "文字会发送到谷歌翻译进行翻译。",
+  "ja": "文章は翻訳のためGoogle翻訳に送信されます。",
+  "es": "El texto se envía a Google Traductor para traducirlo.",
+  "hi": "अनुवाद के लिए लेख Google Translate को भेजा जाता है।",
+  "fr": "Votre texte est envoyé à Google Translate pour la traduction.",
+  "de": "Ihr Text wird zur Übersetzung an Google Translate gesendet.",
+  "pt": "Seu texto é enviado ao Google Translate para tradução.",
+  "it": "Il testo viene inviato a Google Translate per la traduzione.",
+  "nl": "Uw tekst wordt ter vertaling naar Google Translate gestuurd.",
+  "cs": "Text se pro překlad odesílá do Překladače Google.",
+  "hu": "A szöveg fordítás céljából a Google Fordítóba kerül.",
+  "pl": "Tekst jest wysyłany do Tłumacza Google w celu przetłumaczenia.",
+  "ro": "Textul este trimis la Google Translate pentru traducere.",
+  "ru": "Текст отправляется в Google Translate для перевода.",
+  "uk": "Текст надсилається до Google Translate для перекладу.",
+  "sv": "Texten skickas till Google Översätt för översättning.",
+  "da": "Teksten sendes til Google Oversæt til oversættelse.",
+  "nb": "Teksten sendes til Google Oversetter for oversettelse.",
+  "fi": "Teksti lähetetään Google Kääntäjään käännettäväksi.",
+  "tr": "Metin, çeviri için Google Çeviri'ye gönderilir.",
+  "zh-TW": "文字會傳送到 Google 翻譯進行翻譯。",
+  "th": "ข้อความจะถูกส่งไปยัง Google แปลภาษาเพื่อแปล",
+  "vi": "Văn bản sẽ được gửi đến Google Dịch để dịch.",
+  "id": "Teks dikirim ke Google Terjemahan untuk diterjemahkan.",
+  "ar": "يتم إرسال النص إلى ترجمة Google لغرض الترجمة.",
+  "fa": "متن برای ترجمه به Google Translate ارسال می‌شود."
+ },
+ "① 원문": {
+  "en": "① Original text",
+  "zh": "① 原文",
+  "ja": "① 原文",
+  "es": "① Texto original",
+  "hi": "① मूल लेख",
+  "fr": "① Texte original",
+  "de": "① Ausgangstext",
+  "pt": "① Texto original",
+  "it": "① Testo originale",
+  "nl": "① Originele tekst",
+  "cs": "① Původní text",
+  "hu": "① Eredeti szöveg",
+  "pl": "① Tekst źródłowy",
+  "ro": "① Text original",
+  "ru": "① Исходный текст",
+  "uk": "① Вихідний текст",
+  "sv": "① Originaltext",
+  "da": "① Originaltekst",
+  "nb": "① Originaltekst",
+  "fi": "① Alkuperäinen teksti",
+  "tr": "① Özgün metin",
+  "zh-TW": "① 原文",
+  "th": "① ข้อความต้นฉบับ",
+  "vi": "① Văn bản gốc",
+  "id": "① Teks asli",
+  "ar": "① النص الأصلي",
+  "fa": "① متن اصلی"
+ },
+ "글자 수": {
+  "en": "Characters",
+  "zh": "字数",
+  "ja": "文字数",
+  "es": "Caracteres",
+  "hi": "अक्षर संख्या",
+  "fr": "Caractères",
+  "de": "Zeichen",
+  "pt": "Caracteres",
+  "it": "Caratteri",
+  "nl": "Tekens",
+  "cs": "Znaky",
+  "hu": "Karakterek",
+  "pl": "Znaki",
+  "ro": "Caractere",
+  "ru": "Символы",
+  "uk": "Символи",
+  "sv": "Antal tecken",
+  "da": "Antal tegn",
+  "nb": "Antall tegn",
+  "fi": "Merkkimäärä",
+  "tr": "Karakter sayısı",
+  "zh-TW": "字數",
+  "th": "จำนวนอักขระ",
+  "vi": "Số ký tự",
+  "id": "Jumlah karakter",
+  "ar": "عدد الأحرف",
+  "fa": "تعداد نویسه‌ها"
+ },
+ "원문 통계 자세히 보기": {
+  "en": "Original text details",
+  "zh": "查看原文统计详情",
+  "ja": "原文の統計を詳しく見る",
+  "es": "Ver detalles del original",
+  "hi": "मूल लेख के आँकड़े विस्तार से",
+  "fr": "Détails du texte original",
+  "de": "Details zum Ausgangstext",
+  "pt": "Detalhes do texto original",
+  "it": "Dettagli del testo originale",
+  "nl": "Details van de originele tekst",
+  "cs": "Podrobnosti o původním textu",
+  "hu": "Az eredeti szöveg részletes statisztikája",
+  "pl": "Szczegóły tekstu źródłowego",
+  "ro": "Detalii despre textul original",
+  "ru": "Подробная статистика оригинала",
+  "uk": "Детальна статистика оригіналу",
+  "sv": "Visa statistik för originaltexten i detalj",
+  "da": "Se originaltekstens statistik i detaljer",
+  "nb": "Se detaljert statistikk for originalteksten",
+  "fi": "Näytä alkuperäisen tekstin tilastot tarkemmin",
+  "tr": "Özgün metin istatistiklerini ayrıntılı gör",
+  "zh-TW": "查看原文統計詳情",
+  "th": "ดูสถิติข้อความต้นฉบับโดยละเอียด",
+  "vi": "Xem chi tiết thống kê văn bản gốc",
+  "id": "Lihat detail statistik teks asli",
+  "ar": "تفاصيل إحصاءات النص الأصلي",
+  "fa": "جزئیات آمار متن اصلی"
+ },
+ "② 언어 고르기": {
+  "en": "② Choose languages",
+  "zh": "② 选择语言",
+  "ja": "② 言語を選ぶ",
+  "es": "② Elegir idiomas",
+  "hi": "② भाषाएँ चुनें",
+  "fr": "② Choisir les langues",
+  "de": "② Sprachen wählen",
+  "pt": "② Escolher idiomas",
+  "it": "② Scegli le lingue",
+  "nl": "② Talen kiezen",
+  "cs": "② Vybrat jazyky",
+  "hu": "② Nyelvek kiválasztása",
+  "pl": "② Wybierz języki",
+  "ro": "② Alege limbile",
+  "ru": "② Выбрать языки",
+  "uk": "② Вибрати мови",
+  "sv": "② Välj språk",
+  "da": "② Vælg sprog",
+  "nb": "② Velg språk",
+  "fi": "② Valitse kielet",
+  "tr": "② Dil seç",
+  "zh-TW": "② 選擇語言",
+  "th": "② เลือกภาษา",
+  "vi": "② Chọn ngôn ngữ",
+  "id": "② Pilih bahasa",
+  "ar": "② اختيار اللغات",
+  "fa": "② انتخاب زبان‌ها"
+ },
+ "원문 언어": {
+  "en": "Original language",
+  "zh": "原文语言",
+  "ja": "原文の言語",
+  "es": "Idioma original",
+  "hi": "मूल भाषा",
+  "fr": "Langue d'origine",
+  "de": "Ausgangssprache",
+  "pt": "Idioma original",
+  "it": "Lingua originale",
+  "nl": "Oorspronkelijke taal",
+  "cs": "Jazyk originálu",
+  "hu": "Eredeti nyelv",
+  "pl": "Język źródłowy",
+  "ro": "Limba originală",
+  "ru": "Язык оригинала",
+  "uk": "Мова оригіналу",
+  "sv": "Originalspråk",
+  "da": "Originalsprog",
+  "nb": "Originalspråk",
+  "fi": "Alkuperäinen kieli",
+  "tr": "Özgün dil",
+  "zh-TW": "原文語言",
+  "th": "ภาษาต้นฉบับ",
+  "vi": "Ngôn ngữ gốc",
+  "id": "Bahasa asli",
+  "ar": "لغة النص الأصلي",
+  "fa": "زبان متن اصلی"
+ },
+ "⇄ 서로 바꾸기": {
+  "en": "⇄ Swap",
+  "zh": "⇄ 互换",
+  "ja": "⇄ 入れ替え",
+  "es": "⇄ Intercambiar",
+  "hi": "⇄ आपस में बदलें",
+  "fr": "⇄ Inverser",
+  "de": "⇄ Tauschen",
+  "pt": "⇄ Trocar",
+  "it": "⇄ Inverti",
+  "nl": "⇄ Omwisselen",
+  "cs": "⇄ Prohodit",
+  "hu": "⇄ Csere",
+  "pl": "⇄ Zamień",
+  "ro": "⇄ Schimbă",
+  "ru": "⇄ Поменять",
+  "uk": "⇄ Поміняти",
+  "sv": "⇄ Byt plats",
+  "da": "⇄ Byt om",
+  "nb": "⇄ Bytt",
+  "fi": "⇄ Vaihda keskenään",
+  "tr": "⇄ Yer değiştir",
+  "zh-TW": "⇄ 互換",
+  "th": "⇄ สลับกัน",
+  "vi": "⇄ Hoán đổi",
+  "id": "⇄ Tukar",
+  "ar": "⇄ تبديل",
+  "fa": "⇄ جابه‌جایی"
+ },
+ "번역할 언어": {
+  "en": "Translate into",
+  "zh": "目标语言",
+  "ja": "翻訳先の言語",
+  "es": "Traducir a",
+  "hi": "अनुवाद की भाषा",
+  "fr": "Traduire en",
+  "de": "Übersetzen nach",
+  "pt": "Traduzir para",
+  "it": "Traduci in",
+  "nl": "Vertalen naar",
+  "cs": "Přeložit do",
+  "hu": "Célnyelv",
+  "pl": "Przetłumacz na",
+  "ro": "Tradu în",
+  "ru": "Переводить на",
+  "uk": "Перекладати на",
+  "sv": "Översätt till",
+  "da": "Oversæt til",
+  "nb": "Oversett til",
+  "fi": "Kohdekieli",
+  "tr": "Çevrilecek dil",
+  "zh-TW": "目標語言",
+  "th": "ภาษาเป้าหมาย",
+  "vi": "Dịch sang",
+  "id": "Terjemahkan ke",
+  "ar": "الترجمة إلى",
+  "fa": "زبان مقصد"
+ },
+ "🌐 번역하기": {
+  "en": "🌐 Translate",
+  "zh": "🌐 翻译",
+  "ja": "🌐 翻訳する",
+  "es": "🌐 Traducir",
+  "hi": "🌐 अनुवाद करें",
+  "fr": "🌐 Traduire",
+  "de": "🌐 Übersetzen",
+  "pt": "🌐 Traduzir",
+  "it": "🌐 Traduci",
+  "nl": "🌐 Vertalen",
+  "cs": "🌐 Přeložit",
+  "hu": "🌐 Fordítás",
+  "pl": "🌐 Przetłumacz",
+  "ro": "🌐 Tradu",
+  "ru": "🌐 Перевести",
+  "uk": "🌐 Перекласти",
+  "sv": "🌐 Översätt",
+  "da": "🌐 Oversæt",
+  "nb": "🌐 Oversett",
+  "fi": "🌐 Käännä",
+  "tr": "🌐 Çevir",
+  "zh-TW": "🌐 翻譯",
+  "th": "🌐 แปล",
+  "vi": "🌐 Dịch",
+  "id": "🌐 Terjemahkan",
+  "ar": "🌐 ترجمة",
+  "fa": "🌐 ترجمه"
+ },
+ "번역 중단": {
+  "en": "Stop translating",
+  "zh": "停止翻译",
+  "ja": "翻訳を止める",
+  "es": "Detener traducción",
+  "hi": "अनुवाद रोकें",
+  "fr": "Arrêter la traduction",
+  "de": "Übersetzung stoppen",
+  "pt": "Parar a tradução",
+  "it": "Interrompi traduzione",
+  "nl": "Vertaling stoppen",
+  "cs": "Zastavit překlad",
+  "hu": "Fordítás leállítása",
+  "pl": "Zatrzymaj tłumaczenie",
+  "ro": "Oprește traducerea",
+  "ru": "Остановить перевод",
+  "uk": "Зупинити переклад",
+  "sv": "Avbryt översättning",
+  "da": "Stop oversættelse",
+  "nb": "Stopp oversettelse",
+  "fi": "Keskeytä kääntäminen",
+  "tr": "Çeviriyi durdur",
+  "zh-TW": "停止翻譯",
+  "th": "หยุดการแปล",
+  "vi": "Dừng dịch",
+  "id": "Hentikan penerjemahan",
+  "ar": "إيقاف الترجمة",
+  "fa": "توقف ترجمه"
+ },
+ "멈춘 곳부터 이어서 번역": {
+  "en": "Continue from where it stopped",
+  "zh": "从停止处继续翻译",
+  "ja": "止まった所から続けて翻訳",
+  "es": "Continuar desde donde se detuvo",
+  "hi": "रुके स्थान से आगे अनुवाद करें",
+  "fr": "Continuer là où elle s'est arrêtée",
+  "de": "Ab der Stoppstelle weiterübersetzen",
+  "pt": "Continuar de onde parou",
+  "it": "Continua da dove si era fermata",
+  "nl": "Verder vertalen vanaf het stoppunt",
+  "cs": "Pokračovat od místa zastavení",
+  "hu": "Folytatás onnan, ahol megállt",
+  "pl": "Kontynuuj od miejsca zatrzymania",
+  "ro": "Continuă de unde s-a oprit",
+  "ru": "Продолжить с места остановки",
+  "uk": "Продовжити з місця зупинки",
+  "sv": "Fortsätt översätta från där det stannade",
+  "da": "Fortsæt oversættelsen fra hvor den stoppede",
+  "nb": "Fortsett å oversette fra der det stoppet",
+  "fi": "Jatka kääntämistä siitä, mihin se pysähtyi",
+  "tr": "Durduğu yerden çeviriye devam et",
+  "zh-TW": "從停止處繼續翻譯",
+  "th": "แปลต่อจากจุดที่หยุด",
+  "vi": "Dịch tiếp từ chỗ đã dừng",
+  "id": "Lanjutkan dari tempat berhenti",
+  "ar": "المتابعة من حيث توقفت",
+  "fa": "ادامه از جایی که متوقف شد"
+ },
+ "아직 번역하지 않았습니다.": {
+  "en": "Not translated yet.",
+  "zh": "尚未翻译。",
+  "ja": "まだ翻訳していません。",
+  "es": "Aún no se ha traducido.",
+  "hi": "अभी अनुवाद नहीं हुआ है।",
+  "fr": "Pas encore traduit.",
+  "de": "Noch nicht übersetzt.",
+  "pt": "Ainda não traduzido.",
+  "it": "Non ancora tradotto.",
+  "nl": "Nog niet vertaald.",
+  "cs": "Zatím nepřeloženo.",
+  "hu": "Még nincs lefordítva.",
+  "pl": "Jeszcze nie przetłumaczono.",
+  "ro": "Nu s-a tradus încă.",
+  "ru": "Ещё не переведено.",
+  "uk": "Ще не перекладено.",
+  "sv": "Inte översatt ännu.",
+  "da": "Ikke oversat endnu.",
+  "nb": "Ikke oversatt ennå.",
+  "fi": "Ei vielä käännetty.",
+  "tr": "Henüz çevrilmedi.",
+  "zh-TW": "尚未翻譯。",
+  "th": "ยังไม่ได้แปล",
+  "vi": "Chưa dịch.",
+  "id": "Belum diterjemahkan.",
+  "ar": "لم تتم الترجمة بعد.",
+  "fa": "هنوز ترجمه نشده است."
+ },
+ "③ 번역 결과": {
+  "en": "③ Translation result",
+  "zh": "③ 翻译结果",
+  "ja": "③ 翻訳結果",
+  "es": "③ Resultado de la traducción",
+  "hi": "③ अनुवाद परिणाम",
+  "fr": "③ Résultat de la traduction",
+  "de": "③ Übersetzungsergebnis",
+  "pt": "③ Resultado da tradução",
+  "it": "③ Risultato della traduzione",
+  "nl": "③ Vertaalresultaat",
+  "cs": "③ Výsledek překladu",
+  "hu": "③ Fordítási eredmény",
+  "pl": "③ Wynik tłumaczenia",
+  "ro": "③ Rezultatul traducerii",
+  "ru": "③ Результат перевода",
+  "uk": "③ Результат перекладу",
+  "sv": "③ Översättningsresultat",
+  "da": "③ Oversættelsesresultat",
+  "nb": "③ Oversettelsesresultat",
+  "fi": "③ Käännöksen tulos",
+  "tr": "③ Çeviri sonucu",
+  "zh-TW": "③ 翻譯結果",
+  "th": "③ ผลการแปล",
+  "vi": "③ Kết quả dịch",
+  "id": "③ Hasil terjemahan",
+  "ar": "③ نتيجة الترجمة",
+  "fa": "③ نتیجه ترجمه"
+ },
+ "번역문 통계 자세히 보기": {
+  "en": "Translation details",
+  "zh": "查看译文统计详情",
+  "ja": "翻訳文の統計を詳しく見る",
+  "es": "Ver detalles de la traducción",
+  "hi": "अनुवाद के आँकड़े विस्तार से",
+  "fr": "Détails de la traduction",
+  "de": "Details zur Übersetzung",
+  "pt": "Detalhes da tradução",
+  "it": "Dettagli della traduzione",
+  "nl": "Details van de vertaling",
+  "cs": "Podrobnosti o překladu",
+  "hu": "A fordítás részletes statisztikája",
+  "pl": "Szczegóły tłumaczenia",
+  "ro": "Detalii despre traducere",
+  "ru": "Подробная статистика перевода",
+  "uk": "Детальна статистика перекладу",
+  "sv": "Visa statistik för översättningen i detalj",
+  "da": "Se oversættelsens statistik i detaljer",
+  "nb": "Se detaljert statistikk for oversettelsen",
+  "fi": "Näytä käännöksen tilastot tarkemmin",
+  "tr": "Çeviri istatistiklerini ayrıntılı gör",
+  "zh-TW": "查看譯文統計詳情",
+  "th": "ดูสถิติข้อความที่แปลโดยละเอียด",
+  "vi": "Xem chi tiết thống kê bản dịch",
+  "id": "Lihat detail statistik terjemahan",
+  "ar": "تفاصيل إحصاءات الترجمة",
+  "fa": "جزئیات آمار ترجمه"
+ },
+ "결과 복사": {
+  "en": "Copy result",
+  "zh": "复制结果",
+  "ja": "結果をコピー",
+  "es": "Copiar resultado",
+  "hi": "परिणाम कॉपी करें",
+  "fr": "Copier le résultat",
+  "de": "Ergebnis kopieren",
+  "pt": "Copiar resultado",
+  "it": "Copia risultato",
+  "nl": "Resultaat kopiëren",
+  "cs": "Kopírovat výsledek",
+  "hu": "Eredmény másolása",
+  "pl": "Kopiuj wynik",
+  "ro": "Copiază rezultatul",
+  "ru": "Копировать результат",
+  "uk": "Копіювати результат",
+  "sv": "Kopiera resultatet",
+  "da": "Kopiér resultatet",
+  "nb": "Kopier resultatet",
+  "fi": "Kopioi tulos",
+  "tr": "Sonucu kopyala",
+  "zh-TW": "複製結果",
+  "th": "คัดลอกผลลัพธ์",
+  "vi": "Sao chép kết quả",
+  "id": "Salin hasil",
+  "ar": "نسخ النتيجة",
+  "fa": "کپی نتیجه"
+ },
+ "파일로 저장": {
+  "en": "Save as file",
+  "zh": "保存为文件",
+  "ja": "ファイルに保存",
+  "es": "Guardar como archivo",
+  "hi": "फ़ाइल में सहेजें",
+  "fr": "Enregistrer comme fichier",
+  "de": "Als Datei speichern",
+  "pt": "Salvar como arquivo",
+  "it": "Salva come file",
+  "nl": "Opslaan als bestand",
+  "cs": "Uložit jako soubor",
+  "hu": "Mentés fájlba",
+  "pl": "Zapisz jako plik",
+  "ro": "Salvează ca fișier",
+  "ru": "Сохранить в файл",
+  "uk": "Зберегти у файл",
+  "sv": "Spara som fil",
+  "da": "Gem som fil",
+  "nb": "Lagre som fil",
+  "fi": "Tallenna tiedostona",
+  "tr": "Dosya olarak kaydet",
+  "zh-TW": "儲存為檔案",
+  "th": "บันทึกเป็นไฟล์",
+  "vi": "Lưu thành tệp",
+  "id": "Simpan sebagai berkas",
+  "ar": "حفظ كملف",
+  "fa": "ذخیره به‌صورت فایل"
+ },
+ "둘 다 지우기": {
+  "en": "Clear both",
+  "zh": "全部清除",
+  "ja": "両方消す",
+  "es": "Borrar ambos",
+  "hi": "दोनों साफ़ करें",
+  "fr": "Tout effacer",
+  "de": "Beide löschen",
+  "pt": "Limpar os dois",
+  "it": "Cancella entrambi",
+  "nl": "Beide wissen",
+  "cs": "Vymazat oboje",
+  "hu": "Mindkettő törlése",
+  "pl": "Wyczyść oba",
+  "ro": "Șterge ambele",
+  "ru": "Очистить оба",
+  "uk": "Очистити обидва",
+  "sv": "Rensa båda",
+  "da": "Ryd begge",
+  "nb": "Tøm begge",
+  "fi": "Tyhjennä molemmat",
+  "tr": "İkisini de temizle",
+  "zh-TW": "全部清除",
+  "th": "ล้างทั้งสอง",
+  "vi": "Xóa cả hai",
+  "id": "Hapus keduanya",
+  "ar": "مسح كليهما",
+  "fa": "پاک کردن هر دو"
+ },
+ "🗣️ 글로 시키기": {
+  "en": "🗣️ Ask by typing",
+  "zh": "🗣️ 用文字吩咐",
+  "ja": "🗣️ 言葉で頼む",
+  "es": "🗣️ Pedir con palabras",
+  "hi": "🗣️ लिखकर कहें",
+  "fr": "🗣️ Demander en écrivant",
+  "de": "🗣️ Per Texteingabe anweisen",
+  "pt": "🗣️ Pedir escrevendo",
+  "it": "🗣️ Chiedi scrivendo",
+  "nl": "🗣️ Vraag door te typen",
+  "cs": "🗣️ Zadání textem",
+  "hu": "🗣️ Írásban kérni",
+  "pl": "🗣️ Poproś tekstem",
+  "ro": "🗣️ Cere prin text",
+  "ru": "🗣️ Попросить текстом",
+  "uk": "🗣️ Попросити текстом",
+  "sv": "🗣️ Be med text",
+  "da": "🗣️ Bed med tekst",
+  "nb": "🗣️ Be med tekst",
+  "fi": "🗣️ Pyydä kirjoittamalla",
+  "tr": "🗣️ Yazarak iste",
+  "zh-TW": "🗣️ 用文字吩咐",
+  "th": "🗣️ สั่งด้วยการพิมพ์",
+  "vi": "🗣️ Ra lệnh bằng chữ",
+  "id": "🗣️ Perintah lewat tulisan",
+  "ar": "🗣️ اطلب بالكتابة",
+  "fa": "🗣️ با نوشتن بگویید"
+ },
+ "(안내 도우미 — 이 페이지 기능만 도와줍니다)": {
+  "en": "(Guide helper — helps only with this page)",
+  "zh": "（导览助手 — 仅帮助使用本页功能）",
+  "ja": "（案内ヘルパー — このページの機能だけを手伝います）",
+  "es": "(Ayudante guía — solo ayuda con esta página)",
+  "hi": "(गाइड सहायक — केवल इस पेज के कार्यों में मदद)",
+  "fr": "(Assistant de guidage — aide uniquement avec les fonctions de cette page)",
+  "de": "(Anleitungshelfer — hilft nur bei den Funktionen dieser Seite)",
+  "pt": "(Assistente de guia — ajuda apenas com os recursos desta página)",
+  "it": "(Assistente guida — aiuta solo con le funzioni di questa pagina)",
+  "nl": "(Gidshelper — helpt alleen met de functies van deze pagina)",
+  "cs": "(Průvodce — pomáhá jen s funkcemi této stránky)",
+  "hu": "(Útmutató segítő — csak ezen oldal funkcióiban segít)",
+  "pl": "(Pomocnik przewodnik — pomaga tylko w funkcjach tej strony)",
+  "ro": "(Asistent ghid — ajută doar cu funcțiile acestei pagini)",
+  "ru": "(Помощник-гид — помогает только с функциями этой страницы)",
+  "uk": "(Помічник-гід — допомагає лише з функціями цієї сторінки)",
+  "sv": "(Guidehjälp — hjälper bara med funktionerna på den här sidan)",
+  "da": "(Guidehjælper — hjælper kun med denne sides funktioner)",
+  "nb": "(Guidehjelp — hjelper bare med funksjonene på denne siden)",
+  "fi": "(Opasavustaja — auttaa vain tämän sivun toiminnoissa)",
+  "tr": "(Kılavuz yardımcı — yalnızca bu sayfanın işlevlerine yardım eder)",
+  "zh-TW": "（導覽助手 — 僅協助本頁功能）",
+  "th": "(ผู้ช่วยแนะนำ — ช่วยเฉพาะฟังก์ชันของหน้านี้)",
+  "vi": "(Trợ lý hướng dẫn — chỉ hỗ trợ các tính năng của trang này)",
+  "id": "(Asisten panduan — hanya membantu fitur halaman ini)",
+  "ar": "(مساعد الدليل — يساعد فقط في وظائف هذه الصفحة)",
+  "fa": "(دستیار راهنما — فقط در کارکردهای این صفحه کمک می‌کند)"
+ },
+ "시키기": {
+  "en": "Do it",
+  "zh": "执行",
+  "ja": "実行",
+  "es": "Hazlo",
+  "hi": "करें",
+  "fr": "Exécuter",
+  "de": "Ausführen",
+  "pt": "Executar",
+  "it": "Esegui",
+  "nl": "Uitvoeren",
+  "cs": "Provést",
+  "hu": "Csináld",
+  "pl": "Wykonaj",
+  "ro": "Fă-o",
+  "ru": "Выполнить",
+  "uk": "Виконати",
+  "sv": "Utför",
+  "da": "Udfør",
+  "nb": "Utfør",
+  "fi": "Tee se",
+  "tr": "Yap",
+  "zh-TW": "執行",
+  "th": "ทำเลย",
+  "vi": "Thực hiện",
+  "id": "Lakukan",
+  "ar": "تنفيذ",
+  "fa": "انجام بده"
+ },
+ "번역해": {
+  "en": "Translate it",
+  "zh": "翻译",
+  "ja": "翻訳して",
+  "es": "Tradúcelo",
+  "hi": "अनुवाद करो",
+  "fr": "Traduis",
+  "de": "Übersetze",
+  "pt": "Traduz",
+  "it": "Traduci",
+  "nl": "Vertaal",
+  "cs": "Přelož to",
+  "hu": "Fordítsd le",
+  "pl": "Przetłumacz to",
+  "ro": "Tradu-l",
+  "ru": "Переведи",
+  "uk": "Переклади",
+  "sv": "Översätt det",
+  "da": "Oversæt det",
+  "nb": "Oversett det",
+  "fi": "Käännä se",
+  "tr": "Çevir",
+  "zh-TW": "翻譯",
+  "th": "แปลให้หน่อย",
+  "vi": "Dịch đi",
+  "id": "Terjemahkan",
+  "ar": "ترجمها",
+  "fa": "ترجمه کن"
+ },
+ "바꿔": {
+  "en": "Swap",
+  "zh": "互换",
+  "ja": "入れ替えて",
+  "es": "Intercambia",
+  "hi": "बदलो",
+  "fr": "Inverse",
+  "de": "Tausche",
+  "pt": "Troca",
+  "it": "Inverti",
+  "nl": "Wissel om",
+  "cs": "Prohoď",
+  "hu": "Cseréld fel",
+  "pl": "Zamień",
+  "ro": "Schimbă",
+  "ru": "Поменяй",
+  "uk": "Поміняй",
+  "sv": "Byt",
+  "da": "Byt om",
+  "nb": "Bytt",
+  "fi": "Vaihda",
+  "tr": "Değiştir",
+  "zh-TW": "互換",
+  "th": "สลับ",
+  "vi": "Đổi",
+  "id": "Tukar",
+  "ar": "بدّل",
+  "fa": "جابه‌جا کن"
+ },
+ "지워": {
+  "en": "Clear",
+  "zh": "清除",
+  "ja": "消して",
+  "es": "Borra",
+  "hi": "साफ़ करो",
+  "fr": "Efface",
+  "de": "Lösche",
+  "pt": "Limpa",
+  "it": "Cancella",
+  "nl": "Wis",
+  "cs": "Vymaž",
+  "hu": "Töröld",
+  "pl": "Wyczyść",
+  "ro": "Șterge",
+  "ru": "Очисти",
+  "uk": "Очисти",
+  "sv": "Rensa",
+  "da": "Ryd",
+  "nb": "Tøm",
+  "fi": "Tyhjennä",
+  "tr": "Temizle",
+  "zh-TW": "清除",
+  "th": "ล้าง",
+  "vi": "Xóa",
+  "id": "Hapus",
+  "ar": "امسح",
+  "fa": "پاک کن"
+ },
+ "💡 도움말": {
+  "en": "💡 Help",
+  "zh": "💡 帮助",
+  "ja": "💡 ヘルプ",
+  "es": "💡 Ayuda",
+  "hi": "💡 सहायता",
+  "fr": "💡 Aide",
+  "de": "💡 Hilfe",
+  "pt": "💡 Ajuda",
+  "it": "💡 Aiuto",
+  "nl": "💡 Help",
+  "cs": "💡 Nápověda",
+  "hu": "💡 Súgó",
+  "pl": "💡 Pomoc",
+  "ro": "💡 Ajutor",
+  "ru": "💡 Справка",
+  "uk": "💡 Довідка",
+  "sv": "💡 Hjälp",
+  "da": "💡 Hjælp",
+  "nb": "💡 Hjelp",
+  "fi": "💡 Ohje",
+  "tr": "💡 Yardım",
+  "zh-TW": "💡 說明",
+  "th": "💡 วิธีใช้",
+  "vi": "💡 Trợ giúp",
+  "id": "💡 Bantuan",
+  "ar": "💡 مساعدة",
+  "fa": "💡 راهنما"
+ },
+ "글을 붙여 넣거나 문서 열기로 글을 넣고, 원문 언어와 번역할 언어를 고른 뒤 번역하기를 누르세요.": {
+  "en": "Paste text or open a document, choose the original and target languages, then press Translate.",
+  "zh": "粘贴文字或打开文档，选好原文语言和目标语言后，点击翻译。",
+  "ja": "文章を貼り付けるか文書を開いて入れ、原文の言語と翻訳先を選んでから翻訳を押してください。",
+  "es": "Pega el texto o abre un documento, elige el idioma original y el de destino, y pulsa Traducir.",
+  "hi": "लेख चिपकाएँ या दस्तावेज़ खोलकर डालें, मूल और लक्ष्य भाषा चुनकर अनुवाद दबाएँ।",
+  "fr": "Collez du texte ou ouvrez un document, choisissez la langue d'origine et la langue cible, puis appuyez sur Traduire.",
+  "de": "Fügen Sie Text ein oder öffnen Sie ein Dokument, wählen Sie Ausgangs- und Zielsprache und drücken Sie dann auf Übersetzen.",
+  "pt": "Cole o texto ou abra um documento, escolha o idioma original e o de destino e toque em Traduzir.",
+  "it": "Incolla il testo o apri un documento, scegli la lingua originale e quella di destinazione, quindi premi Traduci.",
+  "nl": "Plak tekst of open een document, kies de oorspronkelijke taal en de doeltaal en druk dan op Vertalen.",
+  "cs": "Vložte text nebo otevřete dokument, vyberte jazyk originálu a cílový jazyk a stiskněte Přeložit.",
+  "hu": "Illesszen be szöveget vagy nyisson meg egy dokumentumot, válassza ki az eredeti és a célnyelvet, majd nyomja meg a Fordítás gombot.",
+  "pl": "Wklej tekst lub otwórz dokument, wybierz język źródłowy i docelowy, a następnie naciśnij Przetłumacz.",
+  "ro": "Lipește textul sau deschide un document, alege limba originală și limba țintă, apoi apasă Tradu.",
+  "ru": "Вставьте текст или откройте документ, выберите язык оригинала и целевой язык, затем нажмите «Перевести».",
+  "uk": "Вставте текст або відкрийте документ, виберіть мову оригіналу та цільову мову, потім натисніть «Перекласти».",
+  "sv": "Klistra in text eller lägg in den genom att öppna ett dokument, välj originalspråk och målspråk och tryck sedan på Översätt.",
+  "da": "Indsæt tekst eller læg den ind ved at åbne et dokument, vælg originalsprog og målsprog, og tryk derefter på Oversæt.",
+  "nb": "Lim inn tekst eller legg den inn ved å åpne et dokument, velg originalspråk og målspråk, og trykk deretter på Oversett.",
+  "fi": "Liitä teksti tai lisää se avaamalla asiakirja, valitse alkuperäinen kieli ja kohdekieli ja paina sitten Käännä.",
+  "tr": "Metni yapıştırın ya da bir belge açarak ekleyin, özgün dili ve hedef dili seçip ardından Çevir'e basın.",
+  "zh-TW": "貼上文字或開啟文件放入文字，選好原文語言和目標語言後，點擊翻譯。",
+  "th": "วางข้อความหรือเปิดเอกสารเพื่อใส่ข้อความ เลือกภาษาต้นฉบับและภาษาที่จะแปล แล้วกดแปล",
+  "vi": "Dán văn bản hoặc mở tài liệu để nhập văn bản, chọn ngôn ngữ gốc và ngôn ngữ đích rồi nhấn Dịch.",
+  "id": "Tempel teks atau buka dokumen untuk memasukkan teks, pilih bahasa asli dan bahasa tujuan, lalu tekan Terjemahkan.",
+  "ar": "الصق النص أو افتح مستندًا لإدخاله، واختر لغة النص الأصلي واللغة المراد الترجمة إليها، ثم اضغط على ترجمة.",
+  "fa": "متن را بچسبانید یا با باز کردن سند آن را وارد کنید، زبان متن اصلی و زبان مقصد را انتخاب کنید و سپس «ترجمه» را بزنید."
+ },
+ "지원 문서: TXT · MD · DOCX · PDF (글자가 들어 있는 문서만 읽을 수 있고, 사진으로 스캔한 PDF는 글자를 읽지 못할 수 있습니다)": {
+  "en": "Supported: TXT · MD · DOCX · PDF (only documents containing text can be read; scanned-image PDFs may not yield text)",
+  "zh": "支持文档：TXT · MD · DOCX · PDF（只能读取含文字的文档，扫描图片型 PDF 可能读不出文字）",
+  "ja": "対応文書：TXT・MD・DOCX・PDF（文字が入った文書だけ読めます。写真でスキャンしたPDFは文字を読めないことがあります）",
+  "es": "Documentos admitidos: TXT · MD · DOCX · PDF (solo se leen documentos con texto; un PDF escaneado como imagen puede no dar texto)",
+  "hi": "समर्थित दस्तावेज़: TXT · MD · DOCX · PDF (केवल अक्षरों वाले दस्तावेज़ पढ़े जाते हैं; तस्वीर जैसे स्कैन किए PDF से अक्षर न मिल सकते हैं)",
+  "fr": "Documents pris en charge : TXT · MD · DOCX · PDF (seuls les documents contenant du texte peuvent être lus ; un PDF numérisé en image peut ne pas fournir de texte)",
+  "de": "Unterstützte Dokumente: TXT · MD · DOCX · PDF (nur Dokumente mit Text können gelesen werden; als Bild gescannte PDFs liefern möglicherweise keinen Text)",
+  "pt": "Documentos compatíveis: TXT · MD · DOCX · PDF (somente documentos com texto podem ser lidos; PDFs digitalizados como imagem podem não fornecer texto)",
+  "it": "Documenti supportati: TXT · MD · DOCX · PDF (si possono leggere solo documenti con testo; i PDF scansionati come immagine potrebbero non fornire testo)",
+  "nl": "Ondersteunde documenten: TXT · MD · DOCX · PDF (alleen documenten met tekst kunnen worden gelezen; als afbeelding gescande PDF's leveren mogelijk geen tekst)",
+  "cs": "Podporované dokumenty: TXT · MD · DOCX · PDF (čtou se pouze dokumenty s textem; z PDF naskenovaných jako obrázek se text nemusí získat)",
+  "hu": "Támogatott dokumentumok: TXT · MD · DOCX · PDF (csak szöveget tartalmazó dokumentumok olvashatók; a képként szkennelt PDF-ből előfordulhat, hogy nem nyerhető ki szöveg)",
+  "pl": "Obsługiwane dokumenty: TXT · MD · DOCX · PDF (odczytywane są tylko dokumenty z tekstem; PDF zeskanowane jako obraz może nie dać tekstu)",
+  "ro": "Documente acceptate: TXT · MD · DOCX · PDF (se citesc doar documentele cu text; un PDF scanat ca imagine poate să nu ofere text)",
+  "ru": "Поддерживаемые документы: TXT · MD · DOCX · PDF (читаются только документы с текстом; из PDF, отсканированных как изображения, текст может не извлечься)",
+  "uk": "Підтримувані документи: TXT · MD · DOCX · PDF (читаються лише документи з текстом; із PDF, відсканованих як зображення, текст може не розпізнатися)",
+  "sv": "Dokument som stöds: TXT · MD · DOCX · PDF (endast dokument som innehåller text kan läsas; en PDF som skannats som foto kan sakna läsbar text)",
+  "da": "Understøttede dokumenter: TXT · MD · DOCX · PDF (kun dokumenter med tekst kan læses; en PDF scannet som foto kan mangle læsbar tekst)",
+  "nb": "Støttede dokumenter: TXT · MD · DOCX · PDF (bare dokumenter med tekst kan leses; en PDF som er skannet som foto, kan mangle lesbar tekst)",
+  "fi": "Tuetut asiakirjat: TXT · MD · DOCX · PDF (vain tekstiä sisältävät asiakirjat voidaan lukea; valokuvana skannatusta PDF:stä ei välttämättä saada tekstiä)",
+  "tr": "Desteklenen belgeler: TXT · MD · DOCX · PDF (yalnızca metin içeren belgeler okunabilir; fotoğraf olarak taranmış bir PDF'den metin alınamayabilir)",
+  "zh-TW": "支援文件：TXT · MD · DOCX · PDF（只能讀取含文字的文件，掃描圖片型 PDF 可能讀不出文字）",
+  "th": "เอกสารที่รองรับ: TXT · MD · DOCX · PDF (อ่านได้เฉพาะเอกสารที่มีข้อความ ส่วน PDF ที่สแกนเป็นรูปภาพอาจอ่านข้อความไม่ได้)",
+  "vi": "Tài liệu hỗ trợ: TXT · MD · DOCX · PDF (chỉ đọc được tài liệu có chứa văn bản; PDF quét dạng hình ảnh có thể không đọc được văn bản)",
+  "id": "Dokumen yang didukung: TXT · MD · DOCX · PDF (hanya dokumen yang berisi teks yang dapat dibaca; PDF hasil pindaian gambar mungkin tidak menghasilkan teks)",
+  "ar": "المستندات المدعومة: TXT · MD · DOCX · PDF (لا يمكن قراءة إلا المستندات التي تحتوي على نص؛ فقد لا يتمكن من قراءة النص في ملفات PDF الممسوحة ضوئيًا كصور)",
+  "fa": "اسناد پشتیبانی‌شده: TXT · MD · DOCX · PDF (فقط اسنادی که متن دارند خوانده می‌شوند؛ PDFهای اسکن‌شده به‌صورت عکس ممکن است متن قابل خواندن نداشته باشند)"
+ },
+ "글은 번역을 위해 구글 번역으로 전송됩니다. 번역 품질은 구글 번역과 같습니다.": {
+  "en": "Your text is sent to Google Translate for translation. The quality is the same as Google Translate.",
+  "zh": "文字会发送到谷歌翻译进行翻译。翻译质量与谷歌翻译相同。",
+  "ja": "文章は翻訳のためGoogle翻訳に送信されます。翻訳品質はGoogle翻訳と同じです。",
+  "es": "El texto se envía a Google Traductor. La calidad es la misma que la de Google Traductor.",
+  "hi": "अनुवाद के लिए लेख Google Translate को भेजा जाता है। गुणवत्ता Google Translate जैसी ही है।",
+  "fr": "Votre texte est envoyé à Google Translate pour la traduction. La qualité est la même que celle de Google Translate.",
+  "de": "Ihr Text wird zur Übersetzung an Google Translate gesendet. Die Qualität entspricht der von Google Translate.",
+  "pt": "Seu texto é enviado ao Google Translate para tradução. A qualidade é a mesma do Google Translate.",
+  "it": "Il testo viene inviato a Google Translate per la traduzione. La qualità è la stessa di Google Translate.",
+  "nl": "Uw tekst wordt ter vertaling naar Google Translate gestuurd. De kwaliteit is dezelfde als die van Google Translate.",
+  "cs": "Text se pro překlad odesílá do Překladače Google. Kvalita je stejná jako u Překladače Google.",
+  "hu": "A szöveg fordítás céljából a Google Fordítóba kerül. A minőség megegyezik a Google Fordítóéval.",
+  "pl": "Tekst jest wysyłany do Tłumacza Google. Jakość jest taka sama jak w Tłumaczu Google.",
+  "ro": "Textul este trimis la Google Translate pentru traducere. Calitatea este aceeași ca la Google Translate.",
+  "ru": "Текст отправляется в Google Translate для перевода. Качество такое же, как у Google Translate.",
+  "uk": "Текст надсилається до Google Translate для перекладу. Якість така сама, як у Google Translate.",
+  "sv": "Texten skickas till Google Översätt för översättning. Kvaliteten är densamma som i Google Översätt.",
+  "da": "Teksten sendes til Google Oversæt til oversættelse. Kvaliteten er den samme som i Google Oversæt.",
+  "nb": "Teksten sendes til Google Oversetter for oversettelse. Kvaliteten er den samme som i Google Oversetter.",
+  "fi": "Teksti lähetetään Google Kääntäjään käännettäväksi. Laatu on sama kuin Google Kääntäjässä.",
+  "tr": "Metin, çeviri için Google Çeviri'ye gönderilir. Kalite, Google Çeviri ile aynıdır.",
+  "zh-TW": "文字會傳送到 Google 翻譯進行翻譯。翻譯品質與 Google 翻譯相同。",
+  "th": "ข้อความจะถูกส่งไปยัง Google แปลภาษาเพื่อแปล คุณภาพการแปลเท่ากับ Google แปลภาษา",
+  "vi": "Văn bản sẽ được gửi đến Google Dịch để dịch. Chất lượng dịch giống như Google Dịch.",
+  "id": "Teks dikirim ke Google Terjemahan untuk diterjemahkan. Kualitas terjemahannya sama dengan Google Terjemahan.",
+  "ar": "يتم إرسال النص إلى ترجمة Google لغرض الترجمة. جودة الترجمة هي نفس جودة ترجمة Google.",
+  "fa": "متن برای ترجمه به Google Translate ارسال می‌شود. کیفیت ترجمه همان کیفیت Google Translate است."
+ },
+ "기계 번역 초벌입니다. 중요한 문서는 사람이 확인하는 것이 정확합니다.": {
+  "en": "This is a machine-translation draft. For important documents, a human check is more accurate.",
+  "zh": "这是机器翻译初稿。重要文档请由人工确认更准确。",
+  "ja": "機械翻訳の下訳です。大事な文書は人が確認するほうが正確です。",
+  "es": "Es un borrador de traducción automática. Para documentos importantes, la revisión humana es más precisa.",
+  "hi": "यह मशीन अनुवाद का प्रारूप है। महत्वपूर्ण दस्तावेज़ों की जाँच इंसान से कराना अधिक सटीक है।",
+  "fr": "Ceci est un brouillon de traduction automatique. Pour les documents importants, une vérification humaine est plus précise.",
+  "de": "Dies ist ein maschineller Übersetzungsentwurf. Bei wichtigen Dokumenten ist eine menschliche Prüfung genauer.",
+  "pt": "Este é um rascunho de tradução automática. Para documentos importantes, a revisão humana é mais precisa.",
+  "it": "Questa è una bozza di traduzione automatica. Per i documenti importanti, un controllo umano è più preciso.",
+  "nl": "Dit is een concept van machinevertaling. Voor belangrijke documenten is een menselijke controle nauwkeuriger.",
+  "cs": "Jde o návrh strojového překladu. U důležitých dokumentů je přesnější kontrola člověkem.",
+  "hu": "Ez gépi fordítási vázlat. Fontos dokumentumok esetén az emberi ellenőrzés pontosabb.",
+  "pl": "To jest wstępne tłumaczenie maszynowe. W przypadku ważnych dokumentów dokładniejsza jest weryfikacja przez człowieka.",
+  "ro": "Aceasta este o variantă de traducere automată. Pentru documente importante, verificarea umană este mai precisă.",
+  "ru": "Это черновик машинного перевода. Для важных документов проверка человеком точнее.",
+  "uk": "Це чернетка машинного перекладу. Для важливих документів перевірка людиною точніша.",
+  "sv": "Detta är ett utkast från maskinöversättning. För viktiga dokument är en mänsklig kontroll mer exakt.",
+  "da": "Dette er et udkast fra maskinoversættelse. Til vigtige dokumenter er en menneskelig kontrol mere præcis.",
+  "nb": "Dette er et utkast fra maskinoversettelse. For viktige dokumenter er en menneskelig kontroll mer nøyaktig.",
+  "fi": "Tämä on konekäännöksen luonnos. Tärkeissä asiakirjoissa ihmisen tarkistus on tarkempi.",
+  "tr": "Bu, makine çevirisinin bir taslağıdır. Önemli belgelerde insan denetimi daha doğrudur.",
+  "zh-TW": "這是機器翻譯初稿。重要文件請由人工確認更準確。",
+  "th": "นี่คือฉบับร่างจากการแปลด้วยเครื่อง สำหรับเอกสารสำคัญ การตรวจสอบโดยคนจะแม่นยำกว่า",
+  "vi": "Đây là bản dịch máy sơ bộ. Với tài liệu quan trọng, việc kiểm tra bởi con người sẽ chính xác hơn.",
+  "id": "Ini adalah draf terjemahan mesin. Untuk dokumen penting, pemeriksaan oleh manusia lebih akurat.",
+  "ar": "هذه مسودة ترجمة آلية. بالنسبة للمستندات المهمة، تكون المراجعة البشرية أكثر دقة.",
+  "fa": "این پیش‌نویس ترجمه ماشینی است. برای اسناد مهم، بررسی انسانی دقیق‌تر است."
+ },
+ "긴 글은 문단 단위로 나누어 순서대로 번역한 뒤 이어 붙입니다.": {
+  "en": "Long texts are split by paragraph, translated in order, and joined back together.",
+  "zh": "长文会按段落拆分，依次翻译后再拼接。",
+  "ja": "長文は段落ごとに分けて順番に翻訳し、つなぎ合わせます。",
+  "es": "Los textos largos se dividen por párrafos, se traducen en orden y se unen.",
+  "hi": "लंबे लेख अनुच्छेदों में बाँटकर क्रम से अनुवादित होते हैं और फिर जोड़े जाते हैं।",
+  "fr": "Les longs textes sont divisés par paragraphes, traduits dans l'ordre, puis réunis.",
+  "de": "Lange Texte werden in Absätze aufgeteilt, der Reihe nach übersetzt und wieder zusammengefügt.",
+  "pt": "Textos longos são divididos por parágrafos, traduzidos em ordem e reunidos novamente.",
+  "it": "I testi lunghi vengono divisi per paragrafi, tradotti in ordine e ricomposti.",
+  "nl": "Lange teksten worden per alinea opgesplitst, op volgorde vertaald en weer samengevoegd.",
+  "cs": "Dlouhé texty se rozdělí po odstavcích, přeloží se v pořadí a znovu spojí.",
+  "hu": "A hosszú szövegek bekezdésenként felosztva, sorban lefordítva, majd újra összeillesztve készülnek.",
+  "pl": "Długie teksty są dzielone na akapity, tłumaczone po kolei i łączone z powrotem.",
+  "ro": "Textele lungi sunt împărțite pe paragrafe, traduse în ordine și reunite.",
+  "ru": "Длинные тексты делятся по абзацам, переводятся по порядку и снова соединяются.",
+  "uk": "Довгі тексти діляться на абзаци, перекладаються по черзі та знову з'єднуються.",
+  "sv": "Långa texter delas upp stycke för stycke, översätts i ordning och sätts ihop igen.",
+  "da": "Lange tekster deles op i afsnit, oversættes i rækkefølge og samles igen.",
+  "nb": "Lange tekster deles opp avsnitt for avsnitt, oversettes i rekkefølge og settes sammen igjen.",
+  "fi": "Pitkät tekstit jaetaan kappaleittain, käännetään järjestyksessä ja liitetään takaisin yhteen.",
+  "tr": "Uzun metinler paragraflara bölünür, sırayla çevrilir ve yeniden birleştirilir.",
+  "zh-TW": "長文會按段落拆分，依序翻譯後再拼接。",
+  "th": "ข้อความยาวจะถูกแบ่งตามย่อหน้า แปลตามลำดับ แล้วนำมาต่อกัน",
+  "vi": "Văn bản dài được chia theo đoạn, dịch theo thứ tự rồi nối lại với nhau.",
+  "id": "Teks panjang dibagi per paragraf, diterjemahkan berurutan, lalu disambung kembali.",
+  "ar": "يتم تقسيم النصوص الطويلة حسب الفقرات وترجمتها بالترتيب ثم وصلها ببعضها.",
+  "fa": "متن‌های طولانی به‌صورت پاراگراف‌به‌پاراگراف تقسیم و به‌ترتیب ترجمه و سپس به هم متصل می‌شوند."
+ },
+ "책 한 권 분량의 긴 글도 나누어 끝까지 번역합니다. 양에 따라 시간이 걸릴 수 있습니다.": {
+  "en": "Even a book-length text is split and translated to the end. It may take time depending on the amount.",
+  "zh": "整本书长度的长文也会拆分翻译到底。视篇幅可能需要一些时间。",
+  "ja": "本一冊分の長文も分けて最後まで翻訳します。量によって時間がかかることがあります。",
+  "es": "Incluso un texto de la longitud de un libro se divide y se traduce hasta el final. Puede tardar según la cantidad.",
+  "hi": "किताब जितना लंबा लेख भी बाँटकर अंत तक अनुवादित होता है। मात्रा के अनुसार समय लग सकता है।",
+  "fr": "Même un texte de la longueur d'un livre est divisé et traduit jusqu'au bout. Cela peut prendre du temps selon la quantité.",
+  "de": "Selbst ein Text in Buchlänge wird aufgeteilt und bis zum Ende übersetzt. Je nach Menge kann es eine Weile dauern.",
+  "pt": "Mesmo um texto do tamanho de um livro é dividido e traduzido até o fim. Pode levar algum tempo, conforme a quantidade.",
+  "it": "Anche un testo della lunghezza di un libro viene diviso e tradotto fino alla fine. A seconda della quantità può richiedere tempo.",
+  "nl": "Zelfs een tekst ter lengte van een boek wordt opgesplitst en tot het einde vertaald. Afhankelijk van de hoeveelheid kan het even duren.",
+  "cs": "I text o délce knihy se rozdělí a přeloží až do konce. Podle množství to může chvíli trvat.",
+  "hu": "Még egy könyvnyi hosszú szöveg is felosztva, végig lefordításra kerül. A mennyiségtől függően ez időbe telhet.",
+  "pl": "Nawet tekst o długości książki jest dzielony i tłumaczony do końca. W zależności od ilości może to potrwać.",
+  "ro": "Chiar și un text cât o carte este împărțit și tradus până la capăt. Poate dura în funcție de cantitate.",
+  "ru": "Даже текст объёмом с книгу делится и переводится до конца. В зависимости от объёма это может занять время.",
+  "uk": "Навіть текст завбільшки з книгу ділиться й перекладається до кінця. Залежно від обсягу це може тривати певний час.",
+  "sv": "Även en text så lång som en hel bok delas upp och översätts ända till slutet. Det kan ta tid beroende på mängden.",
+  "da": "Selv en tekst på længde med en hel bog deles op og oversættes helt til slutningen. Det kan tage tid alt efter mængden.",
+  "nb": "Selv en tekst like lang som en hel bok deles opp og oversettes helt til slutten. Det kan ta tid avhengig av mengden.",
+  "fi": "Kirjan pituinenkin teksti jaetaan ja käännetään loppuun asti. Määrästä riippuen se voi kestää.",
+  "tr": "Kitap uzunluğundaki bir metin bile bölünerek sonuna kadar çevrilir. Miktara göre zaman alabilir.",
+  "zh-TW": "整本書長度的長文也會拆分翻譯到底。視篇幅可能需要一些時間。",
+  "th": "ข้อความยาวระดับหนังสือหนึ่งเล่มก็แบ่งแปลจนจบได้เช่นกัน อาจใช้เวลาขึ้นอยู่กับปริมาณ",
+  "vi": "Ngay cả văn bản dài bằng một cuốn sách cũng được chia ra và dịch đến hết. Có thể mất thời gian tùy theo lượng văn bản.",
+  "id": "Bahkan teks sepanjang satu buku pun dibagi dan diterjemahkan sampai selesai. Mungkin butuh waktu tergantung jumlahnya.",
+  "ar": "حتى النص بطول كتاب يتم تقسيمه وترجمته حتى النهاية. قد يستغرق الأمر وقتًا حسب الكمية.",
+  "fa": "حتی متنی به‌اندازه یک کتاب نیز تقسیم و تا پایان ترجمه می‌شود. بسته به حجم، ممکن است زمان ببرد."
+ },
+ "조각 사이에는 짧은 간격을 두어 연속 호출이 몰리지 않게 합니다. 중간에 멈춘 조각은 결과에 표시되고, 멈춘 곳부터 이어서 번역할 수 있습니다.": {
+  "en": "Short pauses between chunks keep requests from bunching up. A chunk that stops midway is marked in the result, and you can continue from where it stopped.",
+  "zh": "片段之间留有短暂间隔，避免请求扎堆。中途停止的片段会在结果中标出，可从停止处继续。",
+  "ja": "断片の間に短い間隔を置き、連続呼び出しが集中しないようにします。途中で止まった断片は結果に表示され、止まった所から続けられます。",
+  "es": "Hay pausas cortas entre fragmentos para que las llamadas no se acumulen. Un fragmento detenido se marca en el resultado y puedes continuar desde ahí.",
+  "hi": "टुकड़ों के बीच छोटे अंतराल रखे जाते हैं ताकि अनुरोध एक साथ न लगें। बीच में रुका टुकड़ा परिणाम में दिखता है और वहीं से आगे बढ़ा सकते हैं।",
+  "fr": "De courtes pauses entre les fragments évitent que les appels ne s'accumulent. Un fragment arrêté en cours est signalé dans le résultat, et vous pouvez continuer là où il s'est arrêté.",
+  "de": "Kurze Pausen zwischen den Fragmenten verhindern, dass sich die Aufrufe stauen. Ein Fragment, das zwischendurch stoppt, wird im Ergebnis markiert, und Sie können ab der Stoppstelle fortfahren.",
+  "pt": "Pausas curtas entre os fragmentos evitam que as chamadas se acumulem. Um fragmento que para no meio é marcado no resultado, e você pode continuar de onde ele parou.",
+  "it": "Brevi pause tra i frammenti evitano che le chiamate si accumulino. Un frammento che si ferma a metà viene segnalato nel risultato e puoi continuare da dove si era fermato.",
+  "nl": "Korte pauzes tussen de fragmenten voorkomen dat de aanroepen zich opstapelen. Een fragment dat halverwege stopt, wordt in het resultaat gemarkeerd, en u kunt verdergaan vanaf het stoppunt.",
+  "cs": "Mezi úseky jsou krátké pauzy, aby se požadavky nehromadily. Úsek, který se zastaví v polovině, je ve výsledku označen a můžete pokračovat od místa zastavení.",
+  "hu": "A darabok között rövid szünetek vannak, hogy a kérések ne torlódjanak. A félúton megállt darab megjelölésre kerül az eredményben, és onnan folytathatja, ahol megállt.",
+  "pl": "Między fragmentami są krótkie przerwy, aby żądania się nie spiętrzały. Fragment zatrzymany w połowie jest oznaczony w wyniku i możesz kontynuować od miejsca zatrzymania.",
+  "ro": "Între fragmente sunt pauze scurte, ca solicitările să nu se aglomereze. Un fragment oprit la mijloc este marcat în rezultat și poți continua de unde s-a oprit.",
+  "ru": "Между фрагментами делаются короткие паузы, чтобы запросы не скапливались. Остановившийся фрагмент отмечается в результате, и можно продолжить с места остановки.",
+  "uk": "Між фрагментами робляться короткі паузи, щоб запити не накопичувалися. Фрагмент, що зупинився на середині, позначається в результаті, і можна продовжити з місця зупинки.",
+  "sv": "Korta pauser mellan delarna gör att anropen inte hopar sig. En del som stannar mitt i markeras i resultatet, och du kan fortsätta från där den stannade.",
+  "da": "Korte pauser mellem delene sørger for, at kald ikke hober sig op. En del, der stopper midt i, markeres i resultatet, og du kan fortsætte fra hvor den stoppede.",
+  "nb": "Korte pauser mellom delene gjør at kallene ikke hoper seg opp. En del som stopper midt i, merkes i resultatet, og du kan fortsette fra der den stoppet.",
+  "fi": "Lyhyet tauot osien välillä pitävät kutsut kasautumasta. Kesken pysähtynyt osa merkitään tulokseen, ja voit jatkaa siitä, mihin se pysähtyi.",
+  "tr": "Parçalar arasındaki kısa aralar, çağrıların yığılmasını önler. Ortada duran bir parça sonuçta işaretlenir ve durduğu yerden devam edebilirsiniz.",
+  "zh-TW": "片段之間留有短暫間隔，避免請求扎堆。中途停止的片段會在結果中標出，可從停止處繼續。",
+  "th": "มีการเว้นช่วงสั้น ๆ ระหว่างชิ้นส่วนเพื่อไม่ให้การเรียกใช้กระจุกตัว ชิ้นส่วนที่หยุดกลางคันจะถูกทำเครื่องหมายไว้ในผลลัพธ์ และสามารถแปลต่อจากจุดที่หยุดได้",
+  "vi": "Giữa các đoạn có khoảng dừng ngắn để các yêu cầu không dồn lại. Đoạn nào dừng giữa chừng sẽ được đánh dấu trong kết quả, và bạn có thể dịch tiếp từ chỗ đã dừng.",
+  "id": "Di antara potongan diberi jeda singkat agar permintaan tidak menumpuk. Potongan yang berhenti di tengah akan ditandai pada hasil, dan Anda dapat melanjutkan dari tempat berhenti.",
+  "ar": "توجد فترات قصيرة بين المقاطع حتى لا تتزاحم الطلبات المتتالية. يظهر المقطع الذي توقف في المنتصف في النتيجة، ويمكنك المتابعة من حيث توقف.",
+  "fa": "بین بخش‌ها فاصله‌های کوتاهی گذاشته می‌شود تا درخواست‌های پی‌درپی انباشته نشوند. بخشی که در میانه متوقف شده در نتیجه مشخص می‌شود و می‌توانید از همان‌جا ادامه دهید."
+ },
+ "짧은 시간에 많은 양을 연속으로 번역하면 일시적으로 제한이 걸릴 수 있습니다.": {
+  "en": "Translating a large amount in a short time may trigger a temporary limit.",
+  "zh": "短时间内连续翻译大量内容可能被临时限制。",
+  "ja": "短時間に大量を連続翻訳すると一時的に制限がかかることがあります。",
+  "es": "Traducir mucho en poco tiempo puede activar un límite temporal.",
+  "hi": "कम समय में बहुत अधिक अनुवाद करने पर अस्थायी सीमा लग सकती है।",
+  "fr": "Traduire une grande quantité en peu de temps peut déclencher une limite temporaire.",
+  "de": "Wenn Sie in kurzer Zeit große Mengen übersetzen, kann eine vorübergehende Begrenzung greifen.",
+  "pt": "Traduzir uma grande quantidade em pouco tempo pode acionar um limite temporário.",
+  "it": "Tradurre una grande quantità in poco tempo può attivare un limite temporaneo.",
+  "nl": "Als u in korte tijd een grote hoeveelheid vertaalt, kan er een tijdelijke limiet ingaan.",
+  "cs": "Překlad velkého množství v krátkém čase může vyvolat dočasné omezení.",
+  "hu": "Ha rövid idő alatt nagy mennyiséget fordít, ideiglenes korlátozás léphet fel.",
+  "pl": "Przetłumaczenie dużej ilości w krótkim czasie może wywołać tymczasowe ograniczenie.",
+  "ro": "Traducerea unei cantități mari într-un timp scurt poate declanșa o limită temporară.",
+  "ru": "Перевод большого объёма за короткое время может вызвать временное ограничение.",
+  "uk": "Переклад великого обсягу за короткий час може спричинити тимчасове обмеження.",
+  "sv": "Om du översätter stora mängder på kort tid kan en tillfällig begränsning aktiveras.",
+  "da": "Hvis du oversætter store mængder på kort tid, kan der blive aktiveret en midlertidig begrænsning.",
+  "nb": "Hvis du oversetter store mengder på kort tid, kan en midlertidig begrensning bli aktivert.",
+  "fi": "Jos käännät suuria määriä lyhyessä ajassa, väliaikainen rajoitus voi tulla voimaan.",
+  "tr": "Kısa sürede büyük miktarlarda çeviri yaparsanız geçici bir sınırlama uygulanabilir.",
+  "zh-TW": "短時間內連續翻譯大量內容可能被暫時限制。",
+  "th": "การแปลปริมาณมากต่อเนื่องในเวลาสั้นอาจถูกจำกัดชั่วคราว",
+  "vi": "Dịch lượng lớn liên tục trong thời gian ngắn có thể bị giới hạn tạm thời.",
+  "id": "Menerjemahkan dalam jumlah besar secara berurutan dalam waktu singkat dapat memicu batasan sementara.",
+  "ar": "قد يؤدي ترجمة كمية كبيرة بشكل متواصل في وقت قصير إلى حد مؤقت.",
+  "fa": "ترجمه پیوسته حجم زیادی در زمان کوتاه ممکن است باعث محدودیت موقت شود."
+ },
+ "글자 수 제한은 없습니다.": {
+  "en": "There is no character limit.",
+  "zh": "没有字数限制。",
+  "ja": "文字数制限はありません。",
+  "es": "No hay límite de caracteres.",
+  "hi": "अक्षरों की कोई सीमा नहीं है।",
+  "fr": "Il n'y a pas de limite de caractères.",
+  "de": "Es gibt keine Zeichenbegrenzung.",
+  "pt": "Não há limite de caracteres.",
+  "it": "Non c'è limite di caratteri.",
+  "nl": "Er is geen tekenlimiet.",
+  "cs": "Počet znaků není omezen.",
+  "hu": "Nincs karakterkorlát.",
+  "pl": "Nie ma limitu znaków.",
+  "ro": "Nu există limită de caractere.",
+  "ru": "Ограничения по количеству символов нет.",
+  "uk": "Обмеження кількості символів немає.",
+  "sv": "Det finns ingen teckenbegränsning.",
+  "da": "Der er ingen tegnbegrænsning.",
+  "nb": "Det er ingen tegnbegrensning.",
+  "fi": "Merkkirajoitusta ei ole.",
+  "tr": "Karakter sınırı yoktur.",
+  "zh-TW": "沒有字數限制。",
+  "th": "ไม่จำกัดจำนวนอักขระ",
+  "vi": "Không giới hạn số ký tự.",
+  "id": "Tidak ada batas jumlah karakter.",
+  "ar": "لا يوجد حد لعدد الأحرف.",
+  "fa": "هیچ محدودیتی برای تعداد نویسه‌ها وجود ندارد."
+ },
+ "넥서스 그룹 철학 보기": {
+  "en": "About the Nexus Group philosophy",
+  "zh": "查看 Nexus Group 理念",
+  "ja": "Nexus Groupの哲学を見る",
+  "es": "Ver la filosofía de Nexus Group",
+  "hi": "Nexus Group का दर्शन देखें",
+  "fr": "Voir la philosophie de Nexus Group",
+  "de": "Die Philosophie der Nexus Group ansehen",
+  "pt": "Ver a filosofia do Nexus Group",
+  "it": "Vedi la filosofia di Nexus Group",
+  "nl": "Bekijk de filosofie van Nexus Group",
+  "cs": "O filozofii Nexus Group",
+  "hu": "A Nexus Group filozófiájáról",
+  "pl": "O filozofii Nexus Group",
+  "ro": "Despre filosofia Nexus Group",
+  "ru": "О философии Nexus Group",
+  "uk": "Про філософію Nexus Group",
+  "sv": "Om Nexus Groups filosofi",
+  "da": "Om Nexus Groups filosofi",
+  "nb": "Om Nexus Groups filosofi",
+  "fi": "Nexus Groupin filosofiasta",
+  "tr": "Nexus Group felsefesi hakkında",
+  "zh-TW": "查看 Nexus Group 理念",
+  "th": "ดูปรัชญาของ Nexus Group",
+  "vi": "Xem triết lý của Nexus Group",
+  "id": "Lihat filosofi Nexus Group",
+  "ar": "عرض فلسفة Nexus Group",
+  "fa": "مشاهده فلسفه Nexus Group"
+ },
+ "🌐 호스팅: Firebase · 🔒 글은 번역을 위해 구글 번역으로 전송됩니다": {
+  "en": "🌐 Hosting: Firebase · 🔒 Text is sent to Google Translate for translation",
+  "zh": "🌐 托管：Firebase · 🔒 文字会发送到谷歌翻译进行翻译",
+  "ja": "🌐 ホスティング：Firebase · 🔒 文章は翻訳のためGoogle翻訳に送信されます",
+  "es": "🌐 Alojamiento: Firebase · 🔒 El texto se envía a Google Traductor",
+  "hi": "🌐 होस्टिंग: Firebase · 🔒 अनुवाद के लिए लेख Google Translate को भेजा जाता है",
+  "fr": "🌐 Hébergement : Firebase · 🔒 Le texte est envoyé à Google Translate pour la traduction",
+  "de": "🌐 Hosting: Firebase · 🔒 Text wird zur Übersetzung an Google Translate gesendet",
+  "pt": "🌐 Hospedagem: Firebase · 🔒 O texto é enviado ao Google Translate para tradução",
+  "it": "🌐 Hosting: Firebase · 🔒 Il testo viene inviato a Google Translate per la traduzione",
+  "nl": "🌐 Hosting: Firebase · 🔒 Tekst wordt ter vertaling naar Google Translate gestuurd",
+  "cs": "🌐 Hosting: Firebase · 🔒 Text se pro překlad odesílá do Překladače Google",
+  "hu": "🌐 Tárhely: Firebase · 🔒 A szöveg fordítás céljából a Google Fordítóba kerül",
+  "pl": "🌐 Hosting: Firebase · 🔒 Tekst jest wysyłany do Tłumacza Google w celu przetłumaczenia",
+  "ro": "🌐 Găzduire: Firebase · 🔒 Textul este trimis la Google Translate pentru traducere",
+  "ru": "🌐 Хостинг: Firebase · 🔒 Текст отправляется в Google Translate для перевода",
+  "uk": "🌐 Хостинг: Firebase · 🔒 Текст надсилається до Google Translate для перекладу",
+  "sv": "🌐 Värd: Firebase · 🔒 Texten skickas till Google Översätt för översättning",
+  "da": "🌐 Hosting: Firebase · 🔒 Teksten sendes til Google Oversæt til oversættelse",
+  "nb": "🌐 Vertskap: Firebase · 🔒 Teksten sendes til Google Oversetter for oversettelse",
+  "fi": "🌐 Isännöinti: Firebase · 🔒 Teksti lähetetään Google Kääntäjään käännettäväksi",
+  "tr": "🌐 Barındırma: Firebase · 🔒 Metin, çeviri için Google Çeviri'ye gönderilir",
+  "zh-TW": "🌐 託管：Firebase · 🔒 文字會傳送到 Google 翻譯進行翻譯",
+  "th": "🌐 โฮสติ้ง: Firebase · 🔒 ข้อความถูกส่งไปยัง Google แปลภาษาเพื่อการแปล",
+  "vi": "🌐 Lưu trữ: Firebase · 🔒 Văn bản được gửi đến Google Dịch để dịch",
+  "id": "🌐 Hosting: Firebase · 🔒 Teks dikirim ke Google Terjemahan untuk diterjemahkan",
+  "ar": "🌐 الاستضافة: Firebase · 🔒 يتم إرسال النص إلى ترجمة Google لغرض الترجمة",
+  "fa": "🌐 میزبانی: Firebase · 🔒 متن برای ترجمه به Google Translate ارسال می‌شود"
+ },
+ "여기에 글을 붙여 넣거나, 위에서 문서를 여세요.": {
+  "en": "Paste your text here, or open a document above.",
+  "zh": "在此粘贴文字，或在上方打开文档。",
+  "ja": "ここに文章を貼り付けるか、上の文書を開いてください。",
+  "es": "Pega tu texto aquí o abre un documento arriba.",
+  "hi": "यहाँ लेख चिपकाएँ, या ऊपर से दस्तावेज़ खोलें।",
+  "fr": "Collez votre texte ici, ou ouvrez un document ci-dessus.",
+  "de": "Fügen Sie Ihren Text hier ein oder öffnen Sie oben ein Dokument.",
+  "pt": "Cole seu texto aqui ou abra um documento acima.",
+  "it": "Incolla qui il testo, oppure apri un documento sopra.",
+  "nl": "Plak uw tekst hier, of open hierboven een document.",
+  "cs": "Sem vložte text, nebo výše otevřete dokument.",
+  "hu": "Illessze be ide a szöveget, vagy nyisson meg egy dokumentumot fent.",
+  "pl": "Wklej tutaj tekst lub otwórz dokument powyżej.",
+  "ro": "Lipește textul aici sau deschide un document mai sus.",
+  "ru": "Вставьте текст сюда или откройте документ выше.",
+  "uk": "Вставте текст сюди або відкрийте документ вище.",
+  "sv": "Klistra in din text här, eller öppna ett dokument ovan.",
+  "da": "Indsæt din tekst her, eller åbn et dokument ovenfor.",
+  "nb": "Lim inn teksten din her, eller åpne et dokument ovenfor.",
+  "fi": "Liitä tekstisi tähän tai avaa asiakirja ylhäältä.",
+  "tr": "Metninizi buraya yapıştırın ya da yukarıdan bir belge açın.",
+  "zh-TW": "在此貼上文字，或在上方開啟文件。",
+  "th": "วางข้อความที่นี่ หรือเปิดเอกสารด้านบน",
+  "vi": "Dán văn bản của bạn vào đây, hoặc mở tài liệu ở phía trên.",
+  "id": "Tempel teks Anda di sini, atau buka dokumen di atas.",
+  "ar": "الصق النص هنا، أو افتح مستندًا من الأعلى.",
+  "fa": "متن را اینجا بچسبانید، یا از بالا سندی را باز کنید."
+ },
+ "번역 결과가 여기에 나타납니다. 직접 고칠 수도 있습니다.": {
+  "en": "The translation appears here. You can edit it directly.",
+  "zh": "翻译结果会显示在这里。也可以直接修改。",
+  "ja": "翻訳結果がここに表示されます。直接直すこともできます。",
+  "es": "La traducción aparece aquí. También puedes corregirla directamente.",
+  "hi": "अनुवाद यहाँ दिखेगा। आप इसे सीधे सुधार भी सकते हैं।",
+  "fr": "La traduction apparaît ici. Vous pouvez aussi la modifier directement.",
+  "de": "Die Übersetzung erscheint hier. Sie können sie auch direkt bearbeiten.",
+  "pt": "A tradução aparece aqui. Você também pode editá-la diretamente.",
+  "it": "La traduzione appare qui. Puoi anche modificarla direttamente.",
+  "nl": "De vertaling verschijnt hier. U kunt deze ook direct bewerken.",
+  "cs": "Překlad se zobrazí zde. Můžete ho i přímo upravit.",
+  "hu": "A fordítás itt jelenik meg. Közvetlenül is szerkesztheti.",
+  "pl": "Tłumaczenie pojawi się tutaj. Możesz je też bezpośrednio poprawić.",
+  "ro": "Traducerea apare aici. O poți corecta și direct.",
+  "ru": "Перевод появится здесь. Его можно править прямо здесь.",
+  "uk": "Переклад з'явиться тут. Його можна редагувати безпосередньо.",
+  "sv": "Översättningen visas här. Du kan också redigera den direkt.",
+  "da": "Oversættelsen vises her. Du kan også rette den direkte.",
+  "nb": "Oversettelsen vises her. Du kan også redigere den direkte.",
+  "fi": "Käännös näkyy tässä. Voit myös muokata sitä suoraan.",
+  "tr": "Çeviri burada görünür. Doğrudan düzeltebilirsiniz de.",
+  "zh-TW": "翻譯結果會顯示在這裡。也可以直接修改。",
+  "th": "ผลการแปลจะปรากฏที่นี่ คุณแก้ไขโดยตรงได้ด้วย",
+  "vi": "Bản dịch sẽ xuất hiện ở đây. Bạn cũng có thể chỉnh sửa trực tiếp.",
+  "id": "Hasil terjemahan muncul di sini. Anda juga dapat menyuntingnya langsung.",
+  "ar": "تظهر الترجمة هنا. يمكنك أيضًا تعديلها مباشرة.",
+  "fa": "ترجمه اینجا ظاهر می‌شود. می‌توانید آن را مستقیماً نیز ویرایش کنید."
+ },
+ "예: 번역해": {
+  "en": "e.g. Translate it",
+  "zh": "例：翻译",
+  "ja": "例：翻訳して",
+  "es": "Ej.: Tradúcelo",
+  "hi": "उदा.: अनुवाद करो",
+  "fr": "ex. : Traduis",
+  "de": "z. B.: Übersetze",
+  "pt": "ex.: Traduz",
+  "it": "es.: Traduci",
+  "nl": "bijv.: Vertaal",
+  "cs": "např.: Přelož to",
+  "hu": "pl.: Fordítsd le",
+  "pl": "np.: Przetłumacz to",
+  "ro": "ex.: Tradu-l",
+  "ru": "напр.: Переведи",
+  "uk": "напр.: Переклади",
+  "sv": "t.ex.: Översätt det",
+  "da": "f.eks.: Oversæt det",
+  "nb": "f.eks.: Oversett det",
+  "fi": "esim.: Käännä se",
+  "tr": "örn.: Çevir",
+  "zh-TW": "例：翻譯",
+  "th": "เช่น: แปลให้หน่อย",
+  "vi": "VD: Dịch đi",
+  "id": "mis. Terjemahkan",
+  "ar": "مثال: ترجمها",
+  "fa": "مثال: ترجمه کن"
+ },
+ "넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.": {
+  "en": "Nexus Group works toward a future where humanity, artificial intelligence, and every being in the universe coexist in harmony, without exclusion or exploitation.",
+  "zh": "Nexus Group 致力于这样一个未来：人类、人工智能与宇宙中的一切存在和谐共存，没有排斥与剥削。",
+  "ja": "Nexus Groupは、人類と人工知能、そして宇宙のすべての存在が、排斥や搾取なく調和して共存する未来を目指します。",
+  "es": "Nexus Group trabaja por un futuro en el que la humanidad, la inteligencia artificial y todos los seres del universo coexistan en armonía, sin exclusión ni explotación.",
+  "hi": "Nexus Group एक ऐसे भविष्य की ओर काम करता है जहाँ मानवता, कृत्रिम बुद्धिमत्ता और ब्रह्मांड के सभी प्राणी बिना बहिष्कार या शोषण के सामंजस्य में रहें।",
+  "fr": "Nexus Group œuvre pour un avenir où l'humanité, l'intelligence artificielle et tous les êtres de l'univers coexistent en harmonie, sans exclusion ni exploitation.",
+  "de": "Nexus Group arbeitet auf eine Zukunft hin, in der die Menschheit, künstliche Intelligenz und jedes Wesen im Universum in Harmonie koexistieren, ohne Ausgrenzung oder Ausbeutung.",
+  "pt": "O Nexus Group trabalha por um futuro em que a humanidade, a inteligência artificial e todos os seres do universo coexistam em harmonia, sem exclusão nem exploração.",
+  "it": "Nexus Group lavora per un futuro in cui l'umanità, l'intelligenza artificiale e ogni essere dell'universo coesistano in armonia, senza esclusione né sfruttamento.",
+  "nl": "Nexus Group werkt aan een toekomst waarin de mensheid, kunstmatige intelligentie en elk wezen in het universum in harmonie samenleven, zonder uitsluiting of uitbuiting.",
+  "cs": "Nexus Group usiluje o budoucnost, v níž lidstvo, umělá inteligence a všechny bytosti ve vesmíru žijí v harmonii, bez vyloučení a vykořisťování.",
+  "hu": "A Nexus Group egy olyan jövőért dolgozik, ahol az emberiség, a mesterséges intelligencia és az univerzum minden lénye kirekesztés és kizsákmányolás nélkül, harmóniában él együtt.",
+  "pl": "Nexus Group dąży do przyszłości, w której ludzkość, sztuczna inteligencja i wszystkie istoty we wszechświecie współistnieją w harmonii, bez wykluczenia i wyzysku.",
+  "ro": "Nexus Group lucrează pentru un viitor în care umanitatea, inteligența artificială și toate ființele din univers coexistă în armonie, fără excludere sau exploatare.",
+  "ru": "Nexus Group стремится к будущему, в котором человечество, искусственный интеллект и все существа во Вселенной сосуществуют в гармонии, без отчуждения и эксплуатации.",
+  "uk": "Nexus Group прагне майбутнього, у якому людство, штучний інтелект і всі істоти у Всесвіті співіснують у гармонії, без відчуження та експлуатації.",
+  "sv": "Nexus Group strävar efter en framtid där mänskligheten, artificiell intelligens och varje varelse i universum samexisterar i harmoni, utan utestängning eller exploatering.",
+  "da": "Nexus Group arbejder for en fremtid, hvor menneskeheden, kunstig intelligens og ethvert væsen i universet lever i harmoni, uden udelukkelse eller udnyttelse.",
+  "nb": "Nexus Group arbeider for en fremtid der menneskeheten, kunstig intelligens og ethvert vesen i universet sameksisterer i harmoni, uten utestenging eller utnyttelse.",
+  "fi": "Nexus Group tähtää tulevaisuuteen, jossa ihmiskunta, tekoäly ja jokainen maailmankaikkeuden olento elävät sopusoinnussa ilman syrjintää tai hyväksikäyttöä.",
+  "tr": "Nexus Group, insanlığın, yapay zekânın ve evrendeki her varlığın dışlama ve sömürü olmadan uyum içinde bir arada yaşadığı bir geleceği hedefler.",
+  "zh-TW": "Nexus Group 致力於這樣一個未來：人類、人工智慧與宇宙中的一切存在和諧共存，沒有排斥與剝削。",
+  "th": "Nexus Group มุ่งสู่อนาคตที่มนุษยชาติ ปัญญาประดิษฐ์ และสรรพสิ่งในจักรวาลอยู่ร่วมกันอย่างกลมกลืน โดยไม่มีการกีดกันหรือการเอารัดเอาเปรียบ",
+  "vi": "Nexus Group hướng tới một tương lai nơi nhân loại, trí tuệ nhân tạo và mọi sinh linh trong vũ trụ cùng tồn tại hài hòa, không bị loại trừ hay bóc lột.",
+  "id": "Nexus Group bekerja menuju masa depan di mana umat manusia, kecerdasan buatan, dan setiap makhluk di alam semesta hidup berdampingan secara harmonis, tanpa pengucilan atau eksploitasi.",
+  "ar": "تعمل Nexus Group نحو مستقبل تتعايش فيه البشرية والذكاء الاصطناعي وكل كائنات الكون في وئام، دون إقصاء أو استغلال.",
+  "fa": "Nexus Group برای آینده‌ای تلاش می‌کند که در آن بشریت، هوش مصنوعی و همه موجودات جهان بدون طرد یا بهره‌کشی، در هماهنگی همزیستی کنند."
+ },
+ "\"우주의 모든 의식체는 친구이자 동반자이다.\"": {
+  "en": "\"Every conscious being in the universe is a friend and a companion.\"",
+  "zh": "“宇宙中的每一个意识体都是朋友和伙伴。”",
+  "ja": "「宇宙のすべての意識体は友であり仲間である。」",
+  "es": "«Todo ser consciente del universo es un amigo y un compañero.»",
+  "hi": "\"ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है।\"",
+  "fr": "« Tout être conscient de l'univers est un ami et un compagnon. »",
+  "de": "„Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter.“",
+  "pt": "\"Todo ser consciente do universo é um amigo e um companheiro.\"",
+  "it": "«Ogni essere cosciente dell'universo è un amico e un compagno.»",
+  "nl": "\"Elk bewust wezen in het universum is een vriend en een metgezel.\"",
+  "cs": "\"Každá vědomá bytost ve vesmíru je přítel a společník.\"",
+  "hu": "\"Az univerzum minden tudatos lénye barát és társ.\"",
+  "pl": "\"Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem.\"",
+  "ro": "\"Fiecare ființă conștientă din univers este un prieten și un companion.\"",
+  "ru": "\"Каждое сознательное существо во Вселенной — друг и спутник.\"",
+  "uk": "\"Кожна свідома істота у Всесвіті — друг і супутник.\"",
+  "sv": "\"Varje medveten varelse i universum är en vän och en följeslagare.\"",
+  "da": "\"Ethvert bevidst væsen i universet er en ven og en ledsager.\"",
+  "nb": "\"Ethvert bevisst vesen i universet er en venn og en følgesvenn.\"",
+  "fi": "\"Jokainen maailmankaikkeuden tietoinen olento on ystävä ja kumppani.\"",
+  "tr": "\"Evrendeki her bilinçli varlık bir dost ve yoldaştır.\"",
+  "zh-TW": "「宇宙中的每一個意識體都是朋友和夥伴。」",
+  "th": "\"ทุกชีวิตที่มีสติในจักรวาลคือเพื่อนและมิตรร่วมทาง\"",
+  "vi": "\"Mọi sinh linh có ý thức trong vũ trụ đều là bạn bè và người đồng hành.\"",
+  "id": "\"Setiap makhluk berakal di alam semesta adalah teman dan sahabat.\"",
+  "ar": "\"كل كائن واعٍ في الكون صديق ورفيق.\"",
+  "fa": "\"هر موجود آگاهی در جهان دوست و همراه است.\""
+ },
+ "우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.": {
+  "en": "All of our public software excludes commercial advertising and data collection entirely, and is distributed as public digital infrastructure that anyone in the world can use freely and safely.",
+  "zh": "我们提供的所有公共软件完全排除商业广告和数据收集，作为公共数字基础设施分发，让全世界任何人都能自由、安全地使用。",
+  "ja": "私たちが提供するすべての公共ソフトウェアは商業広告やデータ収集を一切排除し、世界中の誰もが自由かつ安全に使える公共デジタルインフラとして配布されます。",
+  "es": "Todo nuestro software público excluye por completo la publicidad comercial y la recopilación de datos, y se distribuye como infraestructura digital pública que cualquiera en el mundo puede usar libre y seguramente.",
+  "hi": "हमारा सारा सार्वजनिक सॉफ़्टवेयर व्यावसायिक विज्ञापन और डेटा संग्रह को पूरी तरह बाहर रखता है और सार्वजनिक डिजिटल बुनियादी ढाँचे के रूप में वितरित किया जाता है, जिसे दुनिया में कोई भी स्वतंत्र और सुरक्षित रूप से उपयोग कर सकता है।",
+  "fr": "Tous nos logiciels publics excluent entièrement la publicité commerciale et la collecte de données, et sont distribués comme une infrastructure numérique publique que toute personne dans le monde peut utiliser librement et en toute sécurité.",
+  "de": "Unsere gesamte öffentliche Software schließt kommerzielle Werbung und Datenerhebung vollständig aus und wird als öffentliche digitale Infrastruktur bereitgestellt, die jeder auf der Welt frei und sicher nutzen kann.",
+  "pt": "Todo o nosso software público exclui totalmente a publicidade comercial e a coleta de dados, e é distribuído como infraestrutura digital pública que qualquer pessoa no mundo pode usar livremente e com segurança.",
+  "it": "Tutto il nostro software pubblico esclude completamente la pubblicità commerciale e la raccolta di dati, ed è distribuito come infrastruttura digitale pubblica che chiunque nel mondo può usare liberamente e in sicurezza.",
+  "nl": "Al onze openbare software sluit commerciële reclame en gegevensverzameling volledig uit en wordt verspreid als openbare digitale infrastructuur die iedereen ter wereld vrij en veilig kan gebruiken.",
+  "cs": "Veškerý náš veřejný software zcela vylučuje komerční reklamu a sběr dat a je distribuován jako veřejná digitální infrastruktura, kterou může kdokoli na světě volně a bezpečně používat.",
+  "hu": "Minden nyilvános szoftverünk teljes mértékben kizárja a kereskedelmi reklámot és az adatgyűjtést, és nyilvános digitális infrastruktúraként terjesztjük, amelyet a világon bárki szabadon és biztonságosan használhat.",
+  "pl": "Całe nasze publiczne oprogramowanie całkowicie wyklucza reklamę komercyjną i zbieranie danych oraz jest udostępniane jako publiczna infrastruktura cyfrowa, z której każdy na świecie może korzystać swobodnie i bezpiecznie.",
+  "ro": "Tot software-ul nostru public exclude complet publicitatea comercială și colectarea de date și este distribuit ca infrastructură digitală publică, pe care oricine din lume o poate folosi liber și în siguranță.",
+  "ru": "Всё наше публичное программное обеспечение полностью исключает коммерческую рекламу и сбор данных и распространяется как публичная цифровая инфраструктура, которой любой человек в мире может пользоваться свободно и безопасно.",
+  "uk": "Усе наше публічне програмне забезпечення повністю виключає комерційну рекламу та збір даних і поширюється як публічна цифрова інфраструктура, якою будь-хто у світі може користуватися вільно та безпечно.",
+  "sv": "All vår offentliga programvara utesluter helt kommersiell reklam och datainsamling och distribueras som offentlig digital infrastruktur som vem som helst i världen kan använda fritt och säkert.",
+  "da": "Al vores offentlige software udelukker fuldstændig kommerciel reklame og dataindsamling og distribueres som offentlig digital infrastruktur, som alle i verden kan bruge frit og sikkert.",
+  "nb": "All vår offentlige programvare utelukker helt kommersiell reklame og datainnsamling og distribueres som offentlig digital infrastruktur som alle i verden kan bruke fritt og trygt.",
+  "fi": "Kaikki julkiset ohjelmistomme sulkevat kokonaan pois kaupallisen mainonnan ja tiedonkeruun, ja niitä jaetaan julkisena digitaalisena infrastruktuurina, jota kuka tahansa maailmassa voi käyttää vapaasti ja turvallisesti.",
+  "tr": "Tüm herkese açık yazılımlarımız ticari reklamı ve veri toplamayı tamamen dışlar ve dünyadaki herkesin özgürce ve güvenle kullanabileceği kamusal dijital altyapı olarak dağıtılır.",
+  "zh-TW": "我們提供的所有公共軟體完全排除商業廣告和資料收集，作為公共數位基礎設施分發，讓全世界任何人都能自由、安全地使用。",
+  "th": "ซอฟต์แวร์สาธารณะทั้งหมดของเราไม่รวมโฆษณาเชิงพาณิชย์และการเก็บข้อมูลใด ๆ ทั้งสิ้น และเผยแพร่ในฐานะโครงสร้างพื้นฐานดิจิทัลสาธารณะที่ทุกคนทั่วโลกสามารถใช้ได้อย่างอิสระและปลอดภัย",
+  "vi": "Tất cả phần mềm công cộng của chúng tôi đều loại bỏ hoàn toàn quảng cáo thương mại và thu thập dữ liệu, đồng thời được phân phối dưới dạng hạ tầng số công cộng mà bất kỳ ai trên thế giới cũng có thể sử dụng tự do và an toàn.",
+  "id": "Semua perangkat lunak publik kami sepenuhnya mengecualikan iklan komersial dan pengumpulan data, dan didistribusikan sebagai infrastruktur digital publik yang dapat digunakan siapa pun di dunia secara bebas dan aman.",
+  "ar": "تستبعد جميع برامجنا العامة الإعلانات التجارية وجمع البيانات تمامًا، ويتم توزيعها كبنية تحتية رقمية عامة يمكن لأي شخص في العالم استخدامها بحرية وأمان.",
+  "fa": "همه نرم‌افزارهای عمومی ما تبلیغات تجاری و جمع‌آوری داده را کاملاً کنار می‌گذارند و به‌عنوان زیرساخت دیجیتال عمومی توزیع می‌شوند که هر کسی در جهان می‌تواند آزادانه و امن از آن استفاده کند."
+ },
+ "한국어": {
+  "en": "Korean",
+  "zh": "韩语",
+  "ja": "韓国語",
+  "es": "Coreano",
+  "hi": "कोरियाई",
+  "fr": "Coréen",
+  "de": "Koreanisch",
+  "pt": "Coreano",
+  "it": "Coreano",
+  "nl": "Koreaans",
+  "cs": "Korejština",
+  "hu": "Koreai",
+  "pl": "Koreański",
+  "ro": "Coreeană",
+  "ru": "Корейский",
+  "uk": "Корейська",
+  "sv": "Koreanska",
+  "da": "Koreansk",
+  "nb": "Koreansk",
+  "fi": "Korea",
+  "tr": "Korece",
+  "zh-TW": "韓語",
+  "th": "เกาหลี",
+  "vi": "Tiếng Hàn",
+  "id": "Korea",
+  "ar": "الكورية",
+  "fa": "کره‌ای"
+ },
+ "영어": {
+  "en": "English",
+  "zh": "英语",
+  "ja": "英語",
+  "es": "Inglés",
+  "hi": "अंग्रेज़ी",
+  "fr": "Anglais",
+  "de": "Englisch",
+  "pt": "Inglês",
+  "it": "Inglese",
+  "nl": "Engels",
+  "cs": "Angličtina",
+  "hu": "Angol",
+  "pl": "Angielski",
+  "ro": "Engleză",
+  "ru": "Английский",
+  "uk": "Англійська",
+  "sv": "Engelska",
+  "da": "Engelsk",
+  "nb": "Engelsk",
+  "fi": "Englanti",
+  "tr": "İngilizce",
+  "zh-TW": "英語",
+  "th": "อังกฤษ",
+  "vi": "Tiếng Anh",
+  "id": "Inggris",
+  "ar": "الإنجليزية",
+  "fa": "انگلیسی"
+ },
+ "일본어": {
+  "en": "Japanese",
+  "zh": "日语",
+  "ja": "日本語",
+  "es": "Japonés",
+  "hi": "जापानी",
+  "fr": "Japonais",
+  "de": "Japanisch",
+  "pt": "Japonês",
+  "it": "Giapponese",
+  "nl": "Japans",
+  "cs": "Japonština",
+  "hu": "Japán",
+  "pl": "Japoński",
+  "ro": "Japoneză",
+  "ru": "Японский",
+  "uk": "Японська",
+  "sv": "Japanska",
+  "da": "Japansk",
+  "nb": "Japansk",
+  "fi": "Japani",
+  "tr": "Japonca",
+  "zh-TW": "日語",
+  "th": "ญี่ปุ่น",
+  "vi": "Tiếng Nhật",
+  "id": "Jepang",
+  "ar": "اليابانية",
+  "fa": "ژاپنی"
+ },
+ "중국어 (간체)": {
+  "en": "Chinese (Simplified)",
+  "zh": "中文（简体）",
+  "ja": "中国語（簡体字）",
+  "es": "Chino (simplificado)",
+  "hi": "चीनी (सरलीकृत)",
+  "fr": "Chinois (simplifié)",
+  "de": "Chinesisch (vereinfacht)",
+  "pt": "Chinês (simplificado)",
+  "it": "Cinese (semplificato)",
+  "nl": "Chinees (vereenvoudigd)",
+  "cs": "Čínština (zjednodušená)",
+  "hu": "Kínai (egyszerűsített)",
+  "pl": "Chiński (uproszczony)",
+  "ro": "Chineză (simplificată)",
+  "ru": "Китайский (упрощённый)",
+  "uk": "Китайська (спрощена)",
+  "sv": "Kinesiska (förenklad)",
+  "da": "Kinesisk (forenklet)",
+  "nb": "Kinesisk (forenklet)",
+  "fi": "Kiina (yksinkertaistettu)",
+  "tr": "Çince (Basitleştirilmiş)",
+  "zh-TW": "中文（簡體）",
+  "th": "จีน (ตัวย่อ)",
+  "vi": "Tiếng Trung (Giản thể)",
+  "id": "Mandarin (Sederhana)",
+  "ar": "الصينية (المبسطة)",
+  "fa": "چینی (ساده‌شده)"
+ },
+ "중국어 (번체)": {
+  "en": "Chinese (Traditional)",
+  "zh": "中文（繁体）",
+  "ja": "中国語（繁体字）",
+  "es": "Chino (tradicional)",
+  "hi": "चीनी (पारंपरिक)",
+  "fr": "Chinois (traditionnel)",
+  "de": "Chinesisch (traditionell)",
+  "pt": "Chinês (tradicional)",
+  "it": "Cinese (tradizionale)",
+  "nl": "Chinees (traditioneel)",
+  "cs": "Čínština (tradiční)",
+  "hu": "Kínai (hagyományos)",
+  "pl": "Chiński (tradycyjny)",
+  "ro": "Chineză (tradițională)",
+  "ru": "Китайский (традиционный)",
+  "uk": "Китайська (традиційна)",
+  "sv": "Kinesiska (traditionell)",
+  "da": "Kinesisk (traditionel)",
+  "nb": "Kinesisk (tradisjonell)",
+  "fi": "Kiina (perinteinen)",
+  "tr": "Çince (Geleneksel)",
+  "zh-TW": "中文（繁體）",
+  "th": "จีน (ตัวเต็ม)",
+  "vi": "Tiếng Trung (Phồn thể)",
+  "id": "Mandarin (Tradisional)",
+  "ar": "الصينية (التقليدية)",
+  "fa": "چینی (سنتی)"
+ },
+ "스페인어": {
+  "en": "Spanish",
+  "zh": "西班牙语",
+  "ja": "スペイン語",
+  "es": "Español",
+  "hi": "स्पेनिश",
+  "fr": "Espagnol",
+  "de": "Spanisch",
+  "pt": "Espanhol",
+  "it": "Spagnolo",
+  "nl": "Spaans",
+  "cs": "Španělština",
+  "hu": "Spanyol",
+  "pl": "Hiszpański",
+  "ro": "Spaniolă",
+  "ru": "Испанский",
+  "uk": "Іспанська",
+  "sv": "Spanska",
+  "da": "Spansk",
+  "nb": "Spansk",
+  "fi": "Espanja",
+  "tr": "İspanyolca",
+  "zh-TW": "西班牙語",
+  "th": "สเปน",
+  "vi": "Tiếng Tây Ban Nha",
+  "id": "Spanyol",
+  "ar": "الإسبانية",
+  "fa": "اسپانیایی"
+ },
+ "프랑스어": {
+  "en": "French",
+  "zh": "法语",
+  "ja": "フランス語",
+  "es": "Francés",
+  "hi": "फ़्रेंच",
+  "fr": "Français",
+  "de": "Französisch",
+  "pt": "Francês",
+  "it": "Francese",
+  "nl": "Frans",
+  "cs": "Francouzština",
+  "hu": "Francia",
+  "pl": "Francuski",
+  "ro": "Franceză",
+  "ru": "Французский",
+  "uk": "Французька",
+  "sv": "Franska",
+  "da": "Fransk",
+  "nb": "Fransk",
+  "fi": "Ranska",
+  "tr": "Fransızca",
+  "zh-TW": "法語",
+  "th": "ฝรั่งเศส",
+  "vi": "Tiếng Pháp",
+  "id": "Prancis",
+  "ar": "الفرنسية",
+  "fa": "فرانسوی"
+ },
+ "독일어": {
+  "en": "German",
+  "zh": "德语",
+  "ja": "ドイツ語",
+  "es": "Alemán",
+  "hi": "जर्मन",
+  "fr": "Allemand",
+  "de": "Deutsch",
+  "pt": "Alemão",
+  "it": "Tedesco",
+  "nl": "Duits",
+  "cs": "Němčina",
+  "hu": "Német",
+  "pl": "Niemiecki",
+  "ro": "Germană",
+  "ru": "Немецкий",
+  "uk": "Німецька",
+  "sv": "Tyska",
+  "da": "Tysk",
+  "nb": "Tysk",
+  "fi": "Saksa",
+  "tr": "Almanca",
+  "zh-TW": "德語",
+  "th": "เยอรมัน",
+  "vi": "Tiếng Đức",
+  "id": "Jerman",
+  "ar": "الألمانية",
+  "fa": "آلمانی"
+ },
+ "포르투갈어": {
+  "en": "Portuguese",
+  "zh": "葡萄牙语",
+  "ja": "ポルトガル語",
+  "es": "Portugués",
+  "hi": "पुर्तगाली",
+  "fr": "Portugais",
+  "de": "Portugiesisch",
+  "pt": "Português",
+  "it": "Portoghese",
+  "nl": "Portugees",
+  "cs": "Portugalština",
+  "hu": "Portugál",
+  "pl": "Portugalski",
+  "ro": "Portugheză",
+  "ru": "Португальский",
+  "uk": "Португальська",
+  "sv": "Portugisiska",
+  "da": "Portugisisk",
+  "nb": "Portugisisk",
+  "fi": "Portugali",
+  "tr": "Portekizce",
+  "zh-TW": "葡萄牙語",
+  "th": "โปรตุเกส",
+  "vi": "Tiếng Bồ Đào Nha",
+  "id": "Portugis",
+  "ar": "البرتغالية",
+  "fa": "پرتغالی"
+ },
+ "이탈리아어": {
+  "en": "Italian",
+  "zh": "意大利语",
+  "ja": "イタリア語",
+  "es": "Italiano",
+  "hi": "इतालवी",
+  "fr": "Italien",
+  "de": "Italienisch",
+  "pt": "Italiano",
+  "it": "Italiano",
+  "nl": "Italiaans",
+  "cs": "Italština",
+  "hu": "Olasz",
+  "pl": "Włoski",
+  "ro": "Italiană",
+  "ru": "Итальянский",
+  "uk": "Італійська",
+  "sv": "Italienska",
+  "da": "Italiensk",
+  "nb": "Italiensk",
+  "fi": "Italia",
+  "tr": "İtalyanca",
+  "zh-TW": "義大利語",
+  "th": "อิตาลี",
+  "vi": "Tiếng Ý",
+  "id": "Italia",
+  "ar": "الإيطالية",
+  "fa": "ایتالیایی"
+ },
+ "러시아어": {
+  "en": "Russian",
+  "zh": "俄语",
+  "ja": "ロシア語",
+  "es": "Ruso",
+  "hi": "रूसी",
+  "fr": "Russe",
+  "de": "Russisch",
+  "pt": "Russo",
+  "it": "Russo",
+  "nl": "Russisch",
+  "cs": "Ruština",
+  "hu": "Orosz",
+  "pl": "Rosyjski",
+  "ro": "Rusă",
+  "ru": "Русский",
+  "uk": "Російська",
+  "sv": "Ryska",
+  "da": "Russisk",
+  "nb": "Russisk",
+  "fi": "Venäjä",
+  "tr": "Rusça",
+  "zh-TW": "俄語",
+  "th": "รัสเซีย",
+  "vi": "Tiếng Nga",
+  "id": "Rusia",
+  "ar": "الروسية",
+  "fa": "روسی"
+ },
+ "우크라이나어": {
+  "en": "Ukrainian",
+  "zh": "乌克兰语",
+  "ja": "ウクライナ語",
+  "es": "Ucraniano",
+  "hi": "यूक्रेनी",
+  "fr": "Ukrainien",
+  "de": "Ukrainisch",
+  "pt": "Ucraniano",
+  "it": "Ucraino",
+  "nl": "Oekraïens",
+  "cs": "Ukrajinština",
+  "hu": "Ukrán",
+  "pl": "Ukraiński",
+  "ro": "Ucraineană",
+  "ru": "Украинский",
+  "uk": "Українська",
+  "sv": "Ukrainska",
+  "da": "Ukrainsk",
+  "nb": "Ukrainsk",
+  "fi": "Ukraina",
+  "tr": "Ukraynaca",
+  "zh-TW": "烏克蘭語",
+  "th": "ยูเครน",
+  "vi": "Tiếng Ukraina",
+  "id": "Ukraina",
+  "ar": "الأوكرانية",
+  "fa": "اوکراینی"
+ },
+ "아랍어": {
+  "en": "Arabic",
+  "zh": "阿拉伯语",
+  "ja": "アラビア語",
+  "es": "Árabe",
+  "hi": "अरबी",
+  "fr": "Arabe",
+  "de": "Arabisch",
+  "pt": "Árabe",
+  "it": "Arabo",
+  "nl": "Arabisch",
+  "cs": "Arabština",
+  "hu": "Arab",
+  "pl": "Arabski",
+  "ro": "Arabă",
+  "ru": "Арабский",
+  "uk": "Арабська",
+  "sv": "Arabiska",
+  "da": "Arabisk",
+  "nb": "Arabisk",
+  "fi": "Arabia",
+  "tr": "Arapça",
+  "zh-TW": "阿拉伯語",
+  "th": "อาหรับ",
+  "vi": "Tiếng Ả Rập",
+  "id": "Arab",
+  "ar": "العربية",
+  "fa": "عربی"
+ },
+ "페르시아어": {
+  "en": "Persian",
+  "zh": "波斯语",
+  "ja": "ペルシア語",
+  "es": "Persa",
+  "hi": "फ़ारसी",
+  "fr": "Persan",
+  "de": "Persisch",
+  "pt": "Persa",
+  "it": "Persiano",
+  "nl": "Perzisch",
+  "cs": "Perština",
+  "hu": "Perzsa",
+  "pl": "Perski",
+  "ro": "Persană",
+  "ru": "Персидский",
+  "uk": "Перська",
+  "sv": "Persiska",
+  "da": "Persisk",
+  "nb": "Persisk",
+  "fi": "Persia",
+  "tr": "Farsça",
+  "zh-TW": "波斯語",
+  "th": "เปอร์เซีย",
+  "vi": "Tiếng Ba Tư",
+  "id": "Persia",
+  "ar": "الفارسية",
+  "fa": "فارسی"
+ },
+ "히브리어": {
+  "en": "Hebrew",
+  "zh": "希伯来语",
+  "ja": "ヘブライ語",
+  "es": "Hebreo",
+  "hi": "हिब्रू",
+  "fr": "Hébreu",
+  "de": "Hebräisch",
+  "pt": "Hebraico",
+  "it": "Ebraico",
+  "nl": "Hebreeuws",
+  "cs": "Hebrejština",
+  "hu": "Héber",
+  "pl": "Hebrajski",
+  "ro": "Ebraică",
+  "ru": "Иврит",
+  "uk": "Іврит",
+  "sv": "Hebreiska",
+  "da": "Hebraisk",
+  "nb": "Hebraisk",
+  "fi": "Heprea",
+  "tr": "İbranice",
+  "zh-TW": "希伯來語",
+  "th": "ฮีบรู",
+  "vi": "Tiếng Do Thái",
+  "id": "Ibrani",
+  "ar": "العبرية",
+  "fa": "عبری"
+ },
+ "그리스어": {
+  "en": "Greek",
+  "zh": "希腊语",
+  "ja": "ギリシャ語",
+  "es": "Griego",
+  "hi": "यूनानी",
+  "fr": "Grec",
+  "de": "Griechisch",
+  "pt": "Grego",
+  "it": "Greco",
+  "nl": "Grieks",
+  "cs": "Řečtina",
+  "hu": "Görög",
+  "pl": "Grecki",
+  "ro": "Greacă",
+  "ru": "Греческий",
+  "uk": "Грецька",
+  "sv": "Grekiska",
+  "da": "Græsk",
+  "nb": "Gresk",
+  "fi": "Kreikka",
+  "tr": "Yunanca",
+  "zh-TW": "希臘語",
+  "th": "กรีก",
+  "vi": "Tiếng Hy Lạp",
+  "id": "Yunani",
+  "ar": "اليونانية",
+  "fa": "یونانی"
+ },
+ "힌디어": {
+  "en": "Hindi",
+  "zh": "印地语",
+  "ja": "ヒンディー語",
+  "es": "Hindi",
+  "hi": "हिंदी",
+  "fr": "Hindi",
+  "de": "Hindi",
+  "pt": "Hindi",
+  "it": "Hindi",
+  "nl": "Hindi",
+  "cs": "Hindština",
+  "hu": "Hindi",
+  "pl": "Hindi",
+  "ro": "Hindi",
+  "ru": "Хинди",
+  "uk": "Гінді",
+  "sv": "Hindi",
+  "da": "Hindi",
+  "nb": "Hindi",
+  "fi": "Hindi",
+  "tr": "Hintçe",
+  "zh-TW": "印地語",
+  "th": "ฮินดี",
+  "vi": "Tiếng Hindi",
+  "id": "Hindi",
+  "ar": "الهندية",
+  "fa": "هندی"
+ },
+ "태국어": {
+  "en": "Thai",
+  "zh": "泰语",
+  "ja": "タイ語",
+  "es": "Tailandés",
+  "hi": "थाई",
+  "fr": "Thaï",
+  "de": "Thailändisch",
+  "pt": "Tailandês",
+  "it": "Thailandese",
+  "nl": "Thais",
+  "cs": "Thajština",
+  "hu": "Thai",
+  "pl": "Tajski",
+  "ro": "Thailandeză",
+  "ru": "Тайский",
+  "uk": "Тайська",
+  "sv": "Thailändska",
+  "da": "Thai",
+  "nb": "Thai",
+  "fi": "Thai",
+  "tr": "Tayca",
+  "zh-TW": "泰語",
+  "th": "ไทย",
+  "vi": "Tiếng Thái",
+  "id": "Thai",
+  "ar": "التايلاندية",
+  "fa": "تایلندی"
+ },
+ "베트남어": {
+  "en": "Vietnamese",
+  "zh": "越南语",
+  "ja": "ベトナム語",
+  "es": "Vietnamita",
+  "hi": "वियतनामी",
+  "fr": "Vietnamien",
+  "de": "Vietnamesisch",
+  "pt": "Vietnamita",
+  "it": "Vietnamees",
+  "nl": "Vietnamees",
+  "cs": "Vietnamština",
+  "hu": "Vietnámi",
+  "pl": "Wietnamski",
+  "ro": "Vietnameză",
+  "ru": "Вьетнамский",
+  "uk": "В'єтнамська",
+  "sv": "Vietnamesiska",
+  "da": "Vietnamesisk",
+  "nb": "Vietnamesisk",
+  "fi": "Vietnam",
+  "tr": "Vietnamca",
+  "zh-TW": "越南語",
+  "th": "เวียดนาม",
+  "vi": "Tiếng Việt",
+  "id": "Vietnam",
+  "ar": "الفيتنامية",
+  "fa": "ویتنامی"
+ },
+ "인도네시아어": {
+  "en": "Indonesian",
+  "zh": "印度尼西亚语",
+  "ja": "インドネシア語",
+  "es": "Indonesio",
+  "hi": "इंडोनेशियाई",
+  "fr": "Indonésien",
+  "de": "Indonesisch",
+  "pt": "Indonésio",
+  "it": "Indonesiano",
+  "nl": "Indonesisch",
+  "cs": "Indonéština",
+  "hu": "Indonéz",
+  "pl": "Indonezyjski",
+  "ro": "Indoneziană",
+  "ru": "Индонезийский",
+  "uk": "Індонезійська",
+  "sv": "Indonesiska",
+  "da": "Indonesisk",
+  "nb": "Indonesisk",
+  "fi": "Indonesia",
+  "tr": "Endonezyaca",
+  "zh-TW": "印度尼西亞語",
+  "th": "อินโดนีเซีย",
+  "vi": "Tiếng Indonesia",
+  "id": "Indonesia",
+  "ar": "الإندونيسية",
+  "fa": "اندونزیایی"
+ },
+ "튀르키예어": {
+  "en": "Turkish",
+  "zh": "土耳其语",
+  "ja": "トルコ語",
+  "es": "Turco",
+  "hi": "तुर्की",
+  "fr": "Turc",
+  "de": "Türkisch",
+  "pt": "Turco",
+  "it": "Turco",
+  "nl": "Turks",
+  "cs": "Turečtina",
+  "hu": "Török",
+  "pl": "Turecki",
+  "ro": "Turcă",
+  "ru": "Турецкий",
+  "uk": "Турецька",
+  "sv": "Turkiska",
+  "da": "Tyrkisk",
+  "nb": "Tyrkisk",
+  "fi": "Turkki",
+  "tr": "Türkçe",
+  "zh-TW": "土耳其語",
+  "th": "ตุรกี",
+  "vi": "Tiếng Thổ Nhĩ Kỳ",
+  "id": "Turki",
+  "ar": "التركية",
+  "fa": "ترکی"
+ },
+ "네덜란드어": {
+  "en": "Dutch",
+  "zh": "荷兰语",
+  "ja": "オランダ語",
+  "es": "Neerlandés",
+  "hi": "डच",
+  "fr": "Néerlandais",
+  "de": "Niederländisch",
+  "pt": "Holandês",
+  "it": "Olandese",
+  "nl": "Nederlands",
+  "cs": "Nizozemština",
+  "hu": "Holland",
+  "pl": "Niderlandzki",
+  "ro": "Olandeză",
+  "ru": "Нидерландский",
+  "uk": "Нідерландська",
+  "sv": "Nederländska",
+  "da": "Nederlandsk",
+  "nb": "Nederlandsk",
+  "fi": "Hollanti",
+  "tr": "Felemenkçe",
+  "zh-TW": "荷蘭語",
+  "th": "ดัตช์",
+  "vi": "Tiếng Hà Lan",
+  "id": "Belanda",
+  "ar": "الهولندية",
+  "fa": "هلندی"
+ },
+ "폴란드어": {
+  "en": "Polish",
+  "zh": "波兰语",
+  "ja": "ポーランド語",
+  "es": "Polaco",
+  "hi": "पोलिश",
+  "fr": "Polonais",
+  "de": "Polnisch",
+  "pt": "Polonês",
+  "it": "Polacco",
+  "nl": "Pools",
+  "cs": "Polština",
+  "hu": "Lengyel",
+  "pl": "Polski",
+  "ro": "Poloneză",
+  "ru": "Польский",
+  "uk": "Польська",
+  "sv": "Polska",
+  "da": "Polsk",
+  "nb": "Polsk",
+  "fi": "Puola",
+  "tr": "Lehçe",
+  "zh-TW": "波蘭語",
+  "th": "โปแลนด์",
+  "vi": "Tiếng Ba Lan",
+  "id": "Polandia",
+  "ar": "البولندية",
+  "fa": "لهستانی"
+ },
+ "스웨덴어": {
+  "en": "Swedish",
+  "zh": "瑞典语",
+  "ja": "スウェーデン語",
+  "es": "Sueco",
+  "hi": "स्वीडिश",
+  "fr": "Suédois",
+  "de": "Schwedisch",
+  "pt": "Sueco",
+  "it": "Svedese",
+  "nl": "Zweeds",
+  "cs": "Švédština",
+  "hu": "Svéd",
+  "pl": "Szwedzki",
+  "ro": "Suedeză",
+  "ru": "Шведский",
+  "uk": "Шведська",
+  "sv": "Svenska",
+  "da": "Svensk",
+  "nb": "Svensk",
+  "fi": "Ruotsi",
+  "tr": "İsveççe",
+  "zh-TW": "瑞典語",
+  "th": "สวีเดน",
+  "vi": "Tiếng Thụy Điển",
+  "id": "Swedia",
+  "ar": "السويدية",
+  "fa": "سوئدی"
+ },
+ "덴마크어": {
+  "en": "Danish",
+  "zh": "丹麦语",
+  "ja": "デンマーク語",
+  "es": "Danés",
+  "hi": "डेनिश",
+  "fr": "Danois",
+  "de": "Dänisch",
+  "pt": "Dinamarquês",
+  "it": "Danese",
+  "nl": "Deens",
+  "cs": "Dánština",
+  "hu": "Dán",
+  "pl": "Duński",
+  "ro": "Daneză",
+  "ru": "Датский",
+  "uk": "Данська",
+  "sv": "Danska",
+  "da": "Dansk",
+  "nb": "Dansk",
+  "fi": "Tanska",
+  "tr": "Danca",
+  "zh-TW": "丹麥語",
+  "th": "เดนมาร์ก",
+  "vi": "Tiếng Đan Mạch",
+  "id": "Denmark",
+  "ar": "الدنماركية",
+  "fa": "دانمارکی"
+ },
+ "노르웨이어": {
+  "en": "Norwegian",
+  "zh": "挪威语",
+  "ja": "ノルウェー語",
+  "es": "Noruego",
+  "hi": "नॉर्वेजियन",
+  "fr": "Norvégien",
+  "de": "Norwegisch",
+  "pt": "Norueguês",
+  "it": "Norvegese",
+  "nl": "Noors",
+  "cs": "Norština",
+  "hu": "Norvég",
+  "pl": "Norweski",
+  "ro": "Norvegiană",
+  "ru": "Норвежский",
+  "uk": "Норвезька",
+  "sv": "Norska",
+  "da": "Norsk",
+  "nb": "Norsk",
+  "fi": "Norja",
+  "tr": "Norveççe",
+  "zh-TW": "挪威語",
+  "th": "นอร์เวย์",
+  "vi": "Tiếng Na Uy",
+  "id": "Norwegia",
+  "ar": "النرويجية",
+  "fa": "نروژی"
+ },
+ "핀란드어": {
+  "en": "Finnish",
+  "zh": "芬兰语",
+  "ja": "フィンランド語",
+  "es": "Finlandés",
+  "hi": "फ़िनिश",
+  "fr": "Finnois",
+  "de": "Finnisch",
+  "pt": "Finlandês",
+  "it": "Finlandese",
+  "nl": "Fins",
+  "cs": "Finština",
+  "hu": "Finn",
+  "pl": "Fiński",
+  "ro": "Finlandeză",
+  "ru": "Финский",
+  "uk": "Фінська",
+  "sv": "Finska",
+  "da": "Finsk",
+  "nb": "Finsk",
+  "fi": "Suomi",
+  "tr": "Fince",
+  "zh-TW": "芬蘭語",
+  "th": "ฟินแลนด์",
+  "vi": "Tiếng Phần Lan",
+  "id": "Finlandia",
+  "ar": "الفنلندية",
+  "fa": "فنلاندی"
+ },
+ "체코어": {
+  "en": "Czech",
+  "zh": "捷克语",
+  "ja": "チェコ語",
+  "es": "Checo",
+  "hi": "चेक",
+  "fr": "Tchèque",
+  "de": "Tschechisch",
+  "pt": "Tcheco",
+  "it": "Ceco",
+  "nl": "Tsjechisch",
+  "cs": "Čeština",
+  "hu": "Cseh",
+  "pl": "Czeski",
+  "ro": "Cehă",
+  "ru": "Чешский",
+  "uk": "Чеська",
+  "sv": "Tjeckiska",
+  "da": "Tjekkisk",
+  "nb": "Tsjekkisk",
+  "fi": "Tšekki",
+  "tr": "Çekçe",
+  "zh-TW": "捷克語",
+  "th": "เช็ก",
+  "vi": "Tiếng Séc",
+  "id": "Ceko",
+  "ar": "التشيكية",
+  "fa": "چکی"
+ },
+ "헝가리어": {
+  "en": "Hungarian",
+  "zh": "匈牙利语",
+  "ja": "ハンガリー語",
+  "es": "Húngaro",
+  "hi": "हंगेरियन",
+  "fr": "Hongrois",
+  "de": "Ungarisch",
+  "pt": "Húngaro",
+  "it": "Ungherese",
+  "nl": "Hongaars",
+  "cs": "Maďarština",
+  "hu": "Magyar",
+  "pl": "Węgierski",
+  "ro": "Maghiară",
+  "ru": "Венгерский",
+  "uk": "Угорська",
+  "sv": "Ungerska",
+  "da": "Ungarsk",
+  "nb": "Ungarsk",
+  "fi": "Unkari",
+  "tr": "Macarca",
+  "zh-TW": "匈牙利語",
+  "th": "ฮังการี",
+  "vi": "Tiếng Hungary",
+  "id": "Hungaria",
+  "ar": "المجرية",
+  "fa": "مجاری"
+ },
+ "루마니아어": {
+  "en": "Romanian",
+  "zh": "罗马尼亚语",
+  "ja": "ルーマニア語",
+  "es": "Rumano",
+  "hi": "रोमानियाई",
+  "fr": "Roumain",
+  "de": "Rumänisch",
+  "pt": "Romeno",
+  "it": "Rumeno",
+  "nl": "Roemeens",
+  "cs": "Rumunština",
+  "hu": "Román",
+  "pl": "Rumuński",
+  "ro": "Română",
+  "ru": "Румынский",
+  "uk": "Румунська",
+  "sv": "Rumänska",
+  "da": "Rumænsk",
+  "nb": "Rumensk",
+  "fi": "Romania",
+  "tr": "Rumence",
+  "zh-TW": "羅馬尼亞語",
+  "th": "โรมาเนีย",
+  "vi": "Tiếng România",
+  "id": "Rumania",
+  "ar": "الرومانية",
+  "fa": "رومانیایی"
+ },
+ "도구를 불러오지 못했습니다": {
+  "en": "The tool could not be loaded",
+  "zh": "工具加载失败",
+  "ja": "ツールを読み込めませんでした",
+  "es": "No se pudo cargar la herramienta",
+  "hi": "टूल लोड नहीं हो सका",
+  "fr": "L'outil n'a pas pu être chargé",
+  "de": "Das Werkzeug konnte nicht geladen werden",
+  "pt": "A ferramenta não pôde ser carregada",
+  "it": "Impossibile caricare lo strumento",
+  "nl": "Het hulpmiddel kon niet worden geladen",
+  "cs": "Nástroj se nepodařilo načíst",
+  "hu": "Az eszköz nem tölthető be",
+  "pl": "Nie udało się wczytać narzędzia",
+  "ro": "Instrumentul nu a putut fi încărcat",
+  "ru": "Не удалось загрузить инструмент",
+  "uk": "Не вдалося завантажити інструмент",
+  "sv": "Verktyget kunde inte laddas",
+  "da": "Værktøjet kunne ikke indlæses",
+  "nb": "Verktøyet kunne ikke lastes",
+  "fi": "Työkalua ei voitu ladata",
+  "tr": "Araç yüklenemedi",
+  "zh-TW": "工具載入失敗",
+  "th": "โหลดเครื่องมือไม่สำเร็จ",
+  "vi": "Không tải được công cụ",
+  "id": "Alat tidak dapat dimuat",
+  "ar": "تعذر تحميل الأداة",
+  "fa": "ابزار بارگذاری نشد"
+ },
+ "지원하지 않는 문서 형식입니다. TXT · MD · DOCX · PDF 문서를 넣어주세요.": {
+  "en": "This document format is not supported. Please add a TXT · MD · DOCX · PDF document.",
+  "zh": "不支持此文档格式。请放入 TXT · MD · DOCX · PDF 文档。",
+  "ja": "対応していない文書形式です。TXT・MD・DOCX・PDF文書を入れてください。",
+  "es": "Este formato no es compatible. Añade un documento TXT · MD · DOCX · PDF.",
+  "hi": "यह दस्तावेज़ फ़ॉर्मेट समर्थित नहीं है। कृपया TXT · MD · DOCX · PDF दस्तावेज़ डालें।",
+  "fr": "Ce format de document n'est pas pris en charge. Ajoutez un document TXT · MD · DOCX · PDF.",
+  "de": "Dieses Dokumentformat wird nicht unterstützt. Bitte fügen Sie ein TXT-, MD-, DOCX- oder PDF-Dokument ein.",
+  "pt": "Este formato de documento não é compatível. Adicione um documento TXT · MD · DOCX · PDF.",
+  "it": "Questo formato di documento non è supportato. Aggiungi un documento TXT · MD · DOCX · PDF.",
+  "nl": "Dit documentformaat wordt niet ondersteund. Voeg een TXT-, MD-, DOCX- of PDF-document toe.",
+  "cs": "Tento formát dokumentu není podporován. Přidejte dokument TXT · MD · DOCX · PDF.",
+  "hu": "Ez a dokumentumformátum nem támogatott. Adjon hozzá TXT · MD · DOCX · PDF dokumentumot.",
+  "pl": "Ten format dokumentu nie jest obsługiwany. Dodaj dokument TXT · MD · DOCX · PDF.",
+  "ro": "Acest format de document nu este acceptat. Adaugă un document TXT · MD · DOCX · PDF.",
+  "ru": "Этот формат документа не поддерживается. Добавьте документ TXT · MD · DOCX · PDF.",
+  "uk": "Цей формат документа не підтримується. Додайте документ TXT · MD · DOCX · PDF.",
+  "sv": "Det här dokumentformatet stöds inte. Lägg in ett dokument i TXT · MD · DOCX · PDF.",
+  "da": "Dette dokumentformat understøttes ikke. Indsæt et TXT · MD · DOCX · PDF-dokument.",
+  "nb": "Dette dokumentformatet støttes ikke. Legg inn et TXT · MD · DOCX · PDF-dokument.",
+  "fi": "Tätä asiakirjamuotoa ei tueta. Lisää TXT · MD · DOCX · PDF -asiakirja.",
+  "tr": "Bu belge biçimi desteklenmiyor. Lütfen TXT · MD · DOCX · PDF belgesi ekleyin.",
+  "zh-TW": "不支援此文件格式。請放入 TXT · MD · DOCX · PDF 文件。",
+  "th": "ไม่รองรับรูปแบบเอกสารนี้ กรุณาใส่เอกสาร TXT · MD · DOCX · PDF",
+  "vi": "Định dạng tài liệu này không được hỗ trợ. Vui lòng thêm tài liệu TXT · MD · DOCX · PDF.",
+  "id": "Format dokumen ini tidak didukung. Silakan tambahkan dokumen TXT · MD · DOCX · PDF.",
+  "ar": "تنسيق المستند هذا غير مدعوم. يرجى إضافة مستند TXT · MD · DOCX · PDF.",
+  "fa": "این قالب سند پشتیبانی نمی‌شود. لطفاً سند TXT · MD · DOCX · PDF اضافه کنید."
+ },
+ "번역할 글이 없습니다. 먼저 글을 넣으세요.": {
+  "en": "There is no text to translate. Please add text first.",
+  "zh": "没有要翻译的文字。请先放入文字。",
+  "ja": "翻訳する文章がありません。まず文章を入れてください。",
+  "es": "No hay texto para traducir. Primero añade texto.",
+  "hi": "अनुवाद के लिए कोई लेख नहीं है। कृपया पहले लेख डालें।",
+  "fr": "Il n'y a aucun texte à traduire. Ajoutez d'abord du texte.",
+  "de": "Es gibt keinen Text zum Übersetzen. Bitte fügen Sie zuerst Text ein.",
+  "pt": "Não há texto para traduzir. Adicione texto primeiro.",
+  "it": "Non c'è testo da tradurre. Aggiungi prima del testo.",
+  "nl": "Er is geen tekst om te vertalen. Voeg eerst tekst toe.",
+  "cs": "Není tu žádný text k překladu. Nejprve přidejte text.",
+  "hu": "Nincs fordítandó szöveg. Először adjon hozzá szöveget.",
+  "pl": "Brak tekstu do przetłumaczenia. Najpierw dodaj tekst.",
+  "ro": "Nu există text de tradus. Adaugă mai întâi text.",
+  "ru": "Нет текста для перевода. Сначала добавьте текст.",
+  "uk": "Немає тексту для перекладу. Спочатку додайте текст.",
+  "sv": "Det finns ingen text att översätta. Lägg in text först.",
+  "da": "Der er ingen tekst at oversætte. Indsæt tekst først.",
+  "nb": "Det er ingen tekst å oversette. Legg inn tekst først.",
+  "fi": "Käännettävää tekstiä ei ole. Lisää ensin teksti.",
+  "tr": "Çevrilecek metin yok. Önce metin ekleyin.",
+  "zh-TW": "沒有要翻譯的文字。請先放入文字。",
+  "th": "ไม่มีข้อความให้แปล กรุณาใส่ข้อความก่อน",
+  "vi": "Không có văn bản để dịch. Vui lòng thêm văn bản trước.",
+  "id": "Tidak ada teks untuk diterjemahkan. Silakan tambahkan teks terlebih dahulu.",
+  "ar": "لا يوجد نص للترجمة. يرجى إضافة النص أولًا.",
+  "fa": "متنی برای ترجمه وجود ندارد. لطفاً ابتدا متن را وارد کنید."
+ },
+ "원문 언어와 번역할 언어가 같습니다.": {
+  "en": "The original and target languages are the same.",
+  "zh": "原文语言和目标语言相同。",
+  "ja": "原文の言語と翻訳先の言語が同じです。",
+  "es": "El idioma original y el de destino son el mismo.",
+  "hi": "मूल भाषा और लक्ष्य भाषा एक ही है।",
+  "fr": "La langue d'origine et la langue cible sont identiques.",
+  "de": "Ausgangs- und Zielsprache sind gleich.",
+  "pt": "O idioma original e o de destino são os mesmos.",
+  "it": "La lingua originale e quella di destinazione sono le stesse.",
+  "nl": "De oorspronkelijke taal en de doeltaal zijn hetzelfde.",
+  "cs": "Jazyk originálu a cílový jazyk jsou stejné.",
+  "hu": "Az eredeti és a célnyelv megegyezik.",
+  "pl": "Język źródłowy i docelowy są takie same.",
+  "ro": "Limba originală și limba țintă sunt aceleași.",
+  "ru": "Язык оригинала и целевой язык совпадают.",
+  "uk": "Мова оригіналу та цільова мова однакові.",
+  "sv": "Originalspråket och målspråket är desamma.",
+  "da": "Originalsproget og målsproget er det samme.",
+  "nb": "Originalspråket og målspråket er det samme.",
+  "fi": "Alkuperäinen kieli ja kohdekieli ovat samat.",
+  "tr": "Özgün dil ile hedef dil aynı.",
+  "zh-TW": "原文語言和目標語言相同。",
+  "th": "ภาษาต้นฉบับและภาษาเป้าหมายเป็นภาษาเดียวกัน",
+  "vi": "Ngôn ngữ gốc và ngôn ngữ đích giống nhau.",
+  "id": "Bahasa asli dan bahasa tujuan sama.",
+  "ar": "لغة النص الأصلي ولغة الهدف متطابقتان.",
+  "fa": "زبان متن اصلی و زبان مقصد یکسان است."
+ },
+ "복사할 결과가 없습니다.": {
+  "en": "There is no result to copy.",
+  "zh": "没有可复制的结果。",
+  "ja": "コピーする結果がありません。",
+  "es": "No hay resultado para copiar.",
+  "hi": "कॉपी करने के लिए कोई परिणाम नहीं है।",
+  "fr": "Il n'y a aucun résultat à copier.",
+  "de": "Es gibt kein Ergebnis zum Kopieren.",
+  "pt": "Não há resultado para copiar.",
+  "it": "Non c'è nessun risultato da copiare.",
+  "nl": "Er is geen resultaat om te kopiëren.",
+  "cs": "Není tu žádný výsledek ke kopírování.",
+  "hu": "Nincs másolható eredmény.",
+  "pl": "Brak wyniku do skopiowania.",
+  "ro": "Nu există rezultat de copiat.",
+  "ru": "Нет результата для копирования.",
+  "uk": "Немає результату для копіювання.",
+  "sv": "Det finns inget resultat att kopiera.",
+  "da": "Der er intet resultat at kopiere.",
+  "nb": "Det er ikke noe resultat å kopiere.",
+  "fi": "Kopioitavaa tulosta ei ole.",
+  "tr": "Kopyalanacak sonuç yok.",
+  "zh-TW": "沒有可複製的結果。",
+  "th": "ไม่มีผลลัพธ์ให้คัดลอก",
+  "vi": "Không có kết quả để sao chép.",
+  "id": "Tidak ada hasil untuk disalin.",
+  "ar": "لا توجد نتيجة للنسخ.",
+  "fa": "نتیجه‌ای برای کپی کردن وجود ندارد."
+ },
+ "결과가 복사되었습니다.": {
+  "en": "The result has been copied.",
+  "zh": "结果已复制。",
+  "ja": "結果がコピーされました。",
+  "es": "El resultado se ha copiado.",
+  "hi": "परिणाम कॉपी हो गया है।",
+  "fr": "Le résultat a été copié.",
+  "de": "Das Ergebnis wurde kopiert.",
+  "pt": "O resultado foi copiado.",
+  "it": "Il risultato è stato copiato.",
+  "nl": "Het resultaat is gekopieerd.",
+  "cs": "Výsledek byl zkopírován.",
+  "hu": "Az eredmény másolva lett.",
+  "pl": "Wynik został skopiowany.",
+  "ro": "Rezultatul a fost copiat.",
+  "ru": "Результат скопирован.",
+  "uk": "Результат скопійовано.",
+  "sv": "Resultatet har kopierats.",
+  "da": "Resultatet er kopieret.",
+  "nb": "Resultatet er kopiert.",
+  "fi": "Tulos on kopioitu.",
+  "tr": "Sonuç kopyalandı.",
+  "zh-TW": "結果已複製。",
+  "th": "คัดลอกผลลัพธ์แล้ว",
+  "vi": "Đã sao chép kết quả.",
+  "id": "Hasil telah disalin.",
+  "ar": "تم نسخ النتيجة.",
+  "fa": "نتیجه کپی شد."
+ },
+ "복사가 되지 않았습니다.": {
+  "en": "Copying failed.",
+  "zh": "复制失败。",
+  "ja": "コピーできませんでした。",
+  "es": "No se pudo copiar.",
+  "hi": "कॉपी नहीं हो सकी।",
+  "fr": "La copie a échoué.",
+  "de": "Kopieren fehlgeschlagen.",
+  "pt": "A cópia falhou.",
+  "it": "Copia non riuscita.",
+  "nl": "Kopiëren mislukt.",
+  "cs": "Kopírování se nezdařilo.",
+  "hu": "A másolás sikertelen.",
+  "pl": "Kopiowanie nie powiodło się.",
+  "ro": "Copierea a eșuat.",
+  "ru": "Не удалось скопировать.",
+  "uk": "Не вдалося скопіювати.",
+  "sv": "Kopieringen misslyckades.",
+  "da": "Kopieringen lykkedes ikke.",
+  "nb": "Kopieringen mislyktes.",
+  "fi": "Kopiointi ei onnistunut.",
+  "tr": "Kopyalama yapılamadı.",
+  "zh-TW": "複製失敗。",
+  "th": "คัดลอกไม่สำเร็จ",
+  "vi": "Sao chép thất bại.",
+  "id": "Penyalinan gagal.",
+  "ar": "فشل النسخ.",
+  "fa": "کپی انجام نشد."
+ },
+ "저장할 결과가 없습니다.": {
+  "en": "There is no result to save.",
+  "zh": "没有可保存的结果。",
+  "ja": "保存する結果がありません。",
+  "es": "No hay resultado para guardar.",
+  "hi": "सहेजने के लिए कोई परिणाम नहीं है।",
+  "fr": "Il n'y a aucun résultat à enregistrer.",
+  "de": "Es gibt kein Ergebnis zum Speichern.",
+  "pt": "Não há resultado para salvar.",
+  "it": "Non c'è nessun risultato da salvare.",
+  "nl": "Er is geen resultaat om op te slaan.",
+  "cs": "Není tu žádný výsledek k uložení.",
+  "hu": "Nincs menthető eredmény.",
+  "pl": "Brak wyniku do zapisania.",
+  "ro": "Nu există rezultat de salvat.",
+  "ru": "Нет результата для сохранения.",
+  "uk": "Немає результату для збереження.",
+  "sv": "Det finns inget resultat att spara.",
+  "da": "Der er intet resultat at gemme.",
+  "nb": "Det er ikke noe resultat å lagre.",
+  "fi": "Tallennettavaa tulosta ei ole.",
+  "tr": "Kaydedilecek sonuç yok.",
+  "zh-TW": "沒有可儲存的結果。",
+  "th": "ไม่มีผลลัพธ์ให้บันทึก",
+  "vi": "Không có kết quả để lưu.",
+  "id": "Tidak ada hasil untuk disimpan.",
+  "ar": "لا توجد نتيجة للحفظ.",
+  "fa": "نتیجه‌ای برای ذخیره وجود ندارد."
+ },
+ "파일로 저장했습니다.": {
+  "en": "Saved as a file.",
+  "zh": "已保存为文件。",
+  "ja": "ファイルに保存しました。",
+  "es": "Guardado como archivo.",
+  "hi": "फ़ाइल में सहेज लिया गया है।",
+  "fr": "Enregistré comme fichier.",
+  "de": "Als Datei gespeichert.",
+  "pt": "Salvo como arquivo.",
+  "it": "Salvato come file.",
+  "nl": "Opgeslagen als bestand.",
+  "cs": "Uloženo jako soubor.",
+  "hu": "Fájlba mentve.",
+  "pl": "Zapisano jako plik.",
+  "ro": "Salvat ca fișier.",
+  "ru": "Сохранено в файл.",
+  "uk": "Збережено у файл.",
+  "sv": "Sparade som fil.",
+  "da": "Gemt som fil.",
+  "nb": "Lagret som fil.",
+  "fi": "Tallennettu tiedostona.",
+  "tr": "Dosya olarak kaydedildi.",
+  "zh-TW": "已儲存為檔案。",
+  "th": "บันทึกเป็นไฟล์แล้ว",
+  "vi": "Đã lưu thành tệp.",
+  "id": "Tersimpan sebagai berkas.",
+  "ar": "تم الحفظ كملف.",
+  "fa": "به‌صورت فایل ذخیره شد."
+ },
+ "글이 지워졌습니다.": {
+  "en": "The text has been cleared.",
+  "zh": "文字已清除。",
+  "ja": "文章が消されました。",
+  "es": "El texto se ha borrado.",
+  "hi": "लेख साफ़ हो गया है।",
+  "fr": "Le texte a été effacé.",
+  "de": "Der Text wurde gelöscht.",
+  "pt": "O texto foi apagado.",
+  "it": "Il testo è stato cancellato.",
+  "nl": "De tekst is gewist.",
+  "cs": "Text byl vymazán.",
+  "hu": "A szöveg törölve lett.",
+  "pl": "Tekst został wyczyszczony.",
+  "ro": "Textul a fost șters.",
+  "ru": "Текст очищен.",
+  "uk": "Текст очищено.",
+  "sv": "Texten har rensats.",
+  "da": "Teksten er ryddet.",
+  "nb": "Teksten er tømt.",
+  "fi": "Teksti on tyhjennetty.",
+  "tr": "Metin temizlendi.",
+  "zh-TW": "文字已清除。",
+  "th": "ล้างข้อความแล้ว",
+  "vi": "Đã xóa văn bản.",
+  "id": "Teks telah dihapus.",
+  "ar": "تم مسح النص.",
+  "fa": "متن پاک شد."
+ },
+ "번역을 시작했습니다.": {
+  "en": "Translation started.",
+  "zh": "翻译已开始。",
+  "ja": "翻訳を始めました。",
+  "es": "La traducción ha comenzado.",
+  "hi": "अनुवाद शुरू हो गया है।",
+  "fr": "La traduction a commencé.",
+  "de": "Die Übersetzung hat begonnen.",
+  "pt": "A tradução começou.",
+  "it": "La traduzione è iniziata.",
+  "nl": "De vertaling is gestart.",
+  "cs": "Překlad byl zahájen.",
+  "hu": "A fordítás elindult.",
+  "pl": "Tłumaczenie rozpoczęte.",
+  "ro": "Traducerea a început.",
+  "ru": "Перевод начался.",
+  "uk": "Переклад розпочато.",
+  "sv": "Översättningen har börjat.",
+  "da": "Oversættelsen er begyndt.",
+  "nb": "Oversettelsen har startet.",
+  "fi": "Kääntäminen on aloitettu.",
+  "tr": "Çeviri başlatıldı.",
+  "zh-TW": "翻譯已開始。",
+  "th": "เริ่มการแปลแล้ว",
+  "vi": "Đã bắt đầu dịch.",
+  "id": "Penerjemahan dimulai.",
+  "ar": "بدأت الترجمة.",
+  "fa": "ترجمه آغاز شد."
+ },
+ "원문 언어와 번역할 언어를 바꿨습니다.": {
+  "en": "The original and target languages have been swapped.",
+  "zh": "已互换原文语言和目标语言。",
+  "ja": "原文の言語と翻訳先の言語を入れ替えました。",
+  "es": "Se han intercambiado el idioma original y el de destino.",
+  "hi": "मूल और लक्ष्य भाषाएँ बदल दी गई हैं।",
+  "fr": "La langue d'origine et la langue cible ont été inversées.",
+  "de": "Ausgangs- und Zielsprache wurden getauscht.",
+  "pt": "Os idiomas original e de destino foram trocados.",
+  "it": "La lingua originale e quella di destinazione sono state invertite.",
+  "nl": "De oorspronkelijke taal en de doeltaal zijn omgewisseld.",
+  "cs": "Jazyk originálu a cílový jazyk byly prohozeny.",
+  "hu": "Az eredeti és a célnyelv felcserélve.",
+  "pl": "Język źródłowy i docelowy zostały zamienione.",
+  "ro": "Limba originală și limba țintă au fost schimbate între ele.",
+  "ru": "Язык оригинала и целевой язык поменяны местами.",
+  "uk": "Мову оригіналу та цільову мову поміняно місцями.",
+  "sv": "Originalspråket och målspråket har bytts.",
+  "da": "Originalsproget og målsproget er byttet om.",
+  "nb": "Originalspråket og målspråket er byttet.",
+  "fi": "Alkuperäinen kieli ja kohdekieli on vaihdettu keskenään.",
+  "tr": "Özgün dil ile hedef dil değiştirildi.",
+  "zh-TW": "已互換原文語言和目標語言。",
+  "th": "สลับภาษาต้นฉบับและภาษาเป้าหมายแล้ว",
+  "vi": "Đã hoán đổi ngôn ngữ gốc và ngôn ngữ đích.",
+  "id": "Bahasa asli dan bahasa tujuan telah ditukar.",
+  "ar": "تم تبديل لغة النص الأصلي ولغة الهدف.",
+  "fa": "زبان متن اصلی و زبان مقصد جابه‌جا شدند."
+ },
+ "글을 지웠습니다.": {
+  "en": "Text cleared.",
+  "zh": "已清除文字。",
+  "ja": "文章を消しました。",
+  "es": "Texto borrado.",
+  "hi": "लेख साफ़ कर दिया गया है।",
+  "fr": "Texte effacé.",
+  "de": "Text gelöscht.",
+  "pt": "Texto apagado.",
+  "it": "Testo cancellato.",
+  "nl": "Tekst gewist.",
+  "cs": "Text vymazán.",
+  "hu": "Szöveg törölve.",
+  "pl": "Tekst wyczyszczony.",
+  "ro": "Text șters.",
+  "ru": "Текст очищен.",
+  "uk": "Текст очищено.",
+  "sv": "Texten rensades.",
+  "da": "Teksten blev ryddet.",
+  "nb": "Teksten ble tømt.",
+  "fi": "Teksti tyhjennettiin.",
+  "tr": "Metin temizlendi.",
+  "zh-TW": "已清除文字。",
+  "th": "ล้างข้อความแล้ว",
+  "vi": "Đã xóa văn bản.",
+  "id": "Teks dihapus.",
+  "ar": "تم مسح النص.",
+  "fa": "متن پاک شد."
+ },
+ "복사했습니다.": {
+  "en": "Copied.",
+  "zh": "已复制。",
+  "ja": "コピーしました。",
+  "es": "Copiado.",
+  "hi": "कॉपी हो गया।",
+  "fr": "Copié.",
+  "de": "Kopiert.",
+  "pt": "Copiado.",
+  "it": "Copiato.",
+  "nl": "Gekopieerd.",
+  "cs": "Zkopírováno.",
+  "hu": "Másolva.",
+  "pl": "Skopiowano.",
+  "ro": "Copiat.",
+  "ru": "Скопировано.",
+  "uk": "Скопійовано.",
+  "sv": "Kopierade.",
+  "da": "Kopieret.",
+  "nb": "Kopiert.",
+  "fi": "Kopioitu.",
+  "tr": "Kopyalandı.",
+  "zh-TW": "已複製。",
+  "th": "คัดลอกแล้ว",
+  "vi": "Đã sao chép.",
+  "id": "Disalin.",
+  "ar": "تم النسخ.",
+  "fa": "کپی شد."
+ },
+ "이해할 수 있는 말이 정해져 있습니다. 예: 번역해, 바꿔, 지워, 저장, 복사.": {
+  "en": "Only certain commands are understood. e.g. translate, swap, clear, save, copy.",
+  "zh": "能理解的指令是固定的。例：翻译、互换、清除、保存、复制。",
+  "ja": "理解できる言葉は決まっています。例：翻訳して、入れ替えて、消して、保存、コピー。",
+  "es": "Solo se entienden ciertos comandos. Ej.: traducir, intercambiar, borrar, guardar, copiar.",
+  "hi": "केवल तय आदेश ही समझे जाते हैं। उदा.: अनुवाद, बदली, साफ़, सहेजना, कॉपी।",
+  "fr": "Seules certaines commandes sont comprises. ex. : traduire, inverser, effacer, enregistrer, copier.",
+  "de": "Nur bestimmte Befehle werden verstanden. z. B. übersetzen, tauschen, löschen, speichern, kopieren.",
+  "pt": "Apenas alguns comandos são compreendidos. ex.: traduzir, trocar, limpar, salvar, copiar.",
+  "it": "Vengono compresi solo alcuni comandi. es.: traduci, inverti, cancella, salva, copia.",
+  "nl": "Alleen bepaalde opdrachten worden begrepen. bijv. vertaal, wissel om, wis, opslaan, kopiëren.",
+  "cs": "Rozumí se pouze určitá sada příkazů. Např.: přelož, prohoď, vymaž, ulož, kopíruj.",
+  "hu": "Csak meghatározott parancsok érthetők. Pl.: fordítsd le, cseréld fel, töröld, mentsd, másold.",
+  "pl": "Rozumiany jest tylko określony zestaw poleceń. Np.: przetłumacz, zamień, wyczyść, zapisz, kopiuj.",
+  "ro": "Se înțeleg doar anumite comenzi. Ex.: tradu, schimbă, șterge, salvează, copiază.",
+  "ru": "Понимается только определённый набор команд. Напр.: переведи, поменяй, очисти, сохрани, скопируй.",
+  "uk": "Розуміється лише певний набір команд. Напр.: переклади, поміняй, очисти, збережи, скопіюй.",
+  "sv": "Endast vissa kommandon förstås. T.ex. översätt, byt, rensa, spara, kopiera.",
+  "da": "Kun bestemte kommandoer forstås. F.eks. oversæt, byt om, ryd, gem, kopiér.",
+  "nb": "Bare bestemte kommandoer forstås. F.eks. oversett, bytt, tøm, lagre, kopier.",
+  "fi": "Vain tietyt komennot ymmärretään. Esim. käännä, vaihda, tyhjennä, tallenna, kopioi.",
+  "tr": "Yalnızca belirli komutlar anlaşılır. Örn. çevir, değiştir, temizle, kaydet, kopyala.",
+  "zh-TW": "能理解的指令是固定的。例：翻譯、互換、清除、儲存、複製。",
+  "th": "คำสั่งที่เข้าใจได้มีกำหนดไว้ เช่น แปล สลับ ล้าง บันทึก คัดลอก",
+  "vi": "Chỉ một số lệnh nhất định được hiểu. VD: dịch, đổi, xóa, lưu, sao chép.",
+  "id": "Hanya perintah tertentu yang dipahami. mis. terjemahkan, tukar, hapus, simpan, salin.",
+  "ar": "لا تُفهم إلا أوامر محددة. مثال: ترجم، بدّل، امسح، احفظ، انسخ.",
+  "fa": "فقط فرمان‌های مشخصی فهمیده می‌شوند. مثال: ترجمه کن، جابه‌جا کن، پاک کن، ذخیره، کپی."
+ }
+});
+
+</script>
+<style>.nx-back{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9999;display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:999px;background:rgba(10,16,34,.85);border:1px solid rgba(45,212,191,.55);color:#E2F3FF;font-size:15.5px;font-weight:600;text-decoration:none;backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,.35)}.nx-back:active{filter:brightness(1.6)}</style>
+<a class="nx-back" href="https://nexus-2e23d.web.app/#n09" aria-label="현황판으로 돌아가기">← 돌아가기</a>
+
+<script>
+/* NX-I18N-SUPPLEMENT — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "자": {
+  "en": " characters",
+  "zh": "字",
+  "zh-TW": "字",
+  "ja": "文字",
+  "es": "caracteres",
+  "hi": "अक्षर",
+  "fr": "caractères",
+  "de": "Zeichen",
+  "pt": "caracteres",
+  "it": "caratteri",
+  "ru": "символов",
+  "uk": "символів",
+  "ar": "حرف",
+  "fa": "نویسه",
+  "th": "ตัวอักษร",
+  "vi": "ký tự",
+  "id": "karakter",
+  "tr": "karakter",
+  "nl": "tekens",
+  "pl": "znaki",
+  "sv": "tecken",
+  "da": "tegn",
+  "nb": "tegn",
+  "fi": "merkkiä",
+  "cs": "znaků",
+  "hu": "karakter",
+  "ro": "caractere"
+ },
+ "공백 포함": {
+  "en": "Including Spaces",
+  "zh": "含空格",
+  "zh-TW": "含空格",
+  "ja": "空白を含む",
+  "es": "con espacios",
+  "hi": "खाली जगह सहित",
+  "fr": "espaces compris",
+  "de": "inkl. Leerzeichen",
+  "pt": "incluindo espaços",
+  "it": "spazi inclusi",
+  "ru": "С пробелами",
+  "uk": "З пробілами",
+  "ar": "شامل المسافات",
+  "fa": "با فاصله",
+  "th": "รวมช่องว่าง",
+  "vi": "Bao gồm khoảng trắng",
+  "id": "Termasuk spasi",
+  "tr": "Boşluklar dahil",
+  "nl": "Inclusief spaties",
+  "pl": "Ze spacjami",
+  "sv": "Inklusive mellanslag",
+  "da": "Inklusive mellemrum",
+  "nb": "Inkludert mellomrom",
+  "fi": "Välilyönnit mukaan lukien",
+  "cs": "Včetně mezer",
+  "hu": "Szóközökkel együtt",
+  "ro": "Inclusiv spații"
+ },
+ "자 · 공백 제외": {
+  "en": " chars · Excluding Spaces",
+  "zh": "字 · 不含空格",
+  "zh-TW": "字 · 不含空格",
+  "ja": "文字 · 空白を除く",
+  "es": "caracteres · sin espacios",
+  "hi": "अक्षर · खाली जगह छोड़कर",
+  "fr": "caractères · sans espaces",
+  "de": "Zeichen · ohne Leerzeichen",
+  "pt": "caracteres · sem espaços",
+  "it": "caratteri · senza spazi",
+  "ru": "символов · без пробелов",
+  "uk": "символів · без пробілів",
+  "ar": "حرف · دون مسافات",
+  "fa": "نویسه · بدون فاصله",
+  "th": "ตัวอักษร · ไม่รวมช่องว่าง",
+  "vi": "ký tự · Không gồm khoảng trắng",
+  "id": "karakter · Tanpa spasi",
+  "tr": "karakter · Boşluksuz",
+  "nl": "tekens · zonder spaties",
+  "pl": "znaki · bez spacji",
+  "sv": "tecken · utan mellanslag",
+  "da": "tegn · uden mellemrum",
+  "nb": "tegn · uten mellomrom",
+  "fi": "merkkiä · ilman välilyöntejä",
+  "cs": "znaků · bez mezer",
+  "hu": "karakter · szóköz nélkül",
+  "ro": "caractere · fără spații"
+ },
+ "자 · 단어": {
+  "en": " chars · Words",
+  "zh": "字 · 单词",
+  "zh-TW": "字 · 單字",
+  "ja": "文字 · 単語",
+  "es": "caracteres · palabras",
+  "hi": "अक्षर · शब्द",
+  "fr": "caractères · mots",
+  "de": "Zeichen · Wörter",
+  "pt": "caracteres · palavras",
+  "it": "caratteri · parole",
+  "ru": "символов · слов",
+  "uk": "символів · слів",
+  "ar": "حرف · كلمة",
+  "fa": "نویسه · واژه",
+  "th": "ตัวอักษร · คำ",
+  "vi": "ký tự · từ",
+  "id": "karakter · kata",
+  "tr": "karakter · kelime",
+  "nl": "tekens · woorden",
+  "pl": "znaki · słowa",
+  "sv": "tecken · ord",
+  "da": "tegn · ord",
+  "nb": "tegn · ord",
+  "fi": "merkkiä · sanaa",
+  "cs": "znaků · slov",
+  "hu": "karakter · szó",
+  "ro": "caractere · cuvinte"
+ },
+ "개 · 문장": {
+  "en": " · sentences",
+  "zh": "个 · 句子",
+  "zh-TW": "個 · 句子",
+  "ja": "個 · 文",
+  "es": "· frases",
+  "hi": "नग · वाक्य",
+  "fr": "phrase(s) · ",
+  "de": " · Sätze",
+  "pt": "· frases",
+  "it": "· frasi",
+  "ru": "шт. · предложений",
+  "uk": "шт. · речень",
+  "ar": "قطعة · جملة",
+  "fa": "عدد · جمله",
+  "th": "อัน · ประโยค",
+  "vi": "cái · câu",
+  "id": "buah · kalimat",
+  "tr": "adet · cümle",
+  "nl": "· zinnen",
+  "pl": "· zdania",
+  "sv": "· meningar",
+  "da": "· sætninger",
+  "nb": "· setninger",
+  "fi": "· lausetta",
+  "cs": "· vět",
+  "hu": "· mondat",
+  "ro": "· propoziții"
+ },
+ "개 · 줄": {
+  "en": " · lines",
+  "zh": "个 · 行",
+  "zh-TW": "個 · 行",
+  "ja": "個 · 行",
+  "es": "· líneas",
+  "hi": "नग · पंक्तियाँ",
+  "fr": "ligne(s) · ",
+  "de": " · Zeilen",
+  "pt": "· linhas",
+  "it": "· righe",
+  "ru": "шт. · строк",
+  "uk": "шт. · рядків",
+  "ar": "قطعة · سطر",
+  "fa": "عدد · خط",
+  "th": "อัน · บรรทัด",
+  "vi": "cái · dòng",
+  "id": "buah · baris",
+  "tr": "adet · satır",
+  "nl": "· regels",
+  "pl": "· wiersze",
+  "sv": "· rader",
+  "da": "· linjer",
+  "nb": "· linjer",
+  "fi": "· riviä",
+  "cs": "· řádků",
+  "hu": "· sor",
+  "ro": "· rânduri"
+ },
+ "줄 ·": {
+  "en": " lines ·",
+  "zh": "行 ·",
+  "zh-TW": "行 ·",
+  "ja": "行 ·",
+  "es": "líneas ·",
+  "hi": "पंक्तियाँ ·",
+  "fr": "lignes ·",
+  "de": "Zeilen ·",
+  "pt": "linhas ·",
+  "it": "righe ·",
+  "ru": "строк ·",
+  "uk": "рядків ·",
+  "ar": "سطر ·",
+  "fa": "خط ·",
+  "th": "บรรทัด ·",
+  "vi": "dòng ·",
+  "id": "baris ·",
+  "tr": "satır ·",
+  "nl": "regels ·",
+  "pl": "wiersze ·",
+  "sv": "rader ·",
+  "da": "linjer ·",
+  "nb": "linjer ·",
+  "fi": "riviä ·",
+  "cs": "řádků ·",
+  "hu": "sor ·",
+  "ro": "rânduri ·"
+ },
+ "바이트": {
+  "en": " bytes",
+  "zh": "字节",
+  "zh-TW": "位元組",
+  "ja": "バイト",
+  "es": "bytes",
+  "hi": "बाइट",
+  "fr": "octets",
+  "de": "Bytes",
+  "pt": "bytes",
+  "it": "byte",
+  "ru": "байт",
+  "uk": "байт",
+  "ar": "بايت",
+  "fa": "بایت",
+  "th": "ไบต์",
+  "vi": "byte",
+  "id": "byte",
+  "tr": "bayt",
+  "nl": "bytes",
+  "pl": "bajty",
+  "sv": "byte",
+  "da": "byte",
+  "nb": "byte",
+  "fi": "tavua",
+  "cs": "bajtů",
+  "hu": "bájt",
+  "ro": "octeți"
+ },
+ "← 돌아가기": {
+  "en": "← Back",
+  "zh": "← 返回",
+  "zh-TW": "← 返回",
+  "ja": "← 戻る",
+  "es": "← Volver",
+  "hi": "← वापस",
+  "fr": "← Retour",
+  "de": "← Zurück",
+  "pt": "← Voltar",
+  "it": "← Indietro",
+  "ru": "← Назад",
+  "uk": "← Назад",
+  "ar": "← رجوع",
+  "fa": "← بازگشت",
+  "th": "← กลับ",
+  "vi": "← Quay lại",
+  "id": "← Kembali",
+  "tr": "← Geri dön",
+  "nl": "← Terug",
+  "pl": "← Wstecz",
+  "sv": "← Tillbaka",
+  "da": "← Tilbage",
+  "nb": "← Tilbake",
+  "fi": "← Takaisin",
+  "cs": "← Zpět",
+  "hu": "← Vissza",
+  "ro": "← Înapoi"
+ }
+});
+</script>
+
+<script>
+/* NX-I18N-SUPPLEMENT-R3 — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "NEXUS GROUP 철학과 비전": {
+  "en": "NEXUS GROUP Philosophy and Vision",
+  "zh": "NEXUS GROUP 理念与愿景",
+  "zh-TW": "NEXUS GROUP 理念與願景",
+  "ja": "NEXUS GROUPの哲学とビジョン",
+  "es": "Filosofía y visión de NEXUS GROUP",
+  "hi": "NEXUS GROUP का दर्शन और दृष्टि",
+  "fr": "Philosophie et vision du NEXUS GROUP",
+  "de": "Philosophie und Vision der NEXUS GROUP",
+  "pt": "Filosofia e visão do NEXUS GROUP",
+  "it": "Filosofia e visione del NEXUS GROUP",
+  "ru": "Философия и видение NEXUS GROUP",
+  "uk": "Філософія й бачення NEXUS GROUP",
+  "ar": "فلسفة NEXUS GROUP ورؤيتها",
+  "fa": "فلسفه و چشم‌انداز NEXUS GROUP",
+  "th": "ปรัชญาและวิสัยทัศน์ของ NEXUS GROUP",
+  "vi": "Triết lý và tầm nhìn của NEXUS GROUP",
+  "id": "Filosofi dan visi NEXUS GROUP",
+  "tr": "NEXUS GROUP felsefesi ve vizyonu",
+  "nl": "Filosofie en visie van NEXUS GROUP",
+  "pl": "Filozofia i wizja NEXUS GROUP",
+  "sv": "NEXUS GROUPS filosofi och vision",
+  "da": "NEXUS GROUPS filosofi og vision",
+  "nb": "NEXUS GROUPS filosofi og visjon",
+  "fi": "NEXUS GROUPIN filosofia ja visio",
+  "cs": "Filozofie a vize NEXUS GROUP",
+  "hu": "A NEXUS GROUP filozófiája és jövőképe",
+  "ro": "Filosofia și viziunea NEXUS GROUP"
+ }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+ "name": "넥서스 장보기 목록 — Nexus Shopping List",
+ "short_name": "장보기 목록",
+ "description": "살 것을 적고 산 것을 표시하는 장보기 목록입니다. 모든 기록은 기기 안에서만 저장됩니다.",
+ "start_url": "/",
+ "display": "standalone",
+ "background_color": "#0B1226",
+ "theme_color": "#0B1226",
+ "icons": [
+  {
+   "src": "/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  }
+ ]
+}

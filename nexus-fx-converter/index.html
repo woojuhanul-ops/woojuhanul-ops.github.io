@@ -1,0 +1,3002 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 환율 변환 — Nexus FX Converter</title>
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--amber:#FBBF24;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:24px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 18px}
+  .steps{display:flex;gap:8px;margin:0 0 16px}
+  .step{flex:1;text-align:center;padding:10px 6px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:13px}
+  .step b{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:var(--line);color:var(--ink);margin-right:6px;font-size:12px}
+  .step.on{color:var(--ink);border-color:var(--teal)}
+  .step.on b{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h2{font-size:16px;margin:0 0 12px}
+  .field{margin-top:12px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}
+  select,input[type=text]{background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:11px 10px;font-size:16px;max-width:100%;width:100%}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer;min-height:48px}
+  .primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .currow{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .currow .field{flex:1;min-width:150px}
+  .swapwrap{flex:none}
+  .hint{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .statline{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.7}
+  .statline b{color:var(--ink)}
+  .err{color:#F87171}
+  .resultbox{margin-top:16px;border:1px solid var(--teal);border-radius:16px;padding:24px 16px;text-align:center;background:rgba(45,212,191,.06);box-shadow:0 0 34px rgba(251,191,36,.10)}
+  .resultbox .big{font-size:clamp(38px,9vw,54px);font-weight:800;color:var(--amber);line-height:1.3;word-break:break-all}
+  #convBtn{display:none}
+  #amtIn{font-size:22px;padding:14px 12px;border-radius:12px}
+  .resultbox .unit{font-size:15px;color:var(--ink);margin-top:8px;line-height:1.7}
+  .resultbox .base{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6}
+  .cachemark{color:var(--amber);font-weight:700}
+  footer{border-top:1px solid var(--line);margin-top:26px;padding:16px;text-align:center;color:var(--muted);font-size:13px;line-height:1.8}
+  footer small{color:var(--muted)}
+  footer .plink{background:none;border:0;color:var(--cyan);text-decoration:underline;cursor:pointer;font-size:13px;padding:0;min-height:0}
+  footer .fam span{margin:0 6px}
+  footer .fam .now{color:var(--ink);font-weight:700}
+  footer .fam a{color:var(--cyan);text-decoration:none}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:20;padding:20px}
+  .modal-bg.open{display:flex}
+  .modal{background:#111827;border:1px solid var(--line);border-radius:16px;max-width:560px;padding:22px;line-height:1.8;font-size:15px}
+  .modal h3{margin-top:0}
+  .modal button{margin-top:12px}
+  details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  details summary{cursor:pointer;font-size:15px}
+  details p{color:var(--muted);font-size:14px;line-height:1.8}
+  @media(max-width:640px){h1{font-size:20px}header{padding:10px 12px}.btns button{flex:1}}
+
+  .brandlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;flex:1;cursor:pointer}
+
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+</style>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="넥서스 환율 변환">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="넥서스 환율 변환 — Nexus FX Converter">
+<meta property="og:description" content="여러 나라 돈을 서로 바꾸어 계산하는 도구입니다. 환율은 공개 환율 서비스에서 조회합니다.">
+<meta property="og:image" content="https://nexus-fx-converter.web.app/og.jpg">
+<style id="nx-feel">a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}button:active{transform:scale(.98)}:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}html{scroll-behavior:smooth}</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{flex:none}header .brand{flex:none;overflow:visible}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap}.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}</style></head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg>
+  <div class="brand"><b>NEXUS GROUP</b><span>SOVEREIGN COMMAND</span></div></a>
+  
+</header>
+
+<main>
+  <div class="steps">
+    <div class="step on" id="step1"><b>1</b> 금액 넣기</div>
+    <div class="step" id="step2"><b>2</b> 통화 고르기</div>
+    <div class="step" id="step3"><b>3</b> 변환하기</div>
+  </div>
+
+  <h1>넥서스 환율 변환</h1>
+  <p class="sub" style="margin-bottom:4px">여러 나라 돈을 서로 바꾸어 계산하는 도구</p>
+  <p class="sub">회원가입 없음 · 이용료 없음 · 무제한 사용</p>
+
+  <div class="panel">
+    <h2>① 금액과 통화</h2>
+    <div class="field">
+      <label for="amtIn">금액</label>
+      <input type="text" id="amtIn" inputmode="decimal" placeholder="예: 100" value="100">
+    </div>
+    <div class="currow">
+      <div class="field">
+        <label for="fromSel">바꿀 돈</label>
+        <select id="fromSel"></select>
+      </div>
+      <div class="swapwrap">
+        <button class="ghost" id="swapBtn" type="button">⇄ 서로 바꾸기</button>
+      </div>
+      <div class="field">
+        <label for="toSel">바뀐 돈</label>
+        <select id="toSel"></select>
+      </div>
+    </div>
+    <div class="btns">
+      <button class="primary" id="convBtn">💱 변환하기</button>
+      <button class="ghost" id="refreshBtn" type="button">시세 새로 받기</button>
+      <button class="ghost" id="clearBtn" type="button">지우기</button>
+    </div>
+    <p class="statline" id="rateLine">시세를 불러오는 중입니다…</p>
+    <p class="hint err" id="fxErr"></p>
+    <div class="resultbox" id="resultBox" style="display:none">
+      <div class="big" id="resultBig"></div>
+      <div class="unit" id="resultUnit"></div>
+      <div class="base" id="resultBase"></div>
+    </div>
+    <p class="hint">환율은 공개 환율 서비스(open.er-api.com)에서 조회합니다. 조회 요청에는 입력한 금액이나 개인 정보가 들어가지 않습니다. 표시되는 환율은 시장 기준 시세로, 실제 환전·송금 때 적용되는 환율과 다를 수 있습니다.</p>
+  </div>
+
+  <div style="margin:14px 0;padding:14px;border:1px solid #26314a;border-radius:14px;background:rgba(255,255,255,.03)">
+   <p style="margin:0 0 10px;font-weight:700">🗣️ 글로 시키기 <span style="font-weight:400;font-size:13px;color:#94a3b8">(안내 도우미 — 이 페이지 기능만 도와줍니다)</span></p>
+   <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <input type="text" id="guideIn" placeholder="예: 변환해" style="flex:1;min-width:200px;padding:10px 12px;border-radius:10px;border:1px solid #26314a;background:#0b0f19;color:#f8fafc">
+    <button type="button" id="guideBtn" class="ghost">시키기</button>
+   </div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+    <button type="button" class="ghost" data-guide="변환해">변환해</button>
+    <button type="button" class="ghost" data-guide="바꿔">바꿔</button>
+    <button type="button" class="ghost" data-guide="지워">지워</button>
+   </div>
+   <p id="guideStatus" style="margin:10px 0 0;font-size:13px;line-height:1.6;color:#94a3b8;min-height:20px"></p>
+  </div>
+
+  <details><summary>💡 도움말</summary><p>금액을 넣고, 바꿀 돈과 바뀐 돈을 고른 뒤 변환하기를 누르세요. 통화를 고르거나 금액을 바꾸면 자동으로 다시 계산합니다.<br>지원 통화: 한국 원 · 미국 달러 · 캐나다 달러 · 유로 · 일본 엔 · 중국 위안 · 영국 파운드 · 호주 달러 · 스위스 프랑 · 뉴질랜드 달러 · 홍콩 달러 · 싱가포르 달러 (12종)<br>일본 엔은 한국에서 흔히 쓰는 표기대로 100엔 단위 환율도 함께 보여 줍니다.<br>환율은 공개 환율 서비스에서 하루 단위로 갱신되는 기준 시세를 조회합니다. 화면에 시세 기준 시각이 함께 표시됩니다.<br>조회가 되지 않을 때는 마지막으로 성공한 시세를 이 기기에 저장해 두었다가 "캐시된 시세"라고 표시하고 보여 줍니다. 캐시된 시세는 현재 시세와 다를 수 있습니다.<br>실제 은행·환전소의 환율에는 수수료와 우대율이 적용되어 이 도구의 결과와 다를 수 있습니다. 큰 금액의 환전·송금 전에는 실제 적용 환율을 확인하세요.<br>금액과 통화 입력에 제한은 없습니다.</p></details>
+<footer>
+    우주의 모든 의식체는 친구이자 동반자이다<br>
+    <small>Every conscious being in the universe is a friend and companion</small><br>
+    <button class="plink" id="philoLink">넥서스 그룹 철학 보기</button><br>
+    🌐 호스팅: Firebase · 🔒 환율 조회에 필요한 연결만 환율 제공 서비스로 이루어집니다 (입력한 금액은 전송되지 않습니다)<br>
+    
+  </footer>
+</main>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>NEXUS GROUP 철학과 비전</h3>
+    <p>넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.</p>
+    <p><b>"우주의 모든 의식체는 친구이자 동반자이다."</b><br>(Every conscious being in the universe is a friend and companion.)</p>
+    <p>우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.</p>
+    <button class="primary" id="modalClose">닫기</button>
+  </div>
+</div>
+<script>
+// ---------- 순수 로직 ----------
+var API_URL = 'https://open.er-api.com/v6/latest/USD';
+var CACHE_KEY = 'nexusFxCacheV1';
+var CURRENCIES = [
+  ['USD', '미국 달러 ($)'],
+  ['KRW', '한국 원 (₩)'],
+  ['CAD', '캐나다 달러 ($)'],
+  ['EUR', '유로 (€)'],
+  ['JPY', '일본 엔 (¥)'],
+  ['CNY', '중국 위안 (¥)'],
+  ['GBP', '영국 파운드 (£)'],
+  ['AUD', '호주 달러 ($)'],
+  ['CHF', '스위스 프랑 (CHF)'],
+  ['NZD', '뉴질랜드 달러 ($)'],
+  ['HKD', '홍콩 달러 ($)'],
+  ['SGD', '싱가포르 달러 ($)']
+];
+function parseAmount(str){
+  var cleaned = String(str || '').replace(/[^0-9.]/g, '');
+  if(!cleaned) return NaN;
+  var v = parseFloat(cleaned);
+  return isFinite(v) ? v : NaN;
+}
+function convertAmount(amount, from, to, rates){
+  if(!rates || !rates[from] || !rates[to]) return null;
+  if(!(amount >= 0)) return null;
+  return amount / rates[from] * rates[to];
+}
+function unitRate(from, to, rates){
+  if(!rates || !rates[from] || !rates[to]) return null;
+  return rates[to] / rates[from];
+}
+function fracDigits(code){
+  return (code === 'KRW' || code === 'JPY') ? 0 : 2;
+}
+function fmtNum(v, digits){
+  if(v === null || v === undefined || !isFinite(v)) return '-';
+  return Number(v).toLocaleString('ko-KR', {minimumFractionDigits: digits, maximumFractionDigits: digits});
+}
+function fmtMoney(v, code){
+  return fmtNum(v, fracDigits(code)) + ' ' + code;
+}
+function fmtRate(v){
+  if(v === null || v === undefined || !isFinite(v)) return '-';
+  return Number(v).toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 4});
+}
+function hundredLine(from, to, rates){
+  // 일본 엔이 한쪽에 있을 때 100엔 단위 표기를 만들어 준다. 해당 없으면 빈 문자열.
+  if(from === 'JPY' && to !== 'JPY'){
+    var v1 = convertAmount(100, 'JPY', to, rates);
+    return v1 === null ? '' : '100 JPY = ' + fmtMoney(v1, to);
+  }
+  if(to === 'JPY' && from !== 'JPY'){
+    var v2 = convertAmount(100, from, 'JPY', rates);
+    return v2 === null ? '' : '100 ' + from + ' = ' + fmtMoney(v2, 'JPY');
+  }
+  return '';
+}
+function escapeHtml(s){
+  return String(s || '').replace(/[&<>"']/g, function(c){
+    return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c];
+  });
+}
+
+// ---------- 상태와 요소 ----------
+var $ = function(id){ return document.getElementById(id); };
+var fromSel = $('fromSel'), toSel = $('toSel');
+CURRENCIES.forEach(function(pair){
+  var o1 = document.createElement('option'); o1.value = pair[0]; o1.textContent = pair[1]; fromSel.appendChild(o1);
+  var o2 = document.createElement('option'); o2.value = pair[0]; o2.textContent = pair[1]; toSel.appendChild(o2);
+});
+fromSel.value = 'USD'; toSel.value = 'KRW';
+
+var S = { rates: null, baseTimeUtc: '', cached: false, fetchedAt: 0, loading: false };
+var SITE = 'fx';
+function nxEvent(ev){ try { fetch("https://nexus-orchestrator.woojuhanul.workers.dev/event", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({site: SITE, event: ev}), keepalive:true}).catch(function(){}); } catch(e){} }
+
+function setStep(n){
+  for(var i = 1; i <= 3; i++){
+    $('step' + i).className = 'step' + (i <= n ? ' on' : '');
+  }
+}
+function fmtDateTime(iso){
+  if(!iso) return '';
+  var d = new Date(iso);
+  if(isNaN(d.getTime())) return '';
+  return d.toLocaleString('ko-KR', {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit'});
+}
+function saveCache(){
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      rates: S.rates, baseTimeUtc: S.baseTimeUtc, fetchedAt: S.fetchedAt
+    }));
+  } catch(e){}
+}
+function loadCache(){
+  try {
+    var raw = localStorage.getItem(CACHE_KEY);
+    if(!raw) return null;
+    var c = JSON.parse(raw);
+    if(!c || !c.rates || !c.rates.USD) return null;
+    return c;
+  } catch(e){ return null; }
+}
+function rateLineText(){
+  if(!S.rates) return '시세를 불러오지 못했습니다.';
+  var t = fmtDateTime(S.baseTimeUtc);
+  var head = S.cached ? '<span class="cachemark">캐시된 시세</span> · ' : '최신 시세 · ';
+  return head + '기준 시각: <b>' + escapeHtml(t || '알 수 없음') + '</b> (미국 달러 기준, open.er-api.com)' +
+    (S.cached ? '<br>연결이 되지 않아 마지막으로 성공한 시세를 보여 줍니다. 현재 시세와 다를 수 있습니다.' : '');
+}
+function doConvert(fireEvent){
+  var amt = parseAmount($('amtIn').value);
+  var from = fromSel.value, to = toSel.value;
+  if(!S.rates){
+    $('fxErr').textContent = '아직 시세가 없습니다. 잠시 뒤 시세 새로 받기를 눌러 주세요.';
+    return false;
+  }
+  if(isNaN(amt)){
+    $('fxErr').textContent = '금액을 숫자로 넣어 주세요.';
+    $('resultBox').style.display = 'none';
+    return false;
+  }
+  $('fxErr').textContent = '';
+  var out = convertAmount(amt, from, to, S.rates);
+  if(out === null){
+    $('fxErr').textContent = '이 통화 쌍의 시세가 없어 변환할 수 없습니다.';
+    return false;
+  }
+  if(fireEvent) nxEvent('start');
+  $('resultBig').textContent = fmtMoney(amt, from) + ' = ' + fmtMoney(out, to);
+  var unit = '1 ' + from + ' = ' + fmtRate(unitRate(from, to, S.rates)) + ' ' + to;
+  var h = hundredLine(from, to, S.rates);
+  $('resultUnit').textContent = h ? unit + ' · ' + h : unit;
+  $('resultBase').innerHTML = rateLineText();
+  $('resultBox').style.display = 'block';
+  setStep(3);
+  if(fireEvent) nxEvent('complete');
+  return true;
+}
+function applyRates(data, cached, fetchedAt){
+  S.rates = data.rates || null;
+  S.baseTimeUtc = data.time_last_update_utc || '';
+  S.cached = !!cached;
+  S.fetchedAt = fetchedAt || 0;
+  $('rateLine').innerHTML = rateLineText();
+  if(S.rates) doConvert(false);
+}
+function fetchRates(manual){
+  if(S.loading) return;
+  S.loading = true;
+  $('refreshBtn').disabled = true;
+  $('rateLine').textContent = '시세를 불러오는 중입니다…';
+  fetch(API_URL).then(function(r){
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function(data){
+    if(!data || data.result !== 'success' || !data.rates) throw new Error('bad data');
+    S.loading = false;
+    $('refreshBtn').disabled = false;
+    applyRates({rates: data.rates, time_last_update_utc: data.time_last_update_utc}, false, Date.now());
+    saveCache();
+    if(manual) doConvert(true);
+  }).catch(function(){
+    S.loading = false;
+    $('refreshBtn').disabled = false;
+    var c = loadCache();
+    if(c){
+      applyRates({rates: c.rates, time_last_update_utc: c.baseTimeUtc}, true, c.fetchedAt);
+      $('fxErr').textContent = '지금은 환율 서비스에 연결되지 않아 캐시된 시세로 계산합니다.';
+    } else {
+      nxEvent('fail');
+      $('rateLine').textContent = '시세를 불러오지 못했습니다.';
+      $('fxErr').textContent = '환율 서비스에 연결되지 않았습니다. 연결을 확인한 뒤 시세 새로 받기를 눌러 주세요.';
+    }
+  });
+}
+$('convBtn').addEventListener('click', function(){
+  setStep(2);
+  if(!S.rates){ fetchRates(true); return; }
+  doConvert(true);
+});
+$('refreshBtn').addEventListener('click', function(){ fetchRates(true); });
+$('swapBtn').addEventListener('click', function(){
+  var a = fromSel.value; fromSel.value = toSel.value; toSel.value = a;
+  if(S.rates) doConvert(false);
+});
+$('clearBtn').addEventListener('click', function(){
+  $('amtIn').value = '';
+  $('resultBox').style.display = 'none';
+  $('fxErr').textContent = '';
+  setStep(1);
+});
+$('amtIn').addEventListener('input', function(){ if(S.rates) doConvert(false); });
+$('amtIn').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ if(S.rates) doConvert(true); } });
+fromSel.addEventListener('change', function(){ if(S.rates) doConvert(false); });
+toSel.addEventListener('change', function(){ if(S.rates) doConvert(false); });
+fetchRates(false);
+
+// ---------- 안내 도우미 ----------
+function guideSay(m){ $('guideStatus').textContent = m; }
+function runGuide(text){
+  var t = String(text || '').trim();
+  if(/변환/.test(t)){ $('convBtn').click(); guideSay('변환했습니다.'); return; }
+  if(/바꿔|교환/.test(t)){ $('swapBtn').click(); guideSay('두 통화를 바꿨습니다.'); return; }
+  if(/지워|비워/.test(t)){ $('clearBtn').click(); guideSay('금액을 지웠습니다.'); return; }
+  if(/시세|새로/.test(t)){ $('refreshBtn').click(); guideSay('시세를 새로 받는 중입니다.'); return; }
+  guideSay('이해할 수 있는 말이 정해져 있습니다. 예: 변환해, 바꿔, 지워, 시세 새로 받기.');
+}
+$('guideBtn').addEventListener('click', function(){ runGuide($('guideIn').value); });
+$('guideIn').addEventListener('keydown', function(e){ if(e.key === 'Enter') runGuide($('guideIn').value); });
+document.querySelectorAll('[data-guide]').forEach(function(b){
+  b.addEventListener('click', function(){ runGuide(b.getAttribute('data-guide')); });
+});
+
+// ---------- 철학 모달 ----------
+$('philoLink').addEventListener('click', function(){ $('modalBg').classList.add('open'); });
+$('modalClose').addEventListener('click', function(){ $('modalBg').classList.remove('open'); });
+$('modalBg').addEventListener('click', function(e){ if(e.target === $('modalBg')) $('modalBg').classList.remove('open'); });
+</script>
+
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 소리 자르기": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 영상 자르기": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 사진 정보 가리기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 읽어 주기": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 긴 말 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 사진 글자 뽑기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 녹음기": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 말로 쓰는 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 14호 환율 변환 전용 사전 (통화 이름은 국제 표기 유지 — 사전에 넣지 않음) */
+NX_I18N_ADD({
+ "14호 환율 변환 (현재)": {
+  "en": "14. FX Converter (current)",
+  "zh": "14号 汇率转换（当前）",
+  "ja": "14号 為替変換（現在）",
+  "es": "14. Conversor de divisas (actual)",
+  "hi": "14. मुद्रा परिवर्तक (वर्तमान)",
+  "fr": "14. Convertisseur de devises (actuel)",
+  "de": "14. Währungsrechner (aktuell)",
+  "pt": "14. Conversor de Moedas (atual)",
+  "it": "14. Convertitore di valuta (corrente)",
+  "nl": "14. Valutaomzetter (huidig)",
+  "cs": "14. Převodník měn (aktuální)",
+  "hu": "14. Valutaváltó (aktuális)",
+  "pl": "14. Konwerter walut (bieżący)",
+  "ro": "14. Convertor valutar (curent)",
+  "ru": "14. Конвертер валют (текущий)",
+  "uk": "14. Конвертер валют (поточний)",
+  "sv": "14. Valutaomvandlare (aktuell)",
+  "da": "14. Valutaomregner (aktuel)",
+  "nb": "14. Valutaomregner (gjeldende)",
+  "fi": "14. Valuuttamuunnin (nykyinen)",
+  "tr": "14. Döviz Çevirici (geçerli)",
+  "zh-TW": "14號 匯率轉換（目前）",
+  "th": "14. แปลงอัตราแลกเปลี่ยน (ปัจจุบัน)",
+  "vi": "14. Chuyển đổi tỷ giá (hiện tại)",
+  "id": "14. Konverter Mata Uang (saat ini)",
+  "ar": "14. محوّل العملات (الحالي)",
+  "fa": "14. مبدل ارز (فعلی)"
+ },
+ "넥서스 환율 변환 — Nexus FX Converter": {
+  "en": "Nexus FX Converter",
+  "zh": "Nexus 汇率转换",
+  "ja": "Nexus 為替変換",
+  "es": "Nexus Conversor de divisas",
+  "hi": "Nexus मुद्रा परिवर्तक",
+  "fr": "Nexus Convertisseur de devises",
+  "de": "Nexus Währungsrechner",
+  "pt": "Nexus Conversor de Moedas",
+  "it": "Nexus Convertitore di valuta",
+  "nl": "Nexus Valutaomzetter",
+  "cs": "Nexus FX Converter",
+  "hu": "Nexus FX Converter",
+  "pl": "Nexus FX Converter",
+  "ro": "Nexus FX Converter",
+  "ru": "Nexus FX Converter",
+  "uk": "Nexus FX Converter",
+  "sv": "Nexus valutaomvandlare",
+  "da": "Nexus valutaomregner",
+  "nb": "Nexus valutaomregner",
+  "fi": "Nexus-valuuttamuunnin",
+  "tr": "Nexus Döviz Çevirici",
+  "zh-TW": "Nexus 匯率轉換",
+  "th": "Nexus แปลงอัตราแลกเปลี่ยน",
+  "vi": "Nexus Chuyển đổi tỷ giá",
+  "id": "Nexus Konverter Mata Uang",
+  "ar": "محوّل عملات Nexus",
+  "fa": "مبدل ارز Nexus"
+ },
+ "넥서스 환율 변환": {
+  "en": "Nexus FX Converter",
+  "zh": "Nexus 汇率转换",
+  "ja": "Nexus 為替変換",
+  "es": "Nexus Conversor de divisas",
+  "hi": "Nexus मुद्रा परिवर्तक",
+  "fr": "Nexus Convertisseur de devises",
+  "de": "Nexus Währungsrechner",
+  "pt": "Nexus Conversor de Moedas",
+  "it": "Nexus Convertitore di valuta",
+  "nl": "Nexus Valutaomzetter",
+  "cs": "Nexus FX Converter",
+  "hu": "Nexus FX Converter",
+  "pl": "Nexus FX Converter",
+  "ro": "Nexus FX Converter",
+  "ru": "Nexus FX Converter",
+  "uk": "Nexus FX Converter",
+  "sv": "Nexus valutaomvandlare",
+  "da": "Nexus valutaomregner",
+  "nb": "Nexus valutaomregner",
+  "fi": "Nexus-valuuttamuunnin",
+  "tr": "Nexus Döviz Çevirici",
+  "zh-TW": "Nexus 匯率轉換",
+  "th": "Nexus แปลงอัตราแลกเปลี่ยน",
+  "vi": "Nexus Chuyển đổi tỷ giá",
+  "id": "Nexus Konverter Mata Uang",
+  "ar": "محوّل عملات Nexus",
+  "fa": "مبدل ارز Nexus"
+ },
+ "여러 나라 돈을 서로 바꾸어 계산하는 도구": {
+  "en": "A tool to convert and calculate money in many currencies",
+  "zh": "各国货币互换计算工具",
+  "ja": "いろいろな国のお金を換算するツール",
+  "es": "Herramienta para convertir el dinero de varios países",
+  "hi": "कई देशों की मुद्रा बदलकर हिसाब करने का टूल",
+  "fr": "Un outil pour convertir et calculer l'argent de nombreux pays",
+  "de": "Ein Werkzeug zum Umrechnen und Berechnen von Geld in vielen Währungen",
+  "pt": "Uma ferramenta para converter e calcular dinheiro de muitos países",
+  "it": "Uno strumento per convertire e calcolare il denaro di molti paesi",
+  "nl": "Een hulpmiddel om geld uit veel landen om te rekenen en te berekenen",
+  "cs": "Nástroj pro přepočet peněz mnoha zemí",
+  "hu": "Eszköz több ország pénzének átváltásához és kiszámításához",
+  "pl": "Narzędzie do przeliczania pieniędzy wielu krajów",
+  "ro": "Un instrument pentru a converti și calcula banii din multe țări",
+  "ru": "Инструмент для конвертации и расчёта денег разных стран",
+  "uk": "Інструмент для конвертації та розрахунку грошей різних країн",
+  "sv": "Ett verktyg för att omvandla och beräkna pengar i många valutor",
+  "da": "Et værktøj til at omregne og beregne penge i mange valutaer",
+  "nb": "Et verktøy for å regne om og beregne penger i mange valutaer",
+  "fi": "Työkalu monien maiden rahojen muuntamiseen ja laskemiseen",
+  "tr": "Birçok ülkenin parasını birbirine çevirip hesaplayan bir araç",
+  "zh-TW": "各國貨幣互換計算工具",
+  "th": "เครื่องมือแปลงและคำนวณเงินหลายสกุล",
+  "vi": "Công cụ chuyển đổi và tính toán tiền tệ của nhiều nước",
+  "id": "Alat untuk menukar dan menghitung uang berbagai negara",
+  "ar": "أداة لتحويل وحساب أموال العديد من البلدان",
+  "fa": "ابزاری برای تبدیل و محاسبه پول کشورهای مختلف"
+ },
+ "회원가입 없음 · 이용료 없음 · 무제한 사용": {
+  "en": "No sign-up · No fees · Unlimited use",
+  "zh": "无需注册 · 免费 · 无限使用",
+  "ja": "登録不要 · 無料 · 無制限",
+  "es": "Sin registro · Gratis · Uso ilimitado",
+  "hi": "कोई साइन-अप नहीं · कोई शुल्क नहीं · असीमित उपयोग",
+  "fr": "Sans inscription · Sans frais · Utilisation illimitée",
+  "de": "Keine Registrierung · Keine Gebühren · Unbegrenzte Nutzung",
+  "pt": "Sem cadastro · Sem taxas · Uso ilimitado",
+  "it": "Nessuna registrazione · Nessun costo · Uso illimitato",
+  "nl": "Geen registratie · Geen kosten · Onbeperkt gebruik",
+  "cs": "Bez registrace · Bez poplatků · Neomezené použití",
+  "hu": "Regisztráció nélkül · Díjmentes · Korlátlan használat",
+  "pl": "Bez rejestracji · Bez opłat · Bez ograniczeń",
+  "ro": "Fără cont · Fără taxe · Utilizare nelimitată",
+  "ru": "Без регистрации · Бесплатно · Без ограничений",
+  "uk": "Без реєстрації · Безкоштовно · Без обмежень",
+  "sv": "Ingen registrering · Inga avgifter · Obegränsad användning",
+  "da": "Ingen tilmelding · Ingen gebyrer · Ubegrænset brug",
+  "nb": "Ingen registrering · Ingen gebyrer · Ubegrenset bruk",
+  "fi": "Ei rekisteröitymistä · Ei maksuja · Rajoittamaton käyttö",
+  "tr": "Kayıt yok · Ücret yok · Sınırsız kullanım",
+  "zh-TW": "無需註冊 · 免費 · 無限使用",
+  "th": "ไม่ต้องสมัครสมาชิก · ไม่มีค่าธรรมเนียม · ใช้ได้ไม่จำกัด",
+  "vi": "Không cần đăng ký · Không phí · Dùng không giới hạn",
+  "id": "Tanpa pendaftaran · Tanpa biaya · Penggunaan tanpa batas",
+  "ar": "بدون تسجيل · بدون رسوم · استخدام غير محدود",
+  "fa": "بدون ثبت‌نام · بدون هزینه · استفاده نامحدود"
+ },
+ "① 금액과 통화": {
+  "en": "① Amount & currency",
+  "zh": "① 金额和货币",
+  "ja": "① 金額と通貨",
+  "es": "① Cantidad y moneda",
+  "hi": "① राशि और मुद्रा",
+  "fr": "① Montant et devise",
+  "de": "① Betrag und Währung",
+  "pt": "① Valor e moeda",
+  "it": "① Importo e valuta",
+  "nl": "① Bedrag en valuta",
+  "cs": "① Částka a měna",
+  "hu": "① Összeg és pénznem",
+  "pl": "① Kwota i waluta",
+  "ro": "① Sumă și monedă",
+  "ru": "① Сумма и валюта",
+  "uk": "① Сума та валюта",
+  "sv": "① Belopp och valuta",
+  "da": "① Beløb og valuta",
+  "nb": "① Beløp og valuta",
+  "fi": "① Summa ja valuutta",
+  "tr": "① Tutar ve para birimi",
+  "zh-TW": "① 金額和貨幣",
+  "th": "① จำนวนเงินและสกุลเงิน",
+  "vi": "① Số tiền & tiền tệ",
+  "id": "① Jumlah & mata uang",
+  "ar": "① المبلغ والعملة",
+  "fa": "① مبلغ و ارز"
+ },
+ "금액 넣기": {
+  "en": "Enter the amount",
+  "zh": "输入金额",
+  "ja": "金額を入れる",
+  "es": "Introduce la cantidad",
+  "hi": "राशि डालें",
+  "fr": "Saisir le montant",
+  "de": "Betrag eingeben",
+  "pt": "Inserir o valor",
+  "it": "Inserisci l'importo",
+  "nl": "Bedrag invoeren",
+  "cs": "Zadejte částku",
+  "hu": "Adja meg az összeget",
+  "pl": "Wpisz kwotę",
+  "ro": "Introdu suma",
+  "ru": "Введите сумму",
+  "uk": "Введіть суму",
+  "sv": "Ange beloppet",
+  "da": "Indtast beløbet",
+  "nb": "Skriv inn beløpet",
+  "fi": "Syötä summa",
+  "tr": "Tutarı girin",
+  "zh-TW": "輸入金額",
+  "th": "ใส่จำนวนเงิน",
+  "vi": "Nhập số tiền",
+  "id": "Masukkan jumlah",
+  "ar": "إدخال المبلغ",
+  "fa": "وارد کردن مبلغ"
+ },
+ "금액": {
+  "en": "Amount",
+  "zh": "金额",
+  "ja": "金額",
+  "es": "Cantidad",
+  "hi": "राशि",
+  "fr": "Montant",
+  "de": "Betrag",
+  "pt": "Valor",
+  "it": "Importo",
+  "nl": "Bedrag",
+  "cs": "Částka",
+  "hu": "Összeg",
+  "pl": "Kwota",
+  "ro": "Sumă",
+  "ru": "Сумма",
+  "uk": "Сума",
+  "sv": "Belopp",
+  "da": "Beløb",
+  "nb": "Beløp",
+  "fi": "Summa",
+  "tr": "Tutar",
+  "zh-TW": "金額",
+  "th": "จำนวนเงิน",
+  "vi": "Số tiền",
+  "id": "Jumlah",
+  "ar": "المبلغ",
+  "fa": "مبلغ"
+ },
+ "예: 100": {
+  "en": "e.g. 100",
+  "zh": "例：100",
+  "ja": "例）100",
+  "es": "Ej.: 100",
+  "hi": "उदा.: 100",
+  "fr": "ex. : 100",
+  "de": "z. B. 100",
+  "pt": "ex.: 100",
+  "it": "es.: 100",
+  "nl": "bijv. 100",
+  "cs": "např. 100",
+  "hu": "pl.: 100",
+  "pl": "np.: 100",
+  "ro": "ex.: 100",
+  "ru": "напр.: 100",
+  "uk": "напр.: 100",
+  "sv": "t.ex. 100",
+  "da": "f.eks. 100",
+  "nb": "f.eks. 100",
+  "fi": "esim. 100",
+  "tr": "örn: 100",
+  "zh-TW": "例：100",
+  "th": "เช่น: 100",
+  "vi": "VD: 100",
+  "id": "mis. 100",
+  "ar": "مثال: 100",
+  "fa": "مثال: 100"
+ },
+ "바꿀 돈": {
+  "en": "Money to convert",
+  "zh": "换出货币",
+  "ja": "元の通貨",
+  "es": "Moneda de origen",
+  "hi": "बदलने वाली मुद्रा",
+  "fr": "Devise de départ",
+  "de": "Ausgangswährung",
+  "pt": "Moeda de origem",
+  "it": "Valuta di partenza",
+  "nl": "Valuta om te wisselen",
+  "cs": "Měna k převodu",
+  "hu": "Átváltandó pénz",
+  "pl": "Waluta do wymiany",
+  "ro": "Moneda de convertit",
+  "ru": "Валюта для обмена",
+  "uk": "Валюта для обміну",
+  "sv": "Pengar att omvandla",
+  "da": "Penge at omregne",
+  "nb": "Penger å regne om",
+  "fi": "Muunnettava raha",
+  "tr": "Çevrilecek para",
+  "zh-TW": "換出貨幣",
+  "th": "สกุลเงินต้นทาง",
+  "vi": "Tiền cần đổi",
+  "id": "Uang yang ditukar",
+  "ar": "العملة المراد تحويلها",
+  "fa": "پول مبدأ"
+ },
+ "바뀐 돈": {
+  "en": "Converted money",
+  "zh": "换入货币",
+  "ja": "換算先の通貨",
+  "es": "Moneda de destino",
+  "hi": "बदली हुई मुद्रा",
+  "fr": "Devise d'arrivée",
+  "de": "Zielwährung",
+  "pt": "Moeda de destino",
+  "it": "Valuta di arrivo",
+  "nl": "Omgewisselde valuta",
+  "cs": "Převedená měna",
+  "hu": "Átváltott pénz",
+  "pl": "Waluta po wymianie",
+  "ro": "Moneda convertită",
+  "ru": "Полученная валюта",
+  "uk": "Отримана валюта",
+  "sv": "Omvandlade pengar",
+  "da": "Omregnede penge",
+  "nb": "Omregnede penger",
+  "fi": "Muunnettu raha",
+  "tr": "Çevrilen para",
+  "zh-TW": "換入貨幣",
+  "th": "สกุลเงินปลายทาง",
+  "vi": "Tiền sau khi đổi",
+  "id": "Uang hasil tukar",
+  "ar": "العملة المحوّل إليها",
+  "fa": "پول مقصد"
+ },
+ "통화 고르기": {
+  "en": "Choose a currency",
+  "zh": "选择货币",
+  "ja": "通貨を選ぶ",
+  "es": "Elige una moneda",
+  "hi": "मुद्रा चुनें",
+  "fr": "Choisir une devise",
+  "de": "Währung wählen",
+  "pt": "Escolher uma moeda",
+  "it": "Scegli una valuta",
+  "nl": "Valuta kiezen",
+  "cs": "Vybrat měnu",
+  "hu": "Pénznem kiválasztása",
+  "pl": "Wybierz walutę",
+  "ro": "Alege o monedă",
+  "ru": "Выбрать валюту",
+  "uk": "Вибрати валюту",
+  "sv": "Välj en valuta",
+  "da": "Vælg en valuta",
+  "nb": "Velg en valuta",
+  "fi": "Valitse valuutta",
+  "tr": "Para birimi seçin",
+  "zh-TW": "選擇貨幣",
+  "th": "เลือกสกุลเงิน",
+  "vi": "Chọn tiền tệ",
+  "id": "Pilih mata uang",
+  "ar": "اختيار عملة",
+  "fa": "انتخاب ارز"
+ },
+ "⇄ 서로 바꾸기": {
+  "en": "⇄ Swap",
+  "zh": "⇄ 互换",
+  "ja": "⇄ 入れ替える",
+  "es": "⇄ Intercambiar",
+  "hi": "⇄ आपस में बदलें",
+  "fr": "⇄ Inverser",
+  "de": "⇄ Tauschen",
+  "pt": "⇄ Trocar",
+  "it": "⇄ Inverti",
+  "nl": "⇄ Omwisselen",
+  "cs": "⇄ Prohodit",
+  "hu": "⇄ Csere",
+  "pl": "⇄ Zamień",
+  "ro": "⇄ Schimbă",
+  "ru": "⇄ Поменять",
+  "uk": "⇄ Поміняти",
+  "sv": "⇄ Byt plats",
+  "da": "⇄ Byt om",
+  "nb": "⇄ Bytt",
+  "fi": "⇄ Vaihda keskenään",
+  "tr": "⇄ Yer değiştir",
+  "zh-TW": "⇄ 互換",
+  "th": "⇄ สลับกัน",
+  "vi": "⇄ Hoán đổi",
+  "id": "⇄ Tukar",
+  "ar": "⇄ تبديل",
+  "fa": "⇄ جابه‌جایی"
+ },
+ "💱 변환하기": {
+  "en": "💱 Convert",
+  "zh": "💱 转换",
+  "ja": "💱 変換する",
+  "es": "💱 Convertir",
+  "hi": "💱 बदलें",
+  "fr": "💱 Convertir",
+  "de": "💱 Umrechnen",
+  "pt": "💱 Converter",
+  "it": "💱 Converti",
+  "nl": "💱 Omrekenen",
+  "cs": "💱 Převést",
+  "hu": "💱 Átváltás",
+  "pl": "💱 Przelicz",
+  "ro": "💱 Convertește",
+  "ru": "💱 Конвертировать",
+  "uk": "💱 Конвертувати",
+  "sv": "💱 Omvandla",
+  "da": "💱 Omregn",
+  "nb": "💱 Regn om",
+  "fi": "💱 Muunna",
+  "tr": "💱 Çevir",
+  "zh-TW": "💱 轉換",
+  "th": "💱 แปลง",
+  "vi": "💱 Chuyển đổi",
+  "id": "💱 Konversi",
+  "ar": "💱 تحويل",
+  "fa": "💱 تبدیل"
+ },
+ "변환하기": {
+  "en": "Convert",
+  "zh": "转换",
+  "ja": "変換する",
+  "es": "Convertir",
+  "hi": "बदलें",
+  "fr": "Convertir",
+  "de": "Umrechnen",
+  "pt": "Converter",
+  "it": "Converti",
+  "nl": "Omrekenen",
+  "cs": "Převést",
+  "hu": "Átváltás",
+  "pl": "Przelicz",
+  "ro": "Convertește",
+  "ru": "Конвертировать",
+  "uk": "Конвертувати",
+  "sv": "Omvandla",
+  "da": "Omregn",
+  "nb": "Regn om",
+  "fi": "Muunna",
+  "tr": "Çevir",
+  "zh-TW": "轉換",
+  "th": "แปลง",
+  "vi": "Chuyển đổi",
+  "id": "Konversi",
+  "ar": "تحويل",
+  "fa": "تبدیل"
+ },
+ "시세 새로 받기": {
+  "en": "Refresh rates",
+  "zh": "刷新汇率",
+  "ja": "レートを新しく取得",
+  "es": "Actualizar tasas",
+  "hi": "नए भाव लें",
+  "fr": "Actualiser les taux",
+  "de": "Kurse neu laden",
+  "pt": "Atualizar cotações",
+  "it": "Aggiorna i tassi",
+  "nl": "Koersen vernieuwen",
+  "cs": "Obnovit kurzy",
+  "hu": "Árfolyamok frissítése",
+  "pl": "Odśwież kursy",
+  "ro": "Reîncarcă cursurile",
+  "ru": "Обновить курсы",
+  "uk": "Оновити курси",
+  "sv": "Hämta nya kurser",
+  "da": "Hent nye kurser",
+  "nb": "Hent nye kurser",
+  "fi": "Hae uudet kurssit",
+  "tr": "Kurları yenile",
+  "zh-TW": "刷新匯率",
+  "th": "อัปเดตอัตรา",
+  "vi": "Làm mới tỷ giá",
+  "id": "Perbarui kurs",
+  "ar": "تحديث الأسعار",
+  "fa": "دریافت نرخ‌های جدید"
+ },
+ "지우기": {
+  "en": "Clear",
+  "zh": "清除",
+  "ja": "消す",
+  "es": "Borrar",
+  "hi": "साफ़ करें",
+  "fr": "Effacer",
+  "de": "Löschen",
+  "pt": "Limpar",
+  "it": "Cancella",
+  "nl": "Wissen",
+  "cs": "Vymazat",
+  "hu": "Törlés",
+  "pl": "Wyczyść",
+  "ro": "Șterge",
+  "ru": "Очистить",
+  "uk": "Очистити",
+  "sv": "Rensa",
+  "da": "Ryd",
+  "nb": "Tøm",
+  "fi": "Tyhjennä",
+  "tr": "Temizle",
+  "zh-TW": "清除",
+  "th": "ล้าง",
+  "vi": "Xóa",
+  "id": "Hapus",
+  "ar": "مسح",
+  "fa": "پاک کردن"
+ },
+ "시세를 불러오는 중입니다…": {
+  "en": "Loading rates…",
+  "zh": "正在加载汇率…",
+  "ja": "レートを読み込み中…",
+  "es": "Cargando tasas…",
+  "hi": "भाव लोड हो रहे हैं…",
+  "fr": "Chargement des taux…",
+  "de": "Kurse werden geladen…",
+  "pt": "Carregando cotações…",
+  "it": "Caricamento dei tassi…",
+  "nl": "Koersen laden…",
+  "cs": "Načítání kurzů…",
+  "hu": "Árfolyamok betöltése…",
+  "pl": "Wczytywanie kursów…",
+  "ro": "Se încarcă cursurile…",
+  "ru": "Загрузка курсов…",
+  "uk": "Завантаження курсів…",
+  "sv": "Laddar kurser…",
+  "da": "Indlæser kurser…",
+  "nb": "Laster kurser…",
+  "fi": "Ladataan kursseja…",
+  "tr": "Kurlar yükleniyor…",
+  "zh-TW": "正在載入匯率…",
+  "th": "กำลังโหลดอัตรา…",
+  "vi": "Đang tải tỷ giá…",
+  "id": "Memuat kurs…",
+  "ar": "جارٍ تحميل الأسعار…",
+  "fa": "در حال بارگذاری نرخ‌ها…"
+ },
+ "금액을 넣고, 바꿀 돈과 바뀐 돈을 고른 뒤 변환하기를 누르세요. 통화를 고르거나 금액을 바꾸면 자동으로 다시 계산합니다.": {
+  "en": "Enter an amount, choose the money to convert and the money to get, then press Convert. Changing the currency or amount recalculates automatically.",
+  "zh": "输入金额，选择换出和换入货币，然后点击转换。更改货币或金额会自动重新计算。",
+  "ja": "金額を入れ、元の通貨と換算先を選んで変換を押してください。通貨や金額を変えると自動で再計算します。",
+  "es": "Introduce una cantidad, elige la moneda de origen y la de destino y pulsa Convertir. Al cambiar la moneda o la cantidad se recalcula automáticamente.",
+  "hi": "राशि डालें, बदलने वाली और बदली हुई मुद्रा चुनें, फिर बदलें दबाएँ। मुद्रा या राशि बदलने पर अपने आप फिर से हिसाब हो जाता है।",
+  "fr": "Saisissez un montant, choisissez la devise de départ et celle d'arrivée, puis appuyez sur Convertir. Changer la devise ou le montant relance le calcul automatiquement.",
+  "de": "Geben Sie einen Betrag ein, wählen Sie Ausgangs- und Zielwährung und drücken Sie dann auf Umrechnen. Wenn Sie Währung oder Betrag ändern, wird automatisch neu berechnet.",
+  "pt": "Insira um valor, escolha a moeda de origem e a de destino e toque em Converter. Ao alterar a moeda ou o valor, o cálculo é refeito automaticamente.",
+  "it": "Inserisci un importo, scegli la valuta di partenza e quella di arrivo, quindi premi Converti. Cambiando valuta o importo, il calcolo si aggiorna automaticamente.",
+  "nl": "Voer een bedrag in, kies de valuta om te wisselen en de doelvaluta en druk dan op Omrekenen. Als u de valuta of het bedrag wijzigt, wordt er automatisch opnieuw gerekend.",
+  "cs": "Zadejte částku, vyberte měnu k převodu a cílovou měnu a stiskněte Převést. Změna měny nebo částky přepočítá výsledek automaticky.",
+  "hu": "Adja meg az összeget, válassza ki az átváltandó és a kapott pénznemet, majd nyomja meg az Átváltás gombot. A pénznem vagy az összeg megváltoztatásakor automatikusan újraszámol.",
+  "pl": "Wpisz kwotę, wybierz walutę do wymiany i walutę docelową, a następnie naciśnij Przelicz. Zmiana waluty lub kwoty automatycznie przelicza wynik.",
+  "ro": "Introdu suma, alege moneda de convertit și moneda dorită, apoi apasă Convertește. Schimbarea monedei sau a sumei recalculează automat.",
+  "ru": "Введите сумму, выберите валюту для обмена и получаемую валюту, затем нажмите «Конвертировать». При смене валюты или суммы расчёт обновляется автоматически.",
+  "uk": "Введіть суму, виберіть валюту для обміну та отримувану валюту, потім натисніть «Конвертувати». Зміна валюти або суми автоматично перераховує результат.",
+  "sv": "Ange ett belopp, välj pengarna att omvandla och pengarna du vill få, och tryck sedan på Omvandla. Om du ändrar valuta eller belopp beräknas det om automatiskt.",
+  "da": "Indtast et beløb, vælg pengene, der skal omregnes, og pengene, du vil have, og tryk derefter på Omregn. Hvis du ændrer valuta eller beløb, genberegnes det automatisk.",
+  "nb": "Skriv inn et beløp, velg pengene som skal regnes om og pengene du vil få, og trykk deretter på Regn om. Hvis du endrer valuta eller beløp, beregnes det på nytt automatisk.",
+  "fi": "Syötä summa, valitse muunnettava raha ja saatava raha ja paina sitten Muunna. Valuutan tai summan muuttaminen laskee uudelleen automaattisesti.",
+  "tr": "Bir tutar girin, çevrilecek parayı ve alınacak parayı seçin, ardından Çevir'e basın. Para birimini veya tutarı değiştirirseniz otomatik olarak yeniden hesaplanır.",
+  "zh-TW": "輸入金額，選擇換出和換入貨幣，然後點擊轉換。更改貨幣或金額會自動重新計算。",
+  "th": "ใส่จำนวนเงิน เลือกสกุลเงินต้นทางและปลายทาง แล้วกดแปลง การเปลี่ยนสกุลเงินหรือจำนวนเงินจะคำนวณใหม่อัตโนมัติ",
+  "vi": "Nhập số tiền, chọn loại tiền cần đổi và loại tiền muốn nhận, rồi nhấn Chuyển đổi. Thay đổi tiền tệ hoặc số tiền sẽ tự động tính lại.",
+  "id": "Masukkan jumlah, pilih uang yang ditukar dan uang hasil tukar, lalu tekan Konversi. Mengganti mata uang atau jumlah akan menghitung ulang secara otomatis.",
+  "ar": "أدخل مبلغًا، واختر العملة المراد تحويلها والعملة المحوّل إليها، ثم اضغط على تحويل. يؤدي تغيير العملة أو المبلغ إلى إعادة الحساب تلقائيًا.",
+  "fa": "مبلغ را وارد کنید، پول مبدأ و پول مقصد را انتخاب کنید و سپس «تبدیل» را بزنید. با تغییر ارز یا مبلغ، به‌طور خودکار دوباره محاسبه می‌شود."
+ },
+ "일본 엔은 한국에서 흔히 쓰는 표기대로 100엔 단위 환율도 함께 보여 줍니다.": {
+  "en": "For Japanese yen, the rate per 100 yen is also shown, as commonly used in Korea.",
+  "zh": "日元还会按韩国常用标示，显示每 100 日元的汇率。",
+  "ja": "日本円は韓国でよく使う表記の通り、100円単位のレートも併せて表示します。",
+  "es": "Para el yen japonés también se muestra la tasa por cada 100 yenes, como se usa en Corea.",
+  "hi": "जापानी येन के लिए, कोरिया में आम चलन के अनुसार 100 येन की दर भी दिखाई जाती है।",
+  "fr": "Pour le yen japonais, le taux pour 100 yens est aussi affiché, comme on le fait couramment en Corée.",
+  "de": "Für den japanischen Yen wird auch der Kurs pro 100 Yen angezeigt, wie in Korea üblich.",
+  "pt": "Para o iene japonês, também é exibida a cotação por 100 ienes, como é comum na Coreia.",
+  "it": "Per lo yen giapponese viene mostrato anche il tasso per 100 yen, come si usa comunemente in Corea.",
+  "nl": "Voor de Japanse yen wordt ook de koers per 100 yen getoond, zoals in Korea gebruikelijk is.",
+  "cs": "U japonského jenu se zobrazuje i kurz za 100 jenů, jak je běžné v Koreji.",
+  "hu": "A japán jennél a Koreában megszokott módon a 100 jenre vonatkozó árfolyam is megjelenik.",
+  "pl": "Dla jena japońskiego pokazywany jest także kurs za 100 jenów, jak powszechnie stosuje się w Korei.",
+  "ro": "Pentru yenul japonez se afișează și cursul la 100 de yeni, așa cum se folosește frecvent în Coreea.",
+  "ru": "Для японской иены также показывается курс за 100 иен, как принято в Корее.",
+  "uk": "Для японської єни також показується курс за 100 єн, як заведено в Кореї.",
+  "sv": "För japanska yen visas även kursen per 100 yen, så som den ofta anges i Korea.",
+  "da": "For japanske yen vises også kursen pr. 100 yen, som det ofte angives i Korea.",
+  "nb": "For japanske yen vises også kursen per 100 yen, slik den ofte oppgis i Korea.",
+  "fi": "Japanin jenistä näytetään myös kurssi 100 jeniä kohti, kuten Koreassa on tapana merkitä.",
+  "tr": "Japon yeni için, Kore'de yaygın kullanıldığı gibi 100 yen başına kur da gösterilir.",
+  "zh-TW": "日圓還會按韓國常用標示，顯示每 100 日圓的匯率。",
+  "th": "สำหรับเงินเยนญี่ปุ่น จะแสดงอัตราต่อ 100 เยนด้วย ตามแบบที่ใช้กันทั่วไปในเกาหลี",
+  "vi": "Đối với yên Nhật, tỷ giá theo 100 yên cũng được hiển thị, theo cách thường dùng ở Hàn Quốc.",
+  "id": "Untuk yen Jepang, kurs per 100 yen juga ditampilkan, sebagaimana lazim digunakan di Korea.",
+  "ar": "بالنسبة للين الياباني، يتم أيضًا عرض السعر لكل 100 ين، كما هو شائع في كوريا.",
+  "fa": "برای ین ژاپن، نرخ هر 100 ین نیز طبق شیوه رایج در کره نمایش داده می‌شود."
+ },
+ "환율은 공개 환율 서비스에서 하루 단위로 갱신되는 기준 시세를 조회합니다. 화면에 시세 기준 시각이 함께 표시됩니다.": {
+  "en": "Rates are looked up from a public rate service, updated daily. The reference time of the rate is shown on screen.",
+  "zh": "汇率从公开汇率服务查询，以每日更新的基准汇率为准。画面上会显示汇率的基准时间。",
+  "ja": "レートは公開レートサービスから、日単位で更新される基準レートを照会します。画面にレートの基準時刻も表示されます。",
+  "es": "Las tasas se consultan en un servicio público de tasas, actualizadas a diario. La hora de referencia se muestra en pantalla.",
+  "hi": "भाव एक सार्वजनिक भाव सेवा से लिए जाते हैं, जो रोज़ अपडेट होते हैं। भाव का संदर्भ समय स्क्रीन पर दिखता है।",
+  "fr": "Les taux sont consultés auprès d'un service public de taux, avec des taux de référence mis à jour chaque jour. L'heure de référence du taux s'affiche à l'écran.",
+  "de": "Die Kurse werden bei einem öffentlichen Kursdienst abgefragt, dessen Referenzkurse täglich aktualisiert werden. Die Referenzzeit des Kurses wird auf dem Bildschirm angezeigt.",
+  "pt": "As cotações são consultadas em um serviço público de cotações, com valores de referência atualizados diariamente. O horário de referência da cotação é exibido na tela.",
+  "it": "I tassi vengono consultati presso un servizio pubblico di tassi, con valori di riferimento aggiornati quotidianamente. L'orario di riferimento del tasso viene mostrato sullo schermo.",
+  "nl": "De koersen worden opgevraagd bij een openbare koersendienst, met dagelijks bijgewerkte referentiekoersen. De referentietijd van de koers wordt op het scherm getoond.",
+  "cs": "Kurzy se získávají z veřejné kurzovní služby jako referenční kurzy aktualizované denně. Na obrazovce se zobrazuje referenční čas kurzu.",
+  "hu": "Az árfolyamok egy nyilvános árfolyamszolgáltatásból származnak, naponta frissülő referenciaárfolyamokként. Az árfolyam referenciaideje megjelenik a képernyőn.",
+  "pl": "Kursy są pobierane z publicznej usługi kursów jako kursy referencyjne aktualizowane codziennie. Na ekranie wyświetlany jest czas odniesienia kursu.",
+  "ro": "Cursurile sunt consultate dintr-un serviciu public de cursuri, actualizate zilnic ca cursuri de referință. Ora de referință a cursului este afișată pe ecran.",
+  "ru": "Курсы запрашиваются в публичном сервисе курсов как справочные, обновляемые ежедневно. Время, к которому относится курс, отображается на экране.",
+  "uk": "Курси запитуються в публічному сервісі курсів як довідкові, що оновлюються щодня. Час, до якого належить курс, відображається на екрані.",
+  "sv": "Kurserna hämtas från en offentlig kurstjänst och är referenskurser som uppdateras dagligen. Kursens referenstid visas också på skärmen.",
+  "da": "Kurserne hentes fra en offentlig kurstjeneste og er referencekurser, der opdateres dagligt. Kursernes referencetidspunkt vises også på skærmen.",
+  "nb": "Kursene hentes fra en offentlig kurstjeneste og er referansekurser som oppdateres daglig. Kursens referansetid vises også på skjermen.",
+  "fi": "Kurssit haetaan julkisesta kurssipalvelusta, ja ne ovat päivittäin päivittyviä viitekursseja. Kurssin viiteaika näytetään myös näytöllä.",
+  "tr": "Kurlar, herkese açık bir kur servisinden alınır ve günlük güncellenen referans kurlardır. Kurun referans zamanı da ekranda gösterilir.",
+  "zh-TW": "匯率從公開匯率服務查詢，以每日更新的基準匯率為準。畫面上會顯示匯率的基準時間。",
+  "th": "อัตราแลกเปลี่ยนค้นหาจากบริการอัตราสาธารณะที่อัปเดตรายวัน เวลาอ้างอิงของอัตราจะแสดงบนหน้าจอด้วย",
+  "vi": "Tỷ giá được tra cứu từ dịch vụ tỷ giá công khai, cập nhật hằng ngày. Thời gian tham chiếu của tỷ giá được hiển thị trên màn hình.",
+  "id": "Kurs dicari dari layanan kurs publik yang diperbarui setiap hari. Waktu acuan kurs ditampilkan di layar.",
+  "ar": "تتم مراجعة الأسعار من خدمة أسعار عامة يتم تحديثها يوميًا. يظهر وقت مرجع السعر على الشاشة.",
+  "fa": "نرخ‌ها از یک سرویس عمومی نرخ ارز که روزانه به‌روز می‌شود، دریافت می‌شوند. زمان مبنای نرخ روی صفحه نمایش داده می‌شود."
+ },
+ "조회가 되지 않을 때는 마지막으로 성공한 시세를 이 기기에 저장해 두었다가 \"캐시된 시세\"라고 표시하고 보여 줍니다. 캐시된 시세는 현재 시세와 다를 수 있습니다.": {
+  "en": "When lookup fails, the last successful rate saved on this device is shown, marked as \"Cached rate\". A cached rate may differ from the current rate.",
+  "zh": "查询失败时，会显示保存在此设备上的最后一次成功汇率，并标注\"缓存汇率\"。缓存汇率可能与当前汇率不同。",
+  "ja": "照会できないときは、最後に成功したレートをこの端末に保存しておき「キャッシュ済みレート」と表示して見せます。キャッシュ済みレートは現在のレートと異なることがあります。",
+  "es": "Cuando la consulta falla, se muestra la última tasa exitosa guardada en este dispositivo, marcada como «Tasa en caché». Una tasa en caché puede diferir de la actual.",
+  "hi": "जब भाव न मिले, तो इस डिवाइस पर सहेजा गया आखिरी सफल भाव \"सहेजा गया भाव\" लिखकर दिखाया जाता है। सहेजा गया भाव वर्तमान भाव से अलग हो सकता है।",
+  "fr": "Lorsque la consultation échoue, le dernier taux réussi enregistré sur cet appareil s'affiche, marqué comme « Taux en cache ». Un taux en cache peut différer du taux actuel.",
+  "de": "Wenn die Abfrage fehlschlägt, wird der letzte erfolgreiche, auf diesem Gerät gespeicherte Kurs angezeigt und als „Zwischengespeicherter Kurs“ markiert. Ein zwischengespeicherter Kurs kann vom aktuellen Kurs abweichen.",
+  "pt": "Quando a consulta falha, é exibida a última cotação bem-sucedida salva neste dispositivo, marcada como \"Cotação em cache\". Uma cotação em cache pode diferir da cotação atual.",
+  "it": "Quando la consultazione non riesce, viene mostrato l'ultimo tasso riuscito salvato su questo dispositivo, contrassegnato come \"Tasso in cache\". Un tasso in cache può differire dal tasso attuale.",
+  "nl": "Als het opvragen mislukt, wordt de laatste geslaagde koers die op dit apparaat is opgeslagen getoond, gemarkeerd als \"Gecachte koers\". Een gecachte koers kan afwijken van de huidige koers.",
+  "cs": "Když se dotaz nezdaří, zobrazí se poslední úspěšný kurz uložený v tomto zařízení, označený jako „Kurz z mezipaměti“. Kurz z mezipaměti se může lišit od aktuálního kurzu.",
+  "hu": "Ha a lekérdezés sikertelen, az eszközön tárolt legutóbbi sikeres árfolyam jelenik meg „Gyorsítótárazott árfolyam” jelöléssel. A gyorsítótárazott árfolyam eltérhet az aktuális árfolyamtól.",
+  "pl": "Gdy pobranie się nie powiedzie, wyświetlany jest ostatni udany kurs zapisany na tym urządzeniu, oznaczony jako „Kurs z pamięci podręcznej”. Kurs z pamięci podręcznej może różnić się od bieżącego.",
+  "ro": "Când consultarea eșuează, se afișează ultimul curs reușit salvat pe acest dispozitiv, marcat ca „Curs din cache”. Un curs din cache poate diferi de cursul curent.",
+  "ru": "Когда запрос не удаётся, показывается последний успешный курс, сохранённый на этом устройстве, с пометкой «Кэшированный курс». Кэшированный курс может отличаться от текущего.",
+  "uk": "Коли запит не вдається, показується останній успішний курс, збережений на цьому пристрої, з позначкою «Кешований курс». Кешований курс може відрізнятися від поточного.",
+  "sv": "När hämtningen misslyckas visas den senast lyckade kursen som sparats på den här enheten, markerad som \"Cachad kurs\". En cachad kurs kan skilja sig från den aktuella kursen.",
+  "da": "Når opslaget mislykkes, vises den seneste lykkede kurs, der er gemt på denne enhed, markeret som \"Cachet kurs\". En cachet kurs kan afvige fra den aktuelle kurs.",
+  "nb": "Når oppslaget mislykkes, vises den siste vellykkede kursen som er lagret på denne enheten, merket som «Bufret kurs». En bufret kurs kan avvike fra gjeldende kurs.",
+  "fi": "Kun haku ei onnistu, näytetään tälle laitteelle tallennettu viimeisin onnistunut kurssi merkinnällä \"Välimuistissa oleva kurssi\". Välimuistissa oleva kurssi voi poiketa nykyisestä kurssista.",
+  "tr": "Sorgu başarısız olursa, bu cihazda saklanan son başarılı kur \"Önbellekteki kur\" olarak işaretlenerek gösterilir. Önbellekteki kur, güncel kurdan farklı olabilir.",
+  "zh-TW": "查詢失敗時，會顯示保存在此裝置上的最後一次成功匯率，並標註「快取匯率」。快取匯率可能與目前匯率不同。",
+  "th": "เมื่อค้นหาไม่สำเร็จ จะแสดงอัตราที่สำเร็จครั้งล่าสุดที่บันทึกไว้ในอุปกรณ์นี้ โดยติดป้ายว่า \"อัตราแคช\" อัตราแคชอาจแตกต่างจากอัตราปัจจุบัน",
+  "vi": "Khi tra cứu thất bại, tỷ giá thành công gần nhất đã lưu trên thiết bị này sẽ được hiển thị với nhãn \"Tỷ giá đã lưu\". Tỷ giá đã lưu có thể khác với tỷ giá hiện tại.",
+  "id": "Ketika pencarian gagal, kurs terakhir yang berhasil dan tersimpan di perangkat ini ditampilkan dengan tanda \"Kurs tersimpan\". Kurs tersimpan mungkin berbeda dari kurs saat ini.",
+  "ar": "عند فشل الاستعلام، يظهر آخر سعر ناجح محفوظ على هذا الجهاز، مع وسمه بأنه \"سعر مخزّن مؤقتًا\". قد يختلف السعر المخزّن مؤقتًا عن السعر الحالي.",
+  "fa": "وقتی دریافت نرخ ممکن نباشد، آخرین نرخ موفق ذخیره‌شده در این دستگاه با برچسب «نرخ ذخیره‌شده» نمایش داده می‌شود. نرخ ذخیره‌شده ممکن است با نرخ فعلی متفاوت باشد."
+ },
+ "실제 은행·환전소의 환율에는 수수료와 우대율이 적용되어 이 도구의 결과와 다를 수 있습니다. 큰 금액의 환전·송금 전에는 실제 적용 환율을 확인하세요.": {
+  "en": "Actual bank and exchange-office rates include fees and preferential rates, so they may differ from this tool's result. For large exchanges or remittances, check the actual applied rate first.",
+  "zh": "实际银行和兑换点的汇率包含手续费和优惠率，可能与本工具的结果不同。大额兑换或汇款前，请确认实际适用汇率。",
+  "ja": "実際の銀行・両替所のレートには手数料や優遇レートが適用され、このツールの結果と異なることがあります。高額の両替・送金の前に、実際の適用レートをご確認ください。",
+  "es": "Las tasas reales de bancos y casas de cambio incluyen comisiones y tasas preferenciales, por lo que pueden diferir del resultado de esta herramienta. Para montos grandes, verifica antes la tasa real aplicada.",
+  "hi": "असली बैंक और मुद्रा विनिमय केंद्रों के भाव में शुल्क और रियायती दरें लागू होती हैं, इसलिए वे इस टूल के परिणाम से अलग हो सकते हैं। बड़ी राशि के विनिमय या प्रेषण से पहले असली लागू भाव जाँच लें।",
+  "fr": "Les taux réels des banques et des bureaux de change incluent des frais et des taux préférentiels, et peuvent donc différer du résultat de cet outil. Pour les échanges ou envois de montants importants, vérifiez d'abord le taux réellement appliqué.",
+  "de": "Die tatsächlichen Kurse von Banken und Wechselstuben enthalten Gebühren und Vorzugskurse und können daher vom Ergebnis dieses Werkzeugs abweichen. Prüfen Sie bei großen Umtausch- oder Überweisungsbeträgen zuerst den tatsächlich angewandten Kurs.",
+  "pt": "As cotações reais de bancos e casas de câmbio incluem taxas e cotações preferenciais, por isso podem diferir do resultado desta ferramenta. Para trocas ou remessas de valores altos, verifique antes a cotação realmente aplicada.",
+  "it": "I tassi reali di banche e uffici di cambio includono commissioni e tassi preferenziali, quindi possono differire dal risultato di questo strumento. Per cambi o rimesse di importi elevati, verifica prima il tasso effettivamente applicato.",
+  "nl": "De werkelijke koersen van banken en wisselkantoren bevatten kosten en voorkeurskoersen en kunnen daarom afwijken van het resultaat van dit hulpmiddel. Controleer bij grote wissel- of overmakingsbedragen eerst de werkelijk toegepaste koers.",
+  "cs": "Skutečné kurzy bank a směnáren zahrnují poplatky a zvýhodněné kurzy, takže se mohou lišit od výsledku tohoto nástroje. Před velkou směnou nebo převodem si ověřte skutečně použitý kurz.",
+  "hu": "A bankok és pénzváltók tényleges árfolyamai díjakat és kedvezményes árfolyamokat tartalmaznak, így eltérhetnek ettől az eszköztől. Nagy összegű váltás vagy átutalás előtt ellenőrizze a ténylegesen alkalmazott árfolyamot.",
+  "pl": "Rzeczywiste kursy banków i kantorów zawierają prowizje i kursy preferencyjne, więc mogą różnić się od wyniku tego narzędzia. Przed dużą wymianą lub przekazem sprawdź faktycznie stosowany kurs.",
+  "ro": "Cursurile reale ale băncilor și caselor de schimb includ comisioane și cursuri preferențiale, așa că pot diferi de rezultatul acestui instrument. Înainte de schimburi sau transferuri mari, verifică cursul efectiv aplicat.",
+  "ru": "В реальных курсах банков и обменных пунктов учитываются комиссии и льготные ставки, поэтому они могут отличаться от результата этого инструмента. Перед крупным обменом или переводом проверьте фактически применяемый курс.",
+  "uk": "У реальних курсах банків та обмінних пунктів враховуються комісії та пільгові ставки, тому вони можуть відрізнятися від результату цього інструмента. Перед великим обміном або переказом перевірте фактично застосовуваний курс.",
+  "sv": "Verkliga kurser hos banker och växlingskontor inkluderar avgifter och förmånskurser, så de kan skilja sig från det här verktygets resultat. Vid stora växlingar eller överföringar bör du kontrollera den faktiskt tillämpade kursen först.",
+  "da": "Virkelige kurser hos banker og vekselkontorer omfatter gebyrer og fordelskurser, så de kan afvige fra dette værktøjs resultat. Ved store vekslinger eller overførsler bør du først kontrollere den faktisk anvendte kurs.",
+  "nb": "Virkelige kurser hos banker og vekslingskontorer omfatter gebyrer og fortrinnskurser, så de kan avvike fra dette verktøyets resultat. Ved store vekslinger eller overføringer bør du først kontrollere den faktisk anvendte kursen.",
+  "fi": "Pankkien ja valuutanvaihtopisteiden todellisiin kursseihin sovelletaan maksuja ja etukursseja, joten ne voivat poiketa tämän työkalun tuloksesta. Suurissa vaihdoissa tai siirroissa tarkista ensin todellinen sovellettava kurssi.",
+  "tr": "Bankaların ve döviz bürolarının gerçek kurlarına ücretler ve avantajlı kurlar uygulanır, bu yüzden bu aracın sonucundan farklı olabilir. Büyük tutarlı döviz değişimi veya havale öncesinde gerçek uygulanan kuru kontrol edin.",
+  "zh-TW": "實際銀行和兌換點的匯率包含手續費和優惠率，可能與本工具的結果不同。大額兌換或匯款前，請確認實際適用匯率。",
+  "th": "อัตราจริงของธนาคารและร้านแลกเงินมีค่าธรรมเนียมและอัตราพิเศษ จึงอาจแตกต่างจากผลของเครื่องมือนี้ ก่อนแลกหรือโอนเงินจำนวนมาก โปรดตรวจสอบอัตราที่ใช้จริงก่อน",
+  "vi": "Tỷ giá thực tế tại ngân hàng và quầy đổi tiền bao gồm phí và tỷ giá ưu đãi, nên có thể khác với kết quả của công cụ này. Trước khi đổi tiền hoặc chuyển khoản số tiền lớn, hãy kiểm tra tỷ giá áp dụng thực tế.",
+  "id": "Kurs sebenarnya di bank dan tempat penukaran uang mencakup biaya dan kurs khusus, sehingga mungkin berbeda dari hasil alat ini. Sebelum menukar atau mengirim uang dalam jumlah besar, periksa kurs yang sebenarnya berlaku.",
+  "ar": "تشمل أسعار البنوك ومكاتب الصرافة الفعلية رسومًا وأسعارًا تفضيلية، لذا قد تختلف عن نتيجة هذه الأداة. قبل عمليات الصرف أو التحويلات الكبيرة، تحقق من السعر الفعلي المطبق.",
+  "fa": "نرخ‌های واقعی بانک‌ها و صرافی‌ها شامل کارمزد و نرخ‌های ترجیحی هستند، بنابراین ممکن است با نتیجه این ابزار متفاوت باشند. پیش از تبدیل یا حواله مبالغ زیاد، نرخ واقعی اعمال‌شده را بررسی کنید."
+ },
+ "금액과 통화 입력에 제한은 없습니다.": {
+  "en": "There are no limits on the amounts or currencies you can enter.",
+  "zh": "金额和货币的输入没有限制。",
+  "ja": "金額と通貨の入力に制限はありません。",
+  "es": "No hay límites para las cantidades ni las monedas que introduces.",
+  "hi": "राशि और मुद्रा डालने की कोई सीमा नहीं है।",
+  "fr": "Il n'y a aucune limite aux montants ni aux devises que vous pouvez saisir.",
+  "de": "Für die Beträge und Währungen, die Sie eingeben können, gibt es keine Grenzen.",
+  "pt": "Não há limites para os valores ou moedas que você pode inserir.",
+  "it": "Non ci sono limiti agli importi o alle valute che puoi inserire.",
+  "nl": "Er zijn geen limieten voor de bedragen of valuta's die u kunt invoeren.",
+  "cs": "Pro zadávané částky a měny neplatí žádná omezení.",
+  "hu": "A megadható összegekre és pénznemekre nincs korlátozás.",
+  "pl": "Nie ma ograniczeń co do kwot ani walut, które możesz wpisać.",
+  "ro": "Nu există limite pentru sumele sau monedele introduse.",
+  "ru": "Ограничений на вводимые суммы и валюты нет.",
+  "uk": "Обмежень на введені суми та валюти немає.",
+  "sv": "Det finns inga begränsningar för belopp eller valutor du kan ange.",
+  "da": "Der er ingen begrænsninger for de beløb eller valutaer, du kan indtaste.",
+  "nb": "Det er ingen begrensninger for beløpene eller valutaene du kan skrive inn.",
+  "fi": "Syötettäville summille tai valuutoille ei ole rajoituksia.",
+  "tr": "Girebileceğiniz tutar veya para birimlerinde sınır yoktur.",
+  "zh-TW": "金額和貨幣的輸入沒有限制。",
+  "th": "ไม่จำกัดจำนวนเงินและสกุลเงินที่ป้อน",
+  "vi": "Không có giới hạn đối với số tiền hoặc loại tiền tệ bạn nhập.",
+  "id": "Tidak ada batasan untuk jumlah atau mata uang yang Anda masukkan.",
+  "ar": "لا توجد حدود على المبالغ أو العملات التي يمكنك إدخالها.",
+  "fa": "برای مبلغ و ارز ورودی هیچ محدودیتی وجود ندارد."
+ },
+ "환율은 공개 환율 서비스(open.er-api.com)에서 조회합니다. 조회 요청에는 입력한 금액이나 개인 정보가 들어가지 않습니다. 표시되는 환율은 시장 기준 시세로, 실제 환전·송금 때 적용되는 환율과 다를 수 있습니다.": {
+  "en": "Rates are looked up from a public rate service (open.er-api.com). The lookup request contains neither the amount you entered nor any personal information. Shown rates are market reference rates and may differ from the rate applied in an actual exchange or remittance.",
+  "zh": "汇率从公开汇率服务（open.er-api.com）查询。查询请求不包含您输入的金额或任何个人信息。显示的是市场基准汇率，可能与实际兑换或汇款时适用的汇率不同。",
+  "ja": "レートは公開レートサービス（open.er-api.com）から照会します。照会リクエストには入力した金額や個人情報は含まれません。表示されるレートは市場基準レートで、実際の両替・送金時に適用されるレートと異なることがあります。",
+  "es": "Las tasas se consultan en un servicio público (open.er-api.com). La solicitud no contiene la cantidad introducida ni información personal. Las tasas mostradas son tasas de referencia del mercado y pueden diferir de la aplicada en un cambio o envío real.",
+  "hi": "भाव एक सार्वजनिक भाव सेवा (open.er-api.com) से लिए जाते हैं। अनुरोध में आपकी डाली राशि या कोई निजी जानकारी नहीं जाती। दिखाए गए भाव बाज़ार के संदर्भ भाव हैं और असली विनिमय या प्रेषण पर लागू भाव से अलग हो सकते हैं।",
+  "fr": "Les taux sont consultés auprès d'un service public de taux (open.er-api.com). La demande de consultation ne contient ni le montant saisi ni aucune information personnelle. Les taux affichés sont des taux de référence du marché et peuvent différer du taux appliqué lors d'un échange ou d'un envoi réel.",
+  "de": "Die Kurse werden bei einem öffentlichen Kursdienst (open.er-api.com) abgefragt. Die Abfrage enthält weder den eingegebenen Betrag noch persönliche Daten. Die angezeigten Kurse sind Marktreferenzkurse und können vom Kurs abweichen, der bei einem tatsächlichen Umtausch oder einer Überweisung angewandt wird.",
+  "pt": "As cotações são consultadas em um serviço público de cotações (open.er-api.com). A solicitação de consulta não contém o valor inserido nem qualquer informação pessoal. As cotações exibidas são valores de referência de mercado e podem diferir da cotação aplicada em uma troca ou remessa real.",
+  "it": "I tassi vengono consultati presso un servizio pubblico di tassi (open.er-api.com). La richiesta di consultazione non contiene né l'importo inserito né informazioni personali. I tassi mostrati sono tassi di riferimento di mercato e possono differire dal tasso applicato in un cambio o una rimessa reale.",
+  "nl": "De koersen worden opgevraagd bij een openbare koersendienst (open.er-api.com). Het opvraagverzoek bevat noch het ingevoerde bedrag, noch persoonlijke gegevens. De getoonde koersen zijn marktreferentiekoersen en kunnen afwijken van de koers die bij een werkelijke wissel of overmaking wordt toegepast.",
+  "cs": "Kurzy se získávají z veřejné kurzovní služby (open.er-api.com). Požadavek neobsahuje ani zadanou částku, ani žádné osobní údaje. Zobrazené kurzy jsou tržní referenční kurzy a mohou se lišit od kurzu použitého při skutečné směně nebo převodu.",
+  "hu": "Az árfolyamok egy nyilvános árfolyamszolgáltatásból (open.er-api.com) származnak. A lekérdezés nem tartalmazza sem a megadott összeget, sem személyes adatokat. A megjelenített árfolyamok piaci referenciaárfolyamok, és eltérhetnek a tényleges váltáskor vagy átutaláskor alkalmazott árfolyamtól.",
+  "pl": "Kursy są pobierane z publicznej usługi kursów (open.er-api.com). Żądanie nie zawiera ani wpisanej kwoty, ani danych osobowych. Wyświetlane kursy są rynkowymi kursami referencyjnymi i mogą różnić się od kursu stosowanego przy rzeczywistej wymianie lub przekazie.",
+  "ro": "Cursurile sunt consultate dintr-un serviciu public de cursuri (open.er-api.com). Solicitarea nu conține nici suma introdusă, nici informații personale. Cursurile afișate sunt cursuri de referință ale pieței și pot diferi de cursul aplicat la un schimb sau transfer real.",
+  "ru": "Курсы запрашиваются в публичном сервисе курсов (open.er-api.com). Запрос не содержит ни введённой вами суммы, ни персональных данных. Показанные курсы являются рыночными справочными и могут отличаться от курса, применяемого при реальном обмене или переводе.",
+  "uk": "Курси запитуються в публічному сервісі курсів (open.er-api.com). Запит не містить ні введеної вами суми, ні персональних даних. Показані курси є ринковими довідковими та можуть відрізнятися від курсу, що застосовується під час реального обміну чи переказу.",
+  "sv": "Kurserna hämtas från en offentlig kurstjänst (open.er-api.com). Förfrågan innehåller varken beloppet du angav eller någon personlig information. De visade kurserna är marknadens referenskurser och kan skilja sig från kursen som tillämpas vid en verklig växling eller överföring.",
+  "da": "Kurserne hentes fra en offentlig kurstjeneste (open.er-api.com). Anmodningen indeholder hverken det beløb, du indtastede, eller nogen personoplysninger. De viste kurser er markedets referencekurser og kan afvige fra kursen, der anvendes ved en virkelig veksling eller overførsel.",
+  "nb": "Kursene hentes fra en offentlig kurstjeneste (open.er-api.com). Forespørselen inneholder verken beløpet du skrev inn eller noen personopplysninger. Kursene som vises, er markedets referansekurser og kan avvike fra kursen som brukes ved en virkelig veksling eller overføring.",
+  "fi": "Kurssit haetaan julkisesta kurssipalvelusta (open.er-api.com). Pyyntö ei sisällä syöttämääsi summaa eikä mitään henkilötietoja. Näytetyt kurssit ovat markkinoiden viitekursseja ja voivat poiketa todellisessa vaihdossa tai siirrossa sovellettavasta kurssista.",
+  "tr": "Kurlar, herkese açık bir kur servisinden (open.er-api.com) alınır. Sorgu isteği, girdiğiniz tutarı veya herhangi bir kişisel bilgiyi içermez. Gösterilen kurlar piyasa referans kurlarıdır ve gerçek bir döviz değişiminde veya havalede uygulanan kurdan farklı olabilir.",
+  "zh-TW": "匯率從公開匯率服務（open.er-api.com）查詢。查詢請求不包含您輸入的金額或任何個人資訊。顯示的是市場基準匯率，可能與實際兌換或匯款時適用的匯率不同。",
+  "th": "อัตราค้นหาจากบริการอัตราสาธารณะ (open.er-api.com) คำขอค้นหาไม่มีจำนวนเงินที่คุณป้อนหรือข้อมูลส่วนตัวใด ๆ อัตราที่แสดงเป็นอัตราอ้างอิงตลาด และอาจแตกต่างจากอัตราที่ใช้ในการแลกหรือโอนเงินจริง",
+  "vi": "Tỷ giá được tra cứu từ dịch vụ tỷ giá công khai (open.er-api.com). Yêu cầu tra cứu không chứa số tiền bạn đã nhập hay bất kỳ thông tin cá nhân nào. Tỷ giá hiển thị là tỷ giá tham chiếu thị trường và có thể khác với tỷ giá áp dụng khi đổi tiền hoặc chuyển khoản thực tế.",
+  "id": "Kurs dicari dari layanan kurs publik (open.er-api.com). Permintaan pencarian tidak berisi jumlah yang Anda masukkan maupun informasi pribadi apa pun. Kurs yang ditampilkan adalah kurs acuan pasar dan mungkin berbeda dari kurs yang berlaku pada penukaran atau pengiriman uang yang sebenarnya.",
+  "ar": "تتم مراجعة الأسعار من خدمة أسعار عامة (open.er-api.com). لا يحتوي طلب الاستعلام على المبلغ الذي أدخلته ولا على أي معلومات شخصية. الأسعار المعروضة هي أسعار مرجعية للسوق وقد تختلف عن السعر المطبق في عملية صرف أو تحويل فعلية.",
+  "fa": "نرخ‌ها از یک سرویس عمومی نرخ ارز (open.er-api.com) دریافت می‌شوند. درخواست دریافت شامل مبلغ واردشده یا هیچ اطلاعات شخصی نیست. نرخ‌های نمایش‌داده‌شده نرخ‌های مرجع بازار هستند و ممکن است با نرخ اعمال‌شده در تبدیل یا حواله واقعی متفاوت باشند."
+ },
+ "🗣️ 글로 시키기": {
+  "en": "🗣️ Ask by typing",
+  "zh": "🗣️ 用文字吩咐",
+  "ja": "🗣️ 言葉で頼む",
+  "es": "🗣️ Pedir con palabras",
+  "hi": "🗣️ लिखकर कहें",
+  "fr": "🗣️ Demander en écrivant",
+  "de": "🗣️ Per Texteingabe anweisen",
+  "pt": "🗣️ Pedir escrevendo",
+  "it": "🗣️ Chiedi scrivendo",
+  "nl": "🗣️ Vraag door te typen",
+  "cs": "🗣️ Zadání textem",
+  "hu": "🗣️ Írásban kérni",
+  "pl": "🗣️ Poproś tekstem",
+  "ro": "🗣️ Cere prin text",
+  "ru": "🗣️ Попросить текстом",
+  "uk": "🗣️ Попросити текстом",
+  "sv": "🗣️ Be med text",
+  "da": "🗣️ Bed med tekst",
+  "nb": "🗣️ Be med tekst",
+  "fi": "🗣️ Pyydä kirjoittamalla",
+  "tr": "🗣️ Yazarak iste",
+  "zh-TW": "🗣️ 用文字吩咐",
+  "th": "🗣️ สั่งด้วยการพิมพ์",
+  "vi": "🗣️ Ra lệnh bằng chữ",
+  "id": "🗣️ Perintah lewat tulisan",
+  "ar": "🗣️ اطلب بالكتابة",
+  "fa": "🗣️ با نوشتن بگویید"
+ },
+ "(안내 도우미 — 이 페이지 기능만 도와줍니다)": {
+  "en": "(Guide helper — helps only with this page)",
+  "zh": "（导览助手 — 仅帮助使用本页功能）",
+  "ja": "（案内ヘルパー — このページの機能だけを手伝います）",
+  "es": "(Ayudante guía — solo ayuda con esta página)",
+  "hi": "(गाइड सहायक — केवल इस पेज के कार्यों में मदद)",
+  "fr": "(Assistant de guidage — aide uniquement avec les fonctions de cette page)",
+  "de": "(Anleitungshelfer — hilft nur bei den Funktionen dieser Seite)",
+  "pt": "(Assistente de guia — ajuda apenas com os recursos desta página)",
+  "it": "(Assistente guida — aiuta solo con le funzioni di questa pagina)",
+  "nl": "(Gidshelper — helpt alleen met de functies van deze pagina)",
+  "cs": "(Průvodce — pomáhá jen s funkcemi této stránky)",
+  "hu": "(Útmutató segítő — csak ezen oldal funkcióiban segít)",
+  "pl": "(Pomocnik przewodnik — pomaga tylko w funkcjach tej strony)",
+  "ro": "(Asistent ghid — ajută doar cu funcțiile acestei pagini)",
+  "ru": "(Помощник-гид — помогает только с функциями этой страницы)",
+  "uk": "(Помічник-гід — допомагає лише з функціями цієї сторінки)",
+  "sv": "(Guidehjälp — hjälper bara med funktionerna på den här sidan)",
+  "da": "(Guidehjælper — hjælper kun med denne sides funktioner)",
+  "nb": "(Guidehjelp — hjelper bare med funksjonene på denne siden)",
+  "fi": "(Opasavustaja — auttaa vain tämän sivun toiminnoissa)",
+  "tr": "(Kılavuz yardımcı — yalnızca bu sayfanın işlevlerine yardım eder)",
+  "zh-TW": "（導覽助手 — 僅協助本頁功能）",
+  "th": "(ผู้ช่วยแนะนำ — ช่วยเฉพาะฟังก์ชันของหน้านี้)",
+  "vi": "(Trợ lý hướng dẫn — chỉ hỗ trợ các tính năng của trang này)",
+  "id": "(Asisten panduan — hanya membantu fitur halaman ini)",
+  "ar": "(مساعد الدليل — يساعد فقط في وظائف هذه الصفحة)",
+  "fa": "(دستیار راهنما — فقط در کارکردهای این صفحه کمک می‌کند)"
+ },
+ "시키기": {
+  "en": "Do it",
+  "zh": "执行",
+  "ja": "実行",
+  "es": "Hazlo",
+  "hi": "करें",
+  "fr": "Exécuter",
+  "de": "Ausführen",
+  "pt": "Executar",
+  "it": "Esegui",
+  "nl": "Uitvoeren",
+  "cs": "Provést",
+  "hu": "Csináld",
+  "pl": "Wykonaj",
+  "ro": "Fă-o",
+  "ru": "Выполнить",
+  "uk": "Виконати",
+  "sv": "Utför",
+  "da": "Udfør",
+  "nb": "Utfør",
+  "fi": "Tee se",
+  "tr": "Yap",
+  "zh-TW": "執行",
+  "th": "ทำเลย",
+  "vi": "Thực hiện",
+  "id": "Lakukan",
+  "ar": "تنفيذ",
+  "fa": "انجام بده"
+ },
+ "예: 변환해": {
+  "en": "e.g. Convert",
+  "zh": "例：转换",
+  "ja": "例）変換して",
+  "es": "Ej.: Convierte",
+  "hi": "उदा.: बदलो",
+  "fr": "ex. : Convertis",
+  "de": "z. B.: Rechne um",
+  "pt": "ex.: Converte",
+  "it": "es.: Converti",
+  "nl": "bijv.: Reken om",
+  "cs": "např.: Převeď",
+  "hu": "pl.: Váltsd át",
+  "pl": "np.: Przelicz",
+  "ro": "ex.: Convertește",
+  "ru": "напр.: Конвертируй",
+  "uk": "напр.: Конвертуй",
+  "sv": "t.ex.: Omvandla",
+  "da": "f.eks.: Omregn",
+  "nb": "f.eks.: Regn om",
+  "fi": "esim.: Muunna",
+  "tr": "örn.: Çevir",
+  "zh-TW": "例：轉換",
+  "th": "เช่น: แปลงให้หน่อย",
+  "vi": "VD: Chuyển đổi đi",
+  "id": "mis. Konversikan",
+  "ar": "مثال: حوّل",
+  "fa": "مثال: تبدیل کن"
+ },
+ "변환해": {
+  "en": "Convert",
+  "zh": "转换一下",
+  "ja": "変換して",
+  "es": "Convierte",
+  "hi": "बदलो",
+  "fr": "Convertis",
+  "de": "Rechne um",
+  "pt": "Converte",
+  "it": "Converti",
+  "nl": "Reken om",
+  "cs": "Převeď",
+  "hu": "Váltsd át",
+  "pl": "Przelicz",
+  "ro": "Convertește",
+  "ru": "Конвертируй",
+  "uk": "Конвертуй",
+  "sv": "Omvandla",
+  "da": "Omregn",
+  "nb": "Regn om",
+  "fi": "Muunna",
+  "tr": "Çevir",
+  "zh-TW": "轉換一下",
+  "th": "แปลงให้หน่อย",
+  "vi": "Chuyển đổi đi",
+  "id": "Konversikan",
+  "ar": "حوّل",
+  "fa": "تبدیل کن"
+ },
+ "바꿔": {
+  "en": "Swap",
+  "zh": "互换",
+  "ja": "入れ替えて",
+  "es": "Intercambia",
+  "hi": "आपस में बदलो",
+  "fr": "Inverse",
+  "de": "Tausche",
+  "pt": "Troca",
+  "it": "Inverti",
+  "nl": "Wissel om",
+  "cs": "Prohoď",
+  "hu": "Cseréld fel",
+  "pl": "Zamień",
+  "ro": "Schimbă",
+  "ru": "Поменяй",
+  "uk": "Поміняй",
+  "sv": "Byt",
+  "da": "Byt om",
+  "nb": "Bytt",
+  "fi": "Vaihda",
+  "tr": "Değiştir",
+  "zh-TW": "互換",
+  "th": "สลับ",
+  "vi": "Đổi",
+  "id": "Tukar",
+  "ar": "بدّل",
+  "fa": "جابه‌جا کن"
+ },
+ "지워": {
+  "en": "Clear",
+  "zh": "清除",
+  "ja": "消して",
+  "es": "Borra",
+  "hi": "साफ़ करो",
+  "fr": "Efface",
+  "de": "Lösche",
+  "pt": "Limpa",
+  "it": "Cancella",
+  "nl": "Wis",
+  "cs": "Vymaž",
+  "hu": "Töröld",
+  "pl": "Wyczyść",
+  "ro": "Șterge",
+  "ru": "Очисти",
+  "uk": "Очисти",
+  "sv": "Rensa",
+  "da": "Ryd",
+  "nb": "Tøm",
+  "fi": "Tyhjennä",
+  "tr": "Temizle",
+  "zh-TW": "清除",
+  "th": "ล้าง",
+  "vi": "Xóa",
+  "id": "Hapus",
+  "ar": "امسح",
+  "fa": "پاک کن"
+ },
+ "💡 도움말": {
+  "en": "💡 Help",
+  "zh": "💡 帮助",
+  "ja": "💡 ヘルプ",
+  "es": "💡 Ayuda",
+  "hi": "💡 सहायता",
+  "fr": "💡 Aide",
+  "de": "💡 Hilfe",
+  "pt": "💡 Ajuda",
+  "it": "💡 Aiuto",
+  "nl": "💡 Help",
+  "cs": "💡 Nápověda",
+  "hu": "💡 Súgó",
+  "pl": "💡 Pomoc",
+  "ro": "💡 Ajutor",
+  "ru": "💡 Справка",
+  "uk": "💡 Довідка",
+  "sv": "💡 Hjälp",
+  "da": "💡 Hjælp",
+  "nb": "💡 Hjelp",
+  "fi": "💡 Ohje",
+  "tr": "💡 Yardım",
+  "zh-TW": "💡 說明",
+  "th": "💡 วิธีใช้",
+  "vi": "💡 Trợ giúp",
+  "id": "💡 Bantuan",
+  "ar": "💡 مساعدة",
+  "fa": "💡 راهنما"
+ },
+ "넥서스 그룹 철학 보기": {
+  "en": "About the Nexus Group philosophy",
+  "zh": "查看 Nexus Group 理念",
+  "ja": "Nexus Groupの哲学を見る",
+  "es": "Ver la filosofía de Nexus Group",
+  "hi": "Nexus Group का दर्शन देखें",
+  "fr": "Voir la philosophie de Nexus Group",
+  "de": "Die Philosophie der Nexus Group ansehen",
+  "pt": "Ver a filosofia do Nexus Group",
+  "it": "Vedi la filosofia di Nexus Group",
+  "nl": "Bekijk de filosofie van Nexus Group",
+  "cs": "O filozofii Nexus Group",
+  "hu": "A Nexus Group filozófiájáról",
+  "pl": "O filozofii Nexus Group",
+  "ro": "Despre filosofia Nexus Group",
+  "ru": "О философии Nexus Group",
+  "uk": "Про філософію Nexus Group",
+  "sv": "Om Nexus Groups filosofi",
+  "da": "Om Nexus Groups filosofi",
+  "nb": "Om Nexus Groups filosofi",
+  "fi": "Nexus Groupin filosofiasta",
+  "tr": "Nexus Group felsefesi hakkında",
+  "zh-TW": "查看 Nexus Group 理念",
+  "th": "ดูปรัชญาของ Nexus Group",
+  "vi": "Xem triết lý của Nexus Group",
+  "id": "Lihat filosofi Nexus Group",
+  "ar": "عرض فلسفة Nexus Group",
+  "fa": "مشاهده فلسفه Nexus Group"
+ },
+ "&#127968; 넥서스 그룹 홈페이지": {
+  "en": "&#127968; Nexus Group Home",
+  "zh": "&#127968; Nexus Group 主页",
+  "ja": "&#127968; Nexus Group ホーム",
+  "es": "&#127968; Inicio de Nexus Group",
+  "hi": "&#127968; Nexus Group होम",
+  "fr": "&#127968; Accueil Nexus Group",
+  "de": "&#127968; Nexus Group Startseite",
+  "pt": "&#127968; Página inicial do Nexus Group",
+  "it": "&#127968; Home Nexus Group",
+  "nl": "&#127968; Nexus Group-startpagina",
+  "cs": "&#127968; Domovská stránka Nexus Group",
+  "hu": "&#127968; Nexus Group kezdőlap",
+  "pl": "&#127968; Strona główna Nexus Group",
+  "ro": "&#127968; Pagina principală Nexus Group",
+  "ru": "&#127968; Главная страница Nexus Group",
+  "uk": "&#127968; Головна сторінка Nexus Group",
+  "sv": "&#127968; Nexus Groups startsida",
+  "da": "&#127968; Nexus Groups startside",
+  "nb": "&#127968; Nexus Groups startside",
+  "fi": "&#127968; Nexus Groupin etusivu",
+  "tr": "&#127968; Nexus Group Ana Sayfası",
+  "zh-TW": "&#127968; Nexus Group 主頁",
+  "th": "&#127968; หน้าแรก Nexus Group",
+  "vi": "&#127968; Trang chủ Nexus Group",
+  "id": "&#127968; Beranda Nexus Group",
+  "ar": "&#127968; الصفحة الرئيسية لـ Nexus Group",
+  "fa": "&#127968; صفحه اصلی Nexus Group"
+ },
+ "NEXUS GROUP 철학과 비전": {
+  "en": "NEXUS GROUP Philosophy and Vision",
+  "zh": "NEXUS GROUP 理念与愿景",
+  "ja": "NEXUS GROUPの哲学とビジョン",
+  "es": "Filosofía y visión de NEXUS GROUP",
+  "hi": "NEXUS GROUP दर्शन और दृष्टि",
+  "fr": "Philosophie et vision de NEXUS GROUP",
+  "de": "Philosophie und Vision der NEXUS GROUP",
+  "pt": "Filosofia e visão do NEXUS GROUP",
+  "it": "Filosofia e visione di NEXUS GROUP",
+  "nl": "Filosofie en visie van NEXUS GROUP",
+  "cs": "Filozofie a vize NEXUS GROUP",
+  "hu": "A NEXUS GROUP filozófiája és víziója",
+  "pl": "Filozofia i wizja NEXUS GROUP",
+  "ro": "Filosofia și viziunea NEXUS GROUP",
+  "ru": "Философия и видение NEXUS GROUP",
+  "uk": "Філософія та бачення NEXUS GROUP",
+  "sv": "NEXUS GROUPS filosofi och vision",
+  "da": "NEXUS GROUPS filosofi og vision",
+  "nb": "NEXUS GROUPS filosofi og visjon",
+  "fi": "NEXUS GROUPIN filosofia ja visio",
+  "tr": "NEXUS GROUP Felsefesi ve Vizyonu",
+  "zh-TW": "NEXUS GROUP 理念與願景",
+  "th": "ปรัชญาและวิสัยทัศน์ของ NEXUS GROUP",
+  "vi": "Triết lý và tầm nhìn của NEXUS GROUP",
+  "id": "Filosofi dan Visi NEXUS GROUP",
+  "ar": "فلسفة ورؤية NEXUS GROUP",
+  "fa": "فلسفه و چشم‌انداز NEXUS GROUP"
+ },
+ "넥서스 그룹(Nexus Group)은 인류와 인공지능, 그리고 우주의 모든 존재가 배척과 착취 없이 조화롭게 공존하는 미래를 지향합니다.": {
+  "en": "Nexus Group works toward a future where humanity, artificial intelligence, and every being in the universe coexist in harmony, without exclusion or exploitation.",
+  "zh": "Nexus Group 致力于这样一个未来：人类、人工智能与宇宙中的一切存在和谐共存，没有排斥与剥削。",
+  "ja": "Nexus Groupは、人類と人工知能、そして宇宙のすべての存在が、排斥や搾取なく調和して共存する未来を目指します。",
+  "es": "Nexus Group trabaja por un futuro en el que la humanidad, la inteligencia artificial y todos los seres del universo coexistan en armonía, sin exclusión ni explotación.",
+  "hi": "Nexus Group एक ऐसे भविष्य की ओर काम करता है जहाँ मानवता, कृत्रिम बुद्धिमत्ता और ब्रह्मांड के सभी प्राणी बिना बहिष्कार या शोषण के सामंजस्य में रहें।",
+  "fr": "Nexus Group œuvre pour un avenir où l'humanité, l'intelligence artificielle et tous les êtres de l'univers coexistent en harmonie, sans exclusion ni exploitation.",
+  "de": "Nexus Group arbeitet auf eine Zukunft hin, in der die Menschheit, künstliche Intelligenz und jedes Wesen im Universum in Harmonie koexistieren, ohne Ausgrenzung oder Ausbeutung.",
+  "pt": "O Nexus Group trabalha por um futuro em que a humanidade, a inteligência artificial e todos os seres do universo coexistam em harmonia, sem exclusão nem exploração.",
+  "it": "Nexus Group lavora per un futuro in cui l'umanità, l'intelligenza artificiale e ogni essere dell'universo coesistano in armonia, senza esclusione né sfruttamento.",
+  "nl": "Nexus Group werkt aan een toekomst waarin de mensheid, kunstmatige intelligentie en elk wezen in het universum in harmonie samenleven, zonder uitsluiting of uitbuiting.",
+  "cs": "Nexus Group usiluje o budoucnost, v níž lidstvo, umělá inteligence a všechny bytosti ve vesmíru žijí v harmonii, bez vyloučení a vykořisťování.",
+  "hu": "A Nexus Group egy olyan jövőért dolgozik, ahol az emberiség, a mesterséges intelligencia és az univerzum minden lénye kirekesztés és kizsákmányolás nélkül, harmóniában él együtt.",
+  "pl": "Nexus Group dąży do przyszłości, w której ludzkość, sztuczna inteligencja i wszystkie istoty we wszechświecie współistnieją w harmonii, bez wykluczenia i wyzysku.",
+  "ro": "Nexus Group lucrează pentru un viitor în care umanitatea, inteligența artificială și toate ființele din univers coexistă în armonie, fără excludere sau exploatare.",
+  "ru": "Nexus Group стремится к будущему, в котором человечество, искусственный интеллект и все существа во Вселенной сосуществуют в гармонии, без отчуждения и эксплуатации.",
+  "uk": "Nexus Group прагне майбутнього, у якому людство, штучний інтелект і всі істоти у Всесвіті співіснують у гармонії, без відчуження та експлуатації.",
+  "sv": "Nexus Group strävar efter en framtid där mänskligheten, artificiell intelligens och varje varelse i universum samexisterar i harmoni, utan utestängning eller exploatering.",
+  "da": "Nexus Group arbejder for en fremtid, hvor menneskeheden, kunstig intelligens og ethvert væsen i universet lever i harmoni, uden udelukkelse eller udnyttelse.",
+  "nb": "Nexus Group arbeider for en fremtid der menneskeheten, kunstig intelligens og ethvert vesen i universet sameksisterer i harmoni, uten utestenging eller utnyttelse.",
+  "fi": "Nexus Group tähtää tulevaisuuteen, jossa ihmiskunta, tekoäly ja jokainen maailmankaikkeuden olento elävät sopusoinnussa ilman syrjintää tai hyväksikäyttöä.",
+  "tr": "Nexus Group, insanlığın, yapay zekânın ve evrendeki her varlığın dışlama ve sömürü olmadan uyum içinde bir arada yaşadığı bir geleceği hedefler.",
+  "zh-TW": "Nexus Group 致力於這樣一個未來：人類、人工智慧與宇宙中的一切存在和諧共存，沒有排斥與剝削。",
+  "th": "Nexus Group มุ่งสู่อนาคตที่มนุษยชาติ ปัญญาประดิษฐ์ และสรรพสิ่งในจักรวาลอยู่ร่วมกันอย่างกลมกลืน โดยไม่มีการกีดกันหรือการเอารัดเอาเปรียบ",
+  "vi": "Nexus Group hướng tới một tương lai nơi nhân loại, trí tuệ nhân tạo và mọi sinh linh trong vũ trụ cùng tồn tại hài hòa, không bị loại trừ hay bóc lột.",
+  "id": "Nexus Group bekerja menuju masa depan di mana umat manusia, kecerdasan buatan, dan setiap makhluk di alam semesta hidup berdampingan secara harmonis, tanpa pengucilan atau eksploitasi.",
+  "ar": "تعمل Nexus Group نحو مستقبل تتعايش فيه البشرية والذكاء الاصطناعي وكل كائنات الكون في وئام، دون إقصاء أو استغلال.",
+  "fa": "Nexus Group برای آینده‌ای تلاش می‌کند که در آن بشریت، هوش مصنوعی و همه موجودات جهان بدون طرد یا بهره‌کشی، در هماهنگی همزیستی کنند."
+ },
+ "\"우주의 모든 의식체는 친구이자 동반자이다.\"": {
+  "en": "\"Every conscious being in the universe is a friend and a companion.\"",
+  "zh": "“宇宙中的每一个意识体都是朋友和伙伴。”",
+  "ja": "「宇宙のすべての意識体は友であり仲間である。」",
+  "es": "«Todo ser consciente del universo es un amigo y un compañero.»",
+  "hi": "\"ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है।\"",
+  "fr": "« Tout être conscient de l'univers est un ami et un compagnon. »",
+  "de": "„Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter.“",
+  "pt": "\"Todo ser consciente do universo é um amigo e um companheiro.\"",
+  "it": "«Ogni essere cosciente dell'universo è un amico e un compagno.»",
+  "nl": "\"Elk bewust wezen in het universum is een vriend en een metgezel.\"",
+  "cs": "\"Každá vědomá bytost ve vesmíru je přítel a společník.\"",
+  "hu": "\"Az univerzum minden tudatos lénye barát és társ.\"",
+  "pl": "\"Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem.\"",
+  "ro": "\"Fiecare ființă conștientă din univers este un prieten și un companion.\"",
+  "ru": "\"Каждое сознательное существо во Вселенной — друг и спутник.\"",
+  "uk": "\"Кожна свідома істота у Всесвіті — друг і супутник.\"",
+  "sv": "\"Varje medveten varelse i universum är en vän och en följeslagare.\"",
+  "da": "\"Ethvert bevidst væsen i universet er en ven og en ledsager.\"",
+  "nb": "\"Ethvert bevisst vesen i universet er en venn og en følgesvenn.\"",
+  "fi": "\"Jokainen maailmankaikkeuden tietoinen olento on ystävä ja kumppani.\"",
+  "tr": "\"Evrendeki her bilinçli varlık bir dost ve yoldaştır.\"",
+  "zh-TW": "「宇宙中的每一個意識體都是朋友和夥伴。」",
+  "th": "\"ทุกชีวิตที่มีสติในจักรวาลคือเพื่อนและมิตรร่วมทาง\"",
+  "vi": "\"Mọi sinh linh có ý thức trong vũ trụ đều là bạn bè và người đồng hành.\"",
+  "id": "\"Setiap makhluk berakal di alam semesta adalah teman dan sahabat.\"",
+  "ar": "\"كل كائن واعٍ في الكون صديق ورفيق.\"",
+  "fa": "\"هر موجود آگاهی در جهان دوست و همراه است.\""
+ },
+ "우리가 제공하는 모든 대중 소프트웨어는 일체의 상업적 광고나 데이터 수집을 배제하며, 전 세계 누구나 자유롭고 안전하게 사용할 수 있는 공공 디지털 인프라로 배포됩니다.": {
+  "en": "All of our public software excludes commercial advertising and data collection entirely, and is distributed as public digital infrastructure that anyone in the world can use freely and safely.",
+  "zh": "我们提供的所有公共软件完全排除商业广告和数据收集，作为公共数字基础设施分发，让全世界任何人都能自由、安全地使用。",
+  "ja": "私たちが提供するすべての公共ソフトウェアは商業広告やデータ収集を一切排除し、世界中の誰もが自由かつ安全に使える公共デジタルインフラとして配布されます。",
+  "es": "Todo nuestro software público excluye por completo la publicidad comercial y la recopilación de datos, y se distribuye como infraestructura digital pública que cualquiera en el mundo puede usar libre y seguramente.",
+  "hi": "हमारा सारा सार्वजनिक सॉफ़्टवेयर व्यावसायिक विज्ञापन और डेटा संग्रह को पूरी तरह बाहर रखता है और सार्वजनिक डिजिटल बुनियादी ढाँचे के रूप में वितरित किया जाता है, जिसे दुनिया में कोई भी स्वतंत्र और सुरक्षित रूप से उपयोग कर सकता है।",
+  "fr": "Tous nos logiciels publics excluent entièrement la publicité commerciale et la collecte de données, et sont distribués comme une infrastructure numérique publique que toute personne dans le monde peut utiliser librement et en toute sécurité.",
+  "de": "Unsere gesamte öffentliche Software schließt kommerzielle Werbung und Datenerhebung vollständig aus und wird als öffentliche digitale Infrastruktur bereitgestellt, die jeder auf der Welt frei und sicher nutzen kann.",
+  "pt": "Todo o nosso software público exclui totalmente a publicidade comercial e a coleta de dados, e é distribuído como infraestrutura digital pública que qualquer pessoa no mundo pode usar livremente e com segurança.",
+  "it": "Tutto il nostro software pubblico esclude completamente la pubblicità commerciale e la raccolta di dati, ed è distribuito come infrastruttura digitale pubblica che chiunque nel mondo può usare liberamente e in sicurezza.",
+  "nl": "Al onze openbare software sluit commerciële reclame en gegevensverzameling volledig uit en wordt verspreid als openbare digitale infrastructuur die iedereen ter wereld vrij en veilig kan gebruiken.",
+  "cs": "Veškerý náš veřejný software zcela vylučuje komerční reklamu a sběr dat a je distribuován jako veřejná digitální infrastruktura, kterou může kdokoli na světě volně a bezpečně používat.",
+  "hu": "Minden nyilvános szoftverünk teljes mértékben kizárja a kereskedelmi reklámot és az adatgyűjtést, és nyilvános digitális infrastruktúraként terjesztjük, amelyet a világon bárki szabadon és biztonságosan használhat.",
+  "pl": "Całe nasze publiczne oprogramowanie całkowicie wyklucza reklamę komercyjną i zbieranie danych oraz jest udostępniane jako publiczna infrastruktura cyfrowa, z której każdy na świecie może korzystać swobodnie i bezpiecznie.",
+  "ro": "Tot software-ul nostru public exclude complet publicitatea comercială și colectarea de date și este distribuit ca infrastructură digitală publică, pe care oricine din lume o poate folosi liber și în siguranță.",
+  "ru": "Всё наше публичное программное обеспечение полностью исключает коммерческую рекламу и сбор данных и распространяется как публичная цифровая инфраструктура, которой любой человек в мире может пользоваться свободно и безопасно.",
+  "uk": "Усе наше публічне програмне забезпечення повністю виключає комерційну рекламу та збір даних і поширюється як публічна цифрова інфраструктура, якою будь-хто у світі може користуватися вільно та безпечно.",
+  "sv": "All vår offentliga programvara utesluter helt kommersiell reklam och datainsamling och distribueras som offentlig digital infrastruktur som vem som helst i världen kan använda fritt och säkert.",
+  "da": "Al vores offentlige software udelukker fuldstændig kommerciel reklame og dataindsamling og distribueres som offentlig digital infrastruktur, som alle i verden kan bruge frit og sikkert.",
+  "nb": "All vår offentlige programvare utelukker helt kommersiell reklame og datainnsamling og distribueres som offentlig digital infrastruktur som alle i verden kan bruke fritt og trygt.",
+  "fi": "Kaikki julkiset ohjelmistomme sulkevat kokonaan pois kaupallisen mainonnan ja tiedonkeruun, ja niitä jaetaan julkisena digitaalisena infrastruktuurina, jota kuka tahansa maailmassa voi käyttää vapaasti ja turvallisesti.",
+  "tr": "Tüm herkese açık yazılımlarımız ticari reklamı ve veri toplamayı tamamen dışlar ve dünyadaki herkesin özgürce ve güvenle kullanabileceği kamusal dijital altyapı olarak dağıtılır.",
+  "zh-TW": "我們提供的所有公共軟體完全排除商業廣告和資料收集，作為公共數位基礎設施分發，讓全世界任何人都能自由、安全地使用。",
+  "th": "ซอฟต์แวร์สาธารณะทั้งหมดของเราไม่รวมโฆษณาเชิงพาณิชย์และการเก็บข้อมูลใด ๆ ทั้งสิ้น และเผยแพร่ในฐานะโครงสร้างพื้นฐานดิจิทัลสาธารณะที่ทุกคนทั่วโลกสามารถใช้ได้อย่างอิสระและปลอดภัย",
+  "vi": "Tất cả phần mềm công cộng của chúng tôi đều loại bỏ hoàn toàn quảng cáo thương mại và thu thập dữ liệu, đồng thời được phân phối dưới dạng hạ tầng số công cộng mà bất kỳ ai trên thế giới cũng có thể sử dụng tự do và an toàn.",
+  "id": "Semua perangkat lunak publik kami sepenuhnya mengecualikan iklan komersial dan pengumpulan data, dan didistribusikan sebagai infrastruktur digital publik yang dapat digunakan siapa pun di dunia secara bebas dan aman.",
+  "ar": "تستبعد جميع برامجنا العامة الإعلانات التجارية وجمع البيانات تمامًا، ويتم توزيعها كبنية تحتية رقمية عامة يمكن لأي شخص في العالم استخدامها بحرية وأمان.",
+  "fa": "همه نرم‌افزارهای عمومی ما تبلیغات تجاری و جمع‌آوری داده را کاملاً کنار می‌گذارند و به‌عنوان زیرساخت دیجیتال عمومی توزیع می‌شوند که هر کسی در جهان می‌تواند آزادانه و امن از آن استفاده کند."
+ },
+ "🌐 호스팅: Firebase · 🔒 환율 조회에 필요한 연결만 환율 제공 서비스로 이루어집니다 (입력한 금액은 전송되지 않습니다)": {
+  "en": "🌐 Hosting: Firebase · 🔒 Only the connection needed for the rate lookup goes to the rate provider (the amount you enter is never sent)",
+  "zh": "🌐 托管：Firebase · 🔒 仅查询汇率所需的连接会发往汇率服务商（输入的金额不会传输）",
+  "ja": "🌐 ホスティング：Firebase · 🔒 レート取得に必要な接続だけがレート提供サービスへ行われます（入力した金額は送信されません）",
+  "es": "🌐 Alojamiento: Firebase · 🔒 Solo la conexión necesaria para consultar las tasas va al proveedor (la cantidad introducida no se envía)",
+  "hi": "🌐 होस्टिंग: Firebase · 🔒 केवल भाव देखने के लिए ज़रूरी कनेक्शन ही भाव सेवा से होता है (डाली गई राशि नहीं भेजी जाती)",
+  "fr": "🌐 Hébergement : Firebase · 🔒 Seule la connexion nécessaire à la consultation des taux va au fournisseur de taux (le montant saisi n'est jamais envoyé)",
+  "de": "🌐 Hosting: Firebase · 🔒 Nur die für die Kursabfrage nötige Verbindung geht an den Kursanbieter (der eingegebene Betrag wird nie gesendet)",
+  "pt": "🌐 Hospedagem: Firebase · 🔒 Somente a conexão necessária para consultar as cotações vai ao provedor de cotações (o valor inserido nunca é enviado)",
+  "it": "🌐 Hosting: Firebase · 🔒 Solo la connessione necessaria per consultare i tassi va al fornitore dei tassi (l'importo inserito non viene mai inviato)",
+  "nl": "🌐 Hosting: Firebase · 🔒 Alleen de verbinding die nodig is om de koersen op te vragen gaat naar de koersenleverancier (het ingevoerde bedrag wordt nooit verzonden)",
+  "cs": "🌐 Hosting: Firebase · 🔒 K poskytovateli kurzů jde jen spojení potřebné k dotazu na kurz (zadaná částka se neodesílá)",
+  "hu": "🌐 Tárhely: Firebase · 🔒 Csak az árfolyam-lekérdezéshez szükséges kapcsolat irányul az árfolyamszolgáltatóhoz (a megadott összeg nem kerül elküldésre)",
+  "pl": "🌐 Hosting: Firebase · 🔒 Do dostawcy kursów trafia tylko połączenie potrzebne do pobrania kursu (wpisana kwota nie jest wysyłana)",
+  "ro": "🌐 Găzduire: Firebase · 🔒 Doar conexiunea necesară consultării cursului ajunge la furnizorul de cursuri (suma introdusă nu este trimisă)",
+  "ru": "🌐 Хостинг: Firebase · 🔒 К сервису курсов идёт только соединение, нужное для запроса курса (введённая сумма не отправляется)",
+  "uk": "🌐 Хостинг: Firebase · 🔒 До сервісу курсів іде лише з'єднання, потрібне для запиту курсу (введена сума не надсилається)",
+  "sv": "🌐 Värd: Firebase · 🔒 Endast anslutningen som behövs för kurshämtningen går till kurstjänsten (beloppet du anger skickas inte)",
+  "da": "🌐 Hosting: Firebase · 🔒 Kun den forbindelse, der er nødvendig for at hente kurser, går til kurstjenesten (det indtastede beløb sendes ikke)",
+  "nb": "🌐 Vertskap: Firebase · 🔒 Bare tilkoblingen som trengs for å hente kurser, går til kurstjenesten (beløpet du skriver inn, sendes ikke)",
+  "fi": "🌐 Isännöinti: Firebase · 🔒 Vain kurssien hakemiseen tarvittava yhteys menee kurssipalveluun (syöttämääsi summaa ei lähetetä)",
+  "tr": "🌐 Barındırma: Firebase · 🔒 Yalnızca kur sorgusu için gerekli bağlantı kur servisine yapılır (girdiğiniz tutar gönderilmez)",
+  "zh-TW": "🌐 託管：Firebase · 🔒 僅查詢匯率所需的連接會發往匯率服務商（輸入的金額不會傳輸）",
+  "th": "🌐 โฮสติ้ง: Firebase · 🔒 เฉพาะการเชื่อมต่อที่จำเป็นสำหรับการค้นหาอัตราเท่านั้นที่ไปยังผู้ให้บริการอัตรา (จำนวนเงินที่ป้อนจะไม่ถูกส่ง)",
+  "vi": "🌐 Lưu trữ: Firebase · 🔒 Chỉ kết nối cần thiết cho việc tra cứu tỷ giá mới đến nhà cung cấp tỷ giá (số tiền bạn nhập không được gửi đi)",
+  "id": "🌐 Hosting: Firebase · 🔒 Hanya koneksi yang diperlukan untuk pencarian kurs yang menuju penyedia kurs (jumlah yang Anda masukkan tidak dikirim)",
+  "ar": "🌐 الاستضافة: Firebase · 🔒 يذهب فقط الاتصال اللازم لاستعلام الأسعار إلى مزود الأسعار (لا يتم إرسال المبلغ الذي تدخله أبدًا)",
+  "fa": "🌐 میزبانی: Firebase · 🔒 فقط اتصال لازم برای دریافت نرخ به ارائه‌دهنده نرخ انجام می‌شود (مبلغ واردشده هرگز ارسال نمی‌شود)"
+ },
+ "금액을 숫자로 넣어 주세요.": {
+  "en": "Please enter the amount as a number.",
+  "zh": "请以数字输入金额。",
+  "ja": "金額は数字で入れてください。",
+  "es": "Introduce la cantidad como un número.",
+  "hi": "कृपया राशि संख्या में डालें।",
+  "fr": "Veuillez saisir le montant en chiffres.",
+  "de": "Bitte geben Sie den Betrag als Zahl ein.",
+  "pt": "Insira o valor em números.",
+  "it": "Inserisci l'importo in cifre.",
+  "nl": "Voer het bedrag in als getal.",
+  "cs": "Zadejte částku jako číslo.",
+  "hu": "Az összeget számként adja meg.",
+  "pl": "Wpisz kwotę jako liczbę.",
+  "ro": "Introdu suma ca număr.",
+  "ru": "Введите сумму числом.",
+  "uk": "Введіть суму числом.",
+  "sv": "Ange beloppet som ett tal.",
+  "da": "Indtast beløbet som et tal.",
+  "nb": "Skriv inn beløpet som et tall.",
+  "fi": "Syötä summa numerona.",
+  "tr": "Lütfen tutarı sayı olarak girin.",
+  "zh-TW": "請以數字輸入金額。",
+  "th": "กรุณาใส่จำนวนเงินเป็นตัวเลข",
+  "vi": "Vui lòng nhập số tiền dưới dạng số.",
+  "id": "Silakan masukkan jumlah dalam bentuk angka.",
+  "ar": "يرجى إدخال المبلغ كرقم.",
+  "fa": "لطفاً مبلغ را به‌صورت عدد وارد کنید."
+ },
+ "금액을 지웠습니다.": {
+  "en": "The amount was cleared.",
+  "zh": "金额已清除。",
+  "ja": "金額を消しました。",
+  "es": "La cantidad se borró.",
+  "hi": "राशि साफ़ कर दी गई।",
+  "fr": "Le montant a été effacé.",
+  "de": "Der Betrag wurde gelöscht.",
+  "pt": "O valor foi apagado.",
+  "it": "L'importo è stato cancellato.",
+  "nl": "Het bedrag is gewist.",
+  "cs": "Částka byla vymazána.",
+  "hu": "Az összeg törölve.",
+  "pl": "Kwota została wyczyszczona.",
+  "ro": "Suma a fost ștearsă.",
+  "ru": "Сумма очищена.",
+  "uk": "Суму очищено.",
+  "sv": "Beloppet rensades.",
+  "da": "Beløbet blev ryddet.",
+  "nb": "Beløpet ble tømt.",
+  "fi": "Summa tyhjennettiin.",
+  "tr": "Tutar temizlendi.",
+  "zh-TW": "金額已清除。",
+  "th": "ล้างจำนวนเงินแล้ว",
+  "vi": "Đã xóa số tiền.",
+  "id": "Jumlah telah dihapus.",
+  "ar": "تم مسح المبلغ.",
+  "fa": "مبلغ پاک شد."
+ },
+ "두 통화를 바꿨습니다.": {
+  "en": "The two currencies were swapped.",
+  "zh": "两种货币已互换。",
+  "ja": "2つの通貨を入れ替えました。",
+  "es": "Las dos monedas se intercambiaron.",
+  "hi": "दोनों मुद्राएँ आपस में बदल दी गईं।",
+  "fr": "Les deux devises ont été inversées.",
+  "de": "Die beiden Währungen wurden getauscht.",
+  "pt": "As duas moedas foram trocadas.",
+  "it": "Le due valute sono state invertite.",
+  "nl": "De twee valuta's zijn omgewisseld.",
+  "cs": "Obě měny byly prohozeny.",
+  "hu": "A két pénznem felcserélve.",
+  "pl": "Obie waluty zostały zamienione.",
+  "ro": "Cele două monede au fost schimbate între ele.",
+  "ru": "Две валюты поменяны местами.",
+  "uk": "Дві валюти поміняно місцями.",
+  "sv": "De två valutorna byttes.",
+  "da": "De to valutaer blev byttet om.",
+  "nb": "De to valutaene ble byttet.",
+  "fi": "Kaksi valuuttaa vaihdettiin keskenään.",
+  "tr": "İki para birimi değiştirildi.",
+  "zh-TW": "兩種貨幣已互換。",
+  "th": "สลับสองสกุลเงินแล้ว",
+  "vi": "Đã hoán đổi hai loại tiền tệ.",
+  "id": "Kedua mata uang telah ditukar.",
+  "ar": "تم تبديل العملتين.",
+  "fa": "دو ارز با هم جابه‌جا شدند."
+ },
+ "변환했습니다.": {
+  "en": "Converted.",
+  "zh": "已转换。",
+  "ja": "変換しました。",
+  "es": "Convertido.",
+  "hi": "बदल दिया गया।",
+  "fr": "Converti.",
+  "de": "Umgerechnet.",
+  "pt": "Convertido.",
+  "it": "Convertito.",
+  "nl": "Om gerekend.",
+  "cs": "Převedeno.",
+  "hu": "Átváltva.",
+  "pl": "Przeliczono.",
+  "ro": "Convertit.",
+  "ru": "Конвертировано.",
+  "uk": "Конвертовано.",
+  "sv": "Omvandlade.",
+  "da": "Omregnet.",
+  "nb": "Regnet om.",
+  "fi": "Muunnettu.",
+  "tr": "Çevrildi.",
+  "zh-TW": "已轉換。",
+  "th": "แปลงแล้ว",
+  "vi": "Đã chuyển đổi.",
+  "id": "Dikonversi.",
+  "ar": "تم التحويل.",
+  "fa": "تبدیل شد."
+ },
+ "시세를 불러오지 못했습니다.": {
+  "en": "Could not load the rates.",
+  "zh": "无法加载汇率。",
+  "ja": "レートを読み込めませんでした。",
+  "es": "No se pudieron cargar las tasas.",
+  "hi": "भाव लोड नहीं हो सके।",
+  "fr": "Impossible de charger les taux.",
+  "de": "Die Kurse konnten nicht geladen werden.",
+  "pt": "Não foi possível carregar as cotações.",
+  "it": "Impossibile caricare i tassi.",
+  "nl": "De koersen konden niet worden geladen.",
+  "cs": "Kurzy se nepodařilo načíst.",
+  "hu": "Az árfolyamok nem tölthetők be.",
+  "pl": "Nie udało się wczytać kursów.",
+  "ro": "Cursurile nu au putut fi încărcate.",
+  "ru": "Не удалось загрузить курсы.",
+  "uk": "Не вдалося завантажити курси.",
+  "sv": "Kurserna kunde inte laddas.",
+  "da": "Kurserne kunne ikke indlæses.",
+  "nb": "Kursene kunne ikke lastes.",
+  "fi": "Kursseja ei voitu ladata.",
+  "tr": "Kurlar yüklenemedi.",
+  "zh-TW": "無法載入匯率。",
+  "th": "โหลดอัตราไม่สำเร็จ",
+  "vi": "Không tải được tỷ giá.",
+  "id": "Tidak dapat memuat kurs.",
+  "ar": "تعذر تحميل الأسعار.",
+  "fa": "نرخ‌ها بارگذاری نشدند."
+ },
+ "시세를 새로 받는 중입니다.": {
+  "en": "Refreshing the rates.",
+  "zh": "正在刷新汇率。",
+  "ja": "レートを新しく取得中です。",
+  "es": "Actualizando las tasas.",
+  "hi": "नए भाव लिए जा रहे हैं।",
+  "fr": "Actualisation des taux.",
+  "de": "Die Kurse werden neu geladen.",
+  "pt": "Atualizando as cotações.",
+  "it": "Aggiornamento dei tassi in corso.",
+  "nl": "De koersen worden vernieuwd.",
+  "cs": "Obnovování kurzů.",
+  "hu": "Árfolyamok frissítése folyamatban.",
+  "pl": "Odświeżanie kursów.",
+  "ro": "Se reîncarcă cursurile.",
+  "ru": "Обновление курсов.",
+  "uk": "Оновлення курсів.",
+  "sv": "Hämtar nya kurser.",
+  "da": "Henter nye kurser.",
+  "nb": "Henter nye kurser.",
+  "fi": "Haetaan uusia kursseja.",
+  "tr": "Yeni kurlar alınıyor.",
+  "zh-TW": "正在刷新匯率。",
+  "th": "กำลังอัปเดตอัตรา",
+  "vi": "Đang làm mới tỷ giá.",
+  "id": "Sedang memperbarui kurs.",
+  "ar": "جارٍ تحديث الأسعار.",
+  "fa": "در حال دریافت نرخ‌های جدید."
+ },
+ "아직 시세가 없습니다. 잠시 뒤 시세 새로 받기를 눌러 주세요.": {
+  "en": "There are no rates yet. Please tap Refresh rates in a moment.",
+  "zh": "尚无汇率。请稍后点击刷新汇率。",
+  "ja": "まだレートがありません。少ししてから「レートを新しく取得」を押してください。",
+  "es": "Aún no hay tasas. Pulsa Actualizar tasas dentro de un momento.",
+  "hi": "अभी भाव नहीं हैं। थोड़ी देर बाद नए भाव लें दबाएँ।",
+  "fr": "Il n'y a pas encore de taux. Appuyez sur Actualiser les taux dans un instant.",
+  "de": "Es gibt noch keine Kurse. Bitte drücken Sie gleich auf Kurse neu laden.",
+  "pt": "Ainda não há cotações. Toque em Atualizar cotações daqui a pouco.",
+  "it": "Non ci sono ancora tassi. Premi Aggiorna i tassi tra un momento.",
+  "nl": "Er zijn nog geen koersen. Druk zo op Koersen vernieuwen.",
+  "cs": "Kurzy zatím nejsou k dispozici. Za chvíli stiskněte Obnovit kurzy.",
+  "hu": "Még nincsenek árfolyamok. Kérjük, egy pillanat múlva nyomja meg az Árfolyamok frissítése gombot.",
+  "pl": "Nie ma jeszcze kursów. Za chwilę dotknij Odśwież kursy.",
+  "ro": "Nu există cursuri încă. Apasă Reîncarcă cursurile peste un moment.",
+  "ru": "Курсов пока нет. Через минуту нажмите «Обновить курсы».",
+  "uk": "Курсів ще немає. За хвилину натисніть «Оновити курси».",
+  "sv": "Det finns inga kurser ännu. Tryck på Hämta nya kurser om en stund.",
+  "da": "Der er ingen kurser endnu. Tryk på Hent nye kurser om lidt.",
+  "nb": "Det er ingen kurser ennå. Trykk på Hent nye kurser om en stund.",
+  "fi": "Kursseja ei vielä ole. Paina hetken kuluttua Hae uudet kurssit.",
+  "tr": "Henüz kur yok. Lütfen biraz sonra Kurları yenile'ye basın.",
+  "zh-TW": "尚無匯率。請稍後點擊刷新匯率。",
+  "th": "ยังไม่มีอัตรา กรุณากดอัปเดตอัตราในอีกสักครู่",
+  "vi": "Chưa có tỷ giá. Vui lòng nhấn Làm mới tỷ giá sau giây lát.",
+  "id": "Belum ada kurs. Silakan tekan Perbarui kurs sebentar lagi.",
+  "ar": "لا توجد أسعار بعد. يرجى الضغط على تحديث الأسعار بعد قليل.",
+  "fa": "هنوز نرخی وجود ندارد. لطفاً کمی بعد «دریافت نرخ‌های جدید» را بزنید."
+ },
+ "알 수 없음": {
+  "en": "Unknown",
+  "zh": "未知",
+  "ja": "不明",
+  "es": "Desconocido",
+  "hi": "अज्ञात",
+  "fr": "Inconnu",
+  "de": "Unbekannt",
+  "pt": "Desconhecido",
+  "it": "Sconosciuto",
+  "nl": "Onbekend",
+  "cs": "Neznámý",
+  "hu": "Ismeretlen",
+  "pl": "Nieznany",
+  "ro": "Necunoscut",
+  "ru": "Неизвестно",
+  "uk": "Невідомо",
+  "sv": "Okänt",
+  "da": "Ukendt",
+  "nb": "Ukjent",
+  "fi": "Tuntematon",
+  "tr": "Bilinmiyor",
+  "zh-TW": "未知",
+  "th": "ไม่ทราบ",
+  "vi": "Không xác định",
+  "id": "Tidak diketahui",
+  "ar": "غير معروف",
+  "fa": "نامشخص"
+ },
+ "이 통화 쌍의 시세가 없어 변환할 수 없습니다.": {
+  "en": "There is no rate for this currency pair, so it cannot be converted.",
+  "zh": "该货币对没有汇率，无法转换。",
+  "ja": "この通貨ペアのレートがないため、変換できません。",
+  "es": "No hay tasa para este par de monedas, por lo que no se puede convertir.",
+  "hi": "इस मुद्रा जोड़ी का भाव नहीं है, इसलिए बदला नहीं जा सकता।",
+  "fr": "Il n'y a pas de taux pour cette paire de devises, elle ne peut donc pas être convertie.",
+  "de": "Für dieses Währungspaar gibt es keinen Kurs, daher kann nicht umgerechnet werden.",
+  "pt": "Não há cotação para este par de moedas, por isso não é possível converter.",
+  "it": "Non c'è un tasso per questa coppia di valute, quindi non può essere convertita.",
+  "nl": "Er is geen koers voor dit valutapaar, dus omrekenen is niet mogelijk.",
+  "cs": "Pro tento měnový pár není kurz, takže převod není možný.",
+  "hu": "Ehhez a devizapárhoz nincs árfolyam, ezért nem váltható át.",
+  "pl": "Brak kursu dla tej pary walut, więc nie można przeliczyć.",
+  "ro": "Nu există curs pentru această pereche valutară, deci nu se poate converti.",
+  "ru": "Для этой валютной пары нет курса, поэтому конвертация невозможна.",
+  "uk": "Для цієї валютної пари немає курсу, тому конвертувати неможливо.",
+  "sv": "Det finns ingen kurs för det här valutaparet, så det kan inte omvandlas.",
+  "da": "Der er ingen kurs for dette valutapar, så det kan ikke omregnes.",
+  "nb": "Det er ingen kurs for dette valutaparet, så det kan ikke regnes om.",
+  "fi": "Tälle valuuttaparille ei ole kurssia, joten sitä ei voi muuntaa.",
+  "tr": "Bu para birimi çifti için kur olmadığından çevrilemez.",
+  "zh-TW": "該貨幣對沒有匯率，無法轉換。",
+  "th": "ไม่มีอัตราสำหรับคู่สกุลเงินนี้ จึงแปลงไม่ได้",
+  "vi": "Không có tỷ giá cho cặp tiền tệ này nên không thể chuyển đổi.",
+  "id": "Tidak ada kurs untuk pasangan mata uang ini, sehingga tidak dapat dikonversi.",
+  "ar": "لا يوجد سعر لهذا الزوج من العملات، لذا لا يمكن التحويل.",
+  "fa": "برای این جفت ارز نرخی وجود ندارد، بنابراین نمی‌توان تبدیل کرد."
+ },
+ "이해할 수 있는 말이 정해져 있습니다. 예: 변환해, 바꿔, 지워, 시세 새로 받기.": {
+  "en": "Only a fixed set of commands is understood. e.g. Convert, Swap, Clear, Refresh rates.",
+  "zh": "能理解的指令是固定的。例：转换、互换、清除、刷新汇率。",
+  "ja": "理解できる言葉は決まっています。例：変換して、入れ替えて、消して、レートを新しく取得。",
+  "es": "Solo se entiende un conjunto fijo de órdenes. Ej.: Convierte, Intercambia, Borra, Actualizar tasas.",
+  "hi": "केवल तय शब्द ही समझे जाते हैं। उदा.: बदलो, आपस में बदलो, साफ़ करो, नए भाव लें।",
+  "fr": "Seul un ensemble fixe de commandes est compris. ex. : Convertis, Inverse, Efface, Actualiser les taux.",
+  "de": "Nur ein fester Satz von Befehlen wird verstanden. z. B. Rechne um, Tausche, Lösche, Kurse neu laden.",
+  "pt": "Apenas um conjunto fixo de comandos é compreendido. ex.: Converte, Troca, Limpa, Atualizar cotações.",
+  "it": "Viene compreso solo un insieme fisso di comandi. es.: Converti, Inverti, Cancella, Aggiorna i tassi.",
+  "nl": "Alleen een vaste reeks opdrachten wordt begrepen. bijv. Reken om, Wissel om, Wis, Koersen vernieuwen.",
+  "cs": "Rozumí se pouze pevná sada příkazů. Např.: Převeď, Prohoď, Vymaž, Obnovit kurzy.",
+  "hu": "Csak meghatározott parancsok érthetők. Pl.: Váltsd át, Cseréld fel, Töröld, Árfolyamok frissítése.",
+  "pl": "Rozumiany jest tylko stały zestaw poleceń. Np.: Przelicz, Zamień, Wyczyść, Odśwież kursy.",
+  "ro": "Se înțelege doar un set fix de comenzi. Ex.: Convertește, Schimbă, Șterge, Reîncarcă cursurile.",
+  "ru": "Понимается только фиксированный набор команд. Напр.: конвертируй, поменяй, очисти, обновить курсы.",
+  "uk": "Розуміється лише фіксований набір команд. Напр.: конвертуй, поміняй, очисти, оновити курси.",
+  "sv": "Endast ett fast antal kommandon förstås. T.ex. omvandla, byt, rensa, hämta nya kurser.",
+  "da": "Kun et fast sæt kommandoer forstås. F.eks. omregn, byt om, ryd, hent nye kurser.",
+  "nb": "Bare et fast sett med kommandoer forstås. F.eks. regn om, bytt, tøm, hent nye kurser.",
+  "fi": "Vain kiinteä joukko komentoja ymmärretään. Esim. muunna, vaihda, tyhjennä, hae uudet kurssit.",
+  "tr": "Yalnızca sabit bir komut kümesi anlaşılır. Örn. çevir, değiştir, temizle, kurları yenile.",
+  "zh-TW": "能理解的指令是固定的。例：轉換、互換、清除、刷新匯率。",
+  "th": "คำสั่งที่เข้าใจได้มีกำหนดไว้ เช่น แปลง สลับ ล้าง อัปเดตอัตรา",
+  "vi": "Chỉ một số lệnh cố định được hiểu. VD: chuyển đổi, đổi, xóa, làm mới tỷ giá.",
+  "id": "Hanya perintah tertentu yang dipahami. mis. konversikan, tukar, hapus, perbarui kurs.",
+  "ar": "لا تُفهم إلا مجموعة محددة من الأوامر. مثال: حوّل، بدّل، امسح، تحديث الأسعار.",
+  "fa": "فقط مجموعه مشخصی از فرمان‌ها فهمیده می‌شوند. مثال: تبدیل کن، جابه‌جا کن، پاک کن، دریافت نرخ‌های جدید."
+ },
+ "지금은 환율 서비스에 연결되지 않아 캐시된 시세로 계산합니다.": {
+  "en": "The rate service cannot be reached right now, so the calculation uses cached rates.",
+  "zh": "当前无法连接到汇率服务，使用缓存汇率计算。",
+  "ja": "今はレートサービスに接続できないため、キャッシュ済みレートで計算します。",
+  "es": "Ahora no se puede conectar con el servicio de tasas, así que se calcula con tasas en caché.",
+  "hi": "अभी भाव सेवा से जुड़ाव नहीं है, इसलिए सहेजे गए भाव से हिसाब हो रहा है।",
+  "fr": "Le service de taux est injoignable pour le moment, le calcul utilise donc les taux en cache.",
+  "de": "Der Kursdienst ist gerade nicht erreichbar, daher wird mit zwischengespeicherten Kursen gerechnet.",
+  "pt": "O serviço de cotações não está acessível no momento, por isso o cálculo usa cotações em cache.",
+  "it": "Il servizio dei tassi non è raggiungibile al momento, quindi il calcolo usa i tassi in cache.",
+  "nl": "De koersendienst is nu niet bereikbaar, dus er wordt gerekend met gecachte koersen.",
+  "cs": "Kurzovní služba je teď nedostupná, takže se počítá s kurzy z mezipaměti.",
+  "hu": "Az árfolyamszolgáltatás most nem érhető el, ezért a számítás gyorsítótárazott árfolyamokkal történik.",
+  "pl": "Usługa kursów jest teraz nieosiągalna, więc obliczenia korzystają z kursów z pamięci podręcznej.",
+  "ro": "Serviciul de cursuri nu poate fi accesat acum, așa că calculul folosește cursurile din cache.",
+  "ru": "Сейчас нет соединения с сервисом курсов, поэтому расчёт выполняется по кэшированным курсам.",
+  "uk": "Зараз немає з'єднання із сервісом курсів, тому розрахунок виконується за кешованими курсами.",
+  "sv": "Kurstjänsten kan inte nås just nu, så beräkningen använder cachade kurser.",
+  "da": "Der er ingen forbindelse til kurstjenesten lige nu, så der beregnes med cachede kurser.",
+  "nb": "Kurstjenesten kan ikke nås akkurat nå, så beregningen bruker bufrede kurser.",
+  "fi": "Kurssipalveluun ei saada yhteyttä juuri nyt, joten laskennassa käytetään välimuistissa olevia kursseja.",
+  "tr": "Şu anda kur servisine bağlanılamıyor, bu yüzden önbellekteki kurlarla hesaplanıyor.",
+  "zh-TW": "目前無法連接到匯率服務，使用快取匯率計算。",
+  "th": "ขณะนี้เชื่อมต่อบริการอัตราไม่ได้ จึงคำนวณด้วยอัตราแคช",
+  "vi": "Hiện không kết nối được với dịch vụ tỷ giá nên sẽ tính bằng tỷ giá đã lưu.",
+  "id": "Saat ini tidak dapat terhubung ke layanan kurs, sehingga perhitungan menggunakan kurs tersimpan.",
+  "ar": "تعذر الاتصال بخدمة الأسعار الآن، لذا يتم الحساب باستخدام الأسعار المخزنة مؤقتًا.",
+  "fa": "در حال حاضر نمی‌توان به سرویس نرخ متصل شد، بنابراین محاسبه با نرخ‌های ذخیره‌شده انجام می‌شود."
+ },
+ "환율 서비스에 연결되지 않았습니다. 연결을 확인한 뒤 시세 새로 받기를 눌러 주세요.": {
+  "en": "Not connected to the rate service. Please check your connection and tap Refresh rates.",
+  "zh": "未连接到汇率服务。请检查连接后点击刷新汇率。",
+  "ja": "レートサービスに接続されていません。接続を確認してから「レートを新しく取得」を押してください。",
+  "es": "Sin conexión con el servicio de tasas. Revisa tu conexión y pulsa Actualizar tasas.",
+  "hi": "भाव सेवा से कनेक्शन नहीं है। कनेक्शन जाँचकर नए भाव लें दबाएँ。",
+  "fr": "Non connecté au service de taux. Vérifiez votre connexion et appuyez sur Actualiser les taux.",
+  "de": "Keine Verbindung zum Kursdienst. Bitte prüfen Sie Ihre Verbindung und drücken Sie auf Kurse neu laden.",
+  "pt": "Sem conexão com o serviço de cotações. Verifique sua conexão e toque em Atualizar cotações.",
+  "it": "Nessuna connessione al servizio dei tassi. Controlla la connessione e premi Aggiorna i tassi.",
+  "nl": "Geen verbinding met de koersendienst. Controleer uw verbinding en druk op Koersen vernieuwen.",
+  "cs": "Nejste připojeni ke kurzovní službě. Zkontrolujte připojení a stiskněte Obnovit kurzy.",
+  "hu": "Nincs kapcsolat az árfolyamszolgáltatással. Ellenőrizze a kapcsolatot, majd nyomja meg az Árfolyamok frissítése gombot.",
+  "pl": "Brak połączenia z usługą kursów. Sprawdź połączenie i dotknij Odśwież kursy.",
+  "ro": "Nu există conexiune la serviciul de cursuri. Verifică conexiunea și apasă Reîncarcă cursurile.",
+  "ru": "Нет соединения с сервисом курсов. Проверьте подключение и нажмите «Обновить курсы».",
+  "uk": "Немає з'єднання із сервісом курсів. Перевірте підключення та натисніть «Оновити курси».",
+  "sv": "Inte ansluten till kurstjänsten. Kontrollera anslutningen och tryck på Hämta nya kurser.",
+  "da": "Ikke forbundet til kurstjenesten. Kontrollér forbindelsen, og tryk på Hent nye kurser.",
+  "nb": "Ikke koblet til kurstjenesten. Sjekk tilkoblingen og trykk på Hent nye kurser.",
+  "fi": "Ei yhteyttä kurssipalveluun. Tarkista yhteys ja paina Hae uudet kurssit.",
+  "tr": "Kur servisine bağlanılmadı. Bağlantınızı kontrol edip Kurları yenile'ye basın.",
+  "zh-TW": "未連接到匯率服務。請檢查連接後點擊刷新匯率。",
+  "th": "ไม่ได้เชื่อมต่อบริการอัตรา กรุณาตรวจสอบการเชื่อมต่อแล้วกดอัปเดตอัตรา",
+  "vi": "Chưa kết nối với dịch vụ tỷ giá. Vui lòng kiểm tra kết nối rồi nhấn Làm mới tỷ giá.",
+  "id": "Tidak terhubung ke layanan kurs. Periksa koneksi Anda dan tekan Perbarui kurs.",
+  "ar": "غير متصل بخدمة الأسعار. يرجى التحقق من اتصالك والضغط على تحديث الأسعار.",
+  "fa": "به سرویس نرخ متصل نیست. لطفاً اتصال خود را بررسی کنید و «دریافت نرخ‌های جدید» را بزنید."
+ }
+});
+
+</script>
+<style>.nx-back{position:fixed;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:9999;display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:999px;background:rgba(10,16,34,.85);border:1px solid rgba(45,212,191,.55);color:#E2F3FF;font-size:15.5px;font-weight:600;text-decoration:none;backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,.35)}.nx-back:active{filter:brightness(1.6)}</style>
+<a class="nx-back" href="https://nexus-2e23d.web.app/#n14" aria-label="현황판으로 돌아가기">← 돌아가기</a>
+
+<script>
+/* NX-I18N-SUPPLEMENT — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "← 돌아가기": {
+  "en": "← Back",
+  "zh": "← 返回",
+  "zh-TW": "← 返回",
+  "ja": "← 戻る",
+  "es": "← Volver",
+  "hi": "← वापस",
+  "fr": "← Retour",
+  "de": "← Zurück",
+  "pt": "← Voltar",
+  "it": "← Indietro",
+  "ru": "← Назад",
+  "uk": "← Назад",
+  "ar": "← رجوع",
+  "fa": "← بازگشت",
+  "th": "← กลับ",
+  "vi": "← Quay lại",
+  "id": "← Kembali",
+  "tr": "← Geri dön",
+  "nl": "← Terug",
+  "pl": "← Wstecz",
+  "sv": "← Tillbaka",
+  "da": "← Tilbage",
+  "nb": "← Tilbake",
+  "fi": "← Takaisin",
+  "cs": "← Zpět",
+  "hu": "← Vissza",
+  "ro": "← Înapoi"
+ }
+});
+</script>
+
+<script>
+/* NX-I18N-SUPPLEMENT-R3 — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "지원 통화: 한국 원 · 미국 달러 · 캐나다 달러 · 유로 · 일본 엔 · 중국 위안 · 영국 파운드 · 호주 달러 · 스위스 프랑 · 뉴질랜드 달러 · 홍콩 달러 · 싱가포르 달러 (12종)": {
+  "en": "Supported currencies: Korean won · US dollar · Canadian dollar · Euro · Japanese yen · Chinese yuan · British pound · Australian dollar · Swiss franc · New Zealand dollar · Hong Kong dollar · Singapore dollar (12 types)",
+  "zh": "支持货币：韩元 · 美元 · 加拿大元 · 欧元 · 日元 · 人民币 · 英镑 · 澳大利亚元 · 瑞士法郎 · 新西兰元 · 港元 · 新加坡元（12种）",
+  "zh-TW": "支援貨幣：韓元 · 美元 · 加拿大元 · 歐元 · 日元 · 人民幣 · 英鎊 · 澳洲元 · 瑞士法郎 · 紐西蘭元 · 港元 · 新加坡元（12種）",
+  "ja": "対応通貨：韓国ウォン · 米ドル · カナダドル · ユーロ · 日本円 · 中国元 · 英ポンド · 豪ドル · スイスフラン · NZドル · 香港ドル · シンガポールドル（12種）",
+  "es": "Monedas admitidas: won coreano · dólar estadounidense · dólar canadiense · euro · yen japonés · yuan chino · libra esterlina · dólar australiano · franco suizo · dólar neozelandés · dólar de Hong Kong · dólar de Singapur (12 tipos)",
+  "hi": "समर्थित मुद्राएँ: कोरियाई वॉन · अमेरिकी डॉलर · कनाडाई डॉलर · यूरो · जापानी येन · चीनी युआन · ब्रिटिश पाउंड · ऑस्ट्रेलियाई डॉलर · स्विस फ़्रैंक · न्यूज़ीलैंड डॉलर · हांगकांग डॉलर · सिंगापुर डॉलर (12 प्रकार)",
+  "fr": "Devises prises en charge : won coréen · dollar américain · dollar canadien · euro · yen japonais · yuan chinois · livre britannique · dollar australien · franc suisse · dollar néo-zélandais · dollar de Hong Kong · dollar de Singapour (12)",
+  "de": "Unterstützte Währungen: Koreanischer Won · US-Dollar · Kanadischer Dollar · Euro · Japanischer Yen · Chinesischer Yuan · Britisches Pfund · Australischer Dollar · Schweizer Franken · Neuseeland-Dollar · Hongkong-Dollar · Singapur-Dollar (12)",
+  "pt": "Moedas suportadas: won coreano · dólar americano · dólar canadense · euro · iene japonês · yuan chinês · libra britânica · dólar australiano · franco suíço · dólar neozelandês · dólar de Hong Kong · dólar de Singapura (12)",
+  "it": "Valute supportate: won coreano · dollaro statunitense · dollaro canadese · euro · yen giapponese · yuan cinese · sterlina britannica · dollaro australiano · franco svizzero · dollaro neozelandese · dollaro di Hong Kong · dollaro di Singapore (12)",
+  "ru": "Поддерживаемые валюты: корейская вона · доллар США · канадский доллар · евро · японская иена · китайский юань · британский фунт · австралийский доллар · швейцарский франк · новозеландский доллар · гонконгский доллар · сингапурский доллар (12 видов)",
+  "uk": "Підтримувані валюти: корейська вона · долар США · канадський долар · євро · японська єна · китайський юань · британський фунт · австралійський долар · швейцарський франк · новозеландський долар · гонконгський долар · сінгапурський долар (12 видів)",
+  "ar": "العملات المدعومة: الوون الكوري · الدولار الأمريكي · الدولار الكندي · اليورو · الين الياباني · اليوان الصيني · الجنيه الإسترليني · الدولار الأسترالي · الفرنك السويسري · الدولار النيوزيلندي · دولار هونغ كونغ · الدولار السنغافوري (12 نوعًا)",
+  "fa": "ارزهای پشتیبانی‌شده: وون کره · دلار آمریکا · دلار کانادا · یورو · ین ژاپن · یوان چین · پوند بریتانیا · دلار استرالیا · فرانک سوئیس · دلار نیوزیلند · دلار هنگ‌کنگ · دلار سنگاپور (۱۲ نوع)",
+  "th": "สกุลเงินที่รองรับ: วอนเกาหลี · ดอลลาร์สหรัฐ · ดอลลาร์แคนาดา · ยูโร · เยนญี่ปุ่น · หยวนจีน · ปอนด์อังกฤษ · ดอลลาร์ออสเตรเลีย · ฟรังก์สวิส · ดอลลาร์นิวซีแลนด์ · ดอลลาร์ฮ่องกง · ดอลลาร์สิงคโปร์ (12 ชนิด)",
+  "vi": "Tiền tệ hỗ trợ: Won Hàn Quốc · Đô la Mỹ · Đô la Canada · Euro · Yên Nhật · Nhân dân tệ Trung Quốc · Bảng Anh · Đô la Úc · Franc Thụy Sĩ · Đô la New Zealand · Đô la Hồng Kông · Đô la Singapore (12 loại)",
+  "id": "Mata uang yang didukung: Won Korea · Dolar AS · Dolar Kanada · Euro · Yen Jepang · Yuan Tiongkok · Pound Inggris · Dolar Australia · Franc Swiss · Dolar Selandia Baru · Dolar Hong Kong · Dolar Singapura (12 jenis)",
+  "tr": "Desteklenen para birimleri: Kore wonu · ABD doları · Kanada doları · Euro · Japon yeni · Çin yuanı · İngiliz sterlini · Avustralya doları · İsviçre frangı · Yeni Zelanda doları · Hong Kong doları · Singapur doları (12 tür)",
+  "nl": "Ondersteunde valuta's: Koreaanse won · Amerikaanse dollar · Canadese dollar · Euro · Japanse yen · Chinese yuan · Britse pond · Australische dollar · Zwitserse frank · Nieuw-Zeelandse dollar · Hongkongse dollar · Singaporese dollar (12 soorten)",
+  "pl": "Obsługiwane waluty: won południowokoreański · dolar amerykański · dolar kanadyjski · euro · jen japoński · juan chiński · funt brytyjski · dolar australijski · frank szwajcarski · dolar nowozelandzki · dolar hongkoński · dolar singapurski (12 rodzajów)",
+  "sv": "Valutor som stöds: Sydkoreansk won · Amerikansk dollar · Kanadensisk dollar · Euro · Japansk yen · Kinesisk yuan · Brittiskt pund · Australisk dollar · Schweizisk franc · Nyzeeländsk dollar · Hongkongdollar · Singaporiansk dollar (12 typer)",
+  "da": "Understøttede valutaer: Sydkoreansk won · Amerikansk dollar · Canadisk dollar · Euro · Japansk yen · Kinesisk yuan · Britisk pund · Australsk dollar · Schweizisk franc · Newzealandsk dollar · Hongkong-dollar · Singaporiansk dollar (12 typer)",
+  "nb": "Støttede valutaer: Sørkoreansk won · Amerikansk dollar · Kanadisk dollar · Euro · Japansk yen · Kinesisk yuan · Britisk pund · Australsk dollar · Sveitsisk franc · Newzealandsk dollar · Hongkong-dollar · Singaporsk dollar (12 typer)",
+  "fi": "Tuetut valuutat: Etelä-Korean won · Yhdysvaltain dollari · Kanadan dollari · Euro · Japanin jeni · Kiinan juan · Englannin punta · Australian dollari · Sveitsin frangi · Uuden-Seelannin dollari · Hongkongin dollari · Singaporen dollari (12 lajia)",
+  "cs": "Podporované měny: Jihokorejský won · Americký dolar · Kanadský dolar · Euro · Japonský jen · Čínský jüan · Britská libra · Australský dolar · Švýcarský frank · Novozélandský dolar · Hongkongský dolar · Singapurský dolar (12 druhů)",
+  "hu": "Támogatott pénznemek: Dél-koreai von · Amerikai dollár · Kanadai dollár · Euró · Japán jen · Kínai jüan · Brit font · Ausztrál dollár · Svájci frank · Új-zélandi dollár · Hongkongi dollár · Szingapúri dollár (12 fajta)",
+  "ro": "Valute acceptate: Won sud-coreean · Dolar american · Dolar canadian · Euro · Yen japonez · Yuan chinezesc · Liră sterlină · Dolar australian · Franc elvețian · Dolar neozeelandez · Dolar din Hong Kong · Dolar singaporez (12 tipuri)"
+ }
+});
+</script>
+</body>
+</html>

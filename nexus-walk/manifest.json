@@ -1,0 +1,1 @@
+{"background_color":"#0B0F19","description":"걸은 시간과 거리를 기록하고, 의자를 이용한 가벼운 동작을 음성 안내로 따라 하는 도구","display":"standalone","icons":[{"sizes":"192x192","src":"/icon-192.png","type":"image/png"},{"sizes":"512x512","src":"/icon-512.png","type":"image/png"}],"name":"넥서스 걷기 운동","short_name":"걷기 운동","start_url":"/","theme_color":"#0B0F19"}

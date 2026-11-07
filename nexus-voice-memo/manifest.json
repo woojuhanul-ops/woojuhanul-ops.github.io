@@ -1,0 +1,1 @@
+{"background_color": "#0B0F19", "description": "말하면 적어 주고, 누르면 읽어 주는 큰 글자 메모", "display": "standalone", "icons": [{"sizes": "192x192", "src": "/icon-192.png", "type": "image/png"}, {"sizes": "512x512", "src": "/icon-512.png", "type": "image/png"}], "name": "넥서스 음성 메모", "short_name": "음성 메모", "start_url": "/", "theme_color": "#0B0F19"}

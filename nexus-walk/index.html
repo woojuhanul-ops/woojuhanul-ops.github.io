@@ -1,0 +1,3082 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 걷기 운동 — Nexus Walk &amp; Exercise</title>
+<meta name="description" content="걸은 시간과 거리를 기록하고, 의자를 이용한 가벼운 동작을 음성 안내로 따라 하는 기기 안 도구">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0B0F19">
+<style>
+  :root{--bg:#0B0F19;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif}
+  header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  header .logo{width:40px;height:40px;flex:none}
+  header .brand{line-height:1.2;flex:1}
+  header .brand b{font-size:15px;letter-spacing:.14em}
+  header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em}
+  header .homebtn{flex:none;font-size:13px;font-weight:700;color:#06121f;background:linear-gradient(135deg,var(--cyan),var(--violet));border-radius:999px;padding:9px 15px;text-decoration:none;white-space:nowrap}
+  .nxspin{transform-box:view-box;transform-origin:50px 50px;animation:nxspin 26s linear infinite}
+  @keyframes nxspin{to{transform:rotate(360deg)}}
+  .testbadge{flex:none;font-size:11px;font-weight:700;color:#0B0F19;background:var(--teal);border-radius:999px;padding:4px 10px;letter-spacing:.06em}
+  main{max-width:920px;margin:0 auto;padding:22px 16px 60px}
+  h1{font-size:26px;margin:6px 0 4px}
+  h2{font-size:22px;margin:4px 0 6px}
+  .sub{color:var(--muted);font-size:17px;margin:0 0 18px;line-height:1.65}
+  .panel{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .panel h3{font-size:18px;margin:0 0 12px}
+  .notice{border:1px solid rgba(45,212,191,.45);background:rgba(45,212,191,.08);border-radius:12px;padding:12px 14px;font-size:16px;line-height:1.7;color:var(--ink)}
+  .notice b{color:var(--teal)}
+  .safety{border:1px solid rgba(253,230,138,.5);background:rgba(253,230,138,.07);border-radius:12px;padding:12px 14px;font-size:17px;line-height:1.65;color:var(--ink);font-weight:700}
+  .field{margin-top:12px}
+  .field label{display:block;font-size:14px;color:var(--muted);margin-bottom:5px}
+  input[type="date"],input[type="number"]{background:#111827;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:17px;max-width:100%;color-scheme:dark;width:100%}
+  button{border:0;border-radius:10px;padding:11px 18px;font-size:16px;cursor:pointer;min-height:48px;transition:transform .08s ease,box-shadow .08s ease}
+  button:active{transform:scale(.96)}
+  .primary{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700;box-shadow:0 4px 18px rgba(45,212,191,.25)}
+  .primary:active{box-shadow:0 1px 6px rgba(45,212,191,.2)}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .ghost:disabled,.primary:disabled{opacity:.45;cursor:default}
+  .danger{background:transparent;color:#FCA5A5;border:1px solid rgba(252,165,165,.4)}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .actionbar{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+  .hint{font-size:14px;color:var(--muted);margin-top:10px;line-height:1.65}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:14px}
+  .modcard{display:block;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 16px;color:var(--ink);min-height:118px;width:100%}
+  .modcard,.modcard *,.excard,.excard *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .modcard .mt{font-size:19px;font-weight:800;display:block;margin-bottom:6px}
+  .modcard .md{font-size:16px;color:var(--muted);line-height:1.6;display:block}
+  .screen{display:none}
+  .screen.on{display:block}
+  .backbtn{margin-bottom:6px}
+  .kv{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--line);font-size:17px}
+  .kv:last-child{border-bottom:0}
+  .kv b{color:var(--teal);font-size:19px}
+  .bars{display:flex;align-items:flex-end;gap:6px;height:128px;margin-top:14px;padding-top:6px}
+  .barcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .bar{width:100%;max-width:44px;background:linear-gradient(180deg,var(--teal),var(--cyan));border-radius:6px 6px 0 0;min-height:3px}
+  .barval{font-size:13px;color:var(--ink)}
+  .barlab{font-size:13px;color:var(--muted)}
+  .recrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:16.5px}
+  .recrow:last-child{border-bottom:0}
+  .recrow .rdate{font-weight:700;flex:none}
+  .recrow .rdet{flex:1;color:var(--muted);font-size:15.5px}
+  .recrow .del{flex:none;min-height:40px;padding:6px 12px;font-size:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chip{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:9px 16px;font-size:16px;min-height:44px}
+  .chip.sel{background:linear-gradient(135deg,var(--cyan),var(--teal));color:#06121f;font-weight:700;border-color:transparent}
+  .seclabel{font-size:14px;color:var(--muted);margin-top:16px}
+  .excard{display:block;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--ink);width:100%}
+  .excard .exfig{display:block;background:#0e1526;border:1px solid var(--line);border-radius:10px;padding:8px}
+  .excard .exfig svg{width:100%;height:110px;display:block}
+  .excard .et{font-size:17px;font-weight:800;display:block;margin-top:10px}
+  .excard .ed{font-size:15.5px;color:var(--muted);line-height:1.6;display:block;margin-top:4px}
+  .excard .esec{font-size:14px;color:var(--teal);display:block;margin-top:6px;font-weight:700}
+  .excard.off{opacity:.42}
+  .excard .chk{float:right;font-size:13px;font-weight:800;color:#06121f;background:var(--teal);border-radius:999px;padding:2px 9px}
+  .excard.off .chk{background:var(--muted)}
+  .bigtime{font-size:clamp(52px,15vw,84px);font-weight:800;line-height:1.1;text-align:center;color:var(--teal)}
+  .nowname{font-size:24px;font-weight:800;text-align:center;margin-top:6px}
+  .nowdesc{font-size:17px;line-height:1.7;text-align:center;color:var(--ink);margin-top:8px}
+  .nextline{font-size:15.5px;color:var(--muted);text-align:center;margin-top:10px}
+  .pbar{height:10px;border-radius:99px;background:rgba(255,255,255,.1);margin-top:16px;overflow:hidden}
+  .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--teal));border-radius:99px;transition:width .2s linear}
+  .playfig{max-width:340px;margin:6px auto 0;background:#0e1526;border:1px solid var(--line);border-radius:14px;padding:10px}
+  .playfig svg{width:100%;height:220px;display:block}
+  footer{max-width:920px;margin:0 auto;padding:0 16px 40px;color:var(--muted);font-size:14px;line-height:1.7}
+  .gateovl{position:fixed;inset:0;background:rgba(4,7,14,.82);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px}
+  .gatebox{background:#0e1526;border:1px solid var(--line);border-radius:18px;max-width:440px;width:100%;padding:24px 20px}
+  .gatebox h2{margin:0 0 10px;font-size:20px}
+  .gatebox p{font-size:16px;line-height:1.7;color:var(--ink)}
+  .hidden{display:none!important}
+</style>
+<style id="nx-pagefix">html,body{overflow-x:clip}body>header{flex-wrap:wrap}header .brandlink{flex:none}header .brand{flex:none;overflow:visible}header .brand b{white-space:nowrap}header .brand span{white-space:nowrap}.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}</style></head>
+<body>
+<div class="gateovl" id="gateOvl" style="display:none">
+  <div class="gatebox">
+    <h2>테스트 버전입니다</h2>
+    <p>넥서스 걷기 운동은 지금 다듬어 가고 있는 테스트 버전입니다. 걷기 기록은 직접 적는 방식이고, 가벼운 운동은 의자를 이용한 동작을 소리로 안내하는 도구입니다. 이 도구는 의료 조언을 제공하지 않습니다. 운동 중 통증이 있으면 바로 멈추세요.</p>
+    <div class="actionbar"><button class="primary" id="gateOk">확인했습니다</button></div>
+  </div>
+</div>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo"><defs><linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#2DD4BF"/></linearGradient><linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8"/></linearGradient></defs><g class="nxspin"><ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/><ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/><ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/></g><circle cx="50" cy="50" r="4.5" fill="#F8FAFC"/></svg></a>
+  <div class="brand"><b>넥서스 걷기 운동</b><span>NEXUS WALK · EXERCISE</span></div>
+  </header>
+<main>
+  <!-- 홈: 모듈 선택 -->
+  <section class="screen on" id="scr-home">
+    <h1>걷기와 가벼운 운동</h1>
+    <p class="sub">걸은 시간과 거리를 기록하고, 의자를 이용한 가벼운 동작을 음성 안내로 따라 합니다. 모든 기록은 이 기기 안에만 저장됩니다.</p>
+    <div class="grid">
+      <button class="modcard" data-go="walk"><span class="mt">걷기 기록</span><span class="md">걸은 시간·거리·걸음 수를 적고, 날짜별 누적과 최근 7일의 합계를 봅니다.</span></button>
+      <button class="modcard" data-go="exercise"><span class="mt">가벼운 운동</span><span class="md">앉아서, 또는 의자를 잡고 하는 가벼운 동작을 그림과 음성 안내로 따라 합니다.</span></button>
+    </div>
+    <div class="panel">
+      <h3>이 도구에 대하여</h3>
+      <p class="hint" style="margin-top:0">걷기 기록은 직접 적는 방식입니다. 가벼운 운동은 영상이 아니라 그림 카드와 음성 안내로 진행됩니다. 이 도구는 의료 조언을 제공하지 않습니다.</p>
+    </div>
+  </section>
+
+  <!-- 걷기 기록 -->
+  <section class="screen" id="scr-walk">
+    <button class="ghost backbtn" data-go="home">← 처음으로</button>
+    <h2>걷기 기록</h2>
+    <div class="notice">자동 만보기는 설치형에서 제공됩니다. 지금은 직접 기록하는 방식입니다.</div>
+    <div class="panel">
+      <h3>오늘의 걸음 적기</h3>
+      <div class="field"><label for="wDate">날짜</label><input type="date" id="wDate"></div>
+      <div class="field"><label for="wMin">걸은 시간 (분) — 꼭 적어 주세요</label><input type="number" id="wMin" min="1" max="1440" step="1" inputmode="numeric" placeholder="예: 30"></div>
+      <div class="field"><label for="wKm">거리 (km) — 선택</label><input type="number" id="wKm" min="0" max="200" step="0.1" inputmode="decimal" placeholder="예: 2.5"></div>
+      <div class="field"><label for="wSteps">걸음 수 — 선택</label><input type="number" id="wSteps" min="0" max="200000" step="1" inputmode="numeric" placeholder="예: 3500"></div>
+      <div class="actionbar"><button class="primary" id="wSave">기록 저장</button></div>
+      <p class="hint" id="wMsg" role="status"></p>
+    </div>
+    <div class="panel">
+      <h3>합계</h3>
+      <div class="kv"><span>오늘 걸은 시간</span><b><span id="wTodayMin">0</span>분</b></div>
+      <div class="kv"><span>최근 7일 걸은 시간</span><b><span id="wWeekMin">0</span>분</b></div>
+      <div class="kv"><span>최근 7일 거리</span><b><span id="wWeekKm">0</span> km</b></div>
+      <div class="kv"><span>최근 7일 걸음 수</span><b><span id="wWeekSteps">0</span>걸음</b></div>
+      <h3 style="margin-top:20px">최근 7일 (분)</h3>
+      <div class="bars" id="wBars"></div>
+    </div>
+    <div class="panel">
+      <h3>기록 목록</h3>
+      <div id="wList"></div>
+      <p class="hint" id="wEmpty">아직 기록이 없습니다.</p>
+      <div class="actionbar"><button class="danger" id="wClear">기록 전체 지우기</button></div>
+    </div>
+  </section>
+
+  <!-- 가벼운 운동 -->
+  <section class="screen" id="scr-exercise">
+    <button class="ghost backbtn" data-go="home">← 처음으로</button>
+    <h2>가벼운 운동</h2>
+    <p class="safety">통증이 있으면 멈추세요. 무리하지 말고 편한 범위에서만 따라 하세요.</p>
+
+    <div id="exSetup">
+      <div class="actionbar" style="justify-content:stretch;margin:4px 0 16px"><button class="primary" id="exStart" style="flex:1;min-height:56px;font-size:17px;padding:16px">운동 시작</button></div>
+      <p class="seclabel">함께할 동작을 고르세요. 카드를 누르면 켜고 끌 수 있습니다.</p>
+      <div class="grid" id="exGrid"></div>
+      <p class="seclabel">강도</p>
+      <div class="chips" id="exIntensity">
+        <button class="chip sel" data-int="easy">편하게</button>
+        <button class="chip" data-int="normal">보통</button>
+      </div>
+      <p class="seclabel">진행 속도</p>
+      <div class="chips" id="exSpeed">
+        <button class="chip" data-spd="slow">느리게</button>
+        <button class="chip sel" data-spd="normal">보통</button>
+        <button class="chip" data-spd="fast">빠르게</button>
+      </div>
+      <p class="hint" id="exPlan"></p>
+    </div>
+
+    <div id="exPlayer" class="hidden">
+      <div class="playfig" id="exFig"></div>
+      <div class="nowname" id="exNowName"></div>
+      <p class="nowdesc" id="exNowDesc"></p>
+      <div class="bigtime" id="exClock">0</div>
+      <div class="pbar"><i id="exBar"></i></div>
+      <p class="nextline" id="exNext"></p>
+      <div class="actionbar">
+        <button class="ghost" id="exStop">그만하기</button>
+        <button class="primary" id="exPause">일시정지</button>
+      </div>
+    </div>
+
+    <div id="exDone" class="hidden">
+      <div class="panel">
+        <h3>운동이 끝났습니다</h3>
+        <p class="oneline" style="font-size:17px;line-height:1.7">수고하셨습니다. 오늘 한 운동은 기기에 따로 저장되지 않습니다.</p>
+        <div class="actionbar"><button class="primary" id="exAgain">운동 고르기로</button></div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  <p>기록은 이 기기 안에만 저장되며, 밖으로 전송되지 않습니다. 이 도구는 운동을 안내하는 도구이며 의료 조언을 제공하지 않습니다.</p>
+</footer>
+<script>
+(function () {
+  "use strict";
+  function $(id) { return document.getElementById(id); }
+
+  /* ---------- 화면 전환 ---------- */
+  function show(id) {
+    var ss = document.querySelectorAll(".screen");
+    for (var i = 0; i < ss.length; i++) ss[i].classList.toggle("on", ss[i].id === id);
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener("click", function (e) {
+    var g = e.target.closest ? e.target.closest("[data-go]") : null;
+    if (g) { show("scr-" + g.getAttribute("data-go")); }
+  });
+
+  /* ---------- 입장 고지 (첫 방문 1회) ---------- */
+  try {
+    if (!localStorage.getItem("nxWeGate")) { $("gateOvl").style.display = "flex"; }
+  } catch (e) { $("gateOvl").style.display = "flex"; }
+  $("gateOk").addEventListener("click", function () {
+    $("gateOvl").style.display = "none";
+    try { localStorage.setItem("nxWeGate", "1"); } catch (e) {}
+  });
+
+  /* ---------- 언어 (i18n 코어와 같은 결정 순서) ---------- */
+  var SUPPORTED = ["ko","en","zh","zh-TW","ja","es","hi","fr","de","pt","it","ru","uk","ar","fa","th","vi","id","tr","nl","pl","sv","da","nb","fi","cs","hu","ro"];
+  function curLang() {
+    try {
+      var ql = new URLSearchParams(location.search).get("lang");
+      if (ql && SUPPORTED.indexOf(ql) >= 0) return ql;
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) return saved;
+      var raw = (navigator.language || "ko").toLowerCase(), n = raw.slice(0, 2);
+      if (n === "zh") return /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+      if (SUPPORTED.indexOf(n) >= 0) return n;
+    } catch (e) {}
+    return "ko";
+  }
+  var TTSLANG = { ko: "ko-KR", en: "en-US", zh: "zh-CN", "zh-TW": "zh-TW", ja: "ja-JP", es: "es-ES", hi: "hi-IN" };
+  var PH = {
+    ko:      { start: "가벼운 운동을 시작합니다.", begin: "시작합니다.", end: "끝났습니다.", rest: "잠시 쉽니다. 다음은 {n}입니다.", done: "운동이 끝났습니다. 수고하셨습니다." },
+    en:      { start: "Let's begin the light exercise.", begin: "Begin.", end: "Done.", rest: "Take a short rest. Next is {n}.", done: "The exercise is finished. Well done." },
+    zh:      { start: "开始轻柔运动。", begin: "开始。", end: "结束。", rest: "休息一下。下一个是{n}。", done: "运动结束了。辛苦了。" },
+    "zh-TW": { start: "開始輕柔運動。", begin: "開始。", end: "結束。", rest: "休息一下。接下來是{n}。", done: "運動結束了。辛苦了。" },
+    ja:      { start: "軽い運動を始めます。", begin: "始めます。", end: "終わりました。", rest: "少し休みます。次は{n}です。", done: "運動が終わりました。お疲れさまでした。" },
+    es:      { start: "Comenzamos el ejercicio suave.", begin: "Comience.", end: "Terminado.", rest: "Descanse un momento. El siguiente es {n}.", done: "El ejercicio ha terminado. Buen trabajo." },
+    hi:      { start: "हल्का व्यायाम शुरू करते हैं।", begin: "शुरू करें।", end: "समाप्त।", rest: "थोड़ा आराम करें। अगला है {n}।", done: "व्यायाम समाप्त हुआ। बहुत बढ़िया।" }
+  };
+  function ph() { var l = curLang(); return PH[l] || PH.en; }
+  function speak(text) {
+    try {
+      if (!("speechSynthesis" in window)) return;
+      var u = new SpeechSynthesisUtterance(text);
+      var l = curLang();
+      u.lang = TTSLANG[l] || "en-US";
+      u.rate = exState.rate || 1.0;
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+  function speakCancel() { try { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); } catch (e) {} }
+
+  /* ---------- 동작 그림 (자체 제작 선 그림) ---------- */
+  var INK = "#2DD4BF", SUB = "#64748B", ACC = "#818CF8";
+  function fig(inner) { return '<svg viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>'; }
+  function chair(x) { return '<path d="M' + x + ' 34 V62 H' + (x + 26) + ' M' + (x + 3) + ' 62 V86 M' + (x + 23) + ' 62 V86" stroke="' + SUB + '" stroke-width="3"/>'; }
+  var FIGS = {
+    neck: fig(chair(24) + '<circle cx="52" cy="26" r="7" stroke="' + INK + '" stroke-width="3"/><path d="M51 33 V57 M51 57 H66 M66 57 V82 M51 42 L62 54" stroke="' + INK + '" stroke-width="3"/><path d="M38 20 A15 13 0 1 1 64 14" stroke="' + ACC + '" stroke-width="2.5" stroke-dasharray="4 3"/><path d="M64 14 l-1 7 M64 14 l-7 -2" stroke="' + ACC + '" stroke-width="2.5"/>'),
+    shoulder: fig(chair(24) + '<circle cx="52" cy="27" r="7" stroke="' + INK + '" stroke-width="3"/><path d="M51 34 V57 M51 57 H66 M66 57 V82 M51 40 L41 33 M51 40 L63 33" stroke="' + INK + '" stroke-width="3"/><path d="M34 24 v12 M30 28 l4 -5 4 5 M30 32 l4 5 4 -5" stroke="' + ACC + '" stroke-width="2.5"/>'),
+    wrist: fig(chair(24) + '<circle cx="50" cy="27" r="7" stroke="' + INK + '" stroke-width="3"/><path d="M49 34 V57 M49 57 H64 M64 57 V82 M49 41 L69 43" stroke="' + INK + '" stroke-width="3"/><circle cx="75" cy="44" r="6" stroke="' + ACC + '" stroke-width="2.5" stroke-dasharray="4 3"/><path d="M81 40 l1 6 M81 40 l-6 1" stroke="' + ACC + '" stroke-width="2.5"/>'),
+    knee: fig(chair(24) + '<circle cx="50" cy="26" r="7" stroke="' + INK + '" stroke-width="3"/><path d="M49 33 V57 M49 40 L60 52 M49 57 L63 45 L63 63" stroke="' + INK + '" stroke-width="3"/><path d="M49 57 L62 57 L62 82" stroke="' + INK + '" stroke-width="3" opacity=".45"/><path d="M70 34 a12 10 0 0 1 4 8" stroke="' + ACC + '" stroke-width="2.5" stroke-dasharray="4 3"/>'),
+    ankle: fig(chair(24) + '<circle cx="50" cy="26" r="7" stroke="' + INK + '" stroke-width="3"/><path d="M49 33 V57 M49 40 L60 52 M49 57 L66 61 L79 69" stroke="' + INK + '" stroke-width="3"/><circle cx="83" cy="72" r="5.5" stroke="' + ACC + '" stroke-width="2.5" stroke-dasharray="4 3"/><path d="M49 57 L60 57 L60 82" stroke="' + INK + '" stroke-width="3" opacity=".45"/>'),
+    heel: fig(chair(18) + '<circle cx="63" cy="17" r="7" stroke="' + INK + '" stroke-width="3"/><path d="M63 24 V53 M63 31 L46 40 M63 53 L57 78 L52 82 M63 53 L69 79 L74 82" stroke="' + INK + '" stroke-width="3"/><path d="M82 66 V50 M82 50 l-4 6 M82 50 l4 6" stroke="' + ACC + '" stroke-width="2.5"/>'),
+    legside: fig(chair(18) + '<circle cx="60" cy="17" r="7" stroke="' + INK + '" stroke-width="3"/><path d="M60 24 V53 M60 31 L45 40 M60 53 L58 84 M60 53 L83 65 L87 72" stroke="' + INK + '" stroke-width="3"/><path d="M76 52 a18 14 0 0 1 10 6" stroke="' + ACC + '" stroke-width="2.5" stroke-dasharray="4 3"/>'),
+    balance: fig(chair(18) + '<circle cx="61" cy="17" r="7" stroke="' + INK + '" stroke-width="3"/><path d="M61 24 V53 M61 31 L45 40 M61 53 L60 84 M61 53 L72 63 L67 73" stroke="' + INK + '" stroke-width="3"/><path d="M78 78 h12" stroke="' + ACC + '" stroke-width="2.5" stroke-dasharray="4 3"/>'),
+    rest: fig(chair(24) + '<circle cx="51" cy="27" r="7" stroke="' + INK + '" stroke-width="3"/><path d="M50 34 V57 M50 57 H65 M65 57 V82 M50 41 L61 55" stroke="' + INK + '" stroke-width="3" opacity=".8"/><path d="M70 22 q6 -6 12 0 M74 32 q4 -4 8 0" stroke="' + ACC + '" stroke-width="2.5"/>')
+  };
+
+  /* ---------- 동작 데이터 (초는 '편하게' 기준) ---------- */
+  var EXERCISES = [
+    { id: "neck", sec: 30, fig: "neck", name: "목 천천히 돌리기",
+      desc: "의자에 앉아 고개를 천천히 원을 그리듯 돌립니다. 반대쪽도 같은 방법으로 돌립니다.",
+      i18n: { en: "Slow neck circles", zh: "慢慢转脖子", "zh-TW": "慢慢轉脖子", ja: "首をゆっくり回す", es: "Círculos lentos con el cuello", hi: "गर्दन धीरे-धीरे घुमाना" } },
+    { id: "shoulder", sec: 30, fig: "shoulder", name: "어깨 으쓱하고 내리기",
+      desc: "양쪽 어깨를 귀 쪽으로 천천히 올렸다가 툭 떨어뜨립니다.",
+      i18n: { en: "Shoulder shrugs", zh: "耸肩放松", "zh-TW": "聳肩放鬆", ja: "肩の上げ下げ", es: "Encoger y soltar los hombros", hi: "कंधे उचकाना और छोड़ना" } },
+    { id: "wrist", sec: 30, fig: "wrist", name: "팔 뻗어 손목 돌리기",
+      desc: "팔을 앞으로 뻗고 손목을 천천히 원을 그리듯 돌립니다. 반대쪽도 같은 방법으로 돌립니다.",
+      i18n: { en: "Wrist circles", zh: "伸臂转手腕", "zh-TW": "伸臂轉手腕", ja: "腕を伸ばして手首回し", es: "Círculos con las muñecas", hi: "हाथ फैलाकर कलाई घुमाना" } },
+    { id: "knee", sec: 40, fig: "knee", name: "앉아서 무릎 들어 올리기",
+      desc: "의자에 앉아 한쪽 무릎을 천천히 들어 올렸다 내립니다. 양쪽을 번갈아 합니다.",
+      i18n: { en: "Seated knee lifts", zh: "坐着抬膝盖", "zh-TW": "坐著抬膝蓋", ja: "座って膝上げ", es: "Elevar las rodillas sentado", hi: "बैठकर घुटने उठाना" } },
+    { id: "ankle", sec: 30, fig: "ankle", name: "앉아서 발목 돌리기",
+      desc: "한쪽 발을 살짝 들고 발목을 천천히 원을 그리듯 돌립니다. 양쪽을 번갈아 합니다.",
+      i18n: { en: "Seated ankle circles", zh: "坐着转脚踝", "zh-TW": "坐著轉腳踝", ja: "座って足首回し", es: "Círculos con los tobillos sentado", hi: "बैठकर टखने घुमाना" } },
+    { id: "heel", sec: 30, fig: "heel", name: "의자 잡고 뒤꿈치 들기",
+      desc: "의자 등받이를 잡고 서서 뒤꿈치를 천천히 들었다 내립니다.",
+      i18n: { en: "Heel raises holding a chair", zh: "扶椅子踮脚尖", "zh-TW": "扶椅子踮腳尖", ja: "椅子につかまってかかと上げ", es: "Elevar los talones apoyándose en una silla", hi: "कुर्सी पकड़कर एड़ी उठाना" } },
+    { id: "legside", sec: 40, fig: "legside", name: "의자 잡고 다리 옆으로 들기",
+      desc: "의자를 잡고 서서 한쪽 다리를 옆으로 천천히 들었다 내립니다. 양쪽을 번갈아 합니다.",
+      i18n: { en: "Side leg lifts holding a chair", zh: "扶椅子侧抬腿", "zh-TW": "扶椅子側抬腿", ja: "椅子につかまって横脚上げ", es: "Elevar la pierna de lado apoyándose en una silla", hi: "कुर्सी पकड़कर पैर बगल में उठाना" } },
+    { id: "balance", sec: 30, fig: "balance", name: "의자 잡고 한 발로 서기",
+      desc: "의자를 가볍게 잡고 한쪽 발을 살짝 들어 균형을 잡습니다. 양쪽을 번갈아 합니다.",
+      i18n: { en: "Standing on one foot holding a chair", zh: "扶椅子单脚站立", "zh-TW": "扶椅子單腳站立", ja: "椅子につかまって片足立ち", es: "De pie en un solo pie apoyándose en una silla", hi: "कुर्सी पकड़कर एक पैर पर खड़े होना" } }
+  ];
+  function exName(ex) { var l = curLang(); return (l !== "ko" && ex.i18n[l]) ? ex.i18n[l] : ex.name; }
+
+  /* ================= 걷기 기록 ================= */
+  var WKEY = "nxWalkRecV1";
+  function wLoad() { try { var a = JSON.parse(localStorage.getItem(WKEY) || "[]"); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function wSaveAll(a) { try { localStorage.setItem(WKEY, JSON.stringify(a)); } catch (e) {} }
+  function dstr(d) { var m = d.getMonth() + 1, dd = d.getDate(); return d.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (dd < 10 ? "0" : "") + dd; }
+  function todayStr() { return dstr(new Date()); }
+  var WD = ["일", "월", "화", "수", "목", "금", "토"];
+  function dateLabel(ds) { var p = ds.split("-"); var d = new Date(+p[0], +p[1] - 1, +p[2]); return p[0] + "년 " + (+p[1]) + "월 " + (+p[2]) + "일 (" + WD[d.getDay()] + ")"; }
+
+  function renderWalk() {
+    var recs = wLoad();
+    var byDay = {};
+    recs.forEach(function (r) { byDay[r.d] = byDay[r.d] || { min: 0, km: 0, steps: 0 }; byDay[r.d].min += r.min || 0; byDay[r.d].km += r.km || 0; byDay[r.d].steps += r.steps || 0; });
+    var today = todayStr();
+    $("wTodayMin").textContent = byDay[today] ? byDay[today].min : 0;
+    var wMin = 0, wKm = 0, wSteps = 0, bars = "";
+    var maxMin = 0, days = [];
+    for (var i = 6; i >= 0; i--) { var d = new Date(); d.setDate(d.getDate() - i); days.push(d); }
+    days.forEach(function (d) { var v = byDay[dstr(d)] ? byDay[dstr(d)].min : 0; if (v > maxMin) maxMin = v; });
+    days.forEach(function (d) {
+      var key = dstr(d), v = byDay[key] ? byDay[key].min : 0;
+      wMin += v; wKm += byDay[key] ? byDay[key].km : 0; wSteps += byDay[key] ? byDay[key].steps : 0;
+      var h = maxMin > 0 ? Math.max(4, Math.round(v / maxMin * 88)) : 4;
+      bars += '<div class="barcol"><span class="barval">' + v + '</span><div class="bar" style="height:' + h + 'px"></div><span class="barlab">' + WD[d.getDay()] + '</span></div>';
+    });
+    $("wWeekMin").textContent = wMin;
+    $("wWeekKm").textContent = Math.round(wKm * 10) / 10;
+    $("wWeekSteps").textContent = wSteps;
+    $("wBars").innerHTML = bars;
+    var sorted = recs.slice().sort(function (a, b) { return (b.d + b.ts) < (a.d + a.ts) ? -1 : 1; });
+    if (!sorted.length) { $("wList").innerHTML = ""; $("wEmpty").style.display = "block"; return; }
+    $("wEmpty").style.display = "none";
+    $("wList").innerHTML = sorted.map(function (r) {
+      var det = r.min + "분";
+      if (r.km) det += " · " + r.km + " km";
+      if (r.steps) det += " · " + r.steps + "걸음";
+      return '<div class="recrow"><span class="rdate">' + dateLabel(r.d) + '</span><span class="rdet">' + det + '</span><button class="ghost del" data-del="' + r.id + '">지우기</button></div>';
+    }).join("");
+  }
+  $("wSave").addEventListener("click", function () {
+    var d = $("wDate").value || todayStr();
+    var min = parseInt($("wMin").value, 10);
+    var km = parseFloat($("wKm").value);
+    var steps = parseInt($("wSteps").value, 10);
+    if (!min || min < 1) { $("wMsg").textContent = "걸은 시간(분)을 적어 주세요."; return; }
+    var recs = wLoad();
+    recs.push({ id: "r" + Date.now() + Math.floor(Math.random() * 999), d: d, min: min, km: isNaN(km) ? 0 : km, steps: isNaN(steps) ? 0 : steps, ts: Date.now() });
+    wSaveAll(recs);
+    $("wMin").value = ""; $("wKm").value = ""; $("wSteps").value = "";
+    $("wMsg").textContent = "저장했습니다.";
+    renderWalk();
+  });
+  $("wList").addEventListener("click", function (e) {
+    var b = e.target.closest ? e.target.closest("[data-del]") : null;
+    if (!b) return;
+    var id = b.getAttribute("data-del");
+    wSaveAll(wLoad().filter(function (r) { return r.id !== id; }));
+    renderWalk();
+  });
+  $("wClear").addEventListener("click", function () {
+    if (!wLoad().length) return;
+    if (window.confirm("걷기 기록을 모두 지울까요?")) { wSaveAll([]); $("wMsg").textContent = "기록을 모두 지웠습니다."; renderWalk(); }
+  });
+
+  /* ================= 가벼운 운동 ================= */
+  var exState = { intensity: "easy", speed: "normal", rate: 1.0, selected: {}, playing: false, paused: false, idx: 0, phase: "work", endAt: 0, remain: 0, total: 0, timer: null, routine: [] };
+  EXERCISES.forEach(function (ex) { exState.selected[ex.id] = true; });
+  /* 선택 저장 (감사 수리 2026-11-04): 동작 선택·강도·속도를 기기에 저장해 재방문 시 복원 — 시작 버튼 상단화의 전제 */
+  var EXKEY = "nxWeSetupV1";
+  function exSaveSetup() {
+    try { localStorage.setItem(EXKEY, JSON.stringify({ selected: exState.selected, intensity: exState.intensity, speed: exState.speed })); } catch (e) {}
+  }
+  function exRateFor(spd) { return spd === "slow" ? 0.92 : (spd === "fast" ? 1.08 : 1.0); }
+  function exSyncChips() {
+    var ic = $("exIntensity").querySelectorAll(".chip");
+    for (var i = 0; i < ic.length; i++) ic[i].classList.toggle("sel", ic[i].getAttribute("data-int") === exState.intensity);
+    var sc = $("exSpeed").querySelectorAll(".chip");
+    for (var j = 0; j < sc.length; j++) sc[j].classList.toggle("sel", sc[j].getAttribute("data-spd") === exState.speed);
+  }
+  (function exLoadSetup() {
+    try {
+      var s = JSON.parse(localStorage.getItem(EXKEY) || "null");
+      if (!s || typeof s !== "object") return;
+      if (s.selected && typeof s.selected === "object") {
+        EXERCISES.forEach(function (ex) { if (typeof s.selected[ex.id] === "boolean") exState.selected[ex.id] = s.selected[ex.id]; });
+      }
+      if (s.intensity === "easy" || s.intensity === "normal") exState.intensity = s.intensity;
+      if (s.speed === "slow" || s.speed === "normal" || s.speed === "fast") { exState.speed = s.speed; exState.rate = exRateFor(s.speed); }
+    } catch (e) {}
+  })();
+  exSyncChips();
+  function intMul() { return exState.intensity === "normal" ? 1.5 : 1.0; }
+  function spdMul() { return exState.speed === "slow" ? 1.3 : (exState.speed === "fast" ? 0.75 : 1.0); }
+  function restSec() { return Math.max(5, Math.round((exState.intensity === "normal" ? 10 : 15) * spdMul())); }
+  function workSec(ex) { return Math.max(5, Math.round(ex.sec * intMul() * spdMul())); }
+
+  function renderExGrid() {
+    $("exGrid").innerHTML = EXERCISES.map(function (ex) {
+      var on = exState.selected[ex.id];
+      return '<button class="excard' + (on ? "" : " off") + '" data-ex="' + ex.id + '"><span class="chk">' + (on ? "함께함" : "쉼") + '</span><span class="exfig">' + FIGS[ex.fig] + '</span><span class="et">' + ex.name + '</span><span class="ed">' + ex.desc + '</span><span class="esec"><span>' + workSec(ex) + '</span>초</span></button>';
+    }).join("");
+    updatePlan();
+  }
+  function updatePlan() {
+    var sel = EXERCISES.filter(function (ex) { return exState.selected[ex.id]; });
+    var tot = 0;
+    sel.forEach(function (ex, i) { tot += workSec(ex); if (i < sel.length - 1) tot += restSec(); });
+    $("exPlan").innerHTML = '<span>선택한 동작</span> <b id="exCount">' + sel.length + '개</b> · <span>모두 하면 약</span> <b>' + Math.max(1, Math.round(tot / 60)) + '</b><span>분</span>';
+    $("exStart").disabled = !sel.length;
+  }
+  $("exGrid").addEventListener("click", function (e) {
+    var c = e.target.closest ? e.target.closest("[data-ex]") : null;
+    if (!c) return;
+    var id = c.getAttribute("data-ex");
+    exState.selected[id] = !exState.selected[id];
+    exSaveSetup();
+    renderExGrid();
+  });
+  function chipWire(elId, attr, fn) {
+    $(elId).addEventListener("click", function (e) {
+      var c = e.target.closest ? e.target.closest("[data-" + attr + "]") : null;
+      if (!c) return;
+      var chips = $(elId).querySelectorAll(".chip");
+      for (var i = 0; i < chips.length; i++) chips[i].classList.toggle("sel", chips[i] === c);
+      fn(c.getAttribute("data-" + attr));
+    });
+  }
+  chipWire("exIntensity", "int", function (v) { exState.intensity = v; exSaveSetup(); renderExGrid(); });
+  chipWire("exSpeed", "spd", function (v) { exState.speed = v; exState.rate = exRateFor(v); exSaveSetup(); renderExGrid(); });
+
+  function exShowSetup() { $("exSetup").classList.remove("hidden"); $("exPlayer").classList.add("hidden"); $("exDone").classList.add("hidden"); }
+  function exShowPlayer() { $("exSetup").classList.add("hidden"); $("exPlayer").classList.remove("hidden"); $("exDone").classList.add("hidden"); }
+  function exShowDone() { $("exSetup").classList.add("hidden"); $("exPlayer").classList.add("hidden"); $("exDone").classList.remove("hidden"); }
+
+  function startPhase() {
+    var ex = exState.routine[exState.idx];
+    var dur = exState.phase === "work" ? workSec(ex) : restSec();
+    exState.total = dur;
+    exState.endAt = Date.now() + dur * 1000;
+    exState.paused = false;
+    $("exPause").textContent = "일시정지";
+    if (exState.phase === "work") {
+      $("exFig").innerHTML = FIGS[ex.fig];
+      $("exNowName").textContent = ex.name;
+      $("exNowDesc").textContent = ex.desc;
+      var nxt = exState.routine[exState.idx + 1];
+      $("exNext").innerHTML = nxt ? '<span>다음 동작</span>: <span>' + nxt.name + '</span>' : '<span>마지막 동작입니다</span>';
+      speak(exName(ex) + ". " + ph().begin);
+      if (curLang() === "ko") speak(ex.desc);
+    } else {
+      $("exFig").innerHTML = FIGS.rest;
+      $("exNowName").textContent = "쉬는 시간";
+      $("exNowDesc").textContent = "";
+      $("exNext").innerHTML = '<span>다음 동작</span>: <span>' + ex.name + '</span>';
+    }
+    tick();
+  }
+  function tick() {
+    var remainMs = exState.endAt - Date.now();
+    if (remainMs <= 0) { advance(); return; }
+    var sec = Math.ceil(remainMs / 1000);
+    $("exClock").textContent = sec;
+    var pct = Math.min(100, Math.max(0, (1 - remainMs / (exState.total * 1000)) * 100));
+    $("exBar").style.width = pct + "%";
+  }
+  function advance() {
+    if (exState.phase === "work") {
+      speak(ph().end);
+      if (exState.idx >= exState.routine.length - 1) { finishEx(); return; }
+      exState.phase = "rest";
+      var next = exState.routine[exState.idx + 1];
+      speak(ph().rest.replace("{n}", exName(next)));
+      startPhase();
+    } else {
+      exState.phase = "work";
+      exState.idx++;
+      startPhase();
+    }
+  }
+  function finishEx() {
+    stopTimer();
+    exState.playing = false;
+    speak(ph().done);
+    exShowDone();
+  }
+  function stopTimer() { if (exState.timer) { clearInterval(exState.timer); exState.timer = null; } }
+  $("exStart").addEventListener("click", function () {
+    exState.routine = EXERCISES.filter(function (ex) { return exState.selected[ex.id]; });
+    if (!exState.routine.length) return;
+    exState.idx = 0; exState.phase = "work"; exState.playing = true;
+    speakCancel();
+    speak(ph().start);
+    exShowPlayer();
+    startPhase();
+    stopTimer();
+    exState.timer = setInterval(tick, 200);
+  });
+  $("exPause").addEventListener("click", function () {
+    if (!exState.playing) return;
+    if (!exState.paused) {
+      exState.remain = Math.max(0, exState.endAt - Date.now());
+      exState.paused = true;
+      stopTimer();
+      speakCancel();
+      $("exPause").textContent = "계속하기";
+    } else {
+      exState.endAt = Date.now() + exState.remain;
+      exState.paused = false;
+      stopTimer();
+      exState.timer = setInterval(tick, 200);
+      $("exPause").textContent = "일시정지";
+      tick();
+    }
+  });
+  $("exStop").addEventListener("click", function () {
+    stopTimer(); speakCancel(); exState.playing = false; exShowSetup();
+  });
+  $("exAgain").addEventListener("click", function () { exShowSetup(); });
+
+  /* ---------- 시작: 딥링크 ?m= ---------- */
+  $("wDate").value = todayStr();
+  renderWalk();
+  renderExGrid();
+  var m = "";
+  try { m = new URLSearchParams(location.search).get("m") || ""; } catch (e) {}
+  if (m === "walk" || m === "exercise") show("scr-" + m);
+
+  /* 검증용 핸들 */
+  window.NXWE = { show: show, renderWalk: renderWalk, exState: exState, workSec: workSec, restSec: restSec, EXERCISES: EXERCISES };
+})();
+</script>
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 소리 자르기": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 영상 자르기": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 사진 정보 가리기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 읽어 주기": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 긴 말 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 사진 글자 뽑기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 녹음기": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 말로 쓰는 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 넥서스 걷기 운동 — 표시 언어 사전 (한국어 원문 키, 없는 언어는 원문 유지) */
+NX_I18N_ADD({
+  "넥서스 걷기 운동": { en: "Nexus Walk & Exercise", zh: "Nexus 步行运动", "zh-TW": "Nexus 步行運動", ja: "Nexus ウォーキング運動", es: "Nexus Caminar y Ejercicio", hi: "Nexus वॉक और व्यायाम" },
+  "테스트 버전입니다": { en: "This is a test version", zh: "这是测试版本", "zh-TW": "這是測試版本", ja: "テスト版です", es: "Esta es una versión de prueba", hi: "यह एक परीक्षण संस्करण है" },
+  "넥서스 걷기 운동은 지금 다듬어 가고 있는 테스트 버전입니다. 걷기 기록은 직접 적는 방식이고, 가벼운 운동은 의자를 이용한 동작을 소리로 안내하는 도구입니다. 이 도구는 의료 조언을 제공하지 않습니다. 운동 중 통증이 있으면 바로 멈추세요.": { en: "Nexus Walk & Exercise is a test version still being refined. Walking records are entered by hand, and the light exercise guides chair-based movements with voice. This tool does not provide medical advice. If you feel pain while exercising, stop right away.", zh: "Nexus 步行运动是正在完善的测试版本。步行记录需要手动填写，轻柔运动通过语音引导使用椅子的动作。本工具不提供医疗建议。运动中如感到疼痛，请立即停止。", "zh-TW": "Nexus 步行運動是正在完善的測試版本。步行記錄需要手動填寫，輕柔運動透過語音引導使用椅子的動作。本工具不提供醫療建議。運動中如感到疼痛，請立即停止。", ja: "Nexus ウォーキング運動は改良中のテスト版です。ウォーキング記録は手入力で、軽い運動は椅子を使った動作を音声で案内します。本ツールは医療アドバイスを提供しません。運動中に痛みを感じたらすぐに中止してください。", es: "Nexus Caminar y Ejercicio es una versión de prueba en mejora. Los registros de caminata se escriben a mano y el ejercicio suave guía movimientos con silla mediante voz. Esta herramienta no ofrece consejos médicos. Si siente dolor al ejercitarse, deténgase de inmediato.", hi: "Nexus वॉक और व्यायाम एक परीक्षण संस्करण है जिसे सुधारा जा रहा है। वॉक रिकॉर्ड हाथ से लिखे जाते हैं और हल्का व्यायाम कुर्सी के साथ किए जाने वाले अभ्यासों का आवाज़ से मार्गदर्शन करता है। यह टूल चिकित्सीय सलाह नहीं देता। व्यायाम के दौरान दर्द हो तो तुरंत रुक जाएँ।" },
+  "확인했습니다": { en: "I understand", zh: "知道了", "zh-TW": "知道了", ja: "確認しました", es: "Entendido", hi: "समझ गया" },
+  "테스트 버전": { en: "Test version", zh: "测试版", "zh-TW": "測試版", ja: "テスト版", es: "Versión de prueba", hi: "परीक्षण संस्करण" },
+  "걷기와 가벼운 운동": { en: "Walking and light exercise", zh: "步行与轻柔运动", "zh-TW": "步行與輕柔運動", ja: "ウォーキングと軽い運動", es: "Caminar y ejercicio suave", hi: "पैदल चलना और हल्का व्यायाम" },
+  "걸은 시간과 거리를 기록하고, 의자를 이용한 가벼운 동작을 음성 안내로 따라 합니다. 모든 기록은 이 기기 안에만 저장됩니다.": { en: "Record your walking time and distance, and follow light chair-based movements with voice guidance. All records are stored only on this device.", zh: "记录步行时间和距离，并通过语音引导跟随使用椅子的轻柔动作。所有记录只保存在这台设备中。", "zh-TW": "記錄步行時間和距離，並透過語音引導跟隨使用椅子的輕柔動作。所有記錄只保存在這台設備中。", ja: "歩いた時間と距離を記録し、椅子を使った軽い動作を音声案内で行います。すべての記録はこの端末の中だけに保存されます。", es: "Registre el tiempo y la distancia de sus caminatas y siga movimientos suaves con silla con guía por voz. Todos los registros se guardan solo en este dispositivo.", hi: "अपने चलने का समय और दूरी दर्ज करें और आवाज़ मार्गदर्शन के साथ कुर्सी आधारित हल्के अभ्यास करें। सभी रिकॉर्ड केवल इस डिवाइस में सहेजे जाते हैं।" },
+  "걷기 기록": { en: "Walking record", zh: "步行记录", "zh-TW": "步行記錄", ja: "ウォーキング記録", es: "Registro de caminata", hi: "वॉक रिकॉर्ड" },
+  "걸은 시간·거리·걸음 수를 적고, 날짜별 누적과 최근 7일의 합계를 봅니다.": { en: "Write down your walking time, distance and steps, and see daily totals and the last 7 days.", zh: "填写步行时间、距离和步数，查看每日累计和最近 7 天合计。", "zh-TW": "填寫步行時間、距離和步數，查看每日累計和最近 7 天合計。", ja: "歩いた時間・距離・歩数を書き、日にちごとの累計と最近7日の合計を見ます。", es: "Anote el tiempo, la distancia y los pasos de su caminata y vea los totales por día y de los últimos 7 días.", hi: "अपने चलने का समय, दूरी और कदम लिखें और दिन-वार कुल तथा पिछले 7 दिनों का योग देखें।" },
+  "가벼운 운동": { en: "Light exercise", zh: "轻柔运动", "zh-TW": "輕柔運動", ja: "軽い運動", es: "Ejercicio suave", hi: "हल्का व्यायाम" },
+  "앉아서, 또는 의자를 잡고 하는 가벼운 동작을 그림과 음성 안내로 따라 합니다.": { en: "Follow light movements — seated, or holding a chair — with picture cards and voice guidance.", zh: "通过图卡和语音引导，跟随坐着或扶着椅子的轻柔动作。", "zh-TW": "透過圖卡和語音引導，跟隨坐著或扶著椅子的輕柔動作。", ja: "座って、または椅子につかまって行う軽い動作を、絵カードと音声案内で行います。", es: "Siga movimientos suaves — sentado o apoyándose en una silla — con tarjetas ilustradas y guía por voz.", hi: "बैठकर या कुर्सी पकड़कर किए जाने वाले हल्के अभ्यास चित्र कार्ड और आवाज़ मार्गदर्शन के साथ करें।" },
+  "이 도구에 대하여": { en: "About this tool", zh: "关于本工具", "zh-TW": "關於本工具", ja: "このツールについて", es: "Acerca de esta herramienta", hi: "इस टूल के बारे में" },
+  "걷기 기록은 직접 적는 방식입니다. 가벼운 운동은 영상이 아니라 그림 카드와 음성 안내로 진행됩니다. 이 도구는 의료 조언을 제공하지 않습니다.": { en: "Walking records are entered by hand. The light exercise uses picture cards and voice guidance, not video. This tool does not provide medical advice.", zh: "步行记录需要手动填写。轻柔运动使用图卡和语音引导，而不是视频。本工具不提供医疗建议。", "zh-TW": "步行記錄需要手動填寫。輕柔運動使用圖卡和語音引導，而不是影片。本工具不提供醫療建議。", ja: "ウォーキング記録は手入力です。軽い運動は動画ではなく絵カードと音声案内で進みます。本ツールは医療アドバイスを提供しません。", es: "Los registros de caminata se escriben a mano. El ejercicio suave usa tarjetas ilustradas y guía por voz, no video. Esta herramienta no ofrece consejos médicos.", hi: "वॉक रिकॉर्ड हाथ से लिखे जाते हैं। हल्का व्यायाम वीडियो के बजाय चित्र कार्ड और आवाज़ मार्गदर्शन से होता है। यह टूल चिकित्सीय सलाह नहीं देता।" },
+  "← 처음으로": { en: "← Back to start", zh: "← 返回首页", "zh-TW": "← 返回首頁", ja: "← 最初に戻る", es: "← Volver al inicio", hi: "← शुरुआत पर वापस" },
+  "자동 만보기는 설치형에서 제공됩니다. 지금은 직접 기록하는 방식입니다.": { en: "Automatic step counting will come with the installed version. For now, records are entered by hand.", zh: "自动计步将在安装版中提供。现在是手动记录方式。", "zh-TW": "自動計步將在安裝版中提供。現在是手動記錄方式。", ja: "自動の歩数計測はインストール版で提供されます。今は手入力方式です。", es: "El conteo automático de pasos llegará con la versión instalada. Por ahora, los registros se escriben a mano.", hi: "स्वचालित कदम गिनती इंस्टॉल किए गए संस्करण में मिलेगी। अभी रिकॉर्ड हाथ से लिखे जाते हैं।" },
+  "오늘의 걸음 적기": { en: "Add today's walk", zh: "记录今天的步行", "zh-TW": "記錄今天的步行", ja: "今日の歩きを記録", es: "Anotar la caminata de hoy", hi: "आज की वॉक लिखें" },
+  "날짜": { en: "Date", zh: "日期", "zh-TW": "日期", ja: "日付", es: "Fecha", hi: "तारीख़" },
+  "걸은 시간 (분) — 꼭 적어 주세요": { en: "Walking time (minutes) — required", zh: "步行时间（分钟）— 必填", "zh-TW": "步行時間（分鐘）— 必填", ja: "歩いた時間（分）— 必須", es: "Tiempo de caminata (minutos) — obligatorio", hi: "चलने का समय (मिनट) — आवश्यक" },
+  "거리 (km) — 선택": { en: "Distance (km) — optional", zh: "距离（公里）— 可选", "zh-TW": "距離（公里）— 可選", ja: "距離（km）— 任意", es: "Distancia (km) — opcional", hi: "दूरी (km) — वैकल्पिक" },
+  "걸음 수 — 선택": { en: "Steps — optional", zh: "步数 — 可选", "zh-TW": "步數 — 可選", ja: "歩数 — 任意", es: "Pasos — opcional", hi: "कदम — वैकल्पिक" },
+  "기록 저장": { en: "Save record", zh: "保存记录", "zh-TW": "保存記錄", ja: "記録を保存", es: "Guardar registro", hi: "रिकॉर्ड सहेजें" },
+  "합계": { en: "Totals", zh: "合计", "zh-TW": "合計", ja: "合計", es: "Totales", hi: "कुल योग" },
+  "오늘 걸은 시간": { en: "Time walked today", zh: "今天的步行时间", "zh-TW": "今天的步行時間", ja: "今日歩いた時間", es: "Tiempo caminado hoy", hi: "आज चलने का समय" },
+  "최근 7일 걸은 시간": { en: "Time walked, last 7 days", zh: "最近 7 天步行时间", "zh-TW": "最近 7 天步行時間", ja: "最近7日に歩いた時間", es: "Tiempo caminado, últimos 7 días", hi: "पिछले 7 दिनों में चलने का समय" },
+  "최근 7일 거리": { en: "Distance, last 7 days", zh: "最近 7 天距离", "zh-TW": "最近 7 天距離", ja: "最近7日の距離", es: "Distancia, últimos 7 días", hi: "पिछले 7 दिनों की दूरी" },
+  "최근 7일 걸음 수": { en: "Steps, last 7 days", zh: "最近 7 天步数", "zh-TW": "最近 7 天步數", ja: "最近7日の歩数", es: "Pasos, últimos 7 días", hi: "पिछले 7 दिनों के कदम" },
+  "최근 7일 (분)": { en: "Last 7 days (minutes)", zh: "最近 7 天（分钟）", "zh-TW": "最近 7 天（分鐘）", ja: "最近7日（分）", es: "Últimos 7 días (minutos)", hi: "पिछले 7 दिन (मिनट)" },
+  "기록 목록": { en: "Record list", zh: "记录列表", "zh-TW": "記錄列表", ja: "記録一覧", es: "Lista de registros", hi: "रिकॉर्ड सूची" },
+  "아직 기록이 없습니다.": { en: "No records yet.", zh: "还没有记录。", "zh-TW": "還沒有記錄。", ja: "まだ記録がありません。", es: "Aún no hay registros.", hi: "अभी कोई रिकॉर्ड नहीं है।" },
+  "기록 전체 지우기": { en: "Erase all records", zh: "删除全部记录", "zh-TW": "刪除全部記錄", ja: "記録をすべて消す", es: "Borrar todos los registros", hi: "सभी रिकॉर्ड मिटाएँ" },
+  "통증이 있으면 멈추세요. 무리하지 말고 편한 범위에서만 따라 하세요.": { en: "If you feel pain, stop. Do not push yourself — stay within a comfortable range.", zh: "如果感到疼痛，请停下来。不要勉强，只在舒适的范围内跟随。", "zh-TW": "如果感到疼痛，請停下來。不要勉強，只在舒適的範圍內跟隨。", ja: "痛みがあれば中止してください。無理をせず、楽な範囲でのみ行ってください。", es: "Si siente dolor, deténgase. No se esfuerce; siga solo dentro de un rango cómodo.", hi: "दर्द हो तो रुक जाएँ। ज़बरदस्ती न करें — केवल आरामदायक सीमा में ही करें।" },
+  "함께할 동작을 고르세요. 카드를 누르면 켜고 끌 수 있습니다.": { en: "Choose the movements to do together. Tap a card to turn it on or off.", zh: "选择要一起做的动作。点按卡片可开启或关闭。", "zh-TW": "選擇要一起做的動作。點按卡片可開啟或關閉。", ja: "一緒に行う動作を選んでください。カードを押すとオン・オフが切り替わります。", es: "Elija los movimientos para hacer juntos. Toque una tarjeta para activarla o desactivarla.", hi: "साथ करने वाले अभ्यास चुनें। कार्ड दबाकर चालू या बंद करें।" },
+  "강도": { en: "Intensity", zh: "强度", "zh-TW": "強度", ja: "強度", es: "Intensidad", hi: "तीव्रता" },
+  "편하게": { en: "Easy", zh: "轻松", "zh-TW": "輕鬆", ja: "楽に", es: "Suave", hi: "आराम से" },
+  "보통": { en: "Normal", zh: "普通", "zh-TW": "普通", ja: "普通", es: "Normal", hi: "सामान्य" },
+  "진행 속도": { en: "Pace", zh: "进行速度", "zh-TW": "進行速度", ja: "進む速さ", es: "Ritmo", hi: "गति" },
+  "느리게": { en: "Slow", zh: "慢", "zh-TW": "慢", ja: "ゆっくり", es: "Lento", hi: "धीरे" },
+  "빠르게": { en: "Fast", zh: "快", "zh-TW": "快", ja: "速く", es: "Rápido", hi: "तेज़" },
+  "운동 시작": { en: "Start exercise", zh: "开始运动", "zh-TW": "開始運動", ja: "運動を始める", es: "Iniciar ejercicio", hi: "व्यायाम शुरू करें" },
+  "그만하기": { en: "Stop", zh: "停止", "zh-TW": "停止", ja: "やめる", es: "Detener", hi: "रोकें" },
+  "일시정지": { en: "Pause", zh: "暂停", "zh-TW": "暫停", ja: "一時停止", es: "Pausar", hi: "रोकें (विराम)" },
+  "계속하기": { en: "Resume", zh: "继续", "zh-TW": "繼續", ja: "再開する", es: "Continuar", hi: "जारी रखें" },
+  "운동이 끝났습니다": { en: "The exercise is finished", zh: "运动结束了", "zh-TW": "運動結束了", ja: "運動が終わりました", es: "El ejercicio ha terminado", hi: "व्यायाम समाप्त हुआ" },
+  "수고하셨습니다. 오늘 한 운동은 기기에 따로 저장되지 않습니다.": { en: "Well done. Today's exercise session is not saved separately on the device.", zh: "辛苦了。今天的运动不会单独保存在设备中。", "zh-TW": "辛苦了。今天的運動不會單獨保存在設備中。", ja: "お疲れさまでした。今日の運動は端末に別途保存されません。", es: "Buen trabajo. La sesión de ejercicio de hoy no se guarda por separado en el dispositivo.", hi: "बहुत बढ़िया। आज का व्यायाम सत्र डिवाइस में अलग से सहेजा नहीं जाता।" },
+  "운동 고르기로": { en: "Back to choosing movements", zh: "返回选择动作", "zh-TW": "返回選擇動作", ja: "動作選びに戻る", es: "Volver a elegir movimientos", hi: "अभ्यास चुनने पर वापस" },
+  "기록은 이 기기 안에만 저장되며, 밖으로 전송되지 않습니다. 이 도구는 운동을 안내하는 도구이며 의료 조언을 제공하지 않습니다.": { en: "Records are stored only on this device and are never sent outside. This tool guides exercise and does not provide medical advice.", zh: "记录只保存在这台设备中，绝不向外发送。本工具用于引导运动，不提供医疗建议。", "zh-TW": "記錄只保存在這台設備中，絕不向外傳送。本工具用於引導運動，不提供醫療建議。", ja: "記録はこの端末の中だけに保存され、外に送信されることはありません。本ツールは運動を案内するもので、医療アドバイスは提供しません。", es: "Los registros se guardan solo en este dispositivo y nunca se envían fuera. Esta herramienta guía el ejercicio y no ofrece consejos médicos.", hi: "रिकॉर्ड केवल इस डिवाइस में सहेजे जाते हैं और कभी बाहर नहीं भेजे जाते। यह टूल व्यायाम का मार्गदर्शन करता है और चिकित्सीय सलाह नहीं देता।" },
+  "분": { en: "min", zh: " 分钟", "zh-TW": " 分鐘", ja: " 分", es: " min", hi: " मिनट" },
+  "걸음": { en: " steps", zh: " 步", "zh-TW": " 步", ja: " 歩", es: " pasos", hi: " कदम" },
+  "초": { en: " sec", zh: " 秒", "zh-TW": " 秒", ja: " 秒", es: " s", hi: " सेकंड" },
+  "저장했습니다.": { en: "Saved.", zh: "已保存。", "zh-TW": "已保存。", ja: "保存しました。", es: "Guardado.", hi: "सहेजा गया।" },
+  "걸은 시간(분)을 적어 주세요.": { en: "Please enter the walking time in minutes.", zh: "请填写步行时间（分钟）。", "zh-TW": "請填寫步行時間（分鐘）。", ja: "歩いた時間（分）を入力してください。", es: "Ingrese el tiempo de caminata en minutos.", hi: "कृपया चलने का समय मिनटों में लिखें।" },
+  "기록을 모두 지웠습니다.": { en: "All records were erased.", zh: "已删除全部记录。", "zh-TW": "已刪除全部記錄。", ja: "記録をすべて消しました。", es: "Se borraron todos los registros.", hi: "सभी रिकॉर्ड मिटा दिए गए।" },
+  "지우기": { en: "Erase", zh: "删除", "zh-TW": "刪除", ja: "消す", es: "Borrar", hi: "मिटाएँ" },
+  "함께함": { en: "Included", zh: "一起做", "zh-TW": "一起做", ja: "一緒に行う", es: "Incluido", hi: "शामिल" },
+  "쉼": { en: "Off", zh: "休息", "zh-TW": "休息", ja: "休み", es: "No", hi: "बंद" },
+  "선택한 동작": { en: "Selected movements", zh: "已选动作", "zh-TW": "已選動作", ja: "選んだ動作", es: "Movimientos seleccionados", hi: "चुने गए अभ्यास" },
+  "모두 하면 약": { en: "All together, about", zh: "全部做完约", "zh-TW": "全部做完約", ja: "全部で約", es: "Todo junto, unos", hi: "सब मिलाकर लगभग" },
+  "다음 동작": { en: "Next movement", zh: "下一个动作", "zh-TW": "下一個動作", ja: "次の動作", es: "Siguiente movimiento", hi: "अगला अभ्यास" },
+  "마지막 동작입니다": { en: "This is the last movement", zh: "这是最后一个动作", "zh-TW": "這是最後一個動作", ja: "最後の動作です", es: "Este es el último movimiento", hi: "यह अंतिम अभ्यास है" },
+  "쉬는 시간": { en: "Rest time", zh: "休息时间", "zh-TW": "休息時間", ja: "休む時間", es: "Tiempo de descanso", hi: "आराम का समय" },
+  "일": { en: "Sun", zh: "日", "zh-TW": "日", ja: "日", es: "dom", hi: "रवि" },
+  "월": { en: "Mon", zh: "一", "zh-TW": "一", ja: "月", es: "lun", hi: "सोम" },
+  "화": { en: "Tue", zh: "二", "zh-TW": "二", ja: "火", es: "mar", hi: "मंगल" },
+  "수": { en: "Wed", zh: "三", "zh-TW": "三", ja: "水", es: "mié", hi: "बुध" },
+  "목": { en: "Thu", zh: "四", "zh-TW": "四", ja: "木", es: "jue", hi: "गुरु" },
+  "금": { en: "Fri", zh: "五", "zh-TW": "五", ja: "金", es: "vie", hi: "शुक्र" },
+  "토": { en: "Sat", zh: "六", "zh-TW": "六", ja: "土", es: "sáb", hi: "शनि" },
+  "목 천천히 돌리기": { en: "Slow neck circles", zh: "慢慢转脖子", "zh-TW": "慢慢轉脖子", ja: "首をゆっくり回す", es: "Círculos lentos con el cuello", hi: "गर्दन धीरे-धीरे घुमाना" },
+  "의자에 앉아 고개를 천천히 원을 그리듯 돌립니다. 반대쪽도 같은 방법으로 돌립니다.": { en: "Sit in a chair and slowly roll your head in a circle. Then roll it the other way, the same way.", zh: "坐在椅子上，慢慢地把头画圆转动。反方向也用同样的方法转。", "zh-TW": "坐在椅子上，慢慢地把頭畫圓轉動。反方向也用同樣的方法轉。", ja: "椅子に座り、頭をゆっくり円を描くように回します。反対側も同じように回します。", es: "Siéntese en una silla y gire la cabeza lentamente en círculos. Luego gírela en el otro sentido, de la misma manera.", hi: "कुर्सी पर बैठकर सिर को धीरे-धीरे गोल घुमाएँ। दूसरी ओर भी उसी तरह घुमाएँ।" },
+  "어깨 으쓱하고 내리기": { en: "Shoulder shrugs", zh: "耸肩放松", "zh-TW": "聳肩放鬆", ja: "肩の上げ下げ", es: "Encoger y soltar los hombros", hi: "कंधे उचकाना और छोड़ना" },
+  "양쪽 어깨를 귀 쪽으로 천천히 올렸다가 툭 떨어뜨립니다.": { en: "Slowly lift both shoulders toward your ears, then let them drop.", zh: "把双肩慢慢朝耳朵方向抬起，然后一下子放下。", "zh-TW": "把雙肩慢慢朝耳朵方向抬起，然後一下子放下。", ja: "両肩を耳のほうへゆっくり上げて、ストンと落とします。", es: "Levante lentamente ambos hombros hacia las orejas y luego déjelos caer.", hi: "दोनों कंधों को धीरे-धीरे कानों की ओर उठाएँ, फिर छोड़ दें।" },
+  "팔 뻗어 손목 돌리기": { en: "Wrist circles", zh: "伸臂转手腕", "zh-TW": "伸臂轉手腕", ja: "腕を伸ばして手首回し", es: "Círculos con las muñecas", hi: "हाथ फैलाकर कलाई घुमाना" },
+  "팔을 앞으로 뻗고 손목을 천천히 원을 그리듯 돌립니다. 반대쪽도 같은 방법으로 돌립니다.": { en: "Stretch your arms forward and slowly circle your wrists. Then circle them the other way, the same way.", zh: "把手臂向前伸，慢慢地把手腕画圆转动。反方向也用同样的方法转。", "zh-TW": "把手臂向前伸，慢慢地把手腕畫圓轉動。反方向也用同樣的方法轉。", ja: "腕を前に伸ばし、手首をゆっくり円を描くように回します。反対側も同じように回します。", es: "Estire los brazos hacia adelante y gire las muñecas lentamente en círculos. Luego gírelas en el otro sentido, de la misma manera.", hi: "हाथों को आगे फैलाकर कलाइयों को धीरे-धीरे गोल घुमाएँ। दूसरी ओर भी उसी तरह घुमाएँ।" },
+  "앉아서 무릎 들어 올리기": { en: "Seated knee lifts", zh: "坐着抬膝盖", "zh-TW": "坐著抬膝蓋", ja: "座って膝上げ", es: "Elevar las rodillas sentado", hi: "बैठकर घुटने उठाना" },
+  "의자에 앉아 한쪽 무릎을 천천히 들어 올렸다 내립니다. 양쪽을 번갈아 합니다.": { en: "Sit in a chair and slowly lift one knee, then lower it. Alternate between both sides.", zh: "坐在椅子上，慢慢抬起一侧膝盖再放下。两侧交替进行。", "zh-TW": "坐在椅子上，慢慢抬起一側膝蓋再放下。兩側交替進行。", ja: "椅子に座り、片方の膝をゆっくり上げて下ろします。両側を交互に行います。", es: "Siéntese en una silla y levante lentamente una rodilla, luego bájela. Alterne entre ambos lados.", hi: "कुर्सी पर बैठकर एक घुटना धीरे-धीरे उठाएँ और नीचे करें। दोनों ओर बारी-बारी से करें।" },
+  "앉아서 발목 돌리기": { en: "Seated ankle circles", zh: "坐着转脚踝", "zh-TW": "坐著轉腳踝", ja: "座って足首回し", es: "Círculos con los tobillos sentado", hi: "बैठकर टखने घुमाना" },
+  "한쪽 발을 살짝 들고 발목을 천천히 원을 그리듯 돌립니다. 양쪽을 번갈아 합니다.": { en: "Lift one foot slightly and slowly circle the ankle. Alternate between both sides.", zh: "轻轻抬起一只脚，慢慢地把脚踝画圆转动。两侧交替进行。", "zh-TW": "輕輕抬起一隻腳，慢慢地把腳踝畫圓轉動。兩側交替進行。", ja: "片足を少し持ち上げ、足首をゆっくり円を描くように回します。両側を交互に行います。", es: "Levante un pie ligeramente y gire el tobillo lentamente en círculos. Alterne entre ambos lados.", hi: "एक पैर थोड़ा उठाकर टखने को धीरे-धीरे गोल घुमाएँ। दोनों ओर बारी-बारी से करें।" },
+  "의자 잡고 뒤꿈치 들기": { en: "Heel raises holding a chair", zh: "扶椅子踮脚尖", "zh-TW": "扶椅子踮腳尖", ja: "椅子につかまってかかと上げ", es: "Elevar los talones apoyándose en una silla", hi: "कुर्सी पकड़कर एड़ी उठाना" },
+  "의자 등받이를 잡고 서서 뒤꿈치를 천천히 들었다 내립니다.": { en: "Stand holding the back of a chair and slowly raise your heels, then lower them.", zh: "扶着椅背站立，慢慢抬起脚跟再放下。", "zh-TW": "扶著椅背站立，慢慢抬起腳跟再放下。", ja: "椅子の背もたれにつかまって立ち、かかとをゆっくり上げて下ろします。", es: "De pie, apoyándose en el respaldo de una silla, levante lentamente los talones y luego bájelos.", hi: "कुर्सी की पीठ पकड़कर खड़े हों और धीरे-धीरे एड़ियाँ उठाएँ, फिर नीचे करें।" },
+  "의자 잡고 다리 옆으로 들기": { en: "Side leg lifts holding a chair", zh: "扶椅子侧抬腿", "zh-TW": "扶椅子側抬腿", ja: "椅子につかまって横脚上げ", es: "Elevar la pierna de lado apoyándose en una silla", hi: "कुर्सी पकड़कर पैर बगल में उठाना" },
+  "의자를 잡고 서서 한쪽 다리를 옆으로 천천히 들었다 내립니다. 양쪽을 번갈아 합니다.": { en: "Stand holding a chair and slowly lift one leg out to the side, then lower it. Alternate between both sides.", zh: "扶着椅子站立，把一条腿慢慢向侧面抬起再放下。两侧交替进行。", "zh-TW": "扶著椅子站立，把一條腿慢慢向側面抬起再放下。兩側交替進行。", ja: "椅子につかまって立ち、片脚を横へゆっくり上げて下ろします。両側を交互に行います。", es: "De pie, apoyándose en una silla, levante lentamente una pierna hacia el lado y luego bájela. Alterne entre ambos lados.", hi: "कुर्सी पकड़कर खड़े हों और एक पैर धीरे-धीरे बगल में उठाएँ, फिर नीचे करें। दोनों ओर बारी-बारी से करें।" },
+  "의자 잡고 한 발로 서기": { en: "Standing on one foot holding a chair", zh: "扶椅子单脚站立", "zh-TW": "扶椅子單腳站立", ja: "椅子につかまって片足立ち", es: "De pie en un solo pie apoyándose en una silla", hi: "कुर्सी पकड़कर एक पैर पर खड़े होना" },
+  "의자를 가볍게 잡고 한쪽 발을 살짝 들어 균형을 잡습니다. 양쪽을 번갈아 합니다.": { en: "Lightly hold a chair, lift one foot slightly, and keep your balance. Alternate between both sides.", zh: "轻轻扶着椅子，稍微抬起一只脚，保持平衡。两侧交替进行。", "zh-TW": "輕輕扶著椅子，稍微抬起一隻腳，保持平衡。兩側交替進行。", ja: "椅子に軽くつかまり、片足を少し持ち上げてバランスを取ります。両側を交互に行います。", es: "Apóyese ligeramente en una silla, levante un pie un poco y mantenga el equilibrio. Alterne entre ambos lados.", hi: "कुर्सी को हल्के से पकड़ें, एक पैर थोड़ा उठाएँ और संतुलन बनाएँ। दोनों ओर बारी-बारी से करें।" }
+});
+
+</script>
+
+<script>
+/* NX-I18N-SUPPLEMENT — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "예: 30": {
+  "en": "e.g. 30",
+  "zh": "例如：30",
+  "zh-TW": "例如：30",
+  "ja": "例：30",
+  "es": "Ej.: 30",
+  "hi": "जैसे: 30",
+  "fr": "Ex. : 30",
+  "de": "z. B. 30",
+  "pt": "Ex.: 30",
+  "it": "Es.: 30",
+  "ru": "Пример: 30",
+  "uk": "Приклад: 30",
+  "ar": "مثال: 30",
+  "fa": "مثال: 30",
+  "th": "เช่น: 30",
+  "vi": "Ví dụ: 30",
+  "id": "Mis.: 30",
+  "tr": "Örn: 30",
+  "nl": "Bijv.: 30",
+  "pl": "Np.: 30",
+  "sv": "T.ex.: 30",
+  "da": "F.eks.: 30",
+  "nb": "F.eks.: 30",
+  "fi": "Esim.: 30",
+  "cs": "Např.: 30",
+  "hu": "Pl.: 30",
+  "ro": "Ex.: 30"
+ },
+ "예: 2.5": {
+  "en": "e.g. 2.5",
+  "zh": "例如：2.5",
+  "zh-TW": "例如：2.5",
+  "ja": "例：2.5",
+  "es": "Ej.: 2,5",
+  "hi": "जैसे: 2.5",
+  "fr": "Ex. : 2,5",
+  "de": "z. B. 2,5",
+  "pt": "Ex.: 2,5",
+  "it": "Es.: 2,5",
+  "ru": "Пример: 2.5",
+  "uk": "Приклад: 2.5",
+  "ar": "مثال: 2.5",
+  "fa": "مثال: 2.5",
+  "th": "เช่น: 2.5",
+  "vi": "Ví dụ: 2.5",
+  "id": "Mis.: 2.5",
+  "tr": "Örn: 2.5",
+  "nl": "Bijv.: 2,5",
+  "pl": "Np.: 2,5",
+  "sv": "T.ex.: 2,5",
+  "da": "F.eks.: 2,5",
+  "nb": "F.eks.: 2,5",
+  "fi": "Esim.: 2,5",
+  "cs": "Např.: 2,5",
+  "hu": "Pl.: 2,5",
+  "ro": "Ex.: 2,5"
+ },
+ "예: 3500": {
+  "en": "e.g. 3500",
+  "zh": "例如：3500",
+  "zh-TW": "例如：3500",
+  "ja": "例：3500",
+  "es": "Ej.: 3500",
+  "hi": "जैसे: 3500",
+  "fr": "Ex. : 3500",
+  "de": "z. B. 3500",
+  "pt": "Ex.: 3500",
+  "it": "Es.: 3500",
+  "ru": "Пример: 3500",
+  "uk": "Приклад: 3500",
+  "ar": "مثال: 3500",
+  "fa": "مثال: 3500",
+  "th": "เช่น: 3500",
+  "vi": "Ví dụ: 3500",
+  "id": "Mis.: 3500",
+  "tr": "Örn: 3500",
+  "nl": "Bijv.: 3500",
+  "pl": "Np.: 3500",
+  "sv": "T.ex.: 3500",
+  "da": "F.eks.: 3500",
+  "nb": "F.eks.: 3500",
+  "fi": "Esim.: 3500",
+  "cs": "Např.: 3500",
+  "hu": "Pl.: 3500",
+  "ro": "Ex.: 3500"
+ },
+ "테스트 버전입니다": {
+  "fr": "C'est une version test",
+  "de": "Dies ist eine Testversion",
+  "pt": "Esta é uma versão de teste",
+  "it": "È una versione di prova",
+  "ru": "Тестовая версия",
+  "uk": "Тестова версія",
+  "ar": "نسخة تجريبية",
+  "fa": "نسخه آزمایشی است",
+  "th": "นี่คือเวอร์ชันทดสอบ",
+  "vi": "Đây là phiên bản thử nghiệm",
+  "id": "Ini versi uji",
+  "tr": "Bu bir test sürümüdür",
+  "nl": "Dit is een testversie",
+  "pl": "To jest wersja testowa",
+  "sv": "Detta är en testversion",
+  "da": "Dette er en testversion",
+  "nb": "Dette er en testversjon",
+  "fi": "Tämä on testiversio",
+  "cs": "Toto je testovací verze",
+  "hu": "Ez tesztverzió",
+  "ro": "Aceasta este o versiune de test"
+ },
+ "확인했습니다": {
+  "fr": "Confirmé",
+  "de": "Bestätigt",
+  "pt": "Confirmado",
+  "it": "Confermato",
+  "ru": "Подтверждено",
+  "uk": "Підтверджено",
+  "ar": "تم التأكيد",
+  "fa": "تأیید شد",
+  "th": "ยืนยันแล้ว",
+  "vi": "Đã xác nhận",
+  "id": "Telah dikonfirmasi",
+  "tr": "Onaylandı",
+  "nl": "Bevestigd",
+  "pl": "Potwierdzono",
+  "sv": "Bekräftat",
+  "da": "Bekræftet",
+  "nb": "Bekreftet",
+  "fi": "Vahvistettu",
+  "cs": "Potvrzeno",
+  "hu": "Megerősítve",
+  "ro": "Confirmat"
+ },
+ "넥서스 걷기 운동": {
+  "fr": "Nexus Marche et exercice",
+  "de": "Nexus Gehen und Bewegung",
+  "pt": "Nexus Caminhada e Exercício",
+  "it": "Nexus Camminata ed esercizio",
+  "ru": "Ходьба Nexus",
+  "uk": "Ходьба Nexus",
+  "ar": "مشي Nexus",
+  "fa": "پیاده روی Nexus",
+  "th": "Nexus เดินออกกำลังกาย",
+  "vi": "Nexus Đi bộ tập thể dục",
+  "id": "Nexus Olahraga Jalan",
+  "tr": "Nexus Yürüyüş Egzersizi",
+  "nl": "Nexus Wandelen",
+  "pl": "Nexus Chodzenie",
+  "sv": "Nexus promenad",
+  "da": "Nexus gåture",
+  "nb": "Nexus gåing",
+  "fi": "Nexus-kävely",
+  "cs": "Nexus chůze",
+  "hu": "Nexus séta",
+  "ro": "Mers Nexus"
+ },
+ "걷기와 가벼운 운동": {
+  "fr": "Marche et exercice léger",
+  "de": "Gehen und leichte Bewegung",
+  "pt": "Caminhada e exercício leve",
+  "it": "Camminata ed esercizio leggero",
+  "ru": "Ходьба и лёгкие упражнения",
+  "uk": "Ходьба і легкі вправи",
+  "ar": "المشي وتمارين خفيفة",
+  "fa": "پیاده روی و ورزش سبک",
+  "th": "การเดินและออกกำลังกายเบา ๆ",
+  "vi": "Đi bộ và vận động nhẹ",
+  "id": "Jalan kaki dan olahraga ringan",
+  "tr": "Yürüyüş ve hafif egzersiz",
+  "nl": "Wandelen en lichte beweging",
+  "pl": "Chodzenie i lekka aktywność",
+  "sv": "Promenader och lätt motion",
+  "da": "Gåture og let motion",
+  "nb": "Gåing og lett trening",
+  "fi": "Kävely ja kevyt liikunta",
+  "cs": "Chůze a lehké cvičení",
+  "hu": "Séta és könnyű mozgás",
+  "ro": "Mers și mișcare ușoară"
+ },
+ "걷기 기록": {
+  "fr": "Historique de marche",
+  "de": "Gehverlauf",
+  "pt": "Histórico de caminhada",
+  "it": "Cronologia camminate",
+  "ru": "Запись ходьбы",
+  "uk": "Запис ходьби",
+  "ar": "سجل المشي",
+  "fa": "ثبت پیاده روی",
+  "th": "บันทึกการเดิน",
+  "vi": "Bản ghi đi bộ",
+  "id": "Catatan jalan",
+  "tr": "Yürüyüş kaydı",
+  "nl": "Wandelgeschiedenis",
+  "pl": "Historia chodzenia",
+  "sv": "Promenadhistorik",
+  "da": "Gåhistorik",
+  "nb": "Gåhistorikk",
+  "fi": "Kävelyhistoria",
+  "cs": "Historie chůze",
+  "hu": "Séta előzmények",
+  "ro": "Istoricul mersului"
+ },
+ "가벼운 운동": {
+  "fr": "Exercice léger",
+  "de": "Leichte Bewegung",
+  "pt": "Exercício leve",
+  "it": "Esercizio leggero",
+  "ru": "Лёгкие упражнения",
+  "uk": "Легкі вправи",
+  "ar": "تمارين خفيفة",
+  "fa": "ورزش سبک",
+  "th": "ออกกำลังกายเบา ๆ",
+  "vi": "Vận động nhẹ",
+  "id": "Olahraga ringan",
+  "tr": "Hafif egzersiz",
+  "nl": "Lichte beweging",
+  "pl": "Lekka aktywność",
+  "sv": "Lätt motion",
+  "da": "Let motion",
+  "nb": "Lett trening",
+  "fi": "Kevyt liikunta",
+  "cs": "Lehké cvičení",
+  "hu": "Könnyű mozgás",
+  "ro": "Mișcare ușoară"
+ },
+ "이 도구에 대하여": {
+  "fr": "À propos de cet outil",
+  "de": "Über dieses Werkzeug",
+  "pt": "Sobre esta ferramenta",
+  "it": "Informazioni su questo strumento",
+  "ru": "Об этом инструменте",
+  "uk": "Про цей інструмент",
+  "ar": "حول هذه الأداة",
+  "fa": "درباره این ابزار",
+  "th": "เกี่ยวกับเครื่องมือนี้",
+  "vi": "Về công cụ này",
+  "id": "Tentang alat ini",
+  "tr": "Bu araç hakkında",
+  "nl": "Over deze tool",
+  "pl": "O tym narzędziu",
+  "sv": "Om detta verktyg",
+  "da": "Om dette værktøj",
+  "nb": "Om dette verktøyet",
+  "fi": "Tietoja tästä työkalusta",
+  "cs": "O tomto nástroji",
+  "hu": "Erről az eszközről",
+  "ro": "Despre acest instrument"
+ },
+ "← 처음으로": {
+  "fr": "← Au début",
+  "de": "← Zum Anfang",
+  "pt": "← Para o início",
+  "it": "← All'inizio",
+  "ru": "← В начало",
+  "uk": "← На початок",
+  "ar": "← إلى البداية",
+  "fa": "← به آغاز",
+  "th": "← กลับไปจุดเริ่มต้น",
+  "vi": "← Về đầu",
+  "id": "← Ke awal",
+  "tr": "← Başa dön",
+  "nl": "← Naar begin",
+  "pl": "← Na początek",
+  "sv": "← Till början",
+  "da": "← Til starten",
+  "nb": "← Til starten",
+  "fi": "← Alkuun",
+  "cs": "← Na začátek",
+  "hu": "← Az elejére",
+  "ro": "← La început"
+ },
+ "오늘의 걸음 적기": {
+  "fr": "Noter les pas du jour",
+  "de": "Heutige Schritte eintragen",
+  "pt": "Registrar passos de hoje",
+  "it": "Registra i passi di oggi",
+  "ru": "Записать сегодняшние шаги",
+  "uk": "Записати сьогоднішні кроки",
+  "ar": "تسجيل خطوات اليوم",
+  "fa": "ثبت گام های امروز",
+  "th": "บันทึกก้าววันนี้",
+  "vi": "Ghi số bước hôm nay",
+  "id": "Catat langkah hari ini",
+  "tr": "Bugünkü adımları kaydet",
+  "nl": "Stappen van vandaag noteren",
+  "pl": "Zapisz dzisiejsze kroki",
+  "sv": "Anteckna dagens steg",
+  "da": "Notér dagens skridt",
+  "nb": "Noter dagens skritt",
+  "fi": "Kirjaa päivän askeleet",
+  "cs": "Zapsat dnešní kroky",
+  "hu": "Mai lépések rögzítése",
+  "ro": "Notează pașii de azi"
+ },
+ "날짜": {
+  "fr": "Date",
+  "de": "Datum",
+  "pt": "Data",
+  "it": "Data",
+  "ru": "Дата",
+  "uk": "Дата",
+  "ar": "التاريخ",
+  "fa": "تاریخ",
+  "th": "วันที่",
+  "vi": "Ngày",
+  "id": "Tanggal",
+  "tr": "Tarih",
+  "nl": "Datum",
+  "pl": "Data",
+  "sv": "Datum",
+  "da": "Dato",
+  "nb": "Dato",
+  "fi": "Päivämäärä",
+  "cs": "Datum",
+  "hu": "Dátum",
+  "ro": "Data"
+ },
+ "걸음 수 — 선택": {
+  "fr": "Nombre de pas — facultatif",
+  "de": "Schrittzahl — optional",
+  "pt": "Número de passos — opcional",
+  "it": "Numero di passi — facoltativo",
+  "ru": "Количество шагов — необязательно",
+  "uk": "Кількість кроків — необов’язково",
+  "ar": "عدد الخطوات — اختياري",
+  "fa": "تعداد گام — اختیاری",
+  "th": "จำนวนก้าว — ไม่บังคับ",
+  "vi": "Số bước — Tùy chọn",
+  "id": "Jumlah langkah — Opsional",
+  "tr": "Adım sayısı — İsteğe bağlı",
+  "nl": "Aantal stappen — optioneel",
+  "pl": "Liczba kroków — opcjonalnie",
+  "sv": "Antal steg — valfritt",
+  "da": "Antal skridt — valgfrit",
+  "nb": "Antall skritt — valgfritt",
+  "fi": "Askelmäärä — valinnainen",
+  "cs": "Počet kroků — volitelné",
+  "hu": "Lépésszám — opcionális",
+  "ro": "Număr de pași — opțional"
+ },
+ "기록 저장": {
+  "fr": "Enregistrer",
+  "de": "Eintrag speichern",
+  "pt": "Salvar registro",
+  "it": "Salva registro",
+  "ru": "Сохранить запись",
+  "uk": "Зберегти запис",
+  "ar": "حفظ السجل",
+  "fa": "ذخیره سابقه",
+  "th": "บันทึกบันทึก",
+  "vi": "Lưu bản ghi",
+  "id": "Simpan catatan",
+  "tr": "Kaydı kaydet",
+  "nl": "Record opslaan",
+  "pl": "Zapisz zapis",
+  "sv": "Spara post",
+  "da": "Gem post",
+  "nb": "Lagre post",
+  "fi": "Tallenna tietue",
+  "cs": "Uložit záznam",
+  "hu": "Rekord mentése",
+  "ro": "Salvează înregistrarea"
+ },
+ "합계": {
+  "fr": "Total",
+  "de": "Gesamt",
+  "pt": "Total",
+  "it": "Totale",
+  "ru": "Итого",
+  "uk": "Разом",
+  "ar": "المجموع",
+  "fa": "مجموع",
+  "th": "รวม",
+  "vi": "Tổng",
+  "id": "Total",
+  "tr": "Toplam",
+  "nl": "Totaal",
+  "pl": "Suma",
+  "sv": "Totalt",
+  "da": "I alt",
+  "nb": "Totalt",
+  "fi": "Yhteensä",
+  "cs": "Celkem",
+  "hu": "Összesen",
+  "ro": "Total"
+ },
+ "오늘 걸은 시간": {
+  "fr": "Temps de marche aujourd'hui",
+  "de": "Gehzeit heute",
+  "pt": "Tempo caminhado hoje",
+  "it": "Tempo camminato oggi",
+  "ru": "Время ходьбы сегодня",
+  "uk": "Час ходьби сьогодні",
+  "ar": "وقت مشي اليوم",
+  "fa": "زمان پیاده روی امروز",
+  "th": "เวลาเดินวันนี้",
+  "vi": "Thời gian đi bộ hôm nay",
+  "id": "Waktu jalan hari ini",
+  "tr": "Bugünkü yürüyüş süresi",
+  "nl": "Looptijd vandaag",
+  "pl": "Czas chodzenia dziś",
+  "sv": "Gångtid idag",
+  "da": "Gåtid i dag",
+  "nb": "Gåtid i dag",
+  "fi": "Tänään kävelty aika",
+  "cs": "Dnešní doba chůze",
+  "hu": "Mai sétaidő",
+  "ro": "Timp de mers azi"
+ },
+ "분": {
+  "fr": "Minutes",
+  "de": "Minuten",
+  "pt": "Minutos",
+  "it": "Minuti",
+  "ru": "Минуты",
+  "uk": "Хвилини",
+  "ar": "دقائق",
+  "fa": "دقیقه",
+  "th": "นาที",
+  "vi": "Phút",
+  "id": "Menit",
+  "tr": "Dakika",
+  "nl": "Minuut",
+  "pl": "Minuta",
+  "sv": "Minut",
+  "da": "Minut",
+  "nb": "Minutt",
+  "fi": "Minuutti",
+  "cs": "Minuta",
+  "hu": "Perc",
+  "ro": "Minut"
+ },
+ "최근 7일 거리": {
+  "fr": "Distance des 7 derniers jours",
+  "de": "Strecke der letzten 7 Tage",
+  "pt": "Distância dos últimos 7 dias",
+  "it": "Distanza degli ultimi 7 giorni",
+  "ru": "Расстояние за последние 7 дней",
+  "uk": "Відстань за останні 7 днів",
+  "ar": "مسافة آخر 7 أيام",
+  "fa": "مسافت 7 روز اخیر",
+  "th": "ระยะทาง 7 วันที่ผ่านมา",
+  "vi": "Quãng đường 7 ngày gần đây",
+  "id": "Jarak 7 hari terakhir",
+  "tr": "Son 7 gün mesafe",
+  "nl": "Afstand laatste 7 dagen",
+  "pl": "Dystans z ostatnich 7 dni",
+  "sv": "Avstånd senaste 7 dagarna",
+  "da": "Afstand seneste 7 dage",
+  "nb": "Avstand siste 7 dager",
+  "fi": "Viimeisten 7 päivän matka",
+  "cs": "Vzdálenost za posledních 7 dní",
+  "hu": "Utolsó 7 nap távolsága",
+  "ro": "Distanța din ultimele 7 zile"
+ },
+ "최근 7일 걸음 수": {
+  "fr": "Pas des 7 derniers jours",
+  "de": "Schritte der letzten 7 Tage",
+  "pt": "Passos dos últimos 7 dias",
+  "it": "Passi degli ultimi 7 giorni",
+  "ru": "Шаги за последние 7 дней",
+  "uk": "Кроки за останні 7 днів",
+  "ar": "خطوات آخر 7 أيام",
+  "fa": "تعداد گام 7 روز اخیر",
+  "th": "จำนวนก้าว 7 วันที่ผ่านมา",
+  "vi": "Số bước 7 ngày gần đây",
+  "id": "Jumlah langkah 7 hari terakhir",
+  "tr": "Son 7 gün adım sayısı",
+  "nl": "Stappen laatste 7 dagen",
+  "pl": "Kroki z ostatnich 7 dni",
+  "sv": "Steg senaste 7 dagarna",
+  "da": "Skridt seneste 7 dage",
+  "nb": "Skritt siste 7 dager",
+  "fi": "Viimeisten 7 päivän askeleet",
+  "cs": "Kroky za posledních 7 dní",
+  "hu": "Utolsó 7 nap lépései",
+  "ro": "Pașii din ultimele 7 zile"
+ },
+ "걸음": {
+  "fr": "pas",
+  "de": "Schritte",
+  "pt": "passos",
+  "it": "passi",
+  "ru": "шагов",
+  "uk": "кроків",
+  "ar": "خطوة",
+  "fa": "گام",
+  "th": "ก้าว",
+  "vi": "bước",
+  "id": "langkah",
+  "tr": "adım",
+  "nl": "stappen",
+  "pl": "kroki",
+  "sv": "steg",
+  "da": "skridt",
+  "nb": "skritt",
+  "fi": "askelta",
+  "cs": "kroků",
+  "hu": "lépés",
+  "ro": "pași"
+ },
+ "최근 7일 (분)": {
+  "fr": "7 derniers jours (min)",
+  "de": "Letzte 7 Tage (Min.)",
+  "pt": "Últimos 7 dias (min)",
+  "it": "Ultimi 7 giorni (min)",
+  "ru": "Последние 7 дней (минут)",
+  "uk": "Останні 7 днів (хвилин)",
+  "ar": "آخر 7 أيام (دقائق)",
+  "fa": "7 روز اخیر (دقیقه)",
+  "th": "7 วันที่ผ่านมา (นาที)",
+  "vi": "7 ngày gần đây (phút)",
+  "id": "7 hari terakhir (menit)",
+  "tr": "Son 7 gün (dakika)",
+  "nl": "Laatste 7 dagen (min)",
+  "pl": "Ostatnie 7 dni (min)",
+  "sv": "Senaste 7 dagarna (min)",
+  "da": "Seneste 7 dage (min.)",
+  "nb": "Siste 7 dager (min)",
+  "fi": "Viimeiset 7 päivää (min)",
+  "cs": "Posledních 7 dní (min)",
+  "hu": "Utolsó 7 nap (perc)",
+  "ro": "Ultimele 7 zile (min)"
+ },
+ "기록 목록": {
+  "fr": "Liste des entrées",
+  "de": "Eintragsliste",
+  "pt": "Lista de registros",
+  "it": "Elenco voci",
+  "ru": "Список записей",
+  "uk": "Список записів",
+  "ar": "قائمة السجلات",
+  "fa": "فهرست سوابق",
+  "th": "รายการบันทึก",
+  "vi": "Danh sách bản ghi",
+  "id": "Daftar catatan",
+  "tr": "Kayıt listesi",
+  "nl": "Lijst met records",
+  "pl": "Lista zapisów",
+  "sv": "Postlista",
+  "da": "Postliste",
+  "nb": "Postliste",
+  "fi": "Tietueluettelo",
+  "cs": "Seznam záznamů",
+  "hu": "Rekordok listája",
+  "ro": "Lista înregistrărilor"
+ },
+ "기록 전체 지우기": {
+  "fr": "Effacer tout l'historique",
+  "de": "Gesamten Verlauf löschen",
+  "pt": "Apagar todo o histórico",
+  "it": "Cancella tutta la cronologia",
+  "ru": "Удалить все записи",
+  "uk": "Видалити всі записи",
+  "ar": "حذف جميع السجلات",
+  "fa": "حذف همه سوابق",
+  "th": "ลบบันทึกทั้งหมด",
+  "vi": "Xóa toàn bộ bản ghi",
+  "id": "Hapus semua catatan",
+  "tr": "Tüm kayıtları sil",
+  "nl": "Alle records wissen",
+  "pl": "Usuń wszystkie zapisy",
+  "sv": "Radera alla poster",
+  "da": "Slet alle poster",
+  "nb": "Slett alle poster",
+  "fi": "Poista kaikki tietueet",
+  "cs": "Vymazat všechny záznamy",
+  "hu": "Összes rekord törlése",
+  "ro": "Șterge toate înregistrările"
+ },
+ "운동 시작": {
+  "fr": "Lancer l'exercice",
+  "de": "Bewegung starten",
+  "pt": "Iniciar exercício",
+  "it": "Avvia esercizio",
+  "ru": "Начать упражнение",
+  "uk": "Почати вправу",
+  "ar": "بدء التمرين",
+  "fa": "شروع ورزش",
+  "th": "เริ่มออกกำลังกาย",
+  "vi": "Bắt đầu vận động",
+  "id": "Mulai olahraga",
+  "tr": "Egzersize başla",
+  "nl": "Beweging starten",
+  "pl": "Rozpocznij aktywność",
+  "sv": "Starta motion",
+  "da": "Start motion",
+  "nb": "Start trening",
+  "fi": "Aloita liikunta",
+  "cs": "Zahájit cvičení",
+  "hu": "Mozgás indítása",
+  "ro": "Începe mișcarea"
+ },
+ "강도": {
+  "fr": "Intensité",
+  "de": "Intensität",
+  "pt": "Intensidade",
+  "it": "Intensità",
+  "ru": "Интенсивность",
+  "uk": "Інтенсивність",
+  "ar": "الشدة",
+  "fa": "شدت",
+  "th": "ความหนัก",
+  "vi": "Cường độ",
+  "id": "Intensitas",
+  "tr": "Yoğunluk",
+  "nl": "Intensiteit",
+  "pl": "Intensywność",
+  "sv": "Intensitet",
+  "da": "Intensitet",
+  "nb": "Intensitet",
+  "fi": "Intensiteetti",
+  "cs": "Intenzita",
+  "hu": "Intenzitás",
+  "ro": "Intensitate"
+ },
+ "편하게": {
+  "fr": "Confortable",
+  "de": "Bequem",
+  "pt": "Confortável",
+  "it": "Comodo",
+  "ru": "Удобно",
+  "uk": "Зручно",
+  "ar": "بشكل مريح",
+  "fa": "راحت",
+  "th": "สบาย ๆ",
+  "vi": "Thoải mái",
+  "id": "Santai",
+  "tr": "Rahat",
+  "nl": "Comfortabel",
+  "pl": "Wygodnie",
+  "sv": "Bekvämt",
+  "da": "Behageligt",
+  "nb": "Behagelig",
+  "fi": "Mukavasti",
+  "cs": "Pohodlně",
+  "hu": "Kényelmesen",
+  "ro": "Confortabil"
+ },
+ "보통": {
+  "fr": "Moyen",
+  "de": "Mittel",
+  "pt": "Médio",
+  "it": "Medio",
+  "ru": "Средне",
+  "uk": "Середньо",
+  "ar": "متوسط",
+  "fa": "متوسط",
+  "th": "ปกติ",
+  "vi": "Thường",
+  "id": "Normal",
+  "tr": "Normal",
+  "nl": "Normaal",
+  "pl": "Normalny",
+  "sv": "Normal",
+  "da": "Normal",
+  "nb": "Normal",
+  "fi": "Normaali",
+  "cs": "Normální",
+  "hu": "Normál",
+  "ro": "Normal"
+ },
+ "진행 속도": {
+  "fr": "Rythme",
+  "de": "Tempo",
+  "pt": "Ritmo",
+  "it": "Ritmo",
+  "ru": "Темп",
+  "uk": "Темп",
+  "ar": "الوتيرة",
+  "fa": "سرعت پیشرفت",
+  "th": "ความเร็ว",
+  "vi": "Tốc độ tiến hành",
+  "id": "Kecepatan",
+  "tr": "İlerleme hızı",
+  "nl": "Voortgangssnelheid",
+  "pl": "Tempo postępu",
+  "sv": "Framstegstakt",
+  "da": "Fremgangstempo",
+  "nb": "Fremdriftstempo",
+  "fi": "Etenemisnopeus",
+  "cs": "Rychlost postupu",
+  "hu": "Haladási sebesség",
+  "ro": "Viteza de progres"
+ },
+ "느리게": {
+  "fr": "Lentement",
+  "de": "Langsam",
+  "pt": "Devagar",
+  "it": "Lentamente",
+  "ru": "Медленно",
+  "uk": "Повільно",
+  "ar": "ببطء",
+  "fa": "آهسته",
+  "th": "ช้า",
+  "vi": "Chậm",
+  "id": "Lambat",
+  "tr": "Yavaş",
+  "nl": "Langzaam",
+  "pl": "Wolno",
+  "sv": "Långsamt",
+  "da": "Langsomt",
+  "nb": "Sakte",
+  "fi": "Hitaasti",
+  "cs": "Pomalu",
+  "hu": "Lassan",
+  "ro": "Încet"
+ },
+ "빠르게": {
+  "fr": "Rapidement",
+  "de": "Schnell",
+  "pt": "Rápido",
+  "it": "Velocemente",
+  "ru": "Быстро",
+  "uk": "Швидко",
+  "ar": "بسرعة",
+  "fa": "سریع",
+  "th": "เร็ว",
+  "vi": "Nhanh",
+  "id": "Cepat",
+  "tr": "Hızlı",
+  "nl": "Snel",
+  "pl": "Szybko",
+  "sv": "Snabbt",
+  "da": "Hurtigt",
+  "nb": "Raskt",
+  "fi": "Nopeasti",
+  "cs": "Rychle",
+  "hu": "Gyorsan",
+  "ro": "Repede"
+ },
+ "그만하기": {
+  "fr": "Arrêter",
+  "de": "Beenden",
+  "pt": "Parar",
+  "it": "Interrompi",
+  "ru": "Закончить",
+  "uk": "Завершити",
+  "ar": "إنهاء",
+  "fa": "توقف کردن",
+  "th": "หยุด",
+  "vi": "Dừng lại",
+  "id": "Berhenti",
+  "tr": "Durdur",
+  "nl": "Stoppen hiermee",
+  "pl": "Przerwij to",
+  "sv": "Sluta med detta",
+  "da": "Stop dette",
+  "nb": "Stopp dette",
+  "fi": "Lopeta tämä",
+  "cs": "Ukončit toto",
+  "hu": "Abbahagyás",
+  "ro": "Oprește asta"
+ },
+ "일시정지": {
+  "fr": "Pause",
+  "de": "Pause",
+  "pt": "Pausar",
+  "it": "Pausa",
+  "ru": "Пауза",
+  "uk": "Пауза",
+  "ar": "إيقاف مؤقت",
+  "fa": "توقف موقت",
+  "th": "หยุดชั่วคราว",
+  "vi": "Tạm dừng",
+  "id": "Jeda",
+  "tr": "Duraklat",
+  "nl": "Pauze",
+  "pl": "Pauza",
+  "sv": "Paus",
+  "da": "Pause",
+  "nb": "Pause",
+  "fi": "Tauko",
+  "cs": "Pauza",
+  "hu": "Szünet",
+  "ro": "Pauză"
+ },
+ "운동이 끝났습니다": {
+  "fr": "Exercice terminé",
+  "de": "Bewegung beendet",
+  "pt": "Exercício concluído",
+  "it": "Esercizio terminato",
+  "ru": "Упражнение завершено",
+  "uk": "Вправу завершено",
+  "ar": "انتهى التمرين",
+  "fa": "ورزش به پایان رسید",
+  "th": "ออกกำลังกายเสร็จแล้ว",
+  "vi": "Đã vận động xong",
+  "id": "Olahraga selesai",
+  "tr": "Egzersiz bitti",
+  "nl": "De beweging is afgelopen",
+  "pl": "Aktywność zakończona",
+  "sv": "Motionen är slut",
+  "da": "Motionen er slut",
+  "nb": "Treningen er slutt",
+  "fi": "Liikunta on päättynyt",
+  "cs": "Cvičení skončilo",
+  "hu": "A mozgás véget ért",
+  "ro": "Mișcarea s-a terminat"
+ },
+ "운동 고르기로": {
+  "fr": "Choisir un exercice",
+  "de": "Bewegung auswählen",
+  "pt": "Escolher exercício",
+  "it": "Scegli un esercizio",
+  "ru": "К выбору упражнения",
+  "uk": "До вибору вправи",
+  "ar": "إلى اختيار التمرين",
+  "fa": "به انتخاب ورزش",
+  "th": "ไปเลือกการออกกำลังกาย",
+  "vi": "Đến chọn vận động",
+  "id": "Ke pilihan olahraga",
+  "tr": "Egzersiz seçimine",
+  "nl": "Naar keuze van beweging",
+  "pl": "Do wyboru aktywności",
+  "sv": "Till val av motion",
+  "da": "Til valg af motion",
+  "nb": "Til valg av trening",
+  "fi": "Liikunnan valintaan",
+  "cs": "K výběru cvičení",
+  "hu": "Mozgás választásához",
+  "ro": "La alegerea mișcării"
+ }
+});
+</script>
+
+<script>
+/* NX-I18N-SUPPLEMENT-R3 — 다국어팀 2026-11-06: 잔존 문자열 보충 (기존 사전 항목 무변경, 삭제하면 원복) */
+NX_I18N_ADD({
+ "넥서스 걷기 운동 — Nexus Walk & Exercise": {
+  "en": "Nexus Walk & Exercise — Nexus Walk & Exercise",
+  "zh": "Nexus 步行运动 — Nexus Walk & Exercise",
+  "zh-TW": "Nexus 步行運動 — Nexus Walk & Exercise",
+  "ja": "Nexus ウォーキング運動 — Nexus Walk & Exercise",
+  "es": "Nexus Caminar y Ejercicio — Nexus Walk & Exercise",
+  "hi": "Nexus वॉकिंग व्यायाम — Nexus Walk & Exercise",
+  "fr": "Marche et exercice Nexus — Nexus Walk & Exercise",
+  "de": "Nexus Gehen & Bewegung — Nexus Walk & Exercise",
+  "pt": "Caminhada e Exercício Nexus — Nexus Walk & Exercise",
+  "it": "Camminata ed esercizio Nexus — Nexus Walk & Exercise",
+  "ru": "Прогулка и упражнения Nexus — Nexus Walk & Exercise",
+  "uk": "Прогулянка й вправи Nexus — Nexus Walk & Exercise",
+  "ar": "مشي وتمارين Nexus — Nexus Walk & Exercise",
+  "fa": "پیاده‌روی و ورزش Nexus — Nexus Walk & Exercise",
+  "th": "Nexus การเดินออกกำลังกาย — Nexus Walk & Exercise",
+  "vi": "Nexus Đi bộ & Tập thể dục — Nexus Walk & Exercise",
+  "id": "Nexus Jalan & Olahraga — Nexus Walk & Exercise",
+  "tr": "Nexus Yürüyüş & Egzersiz — Nexus Walk & Exercise",
+  "nl": "Nexus Wandelen & Bewegen — Nexus Walk & Exercise",
+  "pl": "Nexus Spacer i ćwiczenia — Nexus Walk & Exercise",
+  "sv": "Nexus Promenad & Träning — Nexus Walk & Exercise",
+  "da": "Nexus Gåtur & Motion — Nexus Walk & Exercise",
+  "nb": "Nexus Gåtur & Trening — Nexus Walk & Exercise",
+  "fi": "Nexus Kävely & Liikunta — Nexus Walk & Exercise",
+  "cs": "Nexus Chůze a cvičení — Nexus Walk & Exercise",
+  "hu": "Nexus Séta és torna — Nexus Walk & Exercise",
+  "ro": "Nexus Plimbare și exerciții — Nexus Walk & Exercise"
+ },
+ "테스트 버전입니다": {
+  "en": "This is a test version",
+  "zh": "这是测试版本",
+  "zh-TW": "這是測試版本",
+  "ja": "テスト版です",
+  "es": "Esta es una versión de prueba",
+  "hi": "यह परीक्षण संस्करण है"
+ },
+ "넥서스 걷기 운동은 지금 다듬어 가고 있는 테스트 버전입니다. 걷기 기록은 직접 적는 방식이고, 가벼운 운동은 의자를 이용한 동작을 소리로 안내하는 도구입니다. 이 도구는 의료 조언을 제공하지 않습니다. 운동 중 통증이 있으면 바로 멈추세요.": {
+  "fr": "Nexus Marche et exercice est une version d'essai en cours de peaufinage. L'historique de marche s'écrit directement, et l'exercice léger est un outil qui guide par le son des mouvements utilisant une chaise. Cet outil ne fournit pas de conseils médicaux. Si vous ressentez une douleur pendant l'exercice, arrêtez aussitôt.",
+  "de": "Nexus Gehen & Bewegung ist eine Testversion, die gerade verfeinert wird. Der Gehverlauf wird direkt eingetragen, und die leichte Bewegung ist ein Werkzeug, das Bewegungen mit einem Stuhl per Ton anleitet. Dieses Tool bietet keine medizinische Beratung. Wenn während der Bewegung Schmerzen auftreten, hören Sie sofort auf.",
+  "pt": "Nexus Caminhada e Exercício é uma versão de teste que está sendo aperfeiçoada. O histórico de caminhada é escrito diretamente, e o exercício leve é uma ferramenta que orienta por som movimentos usando uma cadeira. Esta ferramenta não fornece aconselhamento médico. Se sentir dor durante o exercício, pare imediatamente.",
+  "it": "Nexus Camminata ed esercizio è una versione di prova in fase di perfezionamento. La cronologia delle camminate si scrive direttamente, e l'esercizio leggero è uno strumento che guida con il suono movimenti usando una sedia. Questo strumento non fornisce consigli medici. Se avverti dolore durante l'esercizio, fermati subito.",
+  "ru": "Прогулка и упражнения Nexus сейчас находятся в тестовой версии, которая ещё доводится. Записи ходьбы вводятся вручную, а лёгкие упражнения — инструмент, который звуком ведёт движения с использованием стула. Этот инструмент не предоставляет медицинских советов. Если во время упражнения появится боль, немедленно остановитесь.",
+  "uk": "Прогулянка й вправи Nexus зараз перебувають у тестовій версії, яка ще доводиться. Записи ходьби вводяться вручну, а легкі вправи — інструмент, який звуком веде рухи з використанням стільця. Цей інструмент не надає медичних порад. Якщо під час вправи з’явиться біль, негайно зупиніться.",
+  "ar": "مشي وتمارين Nexus الآن في نسخة تجريبية ما تزال تُصقل. تُدخل سجلات المشي يدويًا، والتمارين الخفيفة أداة ترشد بالصوت إلى حركات باستخدام كرسي. لا تقدم هذه الأداة نصائح طبية. إذا ظهر ألم أثناء التمرين فتوقف فورًا.",
+  "fa": "پیاده‌روی و ورزش Nexus اکنون نسخه آزمایشی است که هنوز در حال پرداخت است. سوابق پیاده‌روی به‌صورت دستی وارد می‌شوند و ورزش سبک ابزاری است که حرکات با استفاده از صندلی را با صدا راهنمایی می‌کند. این ابزار مشاوره پزشکی ارائه نمی‌دهد. اگر هنگام ورزش درد داشتید، فوراً متوقف شوید.",
+  "th": "Nexus การเดินออกกำลังกายเป็นเวอร์ชันทดสอบที่กำลังปรับปรุงอยู่ บันทึกการเดินเป็นวิธีเขียนเอง และการออกกำลังกายเบาๆ เป็นเครื่องมือที่แนะนำท่าทางโดยใช้เก้าอี้ด้วยเสียง เครื่องมือนี้ไม่ได้ให้คำแนะนำทางการแพทย์ หากมีอาการปวดระหว่างออกกำลังกาย กรุณาหยุดทันที",
+  "vi": "Nexus Đi bộ & Tập thể dục là phiên bản thử nghiệm đang được hoàn thiện. Ghi chép đi bộ là cách tự ghi, và bài tập nhẹ là công cụ hướng dẫn các động tác dùng ghế bằng âm thanh. Công cụ này không cung cấp lời khuyên y tế. Nếu đau khi tập, hãy dừng ngay.",
+  "id": "Nexus Jalan & Olahraga adalah versi uji yang sedang disempurnakan. Catatan jalan adalah cara menulis sendiri, dan olahraga ringan adalah alat yang memandu gerakan menggunakan kursi dengan suara. Alat ini tidak memberikan nasihat medis. Jika terasa nyeri saat berolahraga, segera berhenti.",
+  "tr": "Nexus Yürüyüş & Egzersiz, şu anda üzerinde çalışılan bir test sürümüdür. Yürüyüş kaydı kendinizin yazdığı bir yöntemdir ve hafif egzersiz, sandalye kullanan hareketleri sesle yönlendiren bir araçtır. Bu araç tıbbi tavsiye sağlamaz. Egzersiz sırasında ağrı olursa hemen durun.",
+  "nl": "Nexus Wandelen & Bewegen is een testversie die momenteel wordt verfijnd. Het wandelrecord is een handmatige invoerwijze en lichte beweging is een tool die bewegingen met een stoel met geluid begeleidt. Deze tool biedt geen medisch advies. Stop direct als u tijdens het bewegen pijn hebt.",
+  "pl": "Nexus Spacer i ćwiczenia to wersja testowa, która jest obecnie dopracowywana. Zapis spaceru jest sposobem ręcznego wpisywania, a lekkie ćwiczenia to narzędzie, które prowadzi ruchy z użyciem krzesła dźwiękiem. To narzędzie nie udziela porad medycznych. Jeśli podczas ćwiczeń poczujesz ból, natychmiast przestań.",
+  "sv": "Nexus Promenad & Träning är en testversion som för närvarande finslipas. Promenadloggen är ett manuellt inmatningssätt och lätt träning är ett verktyg som vägleder rörelser med en stol med ljud. Det här verktyget ger inga medicinska råd. Sluta omedelbart om du får ont under träningen.",
+  "da": "Nexus Gåtur & Motion er en testversion, der i øjeblikket finpudses. Gåtursloggen er en manuel indtastningsmåde, og let motion er et værktøj, der guider bevægelser med en stol med lyd. Dette værktøj giver ikke medicinsk rådgivning. Stop med det samme, hvis du får ondt under motionen.",
+  "nb": "Nexus Gåtur & Trening er en testversjon som for tiden finpusses. Gåtursloggen er en manuell inntastingsmåte, og lett trening er et verktøy som veileder bevegelser med en stol med lyd. Dette verktøyet gir ikke medisinske råd. Stopp med en gang hvis du får vondt under treningen.",
+  "fi": "Nexus Kävely & Liikunta on testiversio, jota viimeistellään parhaillaan. Kävelykirjaus on käsin syöttämisen tapa ja kevyt liikunta on työkalu, joka ohjaa tuolia käyttäviä liikkeitä äänellä. Tämä työkalu ei anna lääketieteellisiä neuvoja. Lopeta heti, jos sinulla on kipua liikunnan aikana.",
+  "cs": "Nexus Chůze a cvičení je testovací verze, která se v současnosti dolaďuje. Záznam chůze je způsob ručního zadávání a lehké cvičení je nástroj, který zvukem vede pohyby s použitím židle. Tento nástroj neposkytuje lékařské rady. Pokud během cvičení pocítíte bolest, okamžitě přestaňte.",
+  "hu": "A Nexus Séta és torna egy tesztverzió, amelyet jelenleg finomítanak. A sétanapló kézi beviteli mód, a könnyű torna pedig olyan eszköz, amely hanggal vezeti a székkel végzett mozdulatokat. Ez az eszköz nem ad orvosi tanácsot. Ha torna közben fájdalmat érez, azonnal hagyja abba.",
+  "ro": "Nexus Plimbare și exerciții este o versiune de test care este în curs de rafinare. Jurnalul de plimbare este un mod de introducere manuală, iar exercițiile ușoare sunt un instrument care ghidează cu sunet mișcările folosind un scaun. Acest instrument nu oferă sfaturi medicale. Dacă ai dureri în timpul exercițiilor, oprește-te imediat."
+ },
+ "확인했습니다": {
+  "en": "Confirmed",
+  "zh": "已确认",
+  "zh-TW": "已確認",
+  "ja": "確認しました",
+  "es": "Confirmado",
+  "hi": "पुष्टि हो गई"
+ },
+ "넥서스 걷기 운동": {
+  "en": "Nexus Walking Exercise",
+  "zh": "Nexus 步行运动",
+  "zh-TW": "Nexus 步行運動",
+  "ja": "Nexus ウォーキング",
+  "es": "Ejercicio de caminar Nexus",
+  "hi": "Nexus पैदल चलने का व्यायाम"
+ },
+ "걷기와 가벼운 운동": {
+  "en": "Walking & Light Exercise",
+  "zh": "步行和轻度运动",
+  "zh-TW": "步行和輕度運動",
+  "ja": "ウォーキングと軽い運動",
+  "es": "Caminar y ejercicio ligero",
+  "hi": "पैदल चलना और हल्का व्यायाम"
+ },
+ "걸은 시간과 거리를 기록하고, 의자를 이용한 가벼운 동작을 음성 안내로 따라 합니다. 모든 기록은 이 기기 안에만 저장됩니다.": {
+  "fr": "Il note le temps et la distance marchés et suit, avec un guidage vocal, des mouvements légers utilisant une chaise. Tous les enregistrements sont conservés uniquement sur cet appareil.",
+  "de": "Es zeichnet gegangene Zeit und Strecke auf und folgt mit Sprachführung leichten Bewegungen mit einem Stuhl. Alle Einträge werden nur auf diesem Gerät gespeichert.",
+  "pt": "Registra o tempo e a distância caminhados e acompanha, com orientação por voz, movimentos leves usando uma cadeira. Todos os registros são guardados apenas neste dispositivo.",
+  "it": "Registra tempo e distanza camminati e segue, con guida vocale, movimenti leggeri usando una sedia. Tutte le registrazioni sono salvate solo su questo dispositivo.",
+  "ru": "Записываем время и расстояние ходьбы и выполняем лёгкие движения со стулом по голосовым подсказкам. Все записи хранятся только на этом устройстве.",
+  "uk": "Записуємо час і відстань ходьби та виконуємо легкі рухи зі стільцем за голосовими підказками. Усі записи зберігаються лише на цьому пристрої.",
+  "ar": "نسجل وقت المشي ومسافته، ونتابع حركات خفيفة بالكرسي بإرشاد صوتي. تُحفظ جميع السجلات على هذا الجهاز فقط.",
+  "fa": "زمان و مسافت پیاده‌روی را ثبت می‌کنیم و حرکات سبک با صندلی را با راهنمای صوتی دنبال می‌کنیم. همه سوابق فقط در همین دستگاه ذخیره می‌شوند.",
+  "th": "บันทึกเวลาและระยะทางที่เดิน และทำตามท่าทางเบาๆ โดยใช้เก้าอี้ด้วยคำแนะนำเสียง บันทึกทั้งหมดจะถูกเก็บไว้ในอุปกรณ์นี้เท่านั้น",
+  "vi": "Ghi lại thời gian và quãng đường đã đi, và làm theo các động tác nhẹ dùng ghế bằng hướng dẫn âm thanh. Mọi bản ghi chỉ được lưu trong thiết bị này.",
+  "id": "Mencatat waktu dan jarak yang ditempuh, dan mengikuti gerakan ringan menggunakan kursi dengan panduan suara. Semua catatan hanya disimpan di perangkat ini.",
+  "tr": "Yürüdüğünüz süre ve mesafeyi kaydedip sandalye kullanan hafif hareketleri sesli yönlendirmeyle takip edin. Tüm kayıtlar yalnızca bu cihazda saklanır.",
+  "nl": "Registreert de gewandelde tijd en afstand en volgt lichte bewegingen met een stoel via gesproken begeleiding. Alle records worden alleen op dit apparaat opgeslagen.",
+  "pl": "Zapisuje czas i dystans spaceru oraz podąża za lekkimi ruchami z krzesłem przy przewodnictwie głosowym. Wszystkie zapisy są przechowywane wyłącznie na tym urządzeniu.",
+  "sv": "Registrerar den promenerade tiden och sträckan och följer lätta rörelser med en stol via röstvägledning. Alla poster lagras endast på den här enheten.",
+  "da": "Registrerer den gåede tid og distance og følger lette bevægelser med en stol via stemmevejledning. Alle poster gemmes kun på denne enhed.",
+  "nb": "Registrerer den gåtte tiden og distansen og følger lette bevegelser med en stol via stemmeveiledning. Alle oppføringer lagres kun på denne enheten.",
+  "fi": "Kirjaa kävellyn ajan ja matkan ja seuraa kevyitä tuoliliikkeitä ääniohjauksella. Kaikki merkinnät tallennetaan vain tähän laitteeseen.",
+  "cs": "Zaznamenává dobu a vzdálenost chůze a zvukovým vedením sleduje lehké pohyby se židlí. Všechny záznamy se ukládají pouze do tohoto zařízení.",
+  "hu": "Rögzíti a sétált időt és távolságot, és hangos útmutatással követi a székkel végzett könnyű mozdulatokat. Minden bejegyzés csak ezen az eszközön tárolódik.",
+  "ro": "Înregistrează timpul și distanța de plimbare și urmează mișcări ușoare cu un scaun prin ghidaj vocal. Toate înregistrările sunt stocate numai pe acest dispozitiv."
+ },
+ "걷기 기록": {
+  "en": "Walking Records",
+  "zh": "步行记录",
+  "zh-TW": "步行記錄",
+  "ja": "ウォーキング記録",
+  "es": "Registro de caminatas",
+  "hi": "पैदल चलने का रिकॉर्ड"
+ },
+ "걸은 시간·거리·걸음 수를 적고, 날짜별 누적과 최근 7일의 합계를 봅니다.": {
+  "fr": "Il note le temps, la distance et le nombre de pas marchés et affiche le total par date et la somme des 7 derniers jours.",
+  "de": "Es trägt gegangene Zeit, Strecke und Schrittzahl ein und zeigt die Summe nach Datum und die Summe der letzten 7 Tage.",
+  "pt": "Anota tempo, distância e número de passos caminhados e mostra o acumulado por data e a soma dos últimos 7 dias.",
+  "it": "Annota tempo, distanza e numero di passi camminati e mostra il cumulativo per data e la somma degli ultimi 7 giorni.",
+  "ru": "Записываем время ходьбы, расстояние и количество шагов и смотрим накопление по датам и итоги за последние 7 дней.",
+  "uk": "Записуємо час ходьби, відстань і кількість кроків та дивимося накопичення за датами й підсумки за останні 7 днів.",
+  "ar": "نسجل وقت المشي والمسافة وعدد الخطوات، ونعرض التراكم حسب التاريخ ومجاميع آخر 7 أيام.",
+  "fa": "زمان پیاده‌روی، مسافت و تعداد گام‌ها را ثبت می‌کنیم و انباشت بر اساس تاریخ و مجموع ۷ روز اخیر را می‌بینیم.",
+  "th": "จดเวลา·ระยะทาง·จำนวนก้าวที่เดิน และดูยอดรวมตามวันที่และยอดรวม 7 วันล่าสุด",
+  "vi": "Ghi thời gian·quãng đường·số bước đã đi, và xem tổng tích lũy theo ngày và tổng 7 ngày gần đây.",
+  "id": "Menulis waktu·jarak·jumlah langkah yang ditempuh, dan melihat akumulasi menurut tanggal serta total 7 hari terakhir.",
+  "tr": "Yürüdüğünüz süreyi·mesafeyi·adım sayısını yazıp tarihe göre birikimi ve son 7 günün toplamını görür.",
+  "nl": "Schrijft de gewandelde tijd·afstand·het aantal stappen op en bekijkt het totaal per datum en het totaal van de laatste 7 dagen.",
+  "pl": "Zapisuje czas spaceru · dystans · liczbę kroków i ogląda sumę według daty oraz sumę z ostatnich 7 dni.",
+  "sv": "Skriver den promenerade tiden·sträckan·antalet steg och ser summan per datum och summan för de senaste 7 dagarna.",
+  "da": "Skriver den gåede tid·distance·antallet af skridt og ser summen pr. dato og summen for de seneste 7 dage.",
+  "nb": "Skriver den gåtte tiden·distansen·antallet skritt og ser summen per dato og summen for de siste 7 dagene.",
+  "fi": "Kirjoittaa kävellyn ajan·matkan·askelten määrän ja katsoo päivämääräkohtaista summaa ja viimeisten 7 päivän summaa.",
+  "cs": "Zapisuje dobu chůze·vzdálenost·počet kroků a prohlíží si součet podle data a součet za posledních 7 dní.",
+  "hu": "Leírja a sétált időt·távolságot·lépések számát, és megnézi a dátumonkénti összeget és az utolsó 7 nap összegét.",
+  "ro": "Scrie timpul de plimbare·distanța·numărul de pași și privește suma pe dată și suma din ultimele 7 zile."
+ },
+ "가벼운 운동": {
+  "en": "Light Exercise",
+  "zh": "轻度运动",
+  "zh-TW": "輕度運動",
+  "ja": "軽い運動",
+  "es": "Ejercicio ligero",
+  "hi": "हल्का व्यायाम"
+ },
+ "앉아서, 또는 의자를 잡고 하는 가벼운 동작을 그림과 음성 안내로 따라 합니다.": {
+  "fr": "Il suit, avec des cartes illustrées et un guidage vocal, des mouvements légers à faire assis ou en tenant une chaise.",
+  "de": "Es folgt mit Bildkarten und Sprachführung leichten Bewegungen, die man sitzend oder sich an einem Stuhl festhaltend macht.",
+  "pt": "Acompanha, com cartões ilustrados e orientação por voz, movimentos leves feitos sentado ou segurando uma cadeira.",
+  "it": "Segue, con schede illustrate e guida vocale, movimenti leggeri da fare seduti o tenendosi a una sedia.",
+  "ru": "Сидя или держась за стул, выполняем лёгкие движения по картинкам и голосовым подсказкам.",
+  "uk": "Сидячи або тримаючись за стілець, виконуємо легкі рухи за картинками й голосовими підказками.",
+  "ar": "جارٍ الجلوس أو الإمساك بالكرسي، نتابع حركات خفيفة بالصور والإرشاد الصوتي.",
+  "fa": "نشسته یا با گرفتن صندلی، حرکات سبک را با کارت‌های تصویری و راهنمای صوتی دنبال می‌کنیم.",
+  "th": "ทำตามท่าทางเบาๆ ขณะนั่งหรือจับเก้าอี้ด้วยภาพและคำแนะนำเสียง",
+  "vi": "Làm theo các động tác nhẹ khi ngồi, hoặc vịn ghế, bằng hình và hướng dẫn âm thanh.",
+  "id": "Mengikuti gerakan ringan sambil duduk, atau berpegangan pada kursi, dengan gambar dan panduan suara.",
+  "tr": "Oturarak veya sandalyeyi tutarak yapılan hafif hareketleri görsel ve sesli yönlendirmeyle takip eder.",
+  "nl": "Volgt lichte bewegingen zittend of met een stoel vast, met afbeeldingen en gesproken begeleiding.",
+  "pl": "Podąża za lekkimi ruchami siedząc lub trzymając się krzesła, z obrazkami i przewodnictwem głosowym.",
+  "sv": "Följer lätta rörelser sittande eller hållande i en stol, med bilder och röstvägledning.",
+  "da": "Følger lette bevægelser siddende eller holdende i en stol, med billeder og stemmevejledning.",
+  "nb": "Følger lette bevegelser sittende eller holdende i en stol, med bilder og stemmeveiledning.",
+  "fi": "Seuraa kevyitä liikkeitä istuen tai tuolista kiinni pitäen kuvien ja ääniohjauksen avulla.",
+  "cs": "Sleduje lehké pohyby vsedě nebo s držením židle, s obrázky a hlasovým vedením.",
+  "hu": "Ülve vagy székbe kapaszkodva végzett könnyű mozdulatokat követ képekkel és hangos útmutatással.",
+  "ro": "Urmează mișcări ușoare stând așezat sau ținându-te de un scaun, cu imagini și ghidaj vocal."
+ },
+ "이 도구에 대하여": {
+  "en": "About This Tool",
+  "zh": "关于此工具",
+  "zh-TW": "關於此工具",
+  "ja": "このツールについて",
+  "es": "Acerca de esta herramienta",
+  "hi": "इस उपकरण के बारे में"
+ },
+ "걷기 기록은 직접 적는 방식입니다. 가벼운 운동은 영상이 아니라 그림 카드와 음성 안내로 진행됩니다. 이 도구는 의료 조언을 제공하지 않습니다.": {
+  "fr": "L'historique de marche s'écrit directement. L'exercice léger se déroule avec des cartes illustrées et un guidage vocal, non avec une vidéo. Cet outil ne fournit pas de conseils médicaux.",
+  "de": "Der Gehverlauf wird direkt eingetragen. Die leichte Bewegung läuft mit Bildkarten und Sprachführung, nicht mit Video. Dieses Tool bietet keine medizinische Beratung.",
+  "pt": "O histórico de caminhada é escrito diretamente. O exercício leve é feito com cartões ilustrados e orientação por voz, não com vídeo. Esta ferramenta não fornece aconselhamento médico.",
+  "it": "La cronologia delle camminate si scrive direttamente. L'esercizio leggero si svolge con schede illustrate e guida vocale, non con video. Questo strumento non fornisce consigli medici.",
+  "ru": "Записи ходьбы вводятся вручную. Лёгкие упражнения проводятся не видео, а картинками-карточками и голосовыми подсказками. Этот инструмент не предоставляет медицинских советов.",
+  "uk": "Записи ходьби вводяться вручну. Легкі вправи проводяться не відео, а картинками-картками й голосовими підказками. Цей інструмент не надає медичних порад.",
+  "ar": "نتابع حركات خفيفة بالصور والإرشاد الصوتي، جالسين أو ممسكين بالكرسي.",
+  "fa": "سوابق پیاده‌روی به‌صورت دستی وارد می‌شوند. ورزش سبک نه با ویدئو، بلکه با کارت‌های تصویری و راهنمای صوتی انجام می‌شود. این ابزار مشاوره پزشکی ارائه نمی‌دهد.",
+  "th": "บันทึกการเดินเป็นวิธีเขียนเอง การออกกำลังกายเบาๆ ดำเนินด้วยบัตรภาพและคำแนะนำเสียง ไม่ใช่วิดีโอ เครื่องมือนี้ไม่ได้ให้คำแนะนำทางการแพทย์",
+  "vi": "Ghi chép đi bộ là cách tự ghi. Bài tập nhẹ tiến hành bằng thẻ hình và hướng dẫn âm thanh, không phải video. Công cụ này không cung cấp lời khuyên y tế.",
+  "id": "Catatan jalan adalah cara menulis sendiri. Olahraga ringan dilakukan dengan kartu gambar dan panduan suara, bukan video. Alat ini tidak memberikan nasihat medis.",
+  "tr": "Yürüyüş kaydı kendinizin yazdığı bir yöntemdir. Hafif egzersiz video değil, görsel kartlar ve sesli yönlendirmeyle ilerler. Bu araç tıbbi tavsiye sağlamaz.",
+  "nl": "Het wandelrecord is een handmatige invoerwijze. Lichte beweging verloopt niet met video maar met afbeeldingskaarten en gesproken begeleiding. Deze tool biedt geen medisch advies.",
+  "pl": "Zapis spaceru jest sposobem ręcznego wpisywania. Lekkie ćwiczenia odbywają się nie wideo, lecz kartami obrazkowymi i przewodnictwem głosowym. To narzędzie nie udziela porad medycznych.",
+  "sv": "Promenadloggen är ett manuellt inmatningssätt. Lätt träning sker inte med video utan med bildkort och röstvägledning. Det här verktyget ger inga medicinska råd.",
+  "da": "Gåtursloggen er en manuel indtastningsmåde. Let motion foregår ikke med video, men med billedkort og stemmevejledning. Dette værktøj giver ikke medicinsk rådgivning.",
+  "nb": "Gåtursloggen er en manuell inntastingsmåte. Lett trening foregår ikke med video, men med bildekort og stemmeveiledning. Dette verktøyet gir ikke medisinske råd.",
+  "fi": "Kävelykirjaus on käsin syöttämisen tapa. Kevyt liikunta ei tapahdu videolla vaan kuvakorteilla ja ääniohjauksella. Tämä työkalu ei anna lääketieteellisiä neuvoja.",
+  "cs": "Záznam chůze je způsob ručního zadávání. Lehké cvičení neprobíhá videem, ale obrázkovými kartami a hlasovým vedením. Tento nástroj neposkytuje lékařské rady.",
+  "hu": "A sétanapló kézi beviteli mód. A könnyű torna nem videóval, hanem képkártyákkal és hangos útmutatással zajlik. Ez az eszköz nem ad orvosi tanácsot.",
+  "ro": "Jurnalul de plimbare este un mod de introducere manuală. Exercițiile ușoare se desfășoară nu cu video, ci cu carduri cu imagini și ghidaj vocal. Acest instrument nu oferă sfaturi medicale."
+ },
+ "← 처음으로": {
+  "en": "← Home",
+  "zh": "← 回到开始",
+  "zh-TW": "← 回到開始",
+  "ja": "← 最初へ",
+  "es": "← Al inicio",
+  "hi": "← शुरुआत पर वापस"
+ },
+ "자동 만보기는 설치형에서 제공됩니다. 지금은 직접 기록하는 방식입니다.": {
+  "fr": "Le podomètre automatique est fourni dans la version installée. Actuellement, c'est une saisie directe.",
+  "de": "Der automatische Schrittzähler wird in der installierten Version bereitgestellt. Derzeit ist es eine direkte Eintragung.",
+  "pt": "O podômetro automático é oferecido na versão instalada. Atualmente, é um registro direto.",
+  "it": "Il contapassi automatico è fornito nella versione installata. Attualmente è una registrazione diretta.",
+  "ru": "Автоматический шагомер предоставляется в устанавливаемой версии. Сейчас — способ ручной записи.",
+  "uk": "Автоматичний крокомір надається у встановлюваній версії. Зараз — спосіб ручного запису.",
+  "ar": "يُقدَّم عداد الخطوات التلقائي في النسخة القابلة للتثبيت. الآن طريقة التسجيل اليدوي.",
+  "fa": "گام‌شمار خودکار در نسخه نصب‌شدنی ارائه می‌شود. اکنون روش ثبت دستی است.",
+  "th": "เครื่องนับก้าวอัตโนมัติมีในรุ่นติดตั้ง ขณะนี้เป็นวิธีบันทึกเอง",
+  "vi": "Máy đếm bước tự động được cung cấp ở bản cài đặt. Hiện tại là cách tự ghi.",
+  "id": "Pedometer otomatis disediakan pada versi terinstal. Saat ini cara mencatat sendiri.",
+  "tr": "Otomatik adım sayar, kurulum sürümünde sağlanır. Şu anda kendinizin kaydettiği yöntemdir.",
+  "nl": "De automatische stappenteller wordt in de installeerbare versie aangeboden. Nu is het een handmatige registratiewijze.",
+  "pl": "Automatyczny krokomierz jest oferowany w wersji instalacyjnej. Obecnie jest to sposób ręcznego zapisywania.",
+  "sv": "Den automatiska stegräknaren erbjuds i den installerbara versionen. Nu är det ett manuellt registreringssätt.",
+  "da": "Den automatiske skridttæller tilbydes i den installerbare version. Nu er det en manuel registreringsmåde.",
+  "nb": "Den automatiske skrittelleren tilbys i den installerbare versjonen. Nå er det en manuell registreringsmåte.",
+  "fi": "Automaattinen askelmittari tarjotaan asennettavassa versiossa. Nyt se on käsin kirjaamisen tapa.",
+  "cs": "Automatický krokoměr je nabízen v instalovatelné verzi. Nyní je to způsob ručního zaznamenávání.",
+  "hu": "Az automatikus lépésszámláló a telepíthető verzióban érhető el. Most kézi rögzítési mód van.",
+  "ro": "Pedometrul automat este oferit în versiunea instalabilă. Acum este un mod de înregistrare manuală."
+ },
+ "오늘의 걸음 적기": {
+  "en": "Log Today's Steps",
+  "zh": "记录今日步数",
+  "zh-TW": "記錄今日步數",
+  "ja": "今日の歩数を記録",
+  "es": "Anotar los pasos de hoy",
+  "hi": "आज के कदम दर्ज करें"
+ },
+ "날짜": {
+  "en": "Date",
+  "zh": "日期",
+  "zh-TW": "日期",
+  "ja": "日付",
+  "es": "Fecha",
+  "hi": "तारीख़"
+ },
+ "걸은 시간 (분) — 꼭 적어 주세요": {
+  "fr": "Temps marché (min) — à écrire impérativement",
+  "de": "Gegangene Zeit (Min.) — bitte unbedingt eintragen",
+  "pt": "Tempo caminhado (min) — escreva obrigatoriamente",
+  "it": "Tempo camminato (min) — da scrivere obbligatoriamente",
+  "ru": "Время ходьбы (минут) — обязательно запишите",
+  "uk": "Час ходьби (хвилин) — обов’язково запишіть",
+  "ar": "وقت المشي (دقائق) — اكتبه حتمًا",
+  "fa": "زمان پیاده‌روی (دقیقه) — حتماً بنویسید",
+  "th": "เวลาที่เดิน (นาที) — กรุณาเขียน",
+  "vi": "Thời gian đã đi (phút) — hãy ghi",
+  "id": "Waktu jalan (menit) — harap tulis",
+  "tr": "Yürüdüğünüz süre (dakika) — lütfen yazın",
+  "nl": "Wandeltijd (minuten) — graag noteren",
+  "pl": "Czas spaceru (minuty) — koniecznie zapisz",
+  "sv": "Promenadtid (minuter) — vänligen anteckna",
+  "da": "Gåtid (minutter) — skriv venligst",
+  "nb": "Gåtid (minutter) — vennligst noter",
+  "fi": "Kävelyaika (minuutteja) — kirjoita ehdottomasti",
+  "cs": "Doba chůze (minuty) — prosím zapište",
+  "hu": "Sétaidő (perc) — feltétlenül írja le",
+  "ro": "Timpul de plimbare (minute) — te rugăm să notezi"
+ },
+ "거리 (km) — 선택": {
+  "fr": "Distance (km) — facultatif",
+  "de": "Strecke (km) — optional",
+  "pt": "Distância (km) — opcional",
+  "it": "Distanza (km) — facoltativo",
+  "ru": "Расстояние (км) — необязательно",
+  "uk": "Відстань (км) — необов’язково",
+  "ar": "المسافة (كم) — اختياري",
+  "fa": "مسافت (km) — اختیاری",
+  "th": "ระยะทาง (km) — ไม่บังคับ",
+  "vi": "Quãng đường (km) — tùy chọn",
+  "id": "Jarak (km) — opsional",
+  "tr": "Mesafe (km) — isteğe bağlı",
+  "nl": "Afstand (km) — optioneel",
+  "pl": "Dystans (km) — opcjonalnie",
+  "sv": "Sträcka (km) — valfritt",
+  "da": "Distance (km) — valgfrit",
+  "nb": "Distanse (km) — valgfritt",
+  "fi": "Matka (km) — valinnainen",
+  "cs": "Vzdálenost (km) — volitelné",
+  "hu": "Távolság (km) — nem kötelező",
+  "ro": "Distanță (km) — opțional"
+ },
+ "걸음 수 — 선택": {
+  "en": "Steps — Optional",
+  "zh": "步数 — 可选",
+  "zh-TW": "步數 — 可選",
+  "ja": "歩数 — 任意",
+  "es": "Pasos — Opcional",
+  "hi": "कदम — वैकल्पिक"
+ },
+ "기록 저장": {
+  "en": "Save Record",
+  "zh": "保存记录",
+  "zh-TW": "儲存記錄",
+  "ja": "記録を保存",
+  "es": "Guardar registro",
+  "hi": "रिकॉर्ड सहेजें"
+ },
+ "합계": {
+  "en": "Total",
+  "zh": "总计",
+  "zh-TW": "總計",
+  "ja": "合計",
+  "es": "Total",
+  "hi": "कुल"
+ },
+ "오늘 걸은 시간": {
+  "en": "Time Walked Today",
+  "zh": "今天步行时间",
+  "zh-TW": "今天步行時間",
+  "ja": "今日歩いた時間",
+  "es": "Tiempo caminando hoy",
+  "hi": "आज चलने का समय"
+ },
+ "분": {
+  "en": "Minutes",
+  "zh": "分钟",
+  "zh-TW": "分鐘",
+  "ja": "分",
+  "es": "Minuto",
+  "hi": "मिनट"
+ },
+ "최근 7일 걸은 시간": {
+  "fr": "Temps marché des 7 derniers jours",
+  "de": "Gegangene Zeit der letzten 7 Tage",
+  "pt": "Tempo caminhado nos últimos 7 dias",
+  "it": "Tempo camminato negli ultimi 7 giorni",
+  "ru": "Время ходьбы за последние 7 дней",
+  "uk": "Час ходьби за останні 7 днів",
+  "ar": "وقت مشي آخر 7 أيام",
+  "fa": "زمان پیاده‌روی ۷ روز اخیر",
+  "th": "เวลาที่เดิน 7 วันล่าสุด",
+  "vi": "Thời gian đi bộ 7 ngày gần đây",
+  "id": "Waktu jalan 7 hari terakhir",
+  "tr": "Son 7 günlük yürüme süresi",
+  "nl": "Wandeltijd laatste 7 dagen",
+  "pl": "Czas spaceru z ostatnich 7 dni",
+  "sv": "Promenadtid senaste 7 dagarna",
+  "da": "Gåtid seneste 7 dage",
+  "nb": "Gåtid siste 7 dager",
+  "fi": "Viimeisten 7 päivän kävelyaika",
+  "cs": "Doba chůze za posledních 7 dní",
+  "hu": "Utolsó 7 nap sétaideje",
+  "ro": "Timpul de plimbare din ultimele 7 zile"
+ },
+ "최근 7일 거리": {
+  "en": "Distance, Last 7 Days",
+  "zh": "最近 7 天距离",
+  "zh-TW": "最近 7 天距離",
+  "ja": "最近7日の距離",
+  "es": "Distancia de los últimos 7 días",
+  "hi": "पिछले 7 दिन की दूरी"
+ },
+ "최근 7일 걸음 수": {
+  "en": "Steps, Last 7 Days",
+  "zh": "最近 7 天步数",
+  "zh-TW": "最近 7 天步數",
+  "ja": "最近7日の歩数",
+  "es": "Pasos de los últimos 7 días",
+  "hi": "पिछले 7 दिन के कदम"
+ },
+ "걸음": {
+  "en": " steps",
+  "zh": "步",
+  "zh-TW": "步",
+  "ja": "歩",
+  "es": "pasos",
+  "hi": "कदम"
+ },
+ "최근 7일 (분)": {
+  "en": "Last 7 Days (min)",
+  "zh": "最近 7 天（分钟）",
+  "zh-TW": "最近 7 天（分鐘）",
+  "ja": "最近7日（分）",
+  "es": "Últimos 7 días (min)",
+  "hi": "पिछले 7 दिन (मिनट)"
+ },
+ "기록 목록": {
+  "en": "Record List",
+  "zh": "记录列表",
+  "zh-TW": "記錄清單",
+  "ja": "記録一覧",
+  "es": "Lista de registros",
+  "hi": "रिकॉर्ड सूची"
+ },
+ "아직 기록이 없습니다.": {
+  "fr": "Il n'y a pas encore d'enregistrement.",
+  "de": "Es gibt noch keine Einträge.",
+  "pt": "Ainda não há registros.",
+  "it": "Non ci sono ancora registrazioni.",
+  "ru": "Записей ещё нет.",
+  "uk": "Записів ще немає.",
+  "ar": "لا توجد سجلات بعد.",
+  "fa": "هنوز سابقه‌ای نیست.",
+  "th": "ยังไม่มีบันทึก",
+  "vi": "Chưa có bản ghi nào.",
+  "id": "Belum ada catatan.",
+  "tr": "Henüz kayıt yok.",
+  "nl": "Er zijn nog geen records.",
+  "pl": "Brak jeszcze zapisów.",
+  "sv": "Det finns inga poster ännu.",
+  "da": "Der er ingen poster endnu.",
+  "nb": "Det finnes ingen oppføringer ennå.",
+  "fi": "Merkintöjä ei vielä ole.",
+  "cs": "Zatím nejsou žádné záznamy.",
+  "hu": "Még nincsenek bejegyzések.",
+  "ro": "Nu există încă înregistrări."
+ },
+ "기록 전체 지우기": {
+  "en": "Delete All Records",
+  "zh": "清除全部记录",
+  "zh-TW": "清除全部記錄",
+  "ja": "記録をすべて削除",
+  "es": "Borrar todo el historial",
+  "hi": "पूरा रिकॉर्ड मिटाएँ"
+ },
+ "통증이 있으면 멈추세요. 무리하지 말고 편한 범위에서만 따라 하세요.": {
+  "fr": "Si vous ressentez une douleur, arrêtez. Ne forcez pas et suivez uniquement dans une amplitude confortable.",
+  "de": "Wenn Sie Schmerzen haben, hören Sie auf. Überanstrengen Sie sich nicht und folgen Sie nur in einem bequemen Bereich.",
+  "pt": "Se sentir dor, pare. Não force e acompanhe apenas em uma amplitude confortável.",
+  "it": "Se avverti dolore, fermati. Non forzare e segui solo in un intervallo confortevole.",
+  "ru": "Если есть боль, остановитесь. Не перенапрягайтесь и следуйте только в удобном диапазоне.",
+  "uk": "Якщо є біль, зупиніться. Не перенапружуйтеся й виконуйте лише в зручному діапазоні.",
+  "ar": "إذا كان هناك ألم فتوقف. لا تُجهد نفسك وتابع فقط في نطاق مريح.",
+  "fa": "اگر درد دارید متوقف شوید. به خودتان فشار نیاورید و فقط در محدوده راحت دنبال کنید.",
+  "th": "หากมีอาการปวด กรุณาหยุด อย่าฝืนและทำตามเฉพาะในขอบเขตที่สบาย",
+  "vi": "Nếu đau, hãy dừng lại. Đừng cố quá, chỉ làm theo trong phạm vi thoải mái.",
+  "id": "Jika terasa nyeri, berhentilah. Jangan memaksakan diri, ikuti hanya dalam rentang yang nyaman.",
+  "tr": "Ağrı olursa durun. Zorlamayın ve yalnızca rahat aralıkta takip edin.",
+  "nl": "Stop als u pijn hebt. Overbelast uzelf niet en volg alleen binnen een comfortabel bereik.",
+  "pl": "Przerwij, jeśli poczujesz ból. Nie przeciążaj się i podążaj tylko w komfortowym zakresie.",
+  "sv": "Sluta om du får ont. Ansträng dig inte för mycket och följ endast inom ett bekvämt intervall.",
+  "da": "Stop, hvis du får ondt. Overanstreng dig ikke, og følg kun inden for et behageligt område.",
+  "nb": "Stopp hvis du får vondt. Ikke overanstreng deg, og følg bare innenfor et behagelig område.",
+  "fi": "Lopeta, jos sinulla on kipua. Älä rasita itseäsi liikaa ja seuraa vain mukavalla alueella.",
+  "cs": "Přestaňte, pokud pocítíte bolest. Nepřetěžujte se a pokračujte pouze v pohodlném rozsahu.",
+  "hu": "Álljon meg, ha fájdalmat érez. Ne erőltesse túl magát, és csak kényelmes tartományban kövesse.",
+  "ro": "Oprește-te dacă ai dureri. Nu te suprasolicita și urmează numai într-un interval confortabil."
+ },
+ "운동 시작": {
+  "en": "Start Exercise",
+  "zh": "开始运动",
+  "zh-TW": "開始運動",
+  "ja": "運動開始",
+  "es": "Iniciar ejercicio",
+  "hi": "व्यायाम शुरू करें"
+ },
+ "함께할 동작을 고르세요. 카드를 누르면 켜고 끌 수 있습니다.": {
+  "fr": "Choisissez les mouvements à faire ensemble. Touchez une carte pour l'activer ou la désactiver.",
+  "de": "Wählen Sie die gemeinsam zu machenden Bewegungen. Tippen Sie auf eine Karte, um sie ein- oder auszuschalten.",
+  "pt": "Escolha os movimentos para fazer juntos. Toque em um cartão para ligar ou desligar.",
+  "it": "Scegli i movimenti da fare insieme. Tocca una scheda per attivarla o disattivarla.",
+  "ru": "Выберите движение, которое будете делать вместе. Если нажать карточку, можно включить и выключить.",
+  "uk": "Виберіть рух, який робитимете разом. Якщо натиснути картку, можна ввімкнути й вимкнути.",
+  "ar": "اختر الحركة التي ستقوم بها معًا. عند الضغط على البطاقة يمكنك التشغيل والإيقاف.",
+  "fa": "حرکتی را که با هم انجام می‌دهید انتخاب کنید. اگر کارت را بزنید، می‌توانید روشن و خاموش کنید.",
+  "th": "เลือกท่าทางที่จะทำด้วยกัน แตะบัตรเพื่อเปิดและปิด",
+  "vi": "Hãy chọn động tác sẽ làm cùng. Chạm vào thẻ để bật và tắt.",
+  "id": "Pilih gerakan yang akan dilakukan bersama. Sentuh kartu untuk menyalakan dan mematikan.",
+  "tr": "Birlikte yapacağınız hareketleri seçin. Karta dokunursanız açıp kapatabilirsiniz.",
+  "nl": "Kies de bewegingen die u samen wilt doen. Tik op een kaart om in en uit te schakelen.",
+  "pl": "Wybierz ruchy, które chcesz wykonywać razem. Dotknij karty, aby włączyć i wyłączyć.",
+  "sv": "Välj de rörelser du vill göra tillsammans. Tryck på ett kort för att slå på och av.",
+  "da": "Vælg de bevægelser, du vil lave sammen. Tryk på et kort for at tænde og slukke.",
+  "nb": "Velg bevegelsene du vil gjøre sammen. Trykk på et kort for å slå på og av.",
+  "fi": "Valitse liikkeet, jotka haluat tehdä yhdessä. Napauta korttia kytkeäksesi päälle ja pois.",
+  "cs": "Vyberte pohyby, které chcete dělat společně. Klepnutím na kartu zapnete a vypnete.",
+  "hu": "Válassza ki az együtt végzendő mozdulatokat. Érintsen meg egy kártyát a be- és kikapcsoláshoz.",
+  "ro": "Alege mișcările pe care vrei să le faci împreună. Atinge un card pentru a porni și opri."
+ },
+ "강도": {
+  "en": "Intensity",
+  "zh": "强度",
+  "zh-TW": "強度",
+  "ja": "強度",
+  "es": "Intensidad",
+  "hi": "तीव्रता"
+ },
+ "편하게": {
+  "en": "Comfortable",
+  "zh": "舒适",
+  "zh-TW": "舒適",
+  "ja": "楽に",
+  "es": "Cómodo",
+  "hi": "आरामदायक"
+ },
+ "보통": {
+  "en": "Normal",
+  "zh": "普通",
+  "zh-TW": "普通",
+  "ja": "普通",
+  "es": "Normal",
+  "hi": "सामान्य"
+ },
+ "진행 속도": {
+  "en": "Pace",
+  "zh": "进行速度",
+  "zh-TW": "進行速度",
+  "ja": "進行速度",
+  "es": "Ritmo",
+  "hi": "गति"
+ },
+ "느리게": {
+  "en": "Slowly",
+  "zh": "慢速",
+  "zh-TW": "慢速",
+  "ja": "ゆっくり",
+  "es": "Lento",
+  "hi": "धीरे"
+ },
+ "빠르게": {
+  "en": "Quickly",
+  "zh": "快",
+  "zh-TW": "快",
+  "ja": "速く",
+  "es": "Rápido",
+  "hi": "तेज़"
+ },
+ "그만하기": {
+  "en": "Stop",
+  "zh": "停止运动",
+  "zh-TW": "停止運動",
+  "ja": "やめる",
+  "es": "Terminar ejercicio",
+  "hi": "बंद करें"
+ },
+ "일시정지": {
+  "en": "Pause",
+  "zh": "暂停",
+  "zh-TW": "暫停",
+  "ja": "一時停止",
+  "es": "Pausar",
+  "hi": "रोकें"
+ },
+ "운동이 끝났습니다": {
+  "en": "Exercise Finished",
+  "zh": "运动已结束",
+  "zh-TW": "運動已結束",
+  "ja": "運動が終わりました",
+  "es": "El ejercicio ha terminado",
+  "hi": "व्यायाम समाप्त हुआ"
+ },
+ "수고하셨습니다. 오늘 한 운동은 기기에 따로 저장되지 않습니다.": {
+  "fr": "Bravo pour vos efforts. L'exercice fait aujourd'hui n'est pas conservé séparément sur l'appareil.",
+  "de": "Gut gemacht. Die heute gemachte Bewegung wird nicht gesondert auf dem Gerät gespeichert.",
+  "pt": "Parabéns pelo esforço. O exercício feito hoje não é salvo separadamente no dispositivo.",
+  "it": "Bravo per l'impegno. L'esercizio fatto oggi non viene salvato separatamente sul dispositivo.",
+  "ru": "Вы хорошо поработали. Упражнения, сделанные сегодня, отдельно на устройстве не сохраняются.",
+  "uk": "Ви добре попрацювали. Вправи, зроблені сьогодні, окремо на пристрої не зберігаються.",
+  "ar": "أحسنت. لا تُحفظ التمارين التي قمت بها اليوم بشكل منفصل على الجهاز.",
+  "fa": "خسته نباشید. ورزش‌های انجام‌شده امروز جداگانه در دستگاه ذخیره نمی‌شوند.",
+  "th": "ขอบคุณสำหรับความพยายาม การออกกำลังกายที่ทำวันนี้จะไม่ถูกบันทึกแยกไว้ในอุปกรณ์",
+  "vi": "Bạn đã vất vả rồi. Bài tập hôm nay không được lưu riêng trong thiết bị.",
+  "id": "Terima kasih atas kerja keras Anda. Olahraga yang dilakukan hari ini tidak disimpan secara terpisah di perangkat.",
+  "tr": "Çok çalıştınız. Bugün yaptığınız egzersiz cihaza ayrıca kaydedilmez.",
+  "nl": "Goed gedaan. De beweging van vandaag wordt niet apart op het apparaat opgeslagen.",
+  "pl": "Dobra robota. Dzisiejsze ćwiczenie nie jest osobno zapisywane na urządzeniu.",
+  "sv": "Bra jobbat. Dagens träning sparas inte separat på enheten.",
+  "da": "Godt klaret. Dagens motion gemmes ikke separat på enheden.",
+  "nb": "Godt jobbet. Dagens trening lagres ikke separat på enheten.",
+  "fi": "Hyvää työtä. Tämän päivän liikuntaa ei tallenneta erikseen laitteeseen.",
+  "cs": "Dobrá práce. Dnešní cvičení se na zařízení samostatně neukládá.",
+  "hu": "Szép munka. A mai torna nem kerül külön mentésre az eszközön.",
+  "ro": "Bună treabă. Exercițiul de azi nu este salvat separat pe dispozitiv."
+ },
+ "운동 고르기로": {
+  "en": "Choose an Exercise",
+  "zh": "返回选择运动",
+  "zh-TW": "返回選擇運動",
+  "ja": "運動を選ぶへ",
+  "es": "Volver a elegir ejercicio",
+  "hi": "व्यायाम चुनने पर वापस"
+ },
+ "기록은 이 기기 안에만 저장되며, 밖으로 전송되지 않습니다. 이 도구는 운동을 안내하는 도구이며 의료 조언을 제공하지 않습니다.": {
+  "fr": "Les enregistrements sont conservés uniquement sur cet appareil et ne sont pas transmis à l'extérieur. Cet outil guide l'exercice et ne fournit pas de conseils médicaux.",
+  "de": "Einträge werden nur auf diesem Gerät gespeichert und nicht nach außen übertragen. Dieses Tool leitet Bewegung an und bietet keine medizinische Beratung.",
+  "pt": "Os registros são guardados apenas neste dispositivo e não são enviados para fora. Esta ferramenta orienta o exercício e não fornece aconselhamento médico.",
+  "it": "Le registrazioni sono salvate solo su questo dispositivo e non vengono trasmesse all'esterno. Questo strumento guida l'esercizio e non fornisce consigli medici.",
+  "ru": "Записи хранятся только на этом устройстве и наружу не передаются. Этот инструмент ведёт упражнения и не предоставляет медицинских советов.",
+  "uk": "Записи зберігаються лише на цьому пристрої й назовні не передаються. Цей інструмент веде вправи й не надає медичних порад.",
+  "ar": "تُحفظ السجلات على هذا الجهاز فقط ولا تُرسل إلى الخارج. هذه الأداة ترشد إلى التمارين ولا تقدم نصائح طبية.",
+  "fa": "سوابق فقط در همین دستگاه ذخیره می‌شوند و به بیرون ارسال نمی‌شوند. این ابزار ورزش را راهنمایی می‌کند و مشاوره پزشکی ارائه نمی‌دهد.",
+  "th": "บันทึกจะถูกเก็บไว้ในอุปกรณ์นี้เท่านั้นและจะไม่ส่งออกไป เครื่องมือนี้เป็นเครื่องมือแนะนำการออกกำลังกายและไม่ได้ให้คำแนะนำทางการแพทย์",
+  "vi": "Bản ghi chỉ được lưu trong thiết bị này và không được gửi ra ngoài. Công cụ này là công cụ hướng dẫn tập luyện và không cung cấp lời khuyên y tế.",
+  "id": "Catatan hanya disimpan di perangkat ini dan tidak dikirim ke luar. Alat ini adalah alat pemandu olahraga dan tidak memberikan nasihat medis.",
+  "tr": "Kayıtlar yalnızca bu cihazda saklanır ve dışarı gönderilmez. Bu araç, egzersizi yönlendiren bir araçtır ve tıbbi tavsiye sağlamaz.",
+  "nl": "Records worden alleen op dit apparaat opgeslagen en niet naar buiten verzonden. Deze tool begeleidt beweging en biedt geen medisch advies.",
+  "pl": "Zapisy są przechowywane wyłącznie na tym urządzeniu i nie są wysyłane na zewnątrz. To narzędzie prowadzi ćwiczenia i nie udziela porad medycznych.",
+  "sv": "Poster lagras endast på den här enheten och skickas inte ut. Det här verktyget vägleder träning och ger inga medicinska råd.",
+  "da": "Optegnelser gemmes kun på denne enhed og sendes ikke ud. Dette værktøj guider motion og giver ikke medicinsk rådgivning.",
+  "nb": "Oppføringer lagres kun på denne enheten og sendes ikke ut. Dette verktøyet veileder trening og gir ikke medisinske råd.",
+  "fi": "Merkinnät tallennetaan vain tähän laitteeseen eikä niitä lähetetä ulos. Tämä työkalu ohjaa liikuntaa eikä anna lääketieteellisiä neuvoja.",
+  "cs": "Záznamy se ukládají pouze do tohoto zařízení a neodesílají se ven. Tento nástroj vede cvičení a neposkytuje lékařské rady.",
+  "hu": "A bejegyzések csak ezen az eszközön tárolódnak, és nem kerülnek kiküldésre. Ez az eszköz tornát vezet, és nem ad orvosi tanácsot.",
+  "ro": "Înregistrările sunt stocate numai pe acest dispozitiv și nu sunt trimise în exterior. Acest instrument ghidează exercițiile și nu oferă sfaturi medicale."
+ }
+});
+</script>
+</body>
+</html>

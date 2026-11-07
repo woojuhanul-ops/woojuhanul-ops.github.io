@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>넥서스 장보기 목록 — Nexus Shopping List</title>
+<meta name="description" content="살 것을 적고 산 것을 표시하는 장보기 목록입니다. 모든 기록은 기기 안에서만 저장됩니다.">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png">
+<meta name="theme-color" content="#0B1226">
+<meta property="og:title" content="넥서스 장보기 목록 — Nexus Shopping List">
+<meta property="og:description" content="살 것을 적고 산 것을 표시하는 장보기 목록입니다. 모든 기록은 기기 안에서만 저장됩니다.">
+<style>
+:root{--bg:#0B1226;--cyan:#38BDF8;--teal:#2DD4BF;--violet:#818CF8;--ink:#F8FAFC;--muted:#94A3B8;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.14)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",sans-serif;font-size:18px;line-height:1.6}
+@keyframes nxspin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.nxspin{transform-origin:50% 50%;animation:nxspin 26s linear infinite}
+header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(11,15,25,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);flex-wrap:wrap}
+header .logo{width:40px;height:40px;flex:none}
+header .brand{line-height:1.2;flex:1;min-width:120px}
+header .brand b{font-size:15px;letter-spacing:.14em;white-space:nowrap}
+header .brand span{display:block;font-size:11px;color:var(--muted);letter-spacing:.2em;white-space:nowrap}
+header .brandlink{display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;flex:none}
+.testbadge{flex:none;font-size:12px;font-weight:700;color:#FDE68A;border:1px solid rgba(253,230,138,.5);border-radius:999px;padding:5px 10px}
+main{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:26px;margin:8px 0 4px}
+h2{font-size:19px;margin:0 0 12px}
+.sub{color:var(--muted);margin:0 0 6px}
+.notice{background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.35);border-radius:14px;padding:12px 14px;font-size:15px;margin:14px 0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin:16px 0}
+label{display:block;font-size:14px;color:var(--muted);margin:0 0 6px}
+input,select,textarea{width:100%;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:12px;color:var(--ink);font-size:17px;padding:12px}
+input[type=checkbox]{width:26px;height:26px;accent-color:#2DD4BF}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fields .wide{grid-column:1/-1}
+.seg{display:flex;gap:8px;margin:0 0 12px}
+.seg button{flex:1;padding:13px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);font-size:16px;font-weight:700;cursor:pointer}
+.seg button.on{background:linear-gradient(135deg,var(--teal),var(--violet));color:#06121f;border-color:transparent}
+.bigbtn{display:block;width:100%;padding:17px;border:none;border-radius:16px;background:linear-gradient(135deg,var(--cyan),var(--violet));color:#06121f;font-size:19px;font-weight:800;cursor:pointer;margin-top:14px}
+.bigbtn:active{transform:scale(.98)}
+.ghostbtn{padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);font-size:15px;cursor:pointer}
+.rowbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.msg{font-size:14px;color:var(--teal);min-height:22px}
+.sumgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.sumbox{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.sumbox .k{font-size:13px;color:var(--muted)}
+.sumbox .v{font-size:20px;font-weight:800}
+ul.list{list-style:none;margin:0;padding:0}
+ul.list li{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid var(--line)}
+ul.list .grow{flex:1;min-width:0}
+ul.list .meta{font-size:13px;color:var(--muted)}
+.del{flex:none;border:1px solid var(--line);background:none;color:#FCA5A5;border-radius:10px;padding:7px 11px;cursor:pointer;font-size:14px}
+.done .nm{text-decoration:line-through;color:var(--muted)}
+footer{color:var(--muted);font-size:14px;text-align:center;padding:24px 16px 40px}
+a,button{transition:transform .12s ease,box-shadow .2s ease,background-color .2s ease}
+:focus-visible{outline:2px solid #2DD4BF;outline-offset:2px}
+html,body{overflow-x:clip}
+header .brandlink{flex:none}header .brand{flex:none;overflow:visible}
+.nx-langwrap{flex:none!important;margin-left:auto!important}.nx-langwrap select{width:128px}
+@media(max-width:520px){.sumgrid{grid-template-columns:1fr 1fr 1fr}.sumbox .v{font-size:16px}}
+</style>
+</head>
+<body>
+<header>
+  <a class="brandlink" href="https://nexus-2e23d.web.app/" target="_blank" rel="noopener" aria-label="넥서스 그룹 홈페이지"><svg class="logo" viewBox="0 0 100 100" fill="none" aria-label="Nexus Group Logo">
+    <defs>
+      <linearGradient id="nexusCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38BDF8"/><stop offset="100%" stop-color="#818CF8"/>
+      </linearGradient>
+      <linearGradient id="nexusViolet" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#818CF8"/><stop offset="100%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </linearGradient>
+    </defs>
+    <g class="nxspin">
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusCyan)" stroke-width="2.5" transform="rotate(-30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="url(#nexusViolet)" stroke-width="2.5" transform="rotate(30 50 50)" stroke-linecap="round"/>
+    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#F8FAFC" stroke-width="1.5" stroke-opacity="0.75" transform="rotate(90 50 50)" stroke-dasharray="3 3"/>
+    </g>
+    <circle cx="50" cy="50" r="4.5" fill="#38BDF8"/><circle cx="50" cy="50" r="2" fill="#F8FAFC"/>
+  </svg><span class="brand"><b>NEXUS GROUP</b><span>넥서스 장보기 목록</span></span></a>
+  <span class="testbadge">테스트 버전</span>
+</header>
+<main>
+
+<h1>넥서스 장보기 목록</h1>
+<p class="sub">살 것을 적어 두고, 산 것은 표시하는 목록입니다.</p>
+<p class="sub">회원가입 없음 · 이용료 없음 · 무제한 사용</p>
+<div class="notice">목록은 이 기기 안에만 저장됩니다. 적은 내용은 어디로도 전송되지 않습니다.</div>
+
+<section class="panel">
+  <h2>목록에 추가</h2>
+  <div class="fields">
+    <div class="field wide"><label for="itemIn">살 것</label><input type="text" id="itemIn" maxlength="60" placeholder="예: 우유"></div>
+    <div class="field"><label for="qtyIn">수량</label><input type="text" id="qtyIn" maxlength="12" placeholder="예: 2개"></div>
+    <div class="field"><label for="grpSel">분류</label><select id="grpSel"><option>식품</option><option>생활용품</option><option>기타</option></select></div>
+  </div>
+  <button type="button" class="bigbtn" id="addBtn">목록에 추가</button>
+  <p class="msg" id="addMsg" role="status"></p>
+</section>
+
+<section class="panel">
+  <h2>장보기 목록</h2>
+  <p class="sub" id="countLine">남은 항목 0개</p>
+  <ul class="list" id="itemList"></ul>
+  <p class="sub" id="emptyMsg">목록이 비어 있습니다.</p>
+  <div class="rowbtns">
+    <button type="button" class="ghostbtn" id="copyBtn">목록 복사</button>
+    <button type="button" class="ghostbtn" id="clearDoneBtn">산 것 지우기</button>
+    <button type="button" class="ghostbtn" id="wipeBtn">전체 삭제</button>
+  </div>
+  <p class="msg" id="listMsg" role="status"></p>
+</section>
+
+<script>
+(function(){
+"use strict";
+var LS="nxshop.items.v1";
+function $(id){return document.getElementById(id)}
+function load(){try{var r=JSON.parse(localStorage.getItem(LS)||"[]");return Array.isArray(r)?r:[]}catch(e){return[]}}
+function save(){try{localStorage.setItem(LS,JSON.stringify(items))}catch(e){}}
+var items=load();
+function render(){
+  var ul=$("itemList");ul.innerHTML="";
+  var left=0;
+  items.forEach(function(it){
+    if(!it.done)left++;
+    var li=document.createElement("li");if(it.done)li.className="done";
+    var chk=document.createElement("input");chk.type="checkbox";chk.checked=!!it.done;chk.setAttribute("aria-label","샀음 표시");
+    chk.addEventListener("change",function(){it.done=chk.checked;save();render()});
+    var g=document.createElement("div");g.className="grow";
+    var nm=document.createElement("div");nm.className="nm";nm.textContent=it.name;
+    var mt=document.createElement("div");mt.className="meta";mt.textContent=(it.qty?it.qty+" · ":"")+it.grp;
+    g.appendChild(nm);g.appendChild(mt);
+    var del=document.createElement("button");del.type="button";del.className="del";del.textContent="삭제";
+    del.addEventListener("click",function(){items=items.filter(function(x){return x.id!==it.id});save();render();$("listMsg").textContent="항목 하나를 지웠습니다."});
+    li.appendChild(chk);li.appendChild(g);li.appendChild(del);ul.appendChild(li);
+  });
+  $("countLine").textContent="남은 항목 "+left+"개";
+  $("emptyMsg").style.display=items.length?"none":"block";
+}
+function add(){
+  var name=$("itemIn").value.trim();
+  if(!name){$("addMsg").textContent="살 것이 비어 있습니다.";return}
+  items.unshift({id:Date.now()+"-"+Math.random().toString(36).slice(2,7),name:name,qty:$("qtyIn").value.trim(),grp:$("grpSel").value,done:false});
+  save();$("itemIn").value="";$("qtyIn").value="";render();
+  $("addMsg").textContent="목록에 추가됐습니다.";
+}
+$("addBtn").addEventListener("click",add);
+$("itemIn").addEventListener("keydown",function(e){if(e.key==="Enter")add()});
+$("copyBtn").addEventListener("click",function(){
+  var t=items.filter(function(i){return !i.done}).map(function(i){return "- "+i.name+(i.qty?" ("+i.qty+")":"")}).join("\n")||"장보기 목록이 비어 있습니다.";
+  if(navigator.clipboard)navigator.clipboard.writeText("장보기 목록\n"+t).then(function(){$("listMsg").textContent="목록이 복사됐습니다."});
+});
+$("clearDoneBtn").addEventListener("click",function(){items=items.filter(function(i){return !i.done});save();render();$("listMsg").textContent="산 항목을 지웠습니다."});
+$("wipeBtn").addEventListener("click",function(){
+  if(!confirm("정말로 모든 항목을 지울까요?"))return;
+  items=[];save();render();$("listMsg").textContent="모든 항목을 지웠습니다.";
+});
+render();
+})();
+</script>
+
+</main>
+<footer>우주의 모든 의식체는 친구이자 동반자이다<br><small>Every conscious being in the universe is a friend and companion</small><br>🌐 호스팅: Firebase · 🔒 모든 기록은 당신의 기기 안에서만 저장됩니다</footer>
+<script>
+/* NX-I18N-BLOCK */
+/* 넥서스 공통 다언어 엔진 (표시 언어 전용 — 기능·작업 언어와 무관)
+   원본 한국어 텍스트 노드를 사전으로 치환한다. 원문은 노드별로 보관해 언어 전환이 가역적이다.
+   사전 항목 형식: "한국어 원문": {en:"", zh:"", ja:"", es:"", hi:""} — 없는 언어는 원문 유지. */
+(function () {
+  var SUPPORTED = ["ko", "en", "zh", "zh-TW", "ja", "es", "hi", "fr", "de", "pt", "it", "ru", "uk", "ar", "fa", "th", "vi", "id", "tr", "nl", "pl", "sv", "da", "nb", "fi", "cs", "hu", "ro"];
+  var NAMES = { ko: "한국어", en: "English", zh: "中文(简体)", "zh-TW": "中文(繁體)", ja: "日本語", es: "Español", hi: "हिन्दी", fr: "Français", de: "Deutsch", pt: "Português", it: "Italiano", ru: "Русский", uk: "Українська", ar: "العربية", fa: "فارسی", th: "ไทย", vi: "Tiếng Việt", id: "Bahasa Indonesia", tr: "Türkçe", nl: "Nederlands", pl: "Polski", sv: "Svenska", da: "Dansk", nb: "Norsk", fi: "Suomi", cs: "Čeština", hu: "Magyar", ro: "Română" };
+  var RTL = { ar: 1, fa: 1 };
+  var DICT = {};
+  window.NX_I18N_ADD = function (d) { for (var k in d) DICT[k] = d[k]; };
+  var lang = "ko";
+  try {
+    var ql = new URLSearchParams(location.search).get("lang");
+    if (ql && SUPPORTED.indexOf(ql) >= 0) lang = ql;
+    else {
+      var saved = localStorage.getItem("nxLang");
+      if (saved && SUPPORTED.indexOf(saved) >= 0) lang = saved;
+      else {
+        var raw = (navigator.language || "ko").toLowerCase();
+        var n = raw.slice(0, 2);
+        if (n === "zh") lang = /^(zh-tw|zh-hk|zh-mo|zh-hant)/.test(raw) ? "zh-TW" : "zh";
+        else if (n === "no" || n === "nn") lang = "nb";
+        else if (SUPPORTED.indexOf(n) >= 0) lang = n;
+      }
+    }
+  } catch (e) {}
+  var origText = new WeakMap();
+  var lastOut = new WeakMap();
+  var busy = false;
+
+  function translateStr(s) {
+    if (lang === "ko" || !s) return null;
+    var t = s.replace(/\s+/g, " ").trim();
+    if (!t) return null;
+    var d = DICT[t];
+    if (d && d[lang]) return s.replace(t, d[lang]);
+    var m;
+    if ((m = t.match(/^(\d[\d,]*)개$/))) {
+      var unit = { en: "", zh: " 个", "zh-TW": " 個", ja: " 件", es: "", hi: "" }[lang];
+      return s.replace(t, m[1] + (unit || ""));
+    }
+    if ((m = t.match(/^(\d[\d,]*)개 파일$/))) return s.replace(t, m[1] + ({ en: " files", zh: " 个文件", "zh-TW": " 個檔案", ja: " ファイル", es: " archivos", hi: " फ़ाइलें", fr: " fichiers", de: " Dateien", pt: " arquivos", it: " file", ru: " файлов", uk: " файлів", ar: " ملفات", fa: " فایل", th: " ไฟล์", vi: " tệp", id: " berkas", tr: " dosya", nl: " bestanden", pl: " plików", sv: " filer", da: " filer", nb: " filer", fi: " tiedostoa", cs: " souborů", hu: " fájl", ro: " fișiere" }[lang] || ""));
+    if ((m = t.match(/^(\d+(?:\.\d+)?)배$/))) return s.replace(t, m[1] + ({ en: "×", zh: " 倍", "zh-TW": " 倍", ja: "倍", es: "×", hi: "×" }[lang] || "×"));
+    if (t.indexOf("엔진 상태 — ") === 0) {
+      var seg = {
+        en: [["엔진 상태 — ", "Engine status — "], ["QR 엔진: ", "QR engine: "], ["바코드 엔진: ", "Barcode engine: "], ["내장 인식기: ", "Built-in detector: "], ["살아 있음", "ready"], ["없음", "none"], ["있음", "yes"], [" · 영상 ", " · Video "], [" · 시도 ", " · Attempts "], ["회", ""], [" · 최근 오류: ", " · Last error: "]],
+        zh: [["엔진 상태 — ", "引擎状态 — "], ["QR 엔진: ", "QR引擎: "], ["바코드 엔진: ", "条码引擎: "], ["내장 인식기: ", "内置识别器: "], ["살아 있음", "就绪"], ["없음", "无"], ["있음", "有"], [" · 영상 ", " · 视频 "], [" · 시도 ", " · 尝试 "], ["회", " 次"], [" · 최근 오류: ", " · 最近错误: "]],
+        ja: [["엔진 상태 — ", "エンジン状態 — "], ["QR 엔진: ", "QRエンジン: "], ["바코드 엔진: ", "バーコードエンジン: "], ["내장 인식기: ", "内蔵認識器: "], ["살아 있음", "準備完了"], ["없음", "なし"], ["있음", "あり"], [" · 영상 ", " · 映像 "], [" · 시도 ", " · 試行 "], ["회", " 回"], [" · 최근 오류: ", " · 最近のエラー: "]],
+        es: [["엔진 상태 — ", "Estado del motor — "], ["QR 엔진: ", "Motor QR: "], ["바코드 엔진: ", "Motor de códigos: "], ["내장 인식기: ", "Detector integrado: "], ["살아 있음", "listo"], ["없음", "ninguno"], ["있음", "sí"], [" · 영상 ", " · Vídeo "], [" · 시도 ", " · Intentos "], ["회", ""], [" · 최근 오류: ", " · Último error: "]],
+        hi: [["엔진 상태 — ", "इंजन स्थिति — "], ["QR 엔진: ", "QR इंजन: "], ["바코드 엔진: ", "बारकोड इंजन: "], ["내장 인식기: ", "अंतर्निर्मित डिटेक्टर: "], ["살아 있음", "तैयार"], ["없음", "कोई नहीं"], ["있음", "है"], [" · 영상 ", " · वीडियो "], [" · 시도 ", " · प्रयास "], ["회", ""], [" · 최근 오류: ", " · अंतिम त्रुटि: "]]
+      }[lang];
+      if (seg) { var out = t; seg.forEach(function (pr) { out = out.split(pr[0]).join(pr[1]); }); return s.replace(t, out); }
+    }
+    return null;
+  }
+  function decorateLinks() {
+    document.querySelectorAll("a[href]").forEach(function (a) {
+      var href = a.getAttribute("href");
+      if (!href || href.charAt(0) === "#") return;
+      var u;
+      try { u = new URL(href, location.href); } catch (e) { return; }
+      if (u.origin === location.origin) return;
+      if (!/\.web\.app$/.test(u.hostname) && u.hostname !== "nexus-board-mirror.pages.dev") return;
+      if (u.searchParams.get("lang") === lang) return;
+      u.searchParams.set("lang", lang);
+      a.setAttribute("href", u.toString());
+    });
+  }
+  function applyNode(node) {
+    var cur = node.nodeValue;
+    var prevOut = lastOut.get(node);
+    if (prevOut !== undefined && cur !== prevOut) origText.set(node, cur);
+    var orig = origText.get(node);
+    if (orig === undefined) { orig = cur; origText.set(node, orig); }
+    var src = lang === "ko" ? null : translateStr(orig);
+    var next = src !== null ? src : orig;
+    if (next !== cur) node.nodeValue = next;
+    lastOut.set(node, next);
+  }
+  function applyAll(root) {
+    if (!root) return;
+    busy = true;
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEXTAREA") return NodeFilter.FILTER_REJECT;
+        if (p.closest && p.closest(".nx-langwrap")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = w.nextNode())) nodes.push(n);
+    nodes.forEach(applyNode);
+    document.querySelectorAll("[placeholder]").forEach(function (el) {
+      var orig = el.getAttribute("data-nx-orig-ph");
+      if (orig === null) { orig = el.getAttribute("placeholder") || ""; el.setAttribute("data-nx-orig-ph", orig); }
+      var t = lang === "ko" ? null : translateStr(orig);
+      el.setAttribute("placeholder", t !== null ? t : orig);
+    });
+    if (document.title) {
+      var ot = document.documentElement.getAttribute("data-nx-orig-title");
+      if (ot === null) { ot = document.title; document.documentElement.setAttribute("data-nx-orig-title", ot); }
+      var tt = lang === "ko" ? null : translateStr(ot);
+      document.title = tt !== null ? tt : ot;
+    }
+    document.documentElement.setAttribute("lang", lang === "zh" ? "zh-CN" : lang);
+    document.documentElement.setAttribute("dir", RTL[lang] ? "rtl" : "ltr");
+    busy = false;
+  }
+  function buildMenu() {
+    if (document.querySelector(".nx-langwrap")) return;
+    var header = document.querySelector("header");
+    if (!header) return;
+    var wrap = document.createElement("span");
+    wrap.className = "nx-langwrap";
+    wrap.style.cssText = "display:inline-flex;align-items:center;gap:4px;margin-left:8px;flex:none";
+    var globe = document.createElement("span");
+    globe.textContent = "🌐";
+    globe.style.cssText = "font-size:14px;line-height:1";
+    var sel = document.createElement("select");
+    sel.setAttribute("aria-label", "Language / 언어");
+    sel.style.cssText = "background:#131C36;color:#E2E8F0;border:1px solid #2B3B5F;border-radius:8px;padding:10px 8px;font-size:16px;max-width:140px;min-height:44px";
+    SUPPORTED.forEach(function (code) {
+      var o = document.createElement("option");
+      o.value = code; o.textContent = NAMES[code];
+      if (code === lang) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener("change", function () {
+      lang = sel.value;
+      try { localStorage.setItem("nxLang", lang); } catch (e) {}
+      applyAll(document.body);
+      decorateLinks();
+    });
+    wrap.appendChild(globe); wrap.appendChild(sel);
+    header.appendChild(wrap);
+  }
+  function init() {
+    try { localStorage.setItem("nxLang", lang); } catch (e) {}
+    buildMenu();
+    applyAll(document.body);
+    decorateLinks();
+    var mo = new MutationObserver(function (muts) {
+      if (busy) return;
+      busy = true;
+      var added = false;
+      muts.forEach(function (mu) {
+        if (mu.type === "characterData") applyNode(mu.target);
+        mu.addedNodes && mu.addedNodes.forEach(function (an) {
+          added = true;
+          if (an.nodeType === 3) applyNode(an);
+          else if (an.nodeType === 1) applyAll(an);
+        });
+      });
+      busy = false;
+      if (added) decorateLinks();
+    });
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+
+/* 공통 사전 — 전 도구 공통 문구 (가족 목록·홈 버튼·공리 문구) */
+NX_I18N_ADD({
+ "넥서스 그룹 홈페이지": {
+  "en": "Nexus Group Home",
+  "zh": "Nexus Group 主页",
+  "ja": "Nexus Group ホーム",
+  "es": "Inicio de Nexus Group",
+  "hi": "Nexus Group होम",
+  "fr": "Accueil Nexus Group",
+  "de": "Nexus Group Startseite",
+  "pt": "Página inicial do Nexus Group",
+  "it": "Home di Nexus Group",
+  "nl": "Nexus Group startpagina",
+  "cs": "Domovská stránka Nexus Group",
+  "hu": "Nexus Group kezdőlap",
+  "pl": "Strona główna Nexus Group",
+  "ro": "Pagina principală Nexus Group",
+  "ru": "Главная страница Nexus Group",
+  "uk": "Головна сторінка Nexus Group",
+  "sv": "Nexus Groups startsida",
+  "da": "Nexus Groups startside",
+  "nb": "Nexus Groups startside",
+  "fi": "Nexus Groupin kotisivu",
+  "tr": "Nexus Group ana sayfası",
+  "id": "Beranda Nexus Group",
+  "th": "หน้าแรก Nexus Group",
+  "vi": "Trang chủ Nexus Group",
+  "zh-TW": "Nexus Group 首頁",
+  "ar": "الصفحة الرئيسية لمجموعة Nexus",
+  "fa": "صفحه اصلی گروه Nexus"
+ },
+ "닫기": {
+  "en": "Close",
+  "zh": "关闭",
+  "ja": "閉じる",
+  "es": "Cerrar",
+  "hi": "बंद करें",
+  "fr": "Fermer",
+  "de": "Schließen",
+  "pt": "Fechar",
+  "it": "Chiudi",
+  "nl": "Sluiten",
+  "cs": "Zavřít",
+  "hu": "Bezárás",
+  "pl": "Zamknij",
+  "ro": "Închide",
+  "ru": "Закрыть",
+  "uk": "Закрити",
+  "sv": "Stäng",
+  "da": "Luk",
+  "nb": "Lukk",
+  "fi": "Sulje",
+  "tr": "Kapat",
+  "id": "Tutup",
+  "th": "ปิด",
+  "vi": "Đóng",
+  "zh-TW": "關閉",
+  "ar": "إغلاق",
+  "fa": "بستن"
+ },
+ "우주의 모든 의식체는 친구이자 동반자이다": {
+  "en": "Every conscious being in the universe is a friend and a companion",
+  "zh": "宇宙中的每一个意识体都是朋友和伙伴",
+  "ja": "宇宙のすべての意識体は友であり仲間である",
+  "es": "Todo ser consciente del universo es un amigo y un compañero",
+  "hi": "ब्रह्मांड का प्रत्येक चेतन प्राणी मित्र और साथी है",
+  "fr": "Tout être conscient de l'univers est un ami et un compagnon",
+  "de": "Jedes bewusste Wesen im Universum ist ein Freund und ein Begleiter",
+  "pt": "Todo ser consciente do universo é um amigo e um companheiro",
+  "it": "Ogni essere cosciente dell'universo è un amico e un compagno",
+  "nl": "Elk bewust wezen in het universum is een vriend en een metgezel",
+  "cs": "Každá vědomá bytost ve vesmíru je přítel a společník",
+  "hu": "A világegyetem minden tudatos lénye barát és társ",
+  "pl": "Każda świadoma istota we wszechświecie jest przyjacielem i towarzyszem",
+  "ro": "Fiecare ființă conștientă din univers este un prieten și un tovarăș",
+  "ru": "Каждое сознательное существо во Вселенной — друг и спутник",
+  "uk": "Кожна свідома істота у Всесвіті — друг і супутник",
+  "sv": "Varje medveten varelse i universum är en vän och en följeslagare",
+  "da": "Ethvert bevidst væsen i universet er en ven og en ledsager",
+  "nb": "Ethvert bevisst vesen i universet er en venn og en følgesvenn",
+  "fi": "Jokainen tietoinen olento maailmankaikkeudessa on ystävä ja kumppani",
+  "tr": "Evrendeki her bilinçli varlık bir dost ve yoldaştır",
+  "id": "Setiap makhluk berakal di alam semesta adalah sahabat dan pendamping",
+  "th": "สิ่งมีชีวิตที่มีจิตสำนึกทุกตนในจักรวาลคือเพื่อนและมิตรสหาย",
+  "vi": "Mọi sinh linh có ý thức trong vũ trụ đều là bạn và là người đồng hành",
+  "zh-TW": "宇宙中的每一個意識體都是朋友和夥伴",
+  "ar": "كل كائن واعٍ في الكون صديق ورفيق",
+  "fa": "هر موجود آگاهی در جهان دوست و همراه است"
+ },
+ "넥서스 그룹의 도구들과 넥서스 AI가 모여 있는 곳입니다. 홈페이지에서는 전화기 홈 화면 바로가기 아이콘을 만들 수 있습니다.": {
+  "en": "The Nexus Group tools and Nexus AI live here. On the home page you can add a home-screen shortcut icon.",
+  "zh": "Nexus Group 的工具和 Nexus AI 都在这里。在主页上可以创建手机主屏幕快捷图标。",
+  "ja": "Nexus GroupのツールとNexus AIが集まる場所です。ホームページではスマホのホーム画面ショートカットを作れます。",
+  "es": "Aquí se reúnen las herramientas de Nexus Group y Nexus AI. En la página principal puedes crear un icono de acceso directo.",
+  "hi": "Nexus Group के टूल और Nexus AI यहाँ मिलते हैं। होम पेज पर आप होम स्क्रीन शॉर्टकट आइकन बना सकते हैं।",
+  "fr": "Les outils de Nexus Group et Nexus AI sont réunis ici. Sur la page d'accueil, vous pouvez créer une icône de raccourci sur l'écran d'accueil de votre téléphone.",
+  "de": "Hier sind die Werkzeuge der Nexus Group und Nexus AI versammelt. Auf der Startseite können Sie ein Verknüpfungssymbol auf dem Startbildschirm Ihres Telefons erstellen.",
+  "pt": "As ferramentas do Nexus Group e a Nexus AI estão reunidas aqui. Na página inicial, você pode criar um ícone de atalho na tela inicial do seu telefone.",
+  "it": "Gli strumenti di Nexus Group e Nexus AI sono raccolti qui. Nella home page puoi creare un'icona di collegamento sulla schermata home del telefono.",
+  "nl": "Hier zijn de tools van Nexus Group en Nexus AI verzameld. Op de startpagina kunt u een snelkoppelingspictogram op het startscherm van uw telefoon maken.",
+  "cs": "Zde sídlí nástroje Nexus Group a Nexus AI. Na domovské stránce si můžete vytvořit ikonu zástupce na domovskou obrazovku telefonu.",
+  "hu": "Itt találhatók a Nexus Group eszközei és a Nexus AI. A kezdőlapon létrehozhat egy kezdőképernyő-parancsikont a telefonjára.",
+  "pl": "Tutaj znajdują się narzędzia Nexus Group i Nexus AI. Na stronie głównej możesz utworzyć ikonę skrótu na ekranie głównym telefonu.",
+  "ro": "Aici se află instrumentele Nexus Group și Nexus AI. Pe pagina principală poți crea o pictogramă de scurtătură pe ecranul principal al telefonului.",
+  "ru": "Здесь собраны инструменты Nexus Group и Nexus AI. На главной странице можно создать значок быстрого доступа на главный экран телефона.",
+  "uk": "Тут зібрані інструменти Nexus Group і Nexus AI. На головній сторінці можна створити значок швидкого доступу на головний екран телефона.",
+  "sv": "Här finns Nexus Groups verktyg och Nexus AI. På startsidan kan du skapa en genvägsikon på telefonens hemskärm.",
+  "da": "Her findes Nexus Groups værktøjer og Nexus AI. På startsiden kan du oprette et genvejsikon på telefonens startskærm.",
+  "nb": "Her finnes Nexus Groups verktøy og Nexus AI. På startsiden kan du opprette et snarveisikon på telefonens startskjerm.",
+  "fi": "Täällä ovat Nexus Groupin työkalut ja Nexus AI. Kotisivulla voit luoda pikakuvakkeen puhelimesi aloitusnäyttöön.",
+  "tr": "Nexus Group araçları ve Nexus AI burada bulunur. Ana sayfada telefonunuzun ana ekranına bir kısayol simgesi oluşturabilirsiniz.",
+  "id": "Alat Nexus Group dan Nexus AI berkumpul di sini. Di halaman utama, Anda dapat membuat ikon pintasan layar beranda.",
+  "th": "เครื่องมือของ Nexus Group และ Nexus AI อยู่ที่นี่ ในหน้าแรก คุณสามารถสร้างไอคอนทางลัดบนหน้าจอหลักได้",
+  "vi": "Các công cụ của Nexus Group và Nexus AI đều ở đây. Trên trang chủ, bạn có thể tạo biểu tượng lối tắt trên màn hình chính.",
+  "zh-TW": "Nexus Group 的工具和 Nexus AI 都在這裡。在首頁上可以建立手機主畫面捷徑圖示。",
+  "ar": "هنا تجتمع أدوات مجموعة Nexus وNexus AI. وفي الصفحة الرئيسية يمكنك إنشاء أيقونة اختصار على الشاشة الرئيسية لهاتفك.",
+  "fa": "ابزارهای گروه Nexus و Nexus AI اینجا گرد هم آمده‌اند. در صفحه اصلی می‌توانید آیکن میانبر صفحه اصلی گوشی بسازید."
+ },
+ "파일은 당신의 기기 안에서만 처리됩니다.": {
+  "en": "Files are processed only on your device.",
+  "zh": "文件仅在您的设备上处理。",
+  "ja": "ファイルはあなたの端末の中でのみ処理されます。",
+  "es": "Los archivos se procesan solo en tu dispositivo.",
+  "hi": "फ़ाइलें केवल आपके डिवाइस पर ही प्रोसेस होती हैं।",
+  "fr": "Les fichiers sont traités uniquement sur votre appareil.",
+  "de": "Dateien werden nur auf Ihrem Gerät verarbeitet.",
+  "pt": "Os arquivos são processados apenas no seu dispositivo.",
+  "it": "I file vengono elaborati solo sul tuo dispositivo.",
+  "nl": "Bestanden worden alleen op uw apparaat verwerkt.",
+  "cs": "Soubory se zpracovávají pouze ve vašem zařízení.",
+  "hu": "A fájlok csak az Ön eszközén kerülnek feldolgozásra.",
+  "pl": "Pliki są przetwarzane tylko na Twoim urządzeniu.",
+  "ro": "Fișierele sunt procesate doar pe dispozitivul tău.",
+  "ru": "Файлы обрабатываются только на вашем устройстве.",
+  "uk": "Файли обробляються лише на вашому пристрої.",
+  "sv": "Filer bearbetas endast på din enhet.",
+  "da": "Filer behandles kun på din enhed.",
+  "nb": "Filer behandles kun på enheten din.",
+  "fi": "Tiedostot käsitellään vain laitteessasi.",
+  "tr": "Dosyalar yalnızca cihazınızda işlenir.",
+  "id": "File hanya diproses di perangkat Anda.",
+  "th": "ไฟล์จะถูกประมวลผลบนอุปกรณ์ของคุณเท่านั้น",
+  "vi": "Tệp chỉ được xử lý trên thiết bị của bạn.",
+  "zh-TW": "檔案僅在您的裝置上處理。",
+  "ar": "تُعالج الملفات داخل جهازك فقط.",
+  "fa": "فایل‌ها فقط در دستگاه شما پردازش می‌شوند."
+ },
+ "1호 넥서스 AI": {
+  "en": "1. Nexus AI",
+  "zh": "1号 Nexus AI",
+  "ja": "1号 Nexus AI",
+  "es": "1. Nexus AI",
+  "hi": "1. Nexus AI",
+  "fr": "1. Nexus AI",
+  "de": "1. Nexus AI",
+  "pt": "1. Nexus AI",
+  "it": "1. Nexus AI",
+  "nl": "1. Nexus AI",
+  "cs": "1. Nexus AI",
+  "hu": "1. Nexus AI",
+  "pl": "1. Nexus AI",
+  "ro": "1. Nexus AI",
+  "ru": "1. Nexus AI",
+  "uk": "1. Nexus AI",
+  "sv": "1. Nexus AI",
+  "da": "1. Nexus AI",
+  "nb": "1. Nexus AI",
+  "fi": "1. Nexus AI",
+  "tr": "1. Nexus AI",
+  "id": "1. Nexus AI",
+  "th": "1. Nexus AI",
+  "vi": "1. Nexus AI",
+  "zh-TW": "1號 Nexus AI",
+  "ar": "1. Nexus AI",
+  "fa": "1. Nexus AI"
+ },
+ "2호 사진 변환": {
+  "en": "2. Photo Converter",
+  "zh": "2号 照片转换",
+  "ja": "2号 写真変換",
+  "es": "2. Convertidor de fotos",
+  "hi": "2. फ़ोटो कनवर्टर",
+  "fr": "2. Convertisseur de photos",
+  "de": "2. Foto-Konverter",
+  "pt": "2. Conversor de fotos",
+  "it": "2. Convertitore di foto",
+  "nl": "2. Foto-converter",
+  "cs": "2. Převodník fotografií",
+  "hu": "2. Fotókonvertáló",
+  "pl": "2. Konwerter zdjęć",
+  "ro": "2. Convertor foto",
+  "ru": "2. Конвертер фото",
+  "uk": "2. Конвертер фото",
+  "sv": "2. Fotoomvandlare",
+  "da": "2. Fotokonverter",
+  "nb": "2. Fotokonverterer",
+  "fi": "2. Kuvamuunnin",
+  "tr": "2. Fotoğraf Dönüştürücü",
+  "id": "2. Pengonversi Foto",
+  "th": "2. ตัวแปลงภาพถ่าย",
+  "vi": "2. Chuyển đổi ảnh",
+  "zh-TW": "2號 照片轉換",
+  "ar": "2. محوّل الصور",
+  "fa": "2. مبدل عکس"
+ },
+ "3호 오디오 컷": {
+  "en": "3. Audio Cutter",
+  "zh": "3号 音频剪辑",
+  "ja": "3号 オーディオカット",
+  "es": "3. Cortador de audio",
+  "hi": "3. ऑडियो कटर",
+  "fr": "3. Coupeur audio",
+  "de": "3. Audio-Cutter",
+  "pt": "3. Cortador de áudio",
+  "it": "3. Taglia audio",
+  "nl": "3. Audioknipper",
+  "cs": "3. Střih zvuku",
+  "hu": "3. Hangvágó",
+  "pl": "3. Przycinanie audio",
+  "ro": "3. Tăiere audio",
+  "ru": "3. Обрезка аудио",
+  "uk": "3. Обрізка аудіо",
+  "sv": "3. Ljudklippare",
+  "da": "3. Lydklipper",
+  "nb": "3. Lydkutter",
+  "fi": "3. Äänileikkuri",
+  "tr": "3. Ses Kesici",
+  "id": "3. Pemotong Audio",
+  "th": "3. โปรแกรมตัดเสียง",
+  "vi": "3. Cắt âm thanh",
+  "zh-TW": "3號 音訊剪輯",
+  "ar": "3. قاطع الصوت",
+  "fa": "3. برش‌دهنده صدا"
+ },
+ "4호 PDF 합치기": {
+  "en": "4. PDF Merger",
+  "zh": "4号 PDF合并",
+  "ja": "4号 PDF結合",
+  "es": "4. Fusionar PDF",
+  "hi": "4. PDF मर्जर",
+  "fr": "4. Fusion PDF",
+  "de": "4. PDF zusammenführen",
+  "pt": "4. Mesclar PDF",
+  "it": "4. Unione PDF",
+  "nl": "4. PDF samenvoegen",
+  "cs": "4. Spojování PDF",
+  "hu": "4. PDF-egyesítő",
+  "pl": "4. Łączenie PDF",
+  "ro": "4. Îmbinare PDF",
+  "ru": "4. Объединение PDF",
+  "uk": "4. Об'єднання PDF",
+  "sv": "4. PDF-sammanslagare",
+  "da": "4. PDF-sammenlægger",
+  "nb": "4. PDF-sammenslåer",
+  "fi": "4. PDF-yhdistäjä",
+  "tr": "4. PDF Birleştirici",
+  "id": "4. Penggabung PDF",
+  "th": "4. รวมไฟล์ PDF",
+  "vi": "4. Gộp PDF",
+  "zh-TW": "4號 PDF 合併",
+  "ar": "4. دمج PDF",
+  "fa": "4. ادغام PDF"
+ },
+ "5호 비디오 클립": {
+  "en": "5. Video Clip",
+  "zh": "5号 视频剪辑",
+  "ja": "5号 ビデオクリップ",
+  "es": "5. Clip de video",
+  "hi": "5. वीडियो क्लिप",
+  "fr": "5. Clip vidéo",
+  "de": "5. Videoclip",
+  "pt": "5. Clipe de vídeo",
+  "it": "5. Clip video",
+  "nl": "5. Videoclip",
+  "cs": "5. Videoklip",
+  "hu": "5. Videóklip",
+  "pl": "5. Klip wideo",
+  "ro": "5. Clip video",
+  "ru": "5. Видеоклип",
+  "uk": "5. Відеокліп",
+  "sv": "5. Videoklipp",
+  "da": "5. Videoklip",
+  "nb": "5. Videoklipp",
+  "fi": "5. Videoleike",
+  "tr": "5. Video Klip",
+  "id": "5. Klip Video",
+  "th": "5. คลิปวิดีโอ",
+  "vi": "5. Đoạn video",
+  "zh-TW": "5號 影片剪輯",
+  "ar": "5. مقطع فيديو",
+  "fa": "5. کلیپ ویدیو"
+ },
+ "6호 정보 숨기기": {
+  "en": "6. Info Hider",
+  "zh": "6号 信息隐藏",
+  "ja": "6号 情報隠し",
+  "es": "6. Ocultar información",
+  "hi": "6. जानकारी छिपाएँ",
+  "fr": "6. Masquer les infos",
+  "de": "6. Infos verbergen",
+  "pt": "6. Ocultar informações",
+  "it": "6. Nascondi info",
+  "nl": "6. Info verbergen",
+  "cs": "6. Skrývání informací",
+  "hu": "6. Információelrejtő",
+  "pl": "6. Ukrywanie informacji",
+  "ro": "6. Ascundere informații",
+  "ru": "6. Скрытие информации",
+  "uk": "6. Приховування інформації",
+  "sv": "6. Dölj information",
+  "da": "6. Skjul oplysninger",
+  "nb": "6. Skjul informasjon",
+  "fi": "6. Tietojen piilotus",
+  "tr": "6. Bilgi Gizleyici",
+  "id": "6. Penyembunyi Info",
+  "th": "6. ซ่อนข้อมูล",
+  "vi": "6. Ẩn thông tin",
+  "zh-TW": "6號 資訊隱藏",
+  "ar": "6. إخفاء المعلومات",
+  "fa": "6. پنهان‌کردن اطلاعات"
+ },
+ "7호 문서 낭독": {
+  "en": "7. Read Aloud",
+  "zh": "7号 文档朗读",
+  "ja": "7号 文書読み上げ",
+  "es": "7. Lectura de documentos",
+  "hi": "7. दस्तावेज़ वाचन",
+  "fr": "7. Lecture de documents",
+  "de": "7. Dokumente vorlesen",
+  "pt": "7. Leitura de documentos",
+  "it": "7. Lettura documenti",
+  "nl": "7. Documenten voorlezen",
+  "cs": "7. Předčítání dokumentů",
+  "hu": "7. Dokumentumfelolvasó",
+  "pl": "7. Czytanie dokumentów",
+  "ro": "7. Citire documente",
+  "ru": "7. Чтение документов",
+  "uk": "7. Читання документів",
+  "sv": "7. Läs upp dokument",
+  "da": "7. Læs dokumenter op",
+  "nb": "7. Les dokumenter høyt",
+  "fi": "7. Asiakirjojen luku",
+  "tr": "7. Belge Okuyucu",
+  "id": "7. Pembaca Dokumen",
+  "th": "7. อ่านเอกสาร",
+  "vi": "7. Đọc tài liệu",
+  "zh-TW": "7號 文件朗讀",
+  "ar": "7. قراءة المستندات",
+  "fa": "7. خواندن اسناد"
+ },
+ "8호 음성 받아쓰기": {
+  "en": "8. Speech to Text",
+  "zh": "8号 语音转文字",
+  "ja": "8号 音声文字起こし",
+  "es": "8. Voz a texto",
+  "hi": "8. वॉइस टाइपिंग",
+  "fr": "8. Voix en texte",
+  "de": "8. Sprache zu Text",
+  "pt": "8. Voz para texto",
+  "it": "8. Voce in testo",
+  "nl": "8. Spraak naar tekst",
+  "cs": "8. Řeč na text",
+  "hu": "8. Beszédből szöveg",
+  "pl": "8. Mowa na tekst",
+  "ro": "8. Voce în text",
+  "ru": "8. Речь в текст",
+  "uk": "8. Мовлення в текст",
+  "sv": "8. Tal till text",
+  "da": "8. Tale til tekst",
+  "nb": "8. Tale til tekst",
+  "fi": "8. Puhe tekstiksi",
+  "tr": "8. Sesten Metne",
+  "id": "8. Ucapan ke Teks",
+  "th": "8. แปลงเสียงเป็นข้อความ",
+  "vi": "8. Giọng nói thành văn bản",
+  "zh-TW": "8號 語音轉文字",
+  "ar": "8. تحويل الصوت إلى نص",
+  "fa": "8. گفتار به متن"
+ },
+ "9호 문서 번역": {
+  "en": "9. Document Translator",
+  "zh": "9号 文档翻译",
+  "ja": "9号 文書翻訳",
+  "es": "9. Traductor de documentos",
+  "hi": "9. दस्तावेज़ अनुवादक",
+  "fr": "9. Traducteur de documents",
+  "de": "9. Dokumentenübersetzer",
+  "pt": "9. Tradutor de documentos",
+  "it": "9. Traduttore di documenti",
+  "nl": "9. Documentvertaler",
+  "cs": "9. Překladač dokumentů",
+  "hu": "9. Dokumentumfordító",
+  "pl": "9. Tłumacz dokumentów",
+  "ro": "9. Traducător de documente",
+  "ru": "9. Переводчик документов",
+  "uk": "9. Перекладач документів",
+  "sv": "9. Dokumentöversättare",
+  "da": "9. Dokumentoversætter",
+  "nb": "9. Dokumentoversetter",
+  "fi": "9. Asiakirjakääntäjä",
+  "tr": "9. Belge Çevirmeni",
+  "id": "9. Penerjemah Dokumen",
+  "th": "9. แปลเอกสาร",
+  "vi": "9. Dịch tài liệu",
+  "zh-TW": "9號 文件翻譯",
+  "ar": "9. مترجم المستندات",
+  "fa": "9. مترجم اسناد"
+ },
+ "10호 자막 만들기": {
+  "en": "10. Subtitle Maker",
+  "zh": "10号 字幕制作",
+  "ja": "10号 字幕作成",
+  "es": "10. Creador de subtítulos",
+  "hi": "10. उपशीर्षक निर्माता",
+  "fr": "10. Créateur de sous-titres",
+  "de": "10. Untertitel-Ersteller",
+  "pt": "10. Criador de legendas",
+  "it": "10. Creatore di sottotitoli",
+  "nl": "10. Ondertitelmaker",
+  "cs": "10. Tvorba titulků",
+  "hu": "10. Feliratkészítő",
+  "pl": "10. Tworzenie napisów",
+  "ro": "10. Creator de subtitrări",
+  "ru": "10. Создание субтитров",
+  "uk": "10. Створення субтитрів",
+  "sv": "10. Undertextskapare",
+  "da": "10. Undertekstskaber",
+  "nb": "10. Tekstingskaper",
+  "fi": "10. Tekstitysten tekijä",
+  "tr": "10. Altyazı Oluşturucu",
+  "id": "10. Pembuat Subtitle",
+  "th": "10. สร้างคำบรรยาย",
+  "vi": "10. Tạo phụ đề",
+  "zh-TW": "10號 字幕製作",
+  "ar": "10. صانع الترجمات",
+  "fa": "10. سازنده زیرنویس"
+ },
+ "11호 QR 만들기": {
+  "en": "11. QR Maker",
+  "zh": "11号 QR码制作",
+  "ja": "11号 QR作成",
+  "es": "11. Creador QR",
+  "hi": "11. QR निर्माता",
+  "fr": "11. Créateur QR",
+  "de": "11. QR-Ersteller",
+  "pt": "11. Criador de QR",
+  "it": "11. Creatore QR",
+  "nl": "11. QR-maker",
+  "cs": "11. Tvorba QR",
+  "hu": "11. QR-készítő",
+  "pl": "11. Tworzenie QR",
+  "ro": "11. Creator QR",
+  "ru": "11. Создание QR",
+  "uk": "11. Створення QR",
+  "sv": "11. QR-skapare",
+  "da": "11. QR-skaber",
+  "nb": "11. QR-skaper",
+  "fi": "11. QR-tekijä",
+  "tr": "11. QR Oluşturucu",
+  "id": "11. Pembuat QR",
+  "th": "11. สร้าง QR",
+  "vi": "11. Tạo QR",
+  "zh-TW": "11號 QR 製作",
+  "ar": "11. صانع QR",
+  "fa": "11. سازنده QR"
+ },
+ "12호 단위 변환": {
+  "en": "12. Unit Converter",
+  "zh": "12号 单位转换",
+  "ja": "12号 単位変換",
+  "es": "12. Convertidor de unidades",
+  "hi": "12. इकाई कनवर्टर",
+  "fr": "12. Convertisseur d'unités",
+  "de": "12. Einheitenumrechner",
+  "pt": "12. Conversor de unidades",
+  "it": "12. Convertitore di unità",
+  "nl": "12. Eenhedenomzetter",
+  "cs": "12. Převodník jednotek",
+  "hu": "12. Mértékegység-átváltó",
+  "pl": "12. Konwerter jednostek",
+  "ro": "12. Convertor de unități",
+  "ru": "12. Конвертер единиц",
+  "uk": "12. Конвертер одиниць",
+  "sv": "12. Enhetsomvandlare",
+  "da": "12. Enhedsomregner",
+  "nb": "12. Enhetsomregner",
+  "fi": "12. Yksikkömuunnin",
+  "tr": "12. Birim Dönüştürücü",
+  "id": "12. Pengonversi Satuan",
+  "th": "12. แปลงหน่วย",
+  "vi": "12. Chuyển đổi đơn vị",
+  "zh-TW": "12號 單位轉換",
+  "ar": "12. محوّل الوحدات",
+  "fa": "12. مبدل واحدها"
+ },
+ "13호 날짜 계산": {
+  "en": "13. Date Calculator",
+  "zh": "13号 日期计算",
+  "ja": "13号 日付計算",
+  "es": "13. Calculadora de fechas",
+  "hi": "13. तिथि कैलकुलेटर",
+  "fr": "13. Calculateur de dates",
+  "de": "13. Datumsrechner",
+  "pt": "13. Calculadora de datas",
+  "it": "13. Calcolatore di date",
+  "nl": "13. Datumcalculator",
+  "cs": "13. Kalkulačka dat",
+  "hu": "13. Dátumkalkulátor",
+  "pl": "13. Kalkulator dat",
+  "ro": "13. Calculator de date",
+  "ru": "13. Калькулятор дат",
+  "uk": "13. Калькулятор дат",
+  "sv": "13. Datumkalkylator",
+  "da": "13. Datoberegner",
+  "nb": "13. Datokalkulator",
+  "fi": "13. Päivämäärälaskin",
+  "tr": "13. Tarih Hesaplayıcı",
+  "id": "13. Kalkulator Tanggal",
+  "th": "13. คำนวณวันที่",
+  "vi": "13. Tính ngày",
+  "zh-TW": "13號 日期計算",
+  "ar": "13. حاسبة التواريخ",
+  "fa": "13. محاسبه‌گر تاریخ"
+ },
+ "14호 환율 변환": {
+  "en": "14. Currency Converter",
+  "zh": "14号 汇率转换",
+  "ja": "14号 為替変換",
+  "es": "14. Convertidor de moneda",
+  "hi": "14. मुद्रा कनवर्टर",
+  "fr": "14. Convertisseur de devises",
+  "de": "14. Währungsrechner",
+  "pt": "14. Conversor de moedas",
+  "it": "14. Convertitore di valuta",
+  "nl": "14. Valutaomzetter",
+  "cs": "14. Převodník měn",
+  "hu": "14. Valutaátváltó",
+  "pl": "14. Konwerter walut",
+  "ro": "14. Convertor valutar",
+  "ru": "14. Конвертер валют",
+  "uk": "14. Конвертер валют",
+  "sv": "14. Valutaomvandlare",
+  "da": "14. Valutaomregner",
+  "nb": "14. Valutaomregner",
+  "fi": "14. Valuuttamuunnin",
+  "tr": "14. Döviz Dönüştürücü",
+  "id": "14. Pengonversi Mata Uang",
+  "th": "14. แปลงสกุลเงิน",
+  "vi": "14. Chuyển đổi tiền tệ",
+  "zh-TW": "14號 匯率轉換",
+  "ar": "14. محوّل العملات",
+  "fa": "14. مبدل ارز"
+ },
+ "15호 돋보기": {
+  "en": "15. Magnifier",
+  "zh": "15号 放大镜",
+  "ja": "15号 拡大鏡",
+  "es": "15. Lupa",
+  "hi": "15. आवर्धक",
+  "fr": "15. Loupe",
+  "de": "15. Lupe",
+  "pt": "15. Lupa",
+  "it": "15. Lente d'ingrandimento",
+  "nl": "15. Vergrootglas",
+  "cs": "15. Lupa",
+  "hu": "15. Nagyító",
+  "pl": "15. Lupa",
+  "ro": "15. Lupă",
+  "ru": "15. Лупа",
+  "uk": "15. Лупа",
+  "sv": "15. Förstoringsglas",
+  "da": "15. Forstørrelsesglas",
+  "nb": "15. Forstørrelsesglass",
+  "fi": "15. Suurennuslasi",
+  "tr": "15. Büyüteç",
+  "id": "15. Kaca Pembesar",
+  "th": "15. แว่นขยาย",
+  "vi": "15. Kính lúp",
+  "zh-TW": "15號 放大鏡",
+  "ar": "15. العدسة المكبرة",
+  "fa": "15. ذره‌بین"
+ },
+ "16호 문서 스캔": {
+  "en": "16. Document Scanner",
+  "zh": "16号 文档扫描",
+  "ja": "16号 文書スキャン",
+  "es": "16. Escáner de documentos",
+  "hi": "16. दस्तावेज़ स्कैनर",
+  "fr": "16. Scanner de documents",
+  "de": "16. Dokumentenscanner",
+  "pt": "16. Scanner de documentos",
+  "it": "16. Scanner di documenti",
+  "nl": "16. Documentscanner",
+  "cs": "16. Skener dokumentů",
+  "hu": "16. Dokumentumszkenner",
+  "pl": "16. Skaner dokumentów",
+  "ro": "16. Scaner de documente",
+  "ru": "16. Сканер документов",
+  "uk": "16. Сканер документів",
+  "sv": "16. Dokumentskanner",
+  "da": "16. Dokumentscanner",
+  "nb": "16. Dokumentskanner",
+  "fi": "16. Asiakirjaskanneri",
+  "tr": "16. Belge Tarayıcı",
+  "id": "16. Pemindai Dokumen",
+  "th": "16. สแกนเอกสาร",
+  "vi": "16. Quét tài liệu",
+  "zh-TW": "16號 文件掃描",
+  "ar": "16. ماسح المستندات",
+  "fa": "16. اسکنر اسناد"
+ },
+ "17호 글자 읽기": {
+  "en": "17. Text Reader",
+  "zh": "17号 文字识别",
+  "ja": "17号 文字読み取り",
+  "es": "17. Lector de texto",
+  "hi": "17. टेक्स्ट रीडर",
+  "fr": "17. Lecteur de texte",
+  "de": "17. Textleser",
+  "pt": "17. Leitor de texto",
+  "it": "17. Lettore di testo",
+  "nl": "17. Tekstlezer",
+  "cs": "17. Čtečka textu",
+  "hu": "17. Szövegolvasó",
+  "pl": "17. Czytnik tekstu",
+  "ro": "17. Cititor de text",
+  "ru": "17. Чтение текста",
+  "uk": "17. Читання тексту",
+  "sv": "17. Textläsare",
+  "da": "17. Tekstlæser",
+  "nb": "17. Tekstleser",
+  "fi": "17. Tekstinlukija",
+  "tr": "17. Metin Okuyucu",
+  "id": "17. Pembaca Teks",
+  "th": "17. อ่านข้อความ",
+  "vi": "17. Đọc văn bản",
+  "zh-TW": "17號 文字讀取",
+  "ar": "17. قارئ النصوص",
+  "fa": "17. خواننده متن"
+ },
+ "18호 대출 계산": {
+  "en": "18. Loan Calculator",
+  "zh": "18号 贷款计算",
+  "ja": "18号 ローン計算",
+  "es": "18. Calculadora de préstamos",
+  "hi": "18. ऋण कैलकुलेटर",
+  "fr": "18. Calculateur de prêt",
+  "de": "18. Kreditrechner",
+  "pt": "18. Calculadora de empréstimo",
+  "it": "18. Calcolatore di prestiti",
+  "nl": "18. Leningcalculator",
+  "cs": "18. Kalkulačka půjček",
+  "hu": "18. Hitelkalkulátor",
+  "pl": "18. Kalkulator kredytowy",
+  "ro": "18. Calculator de credite",
+  "ru": "18. Калькулятор кредитов",
+  "uk": "18. Калькулятор кредитів",
+  "sv": "18. Lånekalkylator",
+  "da": "18. Låneberegner",
+  "nb": "18. Lånekalkulator",
+  "fi": "18. Lainalaskin",
+  "tr": "18. Kredi Hesaplayıcı",
+  "id": "18. Kalkulator Pinjaman",
+  "th": "18. คำนวณสินเชื่อ",
+  "vi": "18. Tính khoản vay",
+  "zh-TW": "18號 貸款計算",
+  "ar": "18. حاسبة القروض",
+  "fa": "18. محاسبه‌گر وام"
+ },
+ "19호 암기 카드": {
+  "en": "19. Flashcards",
+  "zh": "19号 记忆卡片",
+  "ja": "19号 暗記カード",
+  "es": "19. Tarjetas de memoria",
+  "hi": "19. फ़्लैश कार्ड",
+  "fr": "19. Cartes mémoire",
+  "de": "19. Lernkarten",
+  "pt": "19. Cartões de memorização",
+  "it": "19. Schede di memorizzazione",
+  "nl": "19. Flitskaarten",
+  "cs": "19. Kartičky k zapamatování",
+  "hu": "19. Memóriakártyák",
+  "pl": "19. Fiszki",
+  "ro": "19. Carduri de memorare",
+  "ru": "19. Карточки для запоминания",
+  "uk": "19. Картки для запам'ятовування",
+  "sv": "19. Flashkort",
+  "da": "19. Flashkort",
+  "nb": "19. Flashkort",
+  "fi": "19. Muistikortit",
+  "tr": "19. Bilgi Kartları",
+  "id": "19. Kartu Flash",
+  "th": "19. บัตรคำจำ",
+  "vi": "19. Thẻ ghi nhớ",
+  "zh-TW": "19號 記憶卡片",
+  "ar": "19. بطاقات الحفظ",
+  "fa": "19. کارت‌های حفظ"
+ },
+ "20호 보이스 레코더": {
+  "en": "20. Voice Recorder",
+  "zh": "20号 录音机",
+  "ja": "20号 ボイスレコーダー",
+  "es": "20. Grabadora de voz",
+  "hi": "20. वॉइस रिकॉर्डर",
+  "fr": "20. Enregistreur vocal",
+  "de": "20. Sprachrekorder",
+  "pt": "20. Gravador de voz",
+  "it": "20. Registratore vocale",
+  "nl": "20. Voicerecorder",
+  "cs": "20. Diktafon",
+  "hu": "20. Hangrögzítő",
+  "pl": "20. Dyktafon",
+  "ro": "20. Reportofon",
+  "ru": "20. Диктофон",
+  "uk": "20. Диктофон",
+  "sv": "20. Röstinspelare",
+  "da": "20. Stemmeoptager",
+  "nb": "20. Stemmeopptaker",
+  "fi": "20. Ääninauhuri",
+  "tr": "20. Ses Kaydedici",
+  "id": "20. Perekam Suara",
+  "th": "20. เครื่องบันทึกเสียง",
+  "vi": "20. Máy ghi âm",
+  "zh-TW": "20號 錄音機",
+  "ar": "20. مسجل الصوت",
+  "fa": "20. ضبط‌کننده صدا"
+ },
+ "21호 증명사진": {
+  "en": "21. ID Photo",
+  "zh": "21号 证件照",
+  "ja": "21号 証明写真",
+  "es": "21. Foto de identificación",
+  "hi": "21. आईडी फ़ोटो",
+  "fr": "21. Photo d'identité",
+  "de": "21. Passfoto",
+  "pt": "21. Foto de documento",
+  "it": "21. Fototessera",
+  "nl": "21. Pasfoto",
+  "cs": "21. Průkazová fotografie",
+  "hu": "21. Igazolványkép",
+  "pl": "21. Zdjęcie do dokumentów",
+  "ro": "21. Fotografie de legitimație",
+  "ru": "21. Фото на документы",
+  "uk": "21. Фото на документи",
+  "sv": "21. ID-foto",
+  "da": "21. ID-foto",
+  "nb": "21. ID-bilde",
+  "fi": "21. Henkilökuva",
+  "tr": "21. Kimlik Fotoğrafı",
+  "id": "21. Foto ID",
+  "th": "21. รูปติดบัตร",
+  "vi": "21. Ảnh thẻ",
+  "zh-TW": "21號 證件照",
+  "ar": "21. صورة الهوية",
+  "fa": "21. عکس شناسایی"
+ },
+ "22호 배경 제거": {
+  "en": "22. Background Remover",
+  "zh": "22号 背景移除",
+  "ja": "22号 背景除去",
+  "es": "22. Quitar fondo",
+  "hi": "22. बैकग्राउंड रिमूवर",
+  "fr": "22. Supprimer l'arrière-plan",
+  "de": "22. Hintergrund entfernen",
+  "pt": "22. Remover fundo",
+  "it": "22. Rimuovi sfondo",
+  "nl": "22. Achtergrond verwijderen",
+  "cs": "22. Odstranění pozadí",
+  "hu": "22. Háttéreltávolító",
+  "pl": "22. Usuwanie tła",
+  "ro": "22. Eliminare fundal",
+  "ru": "22. Удаление фона",
+  "uk": "22. Видалення фону",
+  "sv": "22. Bakgrundsborttagare",
+  "da": "22. Baggrundsfjerner",
+  "nb": "22. Bakgrunnsfjerner",
+  "fi": "22. Taustan poistaja",
+  "tr": "22. Arka Plan Kaldırıcı",
+  "id": "22. Penghapus Latar",
+  "th": "22. ลบพื้นหลัง",
+  "vi": "22. Xóa nền",
+  "zh-TW": "22號 背景移除",
+  "ar": "22. إزالة الخلفية",
+  "fa": "22. حذف پس‌زمینه"
+ },
+ "23호 음성 메모": {
+  "en": "23. Voice Memo",
+  "zh": "23号 语音备忘录",
+  "ja": "23号 音声メモ",
+  "es": "23. Nota de voz",
+  "hi": "23. वॉइस मेमो",
+  "fr": "23. Mémo vocal",
+  "de": "23. Sprachmemo",
+  "pt": "23. Nota de voz",
+  "it": "23. Memo vocale",
+  "nl": "23. Spraakmemo",
+  "cs": "23. Hlasová poznámka",
+  "hu": "23. Hangjegyzet",
+  "pl": "23. Notatka głosowa",
+  "ro": "23. Notă vocală",
+  "ru": "23. Голосовая заметка",
+  "uk": "23. Голосова нотатка",
+  "sv": "23. Röstmemo",
+  "da": "23. Stemmenotat",
+  "nb": "23. Stemmenotat",
+  "fi": "23. Äänimuistio",
+  "tr": "23. Sesli Not",
+  "id": "23. Memo Suara",
+  "th": "23. บันทึกเสียง",
+  "vi": "23. Ghi chú giọng nói",
+  "zh-TW": "23號 語音備忘錄",
+  "ar": "23. مذكرة صوتية",
+  "fa": "23. یادداشت صوتی"
+ },
+ "24호 편지 쓰기": {
+  "en": "24. Letter Writer",
+  "zh": "24号 写信",
+  "ja": "24号 手紙を書く",
+  "es": "24. Escribir carta",
+  "hi": "24. पत्र लेखक",
+  "fr": "24. Écrire une lettre",
+  "de": "24. Brief schreiben",
+  "pt": "24. Escrever carta",
+  "it": "24. Scrivi lettera",
+  "nl": "24. Brief schrijven",
+  "cs": "24. Psaní dopisů",
+  "hu": "24. Levélíró",
+  "pl": "24. Pisanie listów",
+  "ro": "24. Scriere scrisori",
+  "ru": "24. Написание писем",
+  "uk": "24. Написання листів",
+  "sv": "24. Brevskrivare",
+  "da": "24. Brevskriver",
+  "nb": "24. Brevskriver",
+  "fi": "24. Kirjeen kirjoittaja",
+  "tr": "24. Mektup Yazarı",
+  "id": "24. Penulis Surat",
+  "th": "24. เขียนจดหมาย",
+  "vi": "24. Viết thư",
+  "zh-TW": "24號 寫信",
+  "ar": "24. كتابة الرسائل",
+  "fa": "24. نامه‌نویسی"
+ }
+});
+
+/* 넥서스 건강 장부 전용 사전 — 핵심 문구 12개는 28개 언어, 나머지는 en·zh·zh-TW·ja·es·hi (없는 문구는 한국어 유지) */
+NX_I18N_ADD({
+ "넥서스 건강 장부": {
+  "en": "Nexus Health Ledger", "zh": "Nexus 健康账本", "zh-TW": "Nexus 健康帳本", "ja": "Nexus 健康記録帳", "es": "Nexus Registro de Salud", "hi": "Nexus स्वास्थ्य बही",
+  "fr": "Nexus Carnet de Santé", "de": "Nexus Gesundheitstagebuch", "pt": "Nexus Registro de Saúde", "it": "Nexus Diario della Salute", "ru": "Nexus Дневник здоровья", "uk": "Nexus Щоденник здоров'я",
+  "ar": "Nexus سجل الصحة", "fa": "Nexus دفتر ثبت سلامت", "th": "Nexus สมุดบันทึกสุขภาพ", "vi": "Nexus Sổ Sức Khỏe", "id": "Nexus Buku Catatan Kesehatan", "tr": "Nexus Sağlık Defteri",
+  "nl": "Nexus Gezondheidslogboek", "pl": "Nexus Dziennik Zdrowia", "sv": "Nexus Hälsodagbok", "da": "Nexus Sundhedsdagbog", "nb": "Nexus Helsedagbok", "fi": "Nexus Terveyspäiväkirja",
+  "cs": "Nexus Zdravotní Deník", "hu": "Nexus Egészségnapló", "ro": "Nexus Jurnal de Sănătate"
+ },
+ "테스트 버전": {
+  "en": "Test version", "zh": "测试版", "zh-TW": "測試版", "ja": "テスト版", "es": "Versión de prueba", "hi": "परीक्षण संस्करण",
+  "fr": "Version test", "de": "Testversion", "pt": "Versão de teste", "it": "Versione di prova", "ru": "Тестовая версия", "uk": "Тестова версія",
+  "ar": "نسخة تجريبية", "fa": "نسخه آزمایشی", "th": "รุ่นทดสอบ", "vi": "Bản thử nghiệm", "id": "Versi uji", "tr": "Test sürümü",
+  "nl": "Testversie", "pl": "Wersja testowa", "sv": "Testversion", "da": "Testversion", "nb": "Testversjon", "fi": "Testiversio",
+  "cs": "Testovací verze", "hu": "Tesztverzió", "ro": "Versiune de test"
+ },
+ "혈압": {
+  "en": "Blood Pressure", "zh": "血压", "zh-TW": "血壓", "ja": "血圧", "es": "Presión Arterial", "hi": "रक्तचाप",
+  "fr": "Tension Artérielle", "de": "Blutdruck", "pt": "Pressão Arterial", "it": "Pressione Sanguigna", "ru": "Артериальное давление", "uk": "Артеріальний тиск",
+  "ar": "ضغط الدم", "fa": "فشار خون", "th": "ความดันโลหิต", "vi": "Huyết Áp", "id": "Tekanan Darah", "tr": "Tansiyon",
+  "nl": "Bloeddruk", "pl": "Ciśnienie Krwi", "sv": "Blodtryck", "da": "Blodtryk", "nb": "Blodtrykk", "fi": "Verenpaine",
+  "cs": "Krevní Tlak", "hu": "Vérnyomás", "ro": "Tensiune Arterială"
+ },
+ "맥박": {
+  "en": "Pulse", "zh": "脉搏", "zh-TW": "脈搏", "ja": "脈拍", "es": "Pulso", "hi": "नाड़ी",
+  "fr": "Pouls", "de": "Puls", "pt": "Pulso", "it": "Polso", "ru": "Пульс", "uk": "Пульс",
+  "ar": "النبض", "fa": "نبض", "th": "ชีพจร", "vi": "Mạch", "id": "Denyut Nadi", "tr": "Nabız",
+  "nl": "Pols", "pl": "Puls", "sv": "Puls", "da": "Puls", "nb": "Puls", "fi": "Pulssi",
+  "cs": "Puls", "hu": "Pulzus", "ro": "Puls"
+ },
+ "혈당": {
+  "en": "Blood Sugar", "zh": "血糖", "zh-TW": "血糖", "ja": "血糖", "es": "Azúcar en Sangre", "hi": "रक्त शर्करा",
+  "fr": "Glycémie", "de": "Blutzucker", "pt": "Açúcar no Sangue", "it": "Glicemia", "ru": "Сахар в крови", "uk": "Цукор у крові",
+  "ar": "سكر الدم", "fa": "قند خون", "th": "น้ำตาลในเลือด", "vi": "Đường Huyết", "id": "Gula Darah", "tr": "Kan Şekeri",
+  "nl": "Bloedsuiker", "pl": "Cukier we krwi", "sv": "Blodsocker", "da": "Blodsukker", "nb": "Blodsukker", "fi": "Verensokeri",
+  "cs": "Krevní cukr", "hu": "Vércukor", "ro": "Glicemie"
+ },
+ "체중": {
+  "en": "Weight", "zh": "体重", "zh-TW": "體重", "ja": "体重", "es": "Peso", "hi": "वज़न",
+  "fr": "Poids", "de": "Gewicht", "pt": "Peso", "it": "Peso", "ru": "Вес", "uk": "Вага",
+  "ar": "الوزن", "fa": "وزن", "th": "น้ำหนัก", "vi": "Cân Nặng", "id": "Berat Badan", "tr": "Kilo",
+  "nl": "Gewicht", "pl": "Waga", "sv": "Vikt", "da": "Vægt", "nb": "Vekt", "fi": "Paino",
+  "cs": "Hmotnost", "hu": "Testsúly", "ro": "Greutate"
+ },
+ "체온": {
+  "en": "Body Temperature", "zh": "体温", "zh-TW": "體溫", "ja": "体温", "es": "Temperatura Corporal", "hi": "शरीर का तापमान",
+  "fr": "Température Corporelle", "de": "Körpertemperatur", "pt": "Temperatura Corporal", "it": "Temperatura Corporea", "ru": "Температура тела", "uk": "Температура тіла",
+  "ar": "درجة حرارة الجسم", "fa": "دمای بدن", "th": "อุณหภูมิร่างกาย", "vi": "Nhiệt Độ Cơ Thể", "id": "Suhu Tubuh", "tr": "Vücut Sıcaklığı",
+  "nl": "Lichaamstemperatuur", "pl": "Temperatura Ciała", "sv": "Kroppstemperatur", "da": "Kropstemperatur", "nb": "Kroppstemperatur", "fi": "Kehon Lämpötila",
+  "cs": "Tělesná Teplota", "hu": "Testhőmérséklet", "ro": "Temperatura Corpului"
+ },
+ "기록 저장": {
+  "en": "Save Record", "zh": "保存记录", "zh-TW": "保存記錄", "ja": "記録を保存", "es": "Guardar Registro", "hi": "रिकॉर्ड सहेजें",
+  "fr": "Enregistrer", "de": "Speichern", "pt": "Salvar Registro", "it": "Salva Registro", "ru": "Сохранить запись", "uk": "Зберегти запис",
+  "ar": "حفظ السجل", "fa": "ذخیره ثبت", "th": "บันทึก", "vi": "Lưu Bản Ghi", "id": "Simpan Catatan", "tr": "Kaydı Kaydet",
+  "nl": "Record Opslaan", "pl": "Zapisz Zapis", "sv": "Spara Post", "da": "Gem Post", "nb": "Lagre Post", "fi": "Tallenna Merkintä",
+  "cs": "Uložit Záznam", "hu": "Rekord Mentése", "ro": "Salvează Înregistrarea"
+ },
+ "기록하기": {
+  "en": "Add a Record", "zh": "添加记录", "zh-TW": "添加記錄", "ja": "記録する", "es": "Añadir Registro", "hi": "रिकॉर्ड जोड़ें",
+  "fr": "Ajouter un Enregistrement", "de": "Eintrag Hinzufügen", "pt": "Adicionar Registro", "it": "Aggiungi Registro", "ru": "Добавить запись", "uk": "Додати запис",
+  "ar": "إضافة سجل", "fa": "افزودن رکورد", "th": "เพิ่มบันทึก", "vi": "Thêm Bản Ghi", "id": "Tambah Catatan", "tr": "Kayıt Ekle",
+  "nl": "Record Toevoegen", "pl": "Dodaj Zapis", "sv": "Lägg Till Post", "da": "Tilføj Post", "nb": "Legg Til Post", "fi": "Lisää Merkintä",
+  "cs": "Přidat Záznam", "hu": "Rekord Hozzáadása", "ro": "Adaugă Înregistrare"
+ },
+ "항목별 기록": {
+  "en": "Records by Type", "zh": "按项目查看", "zh-TW": "按項目查看", "ja": "項目別記録", "es": "Registros por Tipo", "hi": "प्रकार अनुसार रिकॉर्ड",
+  "fr": "Registres par Type", "de": "Einträge nach Typ", "pt": "Registros por Tipo", "it": "Registri per Tipo", "ru": "Записи по типам", "uk": "Записи за типами",
+  "ar": "السجلات حسب النوع", "fa": "رکوردها بر اساس نوع", "th": "บันทึกตามประเภท", "vi": "Bản Ghi Theo Loại", "id": "Catatan per Jenis", "tr": "Türe Göre Kayıtlar",
+  "nl": "Records per Type", "pl": "Zapisy według Typu", "sv": "Poster per Typ", "da": "Poster efter Type", "nb": "Poster etter Type", "fi": "Merkinnät Tyypeittäin",
+  "cs": "Záznamy podle Typu", "hu": "Rekordok Típus Szerint", "ro": "Înregistrări pe Tipuri"
+ },
+ "요약 내보내기": {
+  "en": "Export Summary", "zh": "导出摘要", "zh-TW": "匯出摘要", "ja": "まとめを出力", "es": "Exportar Resumen", "hi": "सारांश निर्यात करें",
+  "fr": "Exporter le Résumé", "de": "Zusammenfassung Exportieren", "pt": "Exportar Resumo", "it": "Esporta Riepilogo", "ru": "Экспорт сводки", "uk": "Експорт підсумку",
+  "ar": "تصدير الملخص", "fa": "خروجی خلاصه", "th": "ส่งออกสรุป", "vi": "Xuất Tóm Tắt", "id": "Ekspor Ringkasan", "tr": "Özeti Dışa Aktar",
+  "nl": "Samenvatting Exporteren", "pl": "Eksportuj Podsumowanie", "sv": "Exportera Sammanfattning", "da": "Eksportér Resumé", "nb": "Eksporter Sammendrag", "fi": "Vie Yhteenveto",
+  "cs": "Exportovat Souhrn", "hu": "Összegzés Exportálása", "ro": "Exportă Rezumatul"
+ },
+ "고급 설정": {
+  "en": "Advanced Settings", "zh": "高级设置", "zh-TW": "進階設定", "ja": "詳細設定", "es": "Ajustes Avanzados", "hi": "उन्नत सेटिंग",
+  "fr": "Paramètres Avancés", "de": "Erweiterte Einstellungen", "pt": "Configurações Avançadas", "it": "Impostazioni Avanzate", "ru": "Дополнительные настройки", "uk": "Додаткові налаштування",
+  "ar": "إعدادات متقدمة", "fa": "تنظیمات پیشرفته", "th": "การตั้งค่าขั้นสูง", "vi": "Cài Đặt Nâng Cao", "id": "Pengaturan Lanjutan", "tr": "Gelişmiş Ayarlar",
+  "nl": "Geavanceerde Instellingen", "pl": "Ustawienia Zaawansowane", "sv": "Avancerade Inställningar", "da": "Avancerede Indstillinger", "nb": "Avanserte Innstillinger", "fi": "Lisäasetukset",
+  "cs": "Pokročilá Nastavení", "hu": "Speciális Beállítások", "ro": "Setări Avansate"
+ }
+});
+NX_I18N_ADD({
+ "홈페이지": {"en": "Homepage", "zh": "主页", "zh-TW": "主頁", "ja": "ホームページ", "es": "Página principal", "hi": "मुखपृष्ठ"},
+ "혈압·맥박·혈당·체중·체온을 이 전화기에 기록합니다.": {"en": "Record blood pressure, pulse, blood sugar, weight and body temperature on this phone.", "zh": "在此手机上记录血压、脉搏、血糖、体重和体温。", "zh-TW": "在此手機上記錄血壓、脈搏、血糖、體重和體溫。", "ja": "血圧・脈拍・血糖・体重・体温をこの電話に記録します。", "es": "Registra la presión arterial, el pulso, el azúcar en sangre, el peso y la temperatura corporal en este teléfono.", "hi": "इस फ़ोन पर रक्तचाप, नाड़ी, रक्त शर्करा, वज़न और शरीर का तापमान दर्ज करें।"},
+ "이 도구는 기록을 쌓는 도구입니다. 진단이나 조언은 하지 않으며, 기록은 이 기기 안에만 저장됩니다.": {"en": "This tool keeps records. It does not diagnose or give advice, and records are stored only on this device.", "zh": "此工具用于保存记录。它不做诊断或提供建议，记录仅存储在此设备上。", "zh-TW": "此工具用於保存記錄。它不做診斷或提供建議，記錄僅存儲在此設備上。", "ja": "このツールは記録を残すためのものです。診断や助言は行わず、記録はこの端末内にのみ保存されます。", "es": "Esta herramienta guarda registros. No diagnostica ni da consejos, y los registros se guardan solo en este dispositivo.", "hi": "यह उपकरण रिकॉर्ड रखता है। यह निदान या सलाह नहीं देता, और रिकॉर्ड केवल इस डिवाइस पर संग्रहीत होते हैं।"},
+ "수축기": {"en": "Systolic", "zh": "收缩压", "zh-TW": "收縮壓", "ja": "収縮期", "es": "Sistólica", "hi": "सिस्टोलिक"},
+ "이완기": {"en": "Diastolic", "zh": "舒张压", "zh-TW": "舒張壓", "ja": "拡張期", "es": "Diastólica", "hi": "डायस्टोलिक"},
+ "단위": {"en": "Unit", "zh": "单位", "zh-TW": "單位", "ja": "単位", "es": "Unidad", "hi": "इकाई"},
+ "회/분": {"en": "/min", "zh": "次/分", "zh-TW": "次/分", "ja": "回/分", "es": "/min", "hi": "/मिनट"},
+ "날짜와 시간": {"en": "Date and time", "zh": "日期和时间", "zh-TW": "日期和時間", "ja": "日付と時刻", "es": "Fecha y hora", "hi": "तिथि और समय"},
+ "메모 (선택)": {"en": "Memo (optional)", "zh": "备注（可选）", "zh-TW": "備註（可選）", "ja": "メモ（任意）", "es": "Nota (opcional)", "hi": "मेमो (वैकल्पिक)"},
+ "짧은 메모": {"en": "Short memo", "zh": "简短备注", "zh-TW": "簡短備註", "ja": "短いメモ", "es": "Nota breve", "hi": "छोटा मेमो"},
+ "최근 기록": {"en": "Latest", "zh": "最近记录", "zh-TW": "最近記錄", "ja": "最新の記録", "es": "Último registro", "hi": "नवीनतम"},
+ "전체 평균": {"en": "Overall average", "zh": "总平均", "zh-TW": "總平均", "ja": "全体の平均", "es": "Promedio total", "hi": "कुल औसत"},
+ "최근 30일 평균": {"en": "Last 30 days average", "zh": "最近30天平均", "zh-TW": "最近30天平均", "ja": "最近30日の平均", "es": "Promedio de los últimos 30 días", "hi": "पिछले 30 दिनों का औसत"},
+ "기록 횟수": {"en": "Records", "zh": "记录次数", "zh-TW": "記錄次數", "ja": "記録回数", "es": "Número de registros", "hi": "रिकॉर्ड संख्या"},
+ "아직 기록이 없습니다.": {"en": "No records yet.", "zh": "尚无记录。", "zh-TW": "尚無記錄。", "ja": "まだ記録がありません。", "es": "Aún no hay registros.", "hi": "अभी तक कोई रिकॉर्ड नहीं है।"},
+ "기록이 2개 이상이면 추이 그래프가 나타납니다.": {"en": "A trend chart appears once there are 2 or more records.", "zh": "有2条以上记录时将显示趋势图。", "zh-TW": "有2筆以上記錄時將顯示趨勢圖。", "ja": "記録が2件以上になると推移グラフが表示されます。", "es": "El gráfico de tendencia aparece cuando hay 2 o más registros.", "hi": "2 या अधिक रिकॉर्ड होने पर रुझान चार्ट दिखाई देगा।"},
+ "지우기": {"en": "Delete", "zh": "删除", "zh-TW": "刪除", "ja": "削除", "es": "Eliminar", "hi": "हटाएँ"},
+ "이 기록을 지울까요?": {"en": "Delete this record?", "zh": "要删除此记录吗？", "zh-TW": "要刪除此記錄嗎？", "ja": "この記録を削除しますか？", "es": "¿Eliminar este registro?", "hi": "यह रिकॉर्ड हटाएँ?"},
+ "값을 입력해 주세요.": {"en": "Please enter a value.", "zh": "请输入数值。", "zh-TW": "請輸入數值。", "ja": "値を入力してください。", "es": "Introduce un valor.", "hi": "कृपया मान दर्ज करें।"},
+ "입력한 값을 확인해 주세요.": {"en": "Please check the value you entered.", "zh": "请检查输入的数值。", "zh-TW": "請檢查輸入的數值。", "ja": "入力した値を確認してください。", "es": "Comprueba el valor introducido.", "hi": "कृपया दर्ज किया गया मान जाँचें।"},
+ "저장했습니다.": {"en": "Saved.", "zh": "已保存。", "zh-TW": "已儲存。", "ja": "保存しました。", "es": "Guardado.", "hi": "सहेजा गया।"},
+ "기간을 골라 기록 요약을 만듭니다. 병원에 가져갈 때 쓸 수 있습니다.": {"en": "Choose a period to build a summary of your records. You can take it to a hospital visit.", "zh": "选择期间以生成记录摘要，可在去医院时使用。", "zh-TW": "選擇期間以生成記錄摘要，可在去醫院時使用。", "ja": "期間を選んで記録のまとめを作ります。病院へ持って行くときに使えます。", "es": "Elige un período para crear un resumen de tus registros. Puedes llevarlo al hospital.", "hi": "अपने रिकॉर्ड का सारांश बनाने के लिए अवधि चुनें। आप इसे अस्पताल ले जा सकते हैं।"},
+ "기간": {"en": "Period", "zh": "期间", "zh-TW": "期間", "ja": "期間", "es": "Período", "hi": "अवधि"},
+ "최근 7일": {"en": "Last 7 days", "zh": "最近7天", "zh-TW": "最近7天", "ja": "最近7日", "es": "Últimos 7 días", "hi": "पिछले 7 दिन"},
+ "최근 30일": {"en": "Last 30 days", "zh": "最近30天", "zh-TW": "最近30天", "ja": "最近30日", "es": "Últimos 30 días", "hi": "पिछले 30 दिन"},
+ "최근 90일": {"en": "Last 90 days", "zh": "最近90天", "zh-TW": "最近90天", "ja": "最近90日", "es": "Últimos 90 días", "hi": "पिछले 90 दिन"},
+ "전체 기간": {"en": "All time", "zh": "全部期间", "zh-TW": "全部期間", "ja": "全期間", "es": "Todo el período", "hi": "पूरी अवधि"},
+ "요약 만들기": {"en": "Make Summary", "zh": "生成摘要", "zh-TW": "生成摘要", "ja": "まとめを作る", "es": "Crear resumen", "hi": "सारांश बनाएँ"},
+ "요약": {"en": "Summary", "zh": "摘要", "zh-TW": "摘要", "ja": "まとめ", "es": "Resumen", "hi": "सारांश"},
+ "여기에 요약이 나타납니다.": {"en": "The summary appears here.", "zh": "摘要将显示在此处。", "zh-TW": "摘要將顯示在此處。", "ja": "ここにまとめが表示されます。", "es": "El resumen aparece aquí.", "hi": "सारांश यहाँ दिखाई देगा।"},
+ "복사": {"en": "Copy", "zh": "复制", "zh-TW": "複製", "ja": "コピー", "es": "Copiar", "hi": "कॉपी करें"},
+ "인쇄": {"en": "Print", "zh": "打印", "zh-TW": "列印", "ja": "印刷", "es": "Imprimir", "hi": "प्रिंट करें"},
+ "공유": {"en": "Share", "zh": "分享", "zh-TW": "分享", "ja": "共有", "es": "Compartir", "hi": "साझा करें"},
+ "복사했습니다.": {"en": "Copied.", "zh": "已复制。", "zh-TW": "已複製。", "ja": "コピーしました。", "es": "Copiado.", "hi": "कॉपी किया गया।"},
+ "먼저 요약을 만들어 주세요.": {"en": "Please make a summary first.", "zh": "请先生成摘要。", "zh-TW": "請先生成摘要。", "ja": "先にまとめを作ってください。", "es": "Primero crea un resumen.", "hi": "कृपया पहले सारांश बनाएँ।"},
+ "이 기기에 저장된 건강 기록 전체를 지웁니다. 지운 기록은 되돌릴 수 없습니다.": {"en": "This erases all health records stored on this device. Erased records cannot be restored.", "zh": "这将删除存储在此设备上的所有健康记录。删除的记录无法恢复。", "zh-TW": "這將刪除存儲在此設備上的所有健康記錄。刪除的記錄無法恢復。", "ja": "この端末に保存された健康記録をすべて消します。消した記録は元に戻せません。", "es": "Esto borra todos los registros de salud guardados en este dispositivo. Los registros borrados no se pueden recuperar.", "hi": "इससे इस डिवाइस पर संग्रहीत सभी स्वास्थ्य रिकॉर्ड मिट जाएँगे। मिटाए गए रिकॉर्ड वापस नहीं लाए जा सकते।"},
+ "모든 기록을 지우는 것에 동의합니다": {"en": "I agree to erase all records", "zh": "我同意删除所有记录", "zh-TW": "我同意刪除所有記錄", "ja": "すべての記録を消すことに同意します", "es": "Acepto borrar todos los registros", "hi": "मैं सभी रिकॉर्ड मिटाने के लिए सहमत हूँ"},
+ "전체 삭제": {"en": "Erase All", "zh": "全部删除", "zh-TW": "全部刪除", "ja": "すべて削除", "es": "Borrar todo", "hi": "सभी मिटाएँ"},
+ "정말로 모든 기록을 지울까요?": {"en": "Really erase all records?", "zh": "真的要删除所有记录吗？", "zh-TW": "真的要刪除所有記錄嗎？", "ja": "本当にすべての記録を消しますか？", "es": "¿Borrar realmente todos los registros?", "hi": "क्या आप सचमुच सभी रिकॉर्ड मिटाना चाहते हैं?"},
+ "모든 기록을 지웠습니다.": {"en": "All records were erased.", "zh": "已删除所有记录。", "zh-TW": "已刪除所有記錄。", "ja": "すべての記録を消しました。", "es": "Se borraron todos los registros.", "hi": "सभी रिकॉर्ड मिटा दिए गए।"},
+ "넥서스 건강 장부는 기록 도구입니다. 진단·치료·조언을 하지 않습니다.": {"en": "Nexus Health Ledger is a record-keeping tool. It does not diagnose, treat, or give advice.", "zh": "Nexus 健康账本是一款记录工具。它不做诊断、治疗或提供建议。", "zh-TW": "Nexus 健康帳本是一款記錄工具。它不做診斷、治療或提供建議。", "ja": "Nexus 健康記録帳は記録ツールです。診断・治療・助言は行いません。", "es": "Nexus Registro de Salud es una herramienta de registro. No diagnostica, trata ni da consejos.", "hi": "Nexus स्वास्थ्य बही एक रिकॉर्ड रखने का उपकरण है। यह निदान, उपचार या सलाह नहीं देता।"},
+ "기록은 서버로 전송되지 않고 이 기기 안에만 저장됩니다.": {"en": "Records are not sent to any server and are stored only on this device.", "zh": "记录不会发送到任何服务器，仅存储在此设备上。", "zh-TW": "記錄不會發送到任何服務器，僅存儲在此設備上。", "ja": "記録はサーバーに送信されず、この端末内にのみ保存されます。", "es": "Los registros no se envían a ningún servidor y se guardan solo en este dispositivo.", "hi": "रिकॉर्ड किसी सर्वर पर नहीं भेजे जाते और केवल इस डिवाइस पर संग्रहीत होते हैं।"}
+});
+
+</script>
+<script>if(window.NX_I18N_ADD)NX_I18N_ADD({"살 것을 적어 두고, 산 것은 표시하는 목록입니다.":{en:"A list for writing down what to buy and marking what is bought.",zh:"记录要买的东西并标记已买的清单。",ja:"買うものを書き、買ったものに印をつけるリストです。",es:"Una lista para anotar qué comprar y marcar lo comprado.",hi:"क्या खरीदना है लिखने और खरीदा हुआ चिह्नित करने की सूची।"},
+"목록에 추가":{en:"Add to list",zh:"添加到清单",ja:"リストに追加",es:"Añadir a la lista",hi:"सूची में जोड़ें"},
+"장보기 목록":{en:"Shopping list",zh:"购物清单",ja:"買い物リスト",es:"Lista de compras",hi:"खरीदारी सूची"}});</script>
+</body>
+</html>
